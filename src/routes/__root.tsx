@@ -23,7 +23,7 @@ function Root() {
 					<UnderConstruction />
 				</div>
 
-				<Footer showLinks={false} />
+				<Footer />
 			</div>
 		)
 	}

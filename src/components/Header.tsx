@@ -63,6 +63,8 @@ function RouteLinks({ className, onClose, ...props }: RouteLinksProps) {
 			{...props}
 		>
 			<ListNavLink to="/" text={'Home'} onClick={onClose} />
+			<ListNavLink to="/props" text={'Props'} onClick={onClose} />
+			<ListNavLink to="/messages" text={'Messages'} onClick={onClose} />
 		</ul>
 	)
 }

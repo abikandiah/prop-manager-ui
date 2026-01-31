@@ -5,7 +5,7 @@ interface FooterProps {
     showLinks?: boolean;
 }
 
-function Footer({ showLinks = true }: FooterProps) {
+function Footer({ showLinks = false }: FooterProps) {
     return (
         <footer className="mt-auto px-3">
             <div className="py-8 px-6 mt-18">
@@ -23,7 +23,7 @@ function Footer({ showLinks = true }: FooterProps) {
                     }
                     <span className="text-sm text-gray-500">
                         ©
-                        2025
+                        2026
                         Abilaesh Kandiah. All rights reserved.
                     </span>
                 </div>

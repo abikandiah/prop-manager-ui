@@ -19,7 +19,7 @@ function Root() {
 	if (!config.constructionDisabled) {
 		return (
 			<div className="flex flex-col h-full">
-				<div className='flex flex-grow justify-center'>
+				<div className='flex grow justify-center'>
 					<UnderConstruction />
 				</div>
 

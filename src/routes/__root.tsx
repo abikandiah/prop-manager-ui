@@ -1,58 +1,43 @@
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
+import { UnderConstruction } from '@abumble/design-system/components/UnderConstruction';
+import { Outlet, createRootRouteWithContext } from '@tanstack/react-router';
+import type { QueryClient } from '@tanstack/react-query';
+import Footer from '@/components/Footer';
+import Header from '@/components/Header';
+import { config } from '@/config';
 
-import Header from '../components/Header'
 
-import appCss from '../styles.css?url'
-
-export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      {
-        charSet: 'utf-8',
-      },
-      {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
-      },
-      {
-        title: 'TanStack Start Starter',
-      },
-    ],
-    links: [
-      {
-        rel: 'stylesheet',
-        href: appCss,
-      },
-    ],
-  }),
-
-  shellComponent: RootDocument,
-})
-
-function RootDocument({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <Header />
-        {children}
-        <TanStackDevtools
-          config={{
-            position: 'bottom-right',
-          }}
-          plugins={[
-            {
-              name: 'Tanstack Router',
-              render: <TanStackRouterDevtoolsPanel />,
-            },
-          ]}
-        />
-        <Scripts />
-      </body>
-    </html>
-  )
+interface MyRouterContext {
+	queryClient: QueryClient
 }
+
+export const Route = createRootRouteWithContext<MyRouterContext>()({
+	component: Root
+});
+
+function Root() {
+
+	if (!config.constructionDisabled) {
+		return (
+			<div className="flex flex-col h-full">
+				<div className='flex flex-grow justify-center'>
+					<UnderConstruction />
+				</div>
+
+				<Footer showLinks={false} />
+			</div>
+		)
+	}
+
+	return (
+		<div className="flex flex-col h-full">
+			<Header />
+
+			<main className="w-full mt-10 px-3">
+				<Outlet />
+			</main>
+
+			<Footer />
+		</div>
+	)
+}
+

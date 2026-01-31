@@ -1,0 +1,62 @@
+---
+description: Frontend design system, theme, typography, and package architecture—portable for similar-themed UIs
+alwaysApply: true
+---
+
+# Design System & Frontend Architecture
+
+Use this rule to keep styling and tooling consistent. No business logic; safe to reuse in other projects.
+
+## @abumble/design-system
+
+This project uses **@abumble/design-system** for shared components, base styles/themes, and utilities. Use it the same way in this codebase and when recreating this setup elsewhere.
+
+- **Styles & theme**: Import the package’s styles first in the app’s main CSS (e.g. `@import '@abumble/design-system/styles.css'`). Use Tailwind v4 `@source` pointing at the package (e.g. `@source "../node_modules/@abumble/design-system"`) so Tailwind can scan it. The design-system provides base theme variables and semantic classes (`center-page`, `p-text`, `text-link`, `nav-link`, `header`, `card`, `image-background`, etc.). Override or extend `:root` and `.dark` and `@theme inline` in the app stylesheet as needed.
+- **Tailwind**: Include the design-system’s build output in the Tailwind `content` array (e.g. `./node_modules/@abumble/design-system/dist/**/*.{js,jsx,ts,tsx}`) so classes used by its components are included in the build.
+- **Components**: Prefer components from `@abumble/design-system/components/` (e.g. `Card`, `CardContent`, `Button`, `Banner`, `MessageBanner`, `Sidebar*`, `Popover`, `PopoverContent`, `PopoverTrigger`, `Separator`, `List` / `OrderedList` / `UnorderedList`, `CodeDisplay`, `Skeleton`, `NotFound`, `UnderConstruction`, `ConstructionLanding`). Import by name: `import { Card } from '@abumble/design-system/components/Card'`.
+- **Utils**: Use `cn()` for class merging from `@abumble/design-system/utils`; use other utilities (e.g. `stringToBoolean`) from the same package when needed.
+- **Types**: Use shared types from `@abumble/design-system/types` (e.g. `onClickCallback`) when components or hooks require them.
+- **Adding UI**: Prefer design-system components when they exist. For primitives not in the design-system, add via `pnpx shadcn@latest add <component>` and keep Shadcn config (new-york, zinc, CSS variables) aligned with the design-system theme.
+
+## Theme & color
+
+- **Source**: @abumble/design-system provides the base oklch theme; the app overrides in its own CSS as needed.
+- **Color space**: Use **oklch** for all theme colors (better perceptual uniformity).
+- **Tokens**: Define CSS variables in `:root` and `.dark` for: `--background`, `--foreground`, `--card`, `--card-foreground`, `--popover`, `--primary`, `--primary-foreground`, `--secondary`, `--muted`, `--accent`, `--destructive`, `--border`, `--input`, `--ring`, `--chart-1` through `--chart-5`, and sidebar equivalents.
+- **Radius**: Single `--radius` (e.g. `0.625rem`); derive `--radius-sm/md/lg/xl` via `calc(var(--radius) ± Npx)`.
+- **Dark mode**: Class-based (`darkMode: ["class"]`). Toggle by adding/removing `.dark` on a root element.
+
+## Tailwind
+
+- Use **Tailwind v4** with `@tailwindcss/vite` and `@import 'tailwindcss'` in the main CSS entry.
+- Map theme to Tailwind via `@theme inline { --color-*: var(--*); --radius-*: ... }` so utilities like `bg-background`, `text-foreground`, `rounded-lg` use your tokens.
+- For @abumble/design-system: use `@source` in CSS and include the package’s dist in Tailwind `content` (see @abumble/design-system section above).
+
+## Styles & typography
+
+- **Main CSS**: Import @abumble/design-system styles first; then override or extend `:root` / `.dark` and `@theme inline` in the app stylesheet.
+- **Semantic classes** (provided by @abumble/design-system; override in app CSS if needed):
+  - **Layout**: `center-page` → `mx-auto max-w-screen-xl w-full`.
+  - **Body text**: `p-text` → relaxed line-height, neutral dark text (e.g. `text-gray-900` light / equivalent dark).
+  - **Links**: `text-link` for content links (e.g. blue, hover/visited variants); `nav-link` / `nav-link-active` for nav with underline or weight on active.
+  - **Chrome**: `header` (fixed, full-width, card background, border); `card` (padding, rounded, bg-card, border).
+  - **Decorative**: `image-background` for full-bleed background images; use `@utility` or `@layer components` for one-off utilities.
+- **Fonts**: System font stack for body (e.g. `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, …`); monospace stack for `code`. No hard-coded font versions or CDN URLs.
+
+## Component stack
+
+- **Build**: Vite, React, TypeScript (strict, ESNext, path alias `@/` → `src/`).
+- **Routing**: TanStack Router (file-based routes, optional context for query client etc.).
+- **UI**: Prefer **@abumble/design-system** components (see above). For primitives not in the design-system, use Shadcn UI **new-york** style; **zinc** base color; **CSS variables** on; **lucide-react** for icons; add with `pnpx shadcn@latest add <component>`.
+- **Class merging**: Use `cn()` from `@abumble/design-system/utils` on all composite `className` values.
+- **Variants**: Use **class-variance-authority** (`cva`) for components with size/variant APIs; keep variants in the same file as the component.
+
+## Code style (formatting only)
+
+- Prettier: no semicolons, single quotes, trailing commas, tabs for indentation. Run format/lint from project scripts; do not hard-code formatter or linter versions in this rule.
+
+## Recreating a similar UI elsewhere
+
+- Copy this rule into the other project’s `.cursor/rules/`.
+- Use **@abumble/design-system** for components, styles, theme base, and `cn`/utils as in this project. Wire styles with `@import` and `@source`, include the package in Tailwind `content`, and override theme in app CSS as needed.
+- Ensure Tailwind v4, `@theme inline`, and the same semantic token names and semantic class patterns (or equivalents). Add Shadcn with new-york + zinc + CSS variables for primitives not in the design-system. Align fonts and layout utilities (`center-page`, `p-text`, `nav-link`, etc.) to match the intended look and structure.

@@ -1,0 +1,35 @@
+{
+	"name": "Prop Manager UI",
+	"image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
+	"features": {
+		"ghcr.io/devcontainers/features/pnpm:2": {}
+	},
+	"forwardPorts": [
+		3000
+	],
+	"portsAttributes": {
+		"3000": {
+			"label": "Vite dev server",
+			"onAutoForward": "notify"
+		}
+	},
+	"postCreateCommand": "pnpm install",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"dbaeumer.vscode-eslint",
+				"esbenp.prettier-vscode",
+				"bradlc.vscode-tailwindcss",
+				"dsznajder.es7-react-js-snippets"
+			],
+			"settings": {
+				"editor.defaultFormatter": "esbenp.prettier-vscode",
+				"editor.formatOnSave": true,
+				"editor.codeActionsOnSave": {
+					"source.fixAll.eslint": "explicit"
+				}
+			}
+		}
+	},
+	"remoteUser": "node"
+}

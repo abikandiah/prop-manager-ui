@@ -7,7 +7,7 @@ import {
 } from '@abumble/design-system/components/Popover'
 import { cn } from '@abumble/design-system/utils'
 import { useTheme } from '@/contexts/theme'
-import { Link } from '@tanstack/react-router'
+import { Link, useRouterState } from '@tanstack/react-router'
 import { Bell, LogOut, Moon, Settings, Sun, UserRound } from 'lucide-react'
 import { useState } from 'react'
 
@@ -21,7 +21,7 @@ function Header() {
 				</span>
 			</Link>
 
-			<div className="flex items-center">
+			<div className="flex items-center gap-1">
 				<ThemeToggle />
 				<Button
 					type="button"
@@ -68,6 +68,11 @@ function UserProfile() {
 	const [open, setOpen] = useState(false)
 	const close = () => setOpen(false)
 
+	const pathname = useRouterState({ select: (s) => s.location.pathname })
+	const isAccountPage = userMenuLinks.some(
+		({ to }) => pathname === to || pathname.startsWith(to + '/'),
+	)
+
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger
@@ -75,6 +80,8 @@ function UserProfile() {
 					'flex items-center justify-center size-9 rounded-full',
 					'hover:bg-muted hover:text-foreground',
 					'ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+					isAccountPage &&
+						'ring-1 ring-ring ring-offset-1 ring-offset-background bg-muted/80',
 				)}
 				aria-label="User menu"
 			>

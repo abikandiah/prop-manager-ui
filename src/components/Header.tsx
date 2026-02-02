@@ -56,8 +56,8 @@ function ThemeToggle() {
 	)
 }
 
-const userMenuLinkClass =
-	'flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted text-foreground text-sm'
+const userMenuLinkClass = `flex items-center gap-2 rounded p-2 h-8 w-full text-left text-sm outline-hidden ring-ring 
+hover:bg-muted hover:text-foreground focus-visible:ring-2 text-foreground [&>svg]:size-4 [&>svg]:shrink-0`
 
 const userMenuLinks = [
 	{ to: '/profile', label: 'Profile', icon: UserRound },
@@ -81,20 +81,18 @@ function UserProfile() {
 				<UserRound className="size-5" />
 			</PopoverTrigger>
 			<PopoverContent align="end" className="w-52 p-0 mt-2">
-				<div className="px-3 py-2 border-b border-border">
-					<p className="font-medium truncate text-foreground">Signed in</p>
-					<p className="text-xs text-muted-foreground truncate">
+				<div className="border-b border-border px-3 py-2">
+					<p className="truncate text-sm font-semibold text-foreground">
+						Example User
+					</p>
+					<p className="truncate text-xs text-muted-foreground">
 						user@example.com
 					</p>
 				</div>
-				<ul className="py-1.5">
+				<ul className="flex flex-col gap-1 p-2">
 					{userMenuLinks.map(({ to, label, icon: Icon }) => (
 						<li key={to}>
-							<Link
-								to={to}
-								className={cn(userMenuLinkClass, 'w-full px-3')}
-								onClick={close}
-							>
+							<Link to={to} className={userMenuLinkClass} onClick={close}>
 								<Icon className="size-4 shrink-0" />
 								{label}
 							</Link>
@@ -104,7 +102,7 @@ function UserProfile() {
 						<Button
 							type="button"
 							variant="ghost"
-							className={cn(userMenuLinkClass, 'w-full justify-start px-3')}
+							className={cn(userMenuLinkClass, 'justify-start')}
 							onClick={close}
 							aria-label="Sign out"
 						>

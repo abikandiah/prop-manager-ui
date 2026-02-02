@@ -26,7 +26,7 @@ This project uses **@abumble/design-system** for shared components, base styles/
 - **Radius**: Single `--radius` (e.g. `0.625rem`); derive `--radius-sm/md/lg/xl` via `calc(var(--radius) ± Npx)`.
 - **Dark mode**: Class-based (`darkMode: ["class"]`). Toggle by adding/removing `.dark` on `document.documentElement` (e.g. `<html>`).
 - **Theme state**: Use the app’s `ThemeProvider` and `useTheme()` from `@/contexts/theme`. Stored preference: `localStorage` key `theme` (`'light' | 'dark' | 'system'`). Resolve `system` via `prefers-color-scheme`; apply by setting `.dark` on the document root. Wrap the app in `ThemeProvider` in `main.tsx`. Include a small inline script in `index.html` (before React) that reads `theme` from localStorage and sets the class on `document.documentElement` so the first paint matches the saved theme (no flash).
-- **Dark-mode overrides**: The design-system’s `.header`, `.card`, and `border-container` use hardcoded `border-stone-300/80`. Override in app CSS so borders match in dark mode: `.dark .header`, `.dark .card`, `.dark .border-container { border-color: var(--border); }`. In `.dark`, set `--ring` to the same value as `--border` so focus rings/outlines match the sidebar border.
+- **Dark-mode overrides**: The design-system’s `border-container` uses `border-border` (theme token), so `.header`, `.card`, and other consumers adapt in dark mode without app overrides. In `.dark`, set `--ring` to the same value as `--border` so focus rings/outlines match the sidebar border.
 
 ## Tailwind
 

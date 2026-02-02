@@ -24,7 +24,9 @@ This project uses **@abumble/design-system** for shared components, base styles/
 - **Color space**: Use **oklch** for all theme colors (better perceptual uniformity).
 - **Tokens**: Define CSS variables in `:root` and `.dark` for: `--background`, `--foreground`, `--card`, `--card-foreground`, `--popover`, `--primary`, `--primary-foreground`, `--secondary`, `--muted`, `--accent`, `--destructive`, `--border`, `--input`, `--ring`, `--chart-1` through `--chart-5`, and sidebar equivalents.
 - **Radius**: Single `--radius` (e.g. `0.625rem`); derive `--radius-sm/md/lg/xl` via `calc(var(--radius) ± Npx)`.
-- **Dark mode**: Class-based (`darkMode: ["class"]`). Toggle by adding/removing `.dark` on a root element.
+- **Dark mode**: Class-based (`darkMode: ["class"]`). Toggle by adding/removing `.dark` on `document.documentElement` (e.g. `<html>`).
+- **Theme state**: Use the app’s `ThemeProvider` and `useTheme()` from `@/contexts/theme`. Stored preference: `localStorage` key `theme` (`'light' | 'dark' | 'system'`). Resolve `system` via `prefers-color-scheme`; apply by setting `.dark` on the document root. Wrap the app in `ThemeProvider` in `main.tsx`. Include a small inline script in `index.html` (before React) that reads `theme` from localStorage and sets the class on `document.documentElement` so the first paint matches the saved theme (no flash).
+- **Dark-mode overrides**: The design-system’s `.header`, `.card`, and `border-container` use hardcoded `border-stone-300/80`. Override in app CSS so borders match in dark mode: `.dark .header`, `.dark .card`, `.dark .border-container { border-color: var(--border); }`. In `.dark`, set `--ring` to the same value as `--border` so focus rings/outlines match the sidebar border.
 
 ## Tailwind
 
@@ -41,6 +43,12 @@ This project uses **@abumble/design-system** for shared components, base styles/
   - **Links**: `text-link` for content links (e.g. blue, hover/visited variants); `nav-link` / `nav-link-active` for nav with underline or weight on active.
   - **Chrome**: `header` (fixed, full-width, card background, border); `card` (padding, rounded, bg-card, border).
   - **Decorative**: `image-background` for full-bleed background images; use `@utility` or `@layer components` for one-off utilities.
+- **Text colors**: Use semantic tokens for headings and body text so they adapt in dark mode. Prefer `text-foreground` for primary headings and `text-muted-foreground` for descriptions/secondary text. Do not use hardcoded grays (e.g. `text-gray-900`, `text-gray-700`) for page-level content.
+
+## Navigation & account
+
+- **Sidebar**: Reserved for main app navigation (e.g. Home, Props, Messages). Do not put Settings in the sidebar.
+- **Profile & Settings**: Profile = identity (`/profile`). Settings = app preferences (`/settings`). Expose Profile and Settings only in the user avatar dropdown (header). Theme toggle lives in the header to the left of Notifications (sun/moon icon, toggles light/dark).
 - **Fonts**: System font stack for body (e.g. `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, …`); monospace stack for `code`. No hard-coded font versions or CDN URLs.
 
 ## Component stack
@@ -60,3 +68,4 @@ This project uses **@abumble/design-system** for shared components, base styles/
 - Copy this rule into the other project’s `.cursor/rules/`.
 - Use **@abumble/design-system** for components, styles, theme base, and `cn`/utils as in this project. Wire styles with `@import` and `@source`, include the package in Tailwind `content`, and override theme in app CSS as needed.
 - Ensure Tailwind v4, `@theme inline`, and the same semantic token names and semantic class patterns (or equivalents). Add Shadcn with new-york + zinc + CSS variables for primitives not in the design-system. Align fonts and layout utilities (`center-page`, `p-text`, `nav-link`, etc.) to match the intended look and structure.
+- Replicate theme: `ThemeProvider` + `useTheme()` syncing to `document.documentElement` and localStorage, inline script in `index.html` for no flash, and `.dark .header` / `.dark .card` / `.dark .border-container` + `--ring` overrides in dark mode. Use semantic text tokens (`text-foreground`, `text-muted-foreground`) for page content.

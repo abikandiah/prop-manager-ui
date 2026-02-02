@@ -8,6 +8,7 @@ import * as TanStackQueryProvider from './integrations/tanstack-query/root-provi
 import { routeTree } from './routeTree.gen'
 
 import { NotFound } from './components/NotFound.tsx'
+import { ThemeProvider } from './contexts/theme'
 import reportWebVitals from './reportWebVitals'
 import './styles.css'
 
@@ -23,7 +24,7 @@ const router = createRouter({
 	scrollRestoration: true,
 	defaultStructuralSharing: true,
 	defaultPreloadStaleTime: 0,
-	defaultNotFoundComponent: NotFound
+	defaultNotFoundComponent: NotFound,
 })
 
 // Register the router instance for type safety
@@ -40,9 +41,11 @@ if (rootElement && !rootElement.innerHTML) {
 	const root = createRoot(rootElement)
 	root.render(
 		<StrictMode>
-			<TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
-				<RouterProvider router={router} />
-			</TanStackQueryProvider.Provider>
+			<ThemeProvider>
+				<TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
+					<RouterProvider router={router} />
+				</TanStackQueryProvider.Provider>
+			</ThemeProvider>
 		</StrictMode>,
 	)
 }

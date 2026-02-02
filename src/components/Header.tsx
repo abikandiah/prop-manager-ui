@@ -1,104 +1,121 @@
-import { Popover, PopoverContent, PopoverTrigger } from "@abumble/design-system/components/Popover";
-import { cn } from "@abumble/design-system/utils";
-import { Link  } from "@tanstack/react-router";
-import { Menu } from "lucide-react";
-import { useState } from "react";
-import type {LinkComponentProps} from "@tanstack/react-router";
-import type { onClickCallback } from "@abumble/design-system/types";
-import bee from "@/assets/bee.svg";
-
+import bee from '@/assets/bee.svg'
+import { Button } from '@abumble/design-system/components/Button'
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from '@abumble/design-system/components/Popover'
+import { cn } from '@abumble/design-system/utils'
+import { useTheme } from '@/contexts/theme'
+import { Link } from '@tanstack/react-router'
+import { Bell, LogOut, Moon, Settings, Sun, UserRound } from 'lucide-react'
+import { useState } from 'react'
 
 function Header() {
 	return (
-		<>
-			<header className="header h-10">
-				<Link to={"/"}>
-					<img
-						className="h-8 w-8 mx-3"
-						src={bee}
-						alt="Home Bee"
-					/>
-				</Link>
+		<header className="header">
+			<Link to={'/'} className="flex items-center gap-2">
+				<img className="h-8 w-8 shrink-0" src={bee} alt="Home Bee" />
+				<span className="hidden text-lg font-semibold text-foreground sm:inline">
+					Prop Manager
+				</span>
+			</Link>
 
-				<div className="md:hidden flex my-1.5">
-					<HamburgerMenu />
-				</div>
-
-				<nav className="hidden md:block px-3">
-					<RouteLinks className="flex" />
-				</nav>
-			</header>
-		</>
-	);
+			<div className="flex items-center">
+				<ThemeToggle />
+				<Button
+					type="button"
+					variant="ghost"
+					size="icon"
+					className="rounded-full"
+					aria-label="Notifications"
+				>
+					<Bell className="size-5" />
+				</Button>
+				<UserProfile />
+			</div>
+		</header>
+	)
 }
 
-function HamburgerMenu() {
-	const [open, setOpen] = useState(false);
+function ThemeToggle() {
+	const { setTheme, effectiveTheme } = useTheme()
+	const isDark = effectiveTheme === 'dark'
+	const toggle = () => setTheme(isDark ? 'light' : 'dark')
+	return (
+		<Button
+			type="button"
+			variant="ghost"
+			size="icon"
+			className="rounded-full"
+			aria-label={isDark ? 'Dark mode on' : 'Dark mode off'}
+			onClick={toggle}
+		>
+			{isDark ? <Moon className="size-5" /> : <Sun className="size-5" />}
+		</Button>
+	)
+}
 
-	function closeMenu() {
-		setOpen(false);
-	}
+const userMenuLinkClass =
+	'flex items-center gap-2 rounded-md px-2 py-1.5 hover:bg-muted text-foreground text-sm'
+
+const userMenuLinks = [
+	{ to: '/profile', label: 'Profile', icon: UserRound },
+	{ to: '/settings', label: 'Settings', icon: Settings },
+] as const
+
+function UserProfile() {
+	const [open, setOpen] = useState(false)
+	const close = () => setOpen(false)
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
-			<PopoverTrigger className="mx-3">
-				<Menu />
+			<PopoverTrigger
+				className={cn(
+					'flex items-center justify-center size-9 rounded-full',
+					'hover:bg-muted hover:text-foreground',
+					'ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+				)}
+				aria-label="User menu"
+			>
+				<UserRound className="size-5" />
 			</PopoverTrigger>
-
-			<PopoverContent className="mx-3 w-48 p-0 mt-2">
-				<RouteLinks onClose={closeMenu} />
-			</PopoverContent >
+			<PopoverContent align="end" className="w-52 p-0 mt-2">
+				<div className="px-3 py-2 border-b border-border">
+					<p className="font-medium truncate text-foreground">Signed in</p>
+					<p className="text-xs text-muted-foreground truncate">
+						user@example.com
+					</p>
+				</div>
+				<ul className="py-1.5">
+					{userMenuLinks.map(({ to, label, icon: Icon }) => (
+						<li key={to}>
+							<Link
+								to={to}
+								className={cn(userMenuLinkClass, 'w-full px-3')}
+								onClick={close}
+							>
+								<Icon className="size-4 shrink-0" />
+								{label}
+							</Link>
+						</li>
+					))}
+					<li className="mt-1.5 pt-1.5 border-t border-border">
+						<Button
+							type="button"
+							variant="ghost"
+							className={cn(userMenuLinkClass, 'w-full justify-start px-3')}
+							onClick={close}
+							aria-label="Sign out"
+						>
+							<LogOut className="size-4 shrink-0" />
+							Sign out
+						</Button>
+					</li>
+				</ul>
+			</PopoverContent>
 		</Popover>
 	)
 }
 
-interface RouteLinksProps extends React.ComponentProps<"ul"> {
-	onClose?: onClickCallback<HTMLAnchorElement>;
-}
-
-function RouteLinks({ className, onClose, ...props }: RouteLinksProps) {
-	return (
-		<ul
-			className={cn("rounded text-sm font-medium", className)}
-			{...props}
-		>
-			<ListNavLink to="/" text={'Home'} onClick={onClose} />
-			<ListNavLink to="/props" text={'Props'} onClick={onClose} />
-			<ListNavLink to="/messages" text={'Messages'} onClick={onClose} />
-		</ul>
-	)
-}
-
-function ListNavLink(props: React.ComponentProps<typeof NavLink>) {
-	return (
-		<li>
-			<NavLink {...props} />
-		</li>
-	)
-}
-
-function NavLink({ text, ...props }: { text: string } & LinkComponentProps) {
-	return (
-		<Link className="nav-link"
-			activeProps={{ className: 'nav-link-active' }}
-			{...props}
-		>
-			{({ isActive }: { isActive: boolean }) => {
-				return (
-					<>
-						{isActive && (
-							<span className="absolute inset-x-1 -bottom-px h-px bg-linear-to-r from-gray-500/0 via-gray-500/60 to-gray-500/10
-                                dark:from-gray-400/0 dark:via-gray-400/60 dark:to-gray-400/0"></span>
-						)}
-						{text}
-					</>
-				)
-			}}
-		</Link>
-	);
-}
-
-
-
-export default Header;
-
+export default Header

@@ -10,7 +10,9 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as PropsIndexRouteImport } from './routes/props/index'
+import { Route as ProfileIndexRouteImport } from './routes/profile/index'
 import { Route as MessagesIndexRouteImport } from './routes/messages/index'
 
 const IndexRoute = IndexRouteImport.update({
@@ -18,9 +20,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PropsIndexRoute = PropsIndexRouteImport.update({
   id: '/props/',
   path: '/props/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProfileIndexRoute = ProfileIndexRouteImport.update({
+  id: '/profile/',
+  path: '/profile/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const MessagesIndexRoute = MessagesIndexRouteImport.update({
@@ -32,31 +44,39 @@ const MessagesIndexRoute = MessagesIndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/messages/': typeof MessagesIndexRoute
+  '/profile/': typeof ProfileIndexRoute
   '/props/': typeof PropsIndexRoute
+  '/settings/': typeof SettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/messages': typeof MessagesIndexRoute
+  '/profile': typeof ProfileIndexRoute
   '/props': typeof PropsIndexRoute
+  '/settings': typeof SettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/messages/': typeof MessagesIndexRoute
+  '/profile/': typeof ProfileIndexRoute
   '/props/': typeof PropsIndexRoute
+  '/settings/': typeof SettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/messages/' | '/props/'
+  fullPaths: '/' | '/messages/' | '/profile/' | '/props/' | '/settings/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/messages' | '/props'
-  id: '__root__' | '/' | '/messages/' | '/props/'
+  to: '/' | '/messages' | '/profile' | '/props' | '/settings'
+  id: '__root__' | '/' | '/messages/' | '/profile/' | '/props/' | '/settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   MessagesIndexRoute: typeof MessagesIndexRoute
+  ProfileIndexRoute: typeof ProfileIndexRoute
   PropsIndexRoute: typeof PropsIndexRoute
+  SettingsIndexRoute: typeof SettingsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -68,11 +88,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/settings/': {
+      id: '/settings/'
+      path: '/settings'
+      fullPath: '/settings/'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/props/': {
       id: '/props/'
       path: '/props'
       fullPath: '/props/'
       preLoaderRoute: typeof PropsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/profile/': {
+      id: '/profile/'
+      path: '/profile'
+      fullPath: '/profile/'
+      preLoaderRoute: typeof ProfileIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/messages/': {
@@ -88,7 +122,9 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   MessagesIndexRoute: MessagesIndexRoute,
+  ProfileIndexRoute: ProfileIndexRoute,
   PropsIndexRoute: PropsIndexRoute,
+  SettingsIndexRoute: SettingsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

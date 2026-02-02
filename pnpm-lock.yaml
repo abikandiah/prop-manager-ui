@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@abumble/design-system':
-        specifier: ^0.0.25
-        version: 0.0.25(0420dd317b3a1779f17329ab25036046)
+        specifier: ^0.0.26
+        version: 0.0.26(0420dd317b3a1779f17329ab25036046)
       '@tanstack/react-devtools':
         specifier: ^0.7.0
         version: 0.7.11(@types/react-dom@19.2.3(@types/react@19.2.10))(@types/react@19.2.10)(csstype@3.2.3)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(solid-js@1.9.11)
@@ -99,8 +99,8 @@ importers:
 
 packages:
 
-  '@abumble/design-system@0.0.25':
-    resolution: {integrity: sha512-sI0/Szzww1la/azYJSSftOvSZsg9tFnXZtP7IIxsb31yEJMdTtefWbfyHAUMTHZUhnZo+BfeqHU+z2JdWzPBEA==}
+  '@abumble/design-system@0.0.26':
+    resolution: {integrity: sha512-zO3KfrkxhwIhj6z2FWn/vQzyBiKpt0lb6APB205icctTzk/IvbBlFuiCIy10xHf1wI+UQxhI1kCKphtvD73OYA==}
     peerDependencies:
       '@radix-ui/react-collapsible': ^1.1.12
       '@radix-ui/react-context-menu': ^2.2.16
@@ -2763,7 +2763,7 @@ packages:
 
 snapshots:
 
-  '@abumble/design-system@0.0.25(0420dd317b3a1779f17329ab25036046)':
+  '@abumble/design-system@0.0.26(0420dd317b3a1779f17329ab25036046)':
     dependencies:
       '@radix-ui/react-collapsible': 1.1.12(@types/react-dom@19.2.3(@types/react@19.2.10))(@types/react@19.2.10)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@radix-ui/react-context-menu': 2.2.16(@types/react-dom@19.2.3(@types/react@19.2.10))(@types/react@19.2.10)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)

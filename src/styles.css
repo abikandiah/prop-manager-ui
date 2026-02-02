@@ -4,13 +4,6 @@
 @import '@abumble/design-system/styles.css';
 @source "../node_modules/@abumble/design-system";
 
-/* Design-system .header and .card inline border-stone-300/80 via @apply border-container; override in dark to match sidebar */
-.dark .header,
-.dark .card,
-.dark .border-container {
-	border-color: var(--border);
-}
-
 .header {
 	@apply h-14;
 }

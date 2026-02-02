@@ -9,6 +9,7 @@ import { routeTree } from './routeTree.gen'
 
 import { NotFound } from './components/NotFound.tsx'
 import { ThemeProvider } from './contexts/theme'
+import { NetworkProvider } from './contexts/network'
 import reportWebVitals from './reportWebVitals'
 import './styles.css'
 
@@ -42,9 +43,11 @@ if (rootElement && !rootElement.innerHTML) {
 	root.render(
 		<StrictMode>
 			<ThemeProvider>
-				<TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
-					<RouterProvider router={router} />
-				</TanStackQueryProvider.Provider>
+				<NetworkProvider>
+					<TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
+						<RouterProvider router={router} />
+					</TanStackQueryProvider.Provider>
+				</NetworkProvider>
 			</ThemeProvider>
 		</StrictMode>,
 	)

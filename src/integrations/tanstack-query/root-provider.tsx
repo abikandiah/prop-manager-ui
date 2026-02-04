@@ -1,33 +1,69 @@
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import {
-	PersistQueryClientProvider,
-	type PersistQueryClientProviderProps,
-} from '@tanstack/react-query-persist-client'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { createQueryCachePersister } from '@/lib/query-persister'
-
-const CACHE_MAX_AGE_MS = 1000 * 60 * 60 * 24 // 24 hours
+	MutationCache,
+	QueryClient,
+	QueryClientProvider,
+} from '@tanstack/react-query'
+import axios from 'axios'
+import type { Query } from '@tanstack/react-query'
+import type { PersistQueryClientProviderProps } from '@tanstack/react-query-persist-client'
+import { config } from '@/config'
+import { createThrottledCachePersister } from '@/features/offline/cachePersistor'
+import { startSync as startSyncEngine } from '@/features/offline/syncEngine'
+import { db } from '@/features/offline/db'
 
 export function getContext() {
 	const queryClient = new QueryClient({
 		defaultOptions: {
 			queries: {
-				gcTime: CACHE_MAX_AGE_MS,
+				staleTime: config.queryCacheStaleTimeMs,
+				gcTime: config.queryCacheGcTimeMs,
+				networkMode: 'offlineFirst',
+
+				retry: (failureCount, error) => {
+					if (axios.isAxiosError(error)) {
+						if (
+							error.response?.status &&
+							error.response.status >= 400 &&
+							error.response.status < 500
+						) {
+							return false
+						}
+					}
+
+					return failureCount < 2
+				},
+				// Exponential backoff
+				retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
+			},
+			mutations: {
+				networkMode: 'offlineFirst',
 			},
 		},
+		mutationCache: new MutationCache({
+			onMutate: async (variables, mutation) => {
+				await db.addMutation(mutation.options.mutationKey, variables)
+				startSyncEngine()
+			},
+		}),
 	})
-	const persister = createQueryCachePersister()
+	const persister = createThrottledCachePersister()
 	return {
 		queryClient,
-		persister,
 		persistOptions: {
 			persister,
-			maxAge: CACHE_MAX_AGE_MS,
+			maxAge: config.queryCacheMaxAgeHours * 60 * 60 * 1000,
+			buster: 'app-v1',
 			dehydrateOptions: {
-				// Persist paused mutations so they can be re-run after restore or when back online
-				shouldDehydrateMutation: () => true,
+				shouldDehydrateQuery: (query: Query) => {
+					return query.state.status !== 'error'
+				},
 			},
 			onSuccess: () => {
-				queryClient.resumePausedMutations()
+				console.log(
+					'Cache restored from Dexie, checking for pending mutations...',
+				)
+				startSyncEngine()
 			},
 		},
 	}
@@ -42,8 +78,8 @@ export function Provider({
 	queryClient: PersistQueryClientProviderProps['client']
 	persistOptions: PersistQueryClientProviderProps['persistOptions']
 }) {
-	// In dev, skip persistence so HMR and refetches aren't overridden by rehydrated cache
-	if (import.meta.env.DEV) {
+	// In dev, skip persistence unless VITE_PERSIST_OFFLINE is set (so HMR isn't overridden)
+	if (import.meta.env.DEV && !config.persistOfflineInDev) {
 		return (
 			<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
 		)

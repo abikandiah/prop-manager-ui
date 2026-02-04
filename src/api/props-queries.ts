@@ -39,6 +39,7 @@ export function useCreateProp() {
 
 	return useMutation({
 		mutationKey: ['createProp'],
+		networkMode: 'online',
 		mutationFn: (payload: CreatePropPayload) => {
 			const requestId = stableRequestId(['createProp'], payload)
 			return propsApi.create(payload, { [IDEMPOTENCY_HEADER]: requestId })
@@ -72,6 +73,7 @@ export function useUpdateProp() {
 
 	return useMutation({
 		mutationKey: ['updateProp'],
+		networkMode: 'online',
 		mutationFn: ({ id, payload }: { id: number; payload: UpdatePropPayload }) => {
 			const variables = { id, payload }
 			const requestId = stableRequestId(['updateProp'], variables)
@@ -107,6 +109,7 @@ export function useDeleteProp() {
 
 	return useMutation({
 		mutationKey: ['deleteProp'],
+		networkMode: 'online',
 		mutationFn: (id: number) => {
 			const requestId = stableRequestId(['deleteProp'], id)
 			return propsApi.delete(id, { [IDEMPOTENCY_HEADER]: requestId })

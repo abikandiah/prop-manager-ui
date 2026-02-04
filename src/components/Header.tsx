@@ -1,4 +1,3 @@
-import bee from '@/assets/bee.svg'
 import { Button } from '@abumble/design-system/components/Button'
 import {
 	Popover,
@@ -6,10 +5,11 @@ import {
 	PopoverTrigger,
 } from '@abumble/design-system/components/Popover'
 import { cn } from '@abumble/design-system/utils'
-import { useTheme } from '@/contexts/theme'
 import { Link, useRouterState } from '@tanstack/react-router'
 import { Bell, LogOut, Moon, Settings, Sun, UserRound } from 'lucide-react'
 import { useState } from 'react'
+import { useTheme } from '@/contexts/theme'
+import bee from '@/assets/bee.svg'
 
 function Header() {
 	return (
@@ -21,7 +21,7 @@ function Header() {
 				</span>
 			</Link>
 
-			<div className="flex items-center gap-1">
+			<div className="flex items-center gap-1 rounded-full">
 				<ThemeToggle />
 				<Button
 					type="button"
@@ -56,8 +56,8 @@ function ThemeToggle() {
 	)
 }
 
-const userMenuLinkClass = `flex items-center gap-2 rounded p-2 h-8 w-full text-left text-sm outline-hidden ring-ring 
-hover:bg-muted hover:text-foreground focus-visible:ring-2 text-foreground [&>svg]:size-4 [&>svg]:shrink-0`
+const userMenuItemClass =
+	'flex items-center gap-2 rounded p-2 h-8 w-full text-left text-sm text-foreground [&>svg]:size-4 [&>svg]:shrink-0'
 
 const userMenuLinks = [
 	{ to: '/profile', label: 'Profile', icon: UserRound },
@@ -75,17 +75,16 @@ function UserProfile() {
 
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
-			<PopoverTrigger
-				className={cn(
-					'flex items-center justify-center size-9 rounded-full',
-					'hover:bg-muted hover:text-foreground',
-					'ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
-					isAccountPage &&
-						'ring-1 ring-ring ring-offset-1 ring-offset-background bg-muted/80',
-				)}
-				aria-label="User menu"
-			>
-				<UserRound className="size-5" />
+			<PopoverTrigger asChild>
+				<Button
+					type="button"
+					variant="ghost"
+					size="icon"
+					className={cn('rounded-full', isAccountPage && 'bg-muted')}
+					aria-label="User menu"
+				>
+					<UserRound className="size-5" />
+				</Button>
 			</PopoverTrigger>
 			<PopoverContent align="end" className="w-52 p-0 mt-2">
 				<div className="border-b border-border px-3 py-2">
@@ -99,17 +98,23 @@ function UserProfile() {
 				<ul className="flex flex-col gap-1 p-2">
 					{userMenuLinks.map(({ to, label, icon: Icon }) => (
 						<li key={to}>
-							<Link to={to} className={userMenuLinkClass} onClick={close}>
-								<Icon className="size-4 shrink-0" />
-								{label}
-							</Link>
+							<Button
+								variant="ghost"
+								asChild
+								className={cn(userMenuItemClass, 'justify-start')}
+							>
+								<Link to={to} onClick={close}>
+									<Icon className="size-4 shrink-0" />
+									{label}
+								</Link>
+							</Button>
 						</li>
 					))}
 					<li className="mt-1.5 pt-1.5 border-t border-border">
 						<Button
 							type="button"
 							variant="ghost"
-							className={cn(userMenuLinkClass, 'justify-start')}
+							className={cn(userMenuItemClass, 'justify-start')}
 							onClick={close}
 							aria-label="Sign out"
 						>

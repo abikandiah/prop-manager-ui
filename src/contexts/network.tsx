@@ -1,5 +1,3 @@
-import { onlineManager } from '@tanstack/react-query'
-import { config } from '@/config'
 import {
 	createContext,
 	useContext,
@@ -8,12 +6,14 @@ import {
 	useRef,
 	useState,
 } from 'react'
+import { onlineManager, useQueryClient } from '@tanstack/react-query'
+import { config } from '@/config'
+import { startSync } from '@/features/offline/syncEngine'
 
 /**
  * Network status context for offline-first UX.
  * Uses the standard browser APIs: navigator.onLine and the online/offline events.
  * Keeps TanStack Query's onlineManager in sync so queries pause when offline.
- * getIsOnline() is for non-React code that needs the current value without subscribing.
  */
 interface NetworkContextValue {
 	isOnline: boolean
@@ -21,15 +21,10 @@ interface NetworkContextValue {
 
 const NetworkContext = createContext<NetworkContextValue | null>(null)
 
-let isOnlineRef = true
-
-export function getIsOnline(): boolean {
-	return isOnlineRef
-}
-
 export function NetworkProvider({ children }: { children: React.ReactNode }) {
 	const [isOnline, setIsOnline] = useState(navigator.onLine)
 	const abortControllerRef = useRef<AbortController | null>(null)
+	const queryClient = useQueryClient()
 
 	useEffect(() => {
 		async function updateOnline(value: boolean) {
@@ -42,10 +37,11 @@ export function NetworkProvider({ children }: { children: React.ReactNode }) {
 			// If the browser says we are online, double-check with a tiny fetch
 			if (value) {
 				try {
-					// Check if browser is actually online with test request
 					await fetch(
 						`${config.apiBaseUrl.replace(/\/$/, '')}/actuator/health`,
 						{
+							method: 'HEAD',
+							cache: 'no-store',
 							signal: abortControllerRef.current.signal,
 						},
 					)
@@ -56,9 +52,12 @@ export function NetworkProvider({ children }: { children: React.ReactNode }) {
 				}
 			}
 
-			isOnlineRef = actualOnline
 			setIsOnline(actualOnline)
 			onlineManager.setOnline(actualOnline)
+
+			if (actualOnline) {
+				startSync(queryClient)
+			}
 		}
 
 		updateOnline(navigator.onLine)
@@ -69,6 +68,7 @@ export function NetworkProvider({ children }: { children: React.ReactNode }) {
 		window.addEventListener('online', handleOnline)
 		window.addEventListener('offline', handleOffline)
 		return () => {
+			abortControllerRef.current?.abort()
 			window.removeEventListener('online', handleOnline)
 			window.removeEventListener('offline', handleOffline)
 		}
@@ -86,3 +86,8 @@ export function useNetwork() {
 	if (!ctx) throw new Error('useNetwork must be used within NetworkProvider')
 	return ctx
 }
+
+// Force TanStack Query to wait for our manual .setOnline() calls
+onlineManager.setEventListener(() => {
+	return () => {}
+})

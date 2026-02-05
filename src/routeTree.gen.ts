@@ -14,6 +14,7 @@ import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as PropsIndexRouteImport } from './routes/props/index'
 import { Route as ProfileIndexRouteImport } from './routes/profile/index'
 import { Route as MessagesIndexRouteImport } from './routes/messages/index'
+import { Route as DevAuthRouteImport } from './routes/dev/auth'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,9 +41,15 @@ const MessagesIndexRoute = MessagesIndexRouteImport.update({
   path: '/messages/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DevAuthRoute = DevAuthRouteImport.update({
+  id: '/dev/auth',
+  path: '/dev/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dev/auth': typeof DevAuthRoute
   '/messages/': typeof MessagesIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/props/': typeof PropsIndexRoute
@@ -50,6 +57,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dev/auth': typeof DevAuthRoute
   '/messages': typeof MessagesIndexRoute
   '/profile': typeof ProfileIndexRoute
   '/props': typeof PropsIndexRoute
@@ -58,6 +66,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dev/auth': typeof DevAuthRoute
   '/messages/': typeof MessagesIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/props/': typeof PropsIndexRoute
@@ -65,14 +74,28 @@ export interface FileRoutesById {
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/messages/' | '/profile/' | '/props/' | '/settings/'
+  fullPaths:
+    | '/'
+    | '/dev/auth'
+    | '/messages/'
+    | '/profile/'
+    | '/props/'
+    | '/settings/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/messages' | '/profile' | '/props' | '/settings'
-  id: '__root__' | '/' | '/messages/' | '/profile/' | '/props/' | '/settings/'
+  to: '/' | '/dev/auth' | '/messages' | '/profile' | '/props' | '/settings'
+  id:
+    | '__root__'
+    | '/'
+    | '/dev/auth'
+    | '/messages/'
+    | '/profile/'
+    | '/props/'
+    | '/settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DevAuthRoute: typeof DevAuthRoute
   MessagesIndexRoute: typeof MessagesIndexRoute
   ProfileIndexRoute: typeof ProfileIndexRoute
   PropsIndexRoute: typeof PropsIndexRoute
@@ -116,11 +139,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MessagesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dev/auth': {
+      id: '/dev/auth'
+      path: '/dev/auth'
+      fullPath: '/dev/auth'
+      preLoaderRoute: typeof DevAuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DevAuthRoute: DevAuthRoute,
   MessagesIndexRoute: MessagesIndexRoute,
   ProfileIndexRoute: ProfileIndexRoute,
   PropsIndexRoute: PropsIndexRoute,

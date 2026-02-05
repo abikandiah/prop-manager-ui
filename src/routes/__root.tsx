@@ -6,11 +6,10 @@ import {
 import { cn } from '@abumble/design-system/utils'
 import { UnderConstruction } from '@abumble/design-system/components/UnderConstruction'
 import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
-import type { QueryClient } from '@tanstack/react-query'
 import { WifiOff } from 'lucide-react'
+import type { QueryClient } from '@tanstack/react-query'
 import { AppSidebar } from '@/components/AppSidebar'
 import Footer from '@/components/Footer'
-import { SyncOnReconnect } from '@/offline/SyncOnReconnect'
 import { config } from '@/config'
 import Header from '@/components/Header'
 import { useNetwork } from '@/contexts/network'
@@ -46,7 +45,6 @@ function Root() {
 					<AppSidebar />
 					<SidebarInset>
 						<main className="flex flex-col p-4 md:p-6">
-							<SyncOnReconnect />
 							{!isOnline && (
 								<MessageBanner
 									type="warning"

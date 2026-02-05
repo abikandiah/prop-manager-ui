@@ -10,6 +10,7 @@ import { routeTree } from './routeTree.gen'
 import { NotFound } from './components/NotFound.tsx'
 import { ThemeProvider } from './contexts/theme'
 import { NetworkProvider } from './contexts/network'
+import { Toaster } from './components/ui/Toaster'
 import reportWebVitals from './reportWebVitals'
 import './styles.css'
 
@@ -42,13 +43,14 @@ if (rootElement && !rootElement.innerHTML) {
 	const root = createRoot(rootElement)
 	root.render(
 		<StrictMode>
-			<ThemeProvider>
-				<NetworkProvider>
-					<TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
+			<TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
+				<ThemeProvider>
+					<NetworkProvider>
 						<RouterProvider router={router} />
-					</TanStackQueryProvider.Provider>
-				</NetworkProvider>
-			</ThemeProvider>
+						<Toaster />
+					</NetworkProvider>
+				</ThemeProvider>
+			</TanStackQueryProvider.Provider>
 		</StrictMode>,
 	)
 }

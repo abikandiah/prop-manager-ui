@@ -1,23 +1,57 @@
-import {
-	useMutation,
-	useQuery,
-	useQueryClient,
-} from '@tanstack/react-query'
-import {
-	propsApi,
-	IDEMPOTENCY_HEADER,
-	type CreatePropPayload,
-	type Prop,
-	type UpdatePropPayload,
-} from '@/api/props'
-import { propKeys } from '@/api/query-keys'
-import {
-	applyOptimisticCreate,
-	applyOptimisticUpdate,
-	applyOptimisticDelete,
-	OPTIMISTIC_PROP_ID,
-} from '@/api/prop-mutations'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { IDEMPOTENCY_HEADER, propKeys, propsApi } from './props'
+import type { CreatePropPayload, Prop, UpdatePropPayload } from './props'
 import { stableRequestId } from '@/lib/offline-types'
+import { generateOptimisticId, nowIso } from '@/lib/util'
+
+// --- Helpers: Optimistic Updates ---
+
+function applyCreate(
+	queryClient: ReturnType<typeof useQueryClient>,
+	payload: CreatePropPayload,
+): Prop {
+	const optimistic: Prop = {
+		id: generateOptimisticId(),
+		name: payload.name,
+		description: payload.description ?? null,
+		createdAt: nowIso(),
+		updatedAt: nowIso(),
+	}
+	queryClient.setQueryData(propKeys.list(), (old: Array<Prop> | undefined) =>
+		old ? [...old, optimistic] : [optimistic],
+	)
+	return optimistic
+}
+
+function applyUpdate(
+	queryClient: ReturnType<typeof useQueryClient>,
+	id: string,
+	payload: UpdatePropPayload,
+): void {
+	const updatedAt = nowIso()
+	queryClient.setQueryData(
+		propKeys.list(),
+		(old: Array<Prop> | undefined) =>
+			old?.map((p) => (p.id === id ? { ...p, ...payload, updatedAt } : p)) ??
+			[],
+	)
+	queryClient.setQueryData(propKeys.detail(id), (old: Prop | undefined) =>
+		old ? { ...old, ...payload, updatedAt } : undefined,
+	)
+}
+
+function applyDelete(
+	queryClient: ReturnType<typeof useQueryClient>,
+	id: string,
+): void {
+	queryClient.setQueryData(
+		propKeys.list(),
+		(old: Array<Prop> | undefined) => old?.filter((p) => p.id !== id) ?? [],
+	)
+	queryClient.removeQueries({ queryKey: propKeys.detail(id) })
+}
+
+// --- Queries ---
 
 export function usePropsList() {
 	return useQuery({
@@ -26,13 +60,15 @@ export function usePropsList() {
 	})
 }
 
-export function usePropDetail(id: number | null) {
+export function usePropDetail(id: string | null) {
 	return useQuery({
 		queryKey: propKeys.detail(id!),
 		queryFn: () => propsApi.getById(id!),
 		enabled: id != null,
 	})
 }
+
+// --- Mutations ---
 
 export function useCreateProp() {
 	const queryClient = useQueryClient()
@@ -46,12 +82,11 @@ export function useCreateProp() {
 		},
 		onMutate: async (payload) => {
 			await queryClient.cancelQueries({ queryKey: propKeys.list() })
-			const previousProps = queryClient.getQueryData<Prop[]>(propKeys.list())
-
-			// Always apply optimistic update for "snappy" UI
-			applyOptimisticCreate(queryClient, payload)
-
-			return { previousProps }
+			const previousProps = queryClient.getQueryData<Array<Prop>>(
+				propKeys.list(),
+			)
+			const optimistic = applyCreate(queryClient, payload)
+			return { previousProps, optimisticId: optimistic.id }
 		},
 		onError: (err, _, context) => {
 			if (context?.previousProps) {
@@ -59,11 +94,8 @@ export function useCreateProp() {
 			}
 			console.error('[Mutation] Create failed:', err)
 		},
-		onSuccess: (data) => {
-			// If synced successfully (not the optimistic placeholder), refresh from server
-			if (data.id !== OPTIMISTIC_PROP_ID) {
-				queryClient.invalidateQueries({ queryKey: propKeys.all })
-			}
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: propKeys.all })
 		},
 	})
 }
@@ -74,18 +106,24 @@ export function useUpdateProp() {
 	return useMutation({
 		mutationKey: ['updateProp'],
 		networkMode: 'online',
-		mutationFn: ({ id, payload }: { id: number; payload: UpdatePropPayload }) => {
+		mutationFn: async ({
+			id,
+			payload,
+		}: {
+			id: string
+			payload: UpdatePropPayload
+		}) => {
 			const variables = { id, payload }
 			const requestId = stableRequestId(['updateProp'], variables)
 			return propsApi.update(id, payload, { [IDEMPOTENCY_HEADER]: requestId })
 		},
 		onMutate: async ({ id, payload }) => {
 			await queryClient.cancelQueries({ queryKey: propKeys.all })
-			const previousProps = queryClient.getQueryData<Prop[]>(propKeys.list())
+			const previousProps = queryClient.getQueryData<Array<Prop>>(
+				propKeys.list(),
+			)
 			const previousProp = queryClient.getQueryData<Prop>(propKeys.detail(id))
-
-			applyOptimisticUpdate(queryClient, id, payload)
-
+			applyUpdate(queryClient, id, payload)
 			return { previousProps, previousProp }
 		},
 		onError: (err, { id }, context) => {
@@ -110,17 +148,17 @@ export function useDeleteProp() {
 	return useMutation({
 		mutationKey: ['deleteProp'],
 		networkMode: 'online',
-		mutationFn: (id: number) => {
+		mutationFn: async (id: string) => {
 			const requestId = stableRequestId(['deleteProp'], id)
 			return propsApi.delete(id, { [IDEMPOTENCY_HEADER]: requestId })
 		},
 		onMutate: async (id) => {
 			await queryClient.cancelQueries({ queryKey: propKeys.all })
-			const previousProps = queryClient.getQueryData<Prop[]>(propKeys.list())
+			const previousProps = queryClient.getQueryData<Array<Prop>>(
+				propKeys.list(),
+			)
 			const previousProp = queryClient.getQueryData<Prop>(propKeys.detail(id))
-
-			applyOptimisticDelete(queryClient, id)
-
+			applyDelete(queryClient, id)
 			return { previousProps, previousProp }
 		},
 		onError: (err, id, context) => {

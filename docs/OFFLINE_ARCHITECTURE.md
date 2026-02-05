@@ -14,7 +14,7 @@ We use **TanStack Query’s built-in sync** instead of a custom mutation queue a
 1. **PersistQueryClientProvider** – Persists query + mutation cache to IndexedDB. `onSuccess` after restore calls `queryClient.resumePausedMutations()`.
 2. **SyncOnReconnect** – When `isOnline` goes from false → true (with a short debounce), runs **smartSync**: reads pending mutations from Dexie, only calls `resumePausedMutations()` if there are mutations in a resumable state (`state.status` idle or pending).
 3. **Mutations** – `mutationFn` is always the API call (e.g. `propsApi.create`). In `onMutate`, when `!isOnline`, we apply optimistic updates via helpers in `api/prop-mutations.ts` (e.g. `applyOptimisticCreate`). No custom queue.
-4. **Optimistic id** – `OPTIMISTIC_PROP_ID` (-1) for unsynced creates so the UI can show “(pending sync)” and disable delete.
+4. **Optimistic id** – A UUID generated during creation so the UI can show “(pending sync)” and subsequent offline edits can be mapped to the real ID once synced.
 5. **Network** – `NetworkProvider` keeps TanStack’s `onlineManager` in sync and, when the browser says online, checks real connectivity via a request to the API (e.g. `/actuator/health`).
 
 ## IndexedDB (Dexie) — System Outbox

@@ -5,11 +5,11 @@ import {
 	QueryClientProvider,
 } from '@tanstack/react-query'
 import axios from 'axios'
+import { toast } from 'sonner'
 import type { Query } from '@tanstack/react-query'
 import type { PersistQueryClientProviderProps } from '@tanstack/react-query-persist-client'
 import { config } from '@/config'
 import { createThrottledCachePersister } from '@/features/offline/cachePersistor'
-import { startSync as startSyncEngine } from '@/features/offline/syncEngine'
 import { db } from '@/features/offline/db'
 
 export function getContext() {
@@ -38,15 +38,20 @@ export function getContext() {
 			},
 			mutations: {
 				networkMode: 'offlineFirst',
+				onError: (error) => {
+					const message = error.message || 'An error occurred'
+					toast.error(message)
+				},
 			},
 		},
 		mutationCache: new MutationCache({
 			onMutate: async (variables, mutation) => {
 				await db.addMutation(mutation.options.mutationKey, variables)
-				startSyncEngine()
+				// startSyncEngine()
 			},
 		}),
 	})
+
 	const persister = createThrottledCachePersister()
 	return {
 		queryClient,
@@ -63,7 +68,6 @@ export function getContext() {
 				console.log(
 					'Cache restored from Dexie, checking for pending mutations...',
 				)
-				startSyncEngine()
 			},
 		},
 	}

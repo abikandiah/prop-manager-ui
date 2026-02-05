@@ -1,7 +1,8 @@
 import Dexie from 'dexie'
-import type { PersistedClient } from '@tanstack/react-query-persist-client'
 import type { DehydratedState } from '@tanstack/react-query'
+import type { PersistedClient } from '@tanstack/react-query-persist-client'
 import { config } from '@/config'
+import { stableMutationId } from '@/lib/offline-types'
 
 export type DehydratedMutation = DehydratedState['mutations'][number]
 export type MutationOutboxStatus = 'pending' | 'failed' | 'synced'
@@ -46,14 +47,17 @@ export class AppDatabase extends Dexie {
 	}
 
 	async addMutation(mutationKey: any, variables: any) {
-		return this.mutations.add({
-			id: crypto.randomUUID(),
-			value: {
-				mutationKey,
-				state: {
-					variables,
-				},
-			} as DehydratedMutation,
+		const mutation = {
+			mutationKey,
+			state: {
+				variables,
+				submittedAt: Date.now(),
+			},
+		} as DehydratedMutation
+
+		return this.mutations.put({
+			id: stableMutationId(mutation),
+			value: mutation,
 			status: 'pending',
 			timestamp: Date.now(),
 			retryCount: 0,

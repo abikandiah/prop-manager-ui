@@ -1,11 +1,13 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@abumble/design-system/components/Button'
 import { Input } from '@abumble/design-system/components/Input'
+import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { createFileRoute } from '@tanstack/react-router'
 import { useMutationState } from '@tanstack/react-query'
 import { cn } from '@abumble/design-system/utils'
+import { toast } from 'sonner'
 import { useCreateProp, useDeleteProp, usePropsList } from '@/features/props'
-import { PageHeader } from '@/components/ui'
+import { PageDescription, PageHeader } from '@/components/ui'
 import {
 	Table,
 	TableBody,
@@ -59,27 +61,41 @@ function RouteComponent() {
 					setName('')
 					setDescription('')
 					setIsDialogOpen(false)
+					toast.success('Property created successfully')
+				},
+				onError: (err) => {
+					toast.error(`Failed to create property: ${err.message}`)
 				},
 			},
 		)
 	}
 
-	if (isLoading)
-		return <div className="p-text text-muted-foreground">Loading props…</div>
-	if (isError)
-		return (
-			<div className="p-text text-destructive">
-				Error: {String(error.message)}
-			</div>
-		)
+	useEffect(() => {
+		if (isError) {
+			toast.error(`Error loading properties: ${error.message}`)
+		}
+	}, [isError, error])
 
 	return (
-		<div className="space-y-6">
-			<div className="flex items-center justify-between">
-				<PageHeader size="sm">Props</PageHeader>
+		<div className="flex flex-col gap-8">
+			{/* Header Banner */}
+			<div className="relative -mx-4 -mt-4 overflow-hidden border-b bg-card md:-mx-6 md:-mt-6">
+				<div className="image-background absolute inset-0 opacity-10" />
+				<div className="relative px-4 py-8 md:px-6 md:py-12">
+					<div className="space-y-1.5">
+						<PageHeader>Properties</PageHeader>
+						<PageDescription>
+							Manage and monitor your properties, units, and tenants from one
+							central dashboard.
+						</PageDescription>
+					</div>
+				</div>
+			</div>
+
+			<div>
 				<Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 					<DialogTrigger asChild>
-						<Button>Add prop</Button>
+						<Button size="lg">Add property</Button>
 					</DialogTrigger>
 					<DialogContent>
 						<DialogHeader>
@@ -136,13 +152,27 @@ function RouteComponent() {
 						</TableRow>
 					</TableHeader>
 					<TableBody>
-						{!props || props.length === 0 ? (
+						{isLoading ? (
+							Array.from({ length: 5 }).map((_, i) => (
+								<TableRow key={i}>
+									<TableCell>
+										<Skeleton className="h-6 w-32" />
+									</TableCell>
+									<TableCell>
+										<Skeleton className="h-6 w-full max-w-[300px]" />
+									</TableCell>
+									<TableCell className="text-right">
+										<Skeleton className="ml-auto h-8 w-16" />
+									</TableCell>
+								</TableRow>
+							))
+						) : !props || props.length === 0 ? (
 							<TableRow>
 								<TableCell
 									colSpan={3}
 									className="h-24 text-center text-muted-foreground"
 								>
-									No props yet. Add one above.
+									No properties yet. Add one above.
 								</TableCell>
 							</TableRow>
 						) : (
@@ -176,7 +206,18 @@ function RouteComponent() {
 											<Button
 												variant="outline"
 												size="sm"
-												onClick={() => deleteProp.mutate(p.id)}
+												onClick={() =>
+													deleteProp.mutate(p.id, {
+														onSuccess: () => {
+															toast.success('Property deleted successfully')
+														},
+														onError: (err) => {
+															toast.error(
+																`Failed to delete property: ${err.message}`,
+															)
+														},
+													})
+												}
 												disabled={isDeleting || isPendingSync}
 												className="h-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
 											>

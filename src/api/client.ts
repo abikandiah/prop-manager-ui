@@ -35,7 +35,7 @@ export const api = axios.create({
 api.interceptors.request.use((_config) => {
 	const token = getDevToken()
 	if (token) {
-		_config.headers['Authentication'] = `Bearer ${token}`
+		_config.headers['Authorization'] = `Bearer ${token}`
 	}
 	return _config
 })
@@ -48,9 +48,6 @@ api.interceptors.response.use(
 			console.error('401 Unauthorized')
 			if (config.isDev) {
 				clearDevToken()
-				if (window.location.pathname !== '/dev/auth') {
-					window.location.href = '/dev/auth'
-				}
 			}
 		}
 		return Promise.reject(error)

@@ -1,29 +1,31 @@
 <!doctype html>
 <html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<script>
+			;(function () {
+				const stored = localStorage.getItem('theme')
+				const theme =
+					stored === 'light' || stored === 'dark' ? stored : 'system'
+				const dark =
+					theme === 'dark' ||
+					(theme === 'system' &&
+						window.matchMedia('(prefers-color-scheme: dark)').matches)
+				if (dark) document.documentElement.classList.add('dark')
+				else document.documentElement.classList.remove('dark')
+			})()
+		</script>
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="theme-color" content="#000000" />
+		<meta name="description" content="A management system for props" />
+		<link rel="apple-touch-icon" href="/logo192.png" />
+		<link rel="manifest" href="/manifest.json" />
+		<title>PropMange</title>
+	</head>
 
-<head>
-	<meta charset="UTF-8" />
-	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<script>
-		(function () {
-			const stored = localStorage.getItem('theme');
-			const theme = (stored === 'light' || stored === 'dark') ? stored : 'system';
-			const dark = theme === 'dark' || (theme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-			if (dark) document.documentElement.classList.add('dark');
-			else document.documentElement.classList.remove('dark');
-		})();
-	</script>
-	<link rel="icon" href="/favicon.ico" />
-	<meta name="theme-color" content="#000000" />
-	<meta name="description" content="A management system for props" />
-	<link rel="apple-touch-icon" href="/logo192.png" />
-	<link rel="manifest" href="/manifest.json" />
-	<title>Prop Manager</title>
-</head>
-
-<body>
-	<div style="height: 100vh;" id="app"></div>
-	<script type="module" src="/src/main.tsx"></script>
-</body>
-
+	<body>
+		<div style="height: 100vh" id="app"></div>
+		<script type="module" src="/src/main.tsx"></script>
+	</body>
 </html>

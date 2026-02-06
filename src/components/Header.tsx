@@ -8,31 +8,39 @@ import { cn } from '@abumble/design-system/utils'
 import { Link, useRouterState } from '@tanstack/react-router'
 import { Bell, LogOut, Moon, Settings, Sun, UserRound } from 'lucide-react'
 import { useState } from 'react'
-import { useTheme } from '@/contexts/theme'
+import { useTheme } from '../contexts/theme'
+import { useAuth } from '../contexts/auth'
 import bee from '@/assets/bee.svg'
 
 function Header() {
+	const { isUserDefined } = useAuth()
+
 	return (
 		<header className="header">
 			<Link to={'/'} className="flex items-center gap-2">
 				<img className="h-8 w-8 shrink-0" src={bee} alt="Home Bee" />
 				<span className="hidden text-lg font-semibold text-foreground sm:inline">
-					Prop Manager
+					PropMange
 				</span>
 			</Link>
 
 			<div className="flex items-center gap-1 rounded-full">
 				<ThemeToggle />
-				<Button
-					type="button"
-					variant="ghost"
-					size="icon"
-					className="rounded-full"
-					aria-label="Notifications"
-				>
-					<Bell className="size-5" />
-				</Button>
-				<UserProfile />
+
+				{isUserDefined && (
+					<>
+						<Button
+							type="button"
+							variant="ghost"
+							size="icon"
+							className="rounded-full"
+							aria-label="Notifications"
+						>
+							<Bell className="size-5" />
+						</Button>
+						<UserProfile />
+					</>
+				)}
 			</div>
 		</header>
 	)
@@ -66,6 +74,7 @@ const userMenuLinks = [
 
 function UserProfile() {
 	const [open, setOpen] = useState(false)
+	const { user } = useAuth()
 	const close = () => setOpen(false)
 
 	const pathname = useRouterState({ select: (s) => s.location.pathname })
@@ -89,10 +98,10 @@ function UserProfile() {
 			<PopoverContent align="end" className="w-52 p-0 mt-2">
 				<div className="border-b border-border px-3 py-2">
 					<p className="truncate text-sm font-semibold text-foreground">
-						Example User
+						{user?.name || 'Guest'}
 					</p>
 					<p className="truncate text-xs text-muted-foreground">
-						user@example.com
+						{user?.email || ''}
 					</p>
 				</div>
 				<ul className="flex flex-col gap-1 p-2">
@@ -110,7 +119,7 @@ function UserProfile() {
 							</Button>
 						</li>
 					))}
-					<li className="mt-1.5 pt-1.5 border-t border-border">
+					<li className="mt-1 pt-1 border-t border-border">
 						<Button
 							type="button"
 							variant="ghost"

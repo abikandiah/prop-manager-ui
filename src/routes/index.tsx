@@ -21,8 +21,8 @@ function Home() {
 					<div className="space-y-1.5">
 						<PageHeader>Dashboard</PageHeader>
 						<PageDescription>
-							Welcome to Prop Manager. Manage your properties and messages from
-							one central dashboard.
+							Welcome to PropMange. Manage your properties and messages from one
+							central dashboard.
 						</PageDescription>
 					</div>
 				</div>

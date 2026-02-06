@@ -4,6 +4,9 @@ import { db } from '@/features/offline/db'
 let syncPromise: Promise<void> | null = null
 
 export async function startSync(queryClient: QueryClient) {
+	// TODO: Implement sync engine
+	return
+
 	// If already syncing, the new mutation will be picked up
 	// by the existing loop's next iteration.
 	if (syncPromise) return syncPromise

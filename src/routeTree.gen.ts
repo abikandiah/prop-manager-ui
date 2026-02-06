@@ -14,6 +14,8 @@ import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as PropsIndexRouteImport } from './routes/props/index'
 import { Route as ProfileIndexRouteImport } from './routes/profile/index'
 import { Route as MessagesIndexRouteImport } from './routes/messages/index'
+import { Route as PublicTermsRouteImport } from './routes/public/terms'
+import { Route as PublicPrivacyRouteImport } from './routes/public/privacy'
 import { Route as DevAuthRouteImport } from './routes/dev/auth'
 
 const IndexRoute = IndexRouteImport.update({
@@ -41,6 +43,16 @@ const MessagesIndexRoute = MessagesIndexRouteImport.update({
   path: '/messages/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PublicTermsRoute = PublicTermsRouteImport.update({
+  id: '/public/terms',
+  path: '/public/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PublicPrivacyRoute = PublicPrivacyRouteImport.update({
+  id: '/public/privacy',
+  path: '/public/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DevAuthRoute = DevAuthRouteImport.update({
   id: '/dev/auth',
   path: '/dev/auth',
@@ -50,6 +62,8 @@ const DevAuthRoute = DevAuthRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dev/auth': typeof DevAuthRoute
+  '/public/privacy': typeof PublicPrivacyRoute
+  '/public/terms': typeof PublicTermsRoute
   '/messages/': typeof MessagesIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/props/': typeof PropsIndexRoute
@@ -58,6 +72,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dev/auth': typeof DevAuthRoute
+  '/public/privacy': typeof PublicPrivacyRoute
+  '/public/terms': typeof PublicTermsRoute
   '/messages': typeof MessagesIndexRoute
   '/profile': typeof ProfileIndexRoute
   '/props': typeof PropsIndexRoute
@@ -67,6 +83,8 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dev/auth': typeof DevAuthRoute
+  '/public/privacy': typeof PublicPrivacyRoute
+  '/public/terms': typeof PublicTermsRoute
   '/messages/': typeof MessagesIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/props/': typeof PropsIndexRoute
@@ -77,16 +95,28 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dev/auth'
+    | '/public/privacy'
+    | '/public/terms'
     | '/messages/'
     | '/profile/'
     | '/props/'
     | '/settings/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dev/auth' | '/messages' | '/profile' | '/props' | '/settings'
+  to:
+    | '/'
+    | '/dev/auth'
+    | '/public/privacy'
+    | '/public/terms'
+    | '/messages'
+    | '/profile'
+    | '/props'
+    | '/settings'
   id:
     | '__root__'
     | '/'
     | '/dev/auth'
+    | '/public/privacy'
+    | '/public/terms'
     | '/messages/'
     | '/profile/'
     | '/props/'
@@ -96,6 +126,8 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DevAuthRoute: typeof DevAuthRoute
+  PublicPrivacyRoute: typeof PublicPrivacyRoute
+  PublicTermsRoute: typeof PublicTermsRoute
   MessagesIndexRoute: typeof MessagesIndexRoute
   ProfileIndexRoute: typeof ProfileIndexRoute
   PropsIndexRoute: typeof PropsIndexRoute
@@ -139,6 +171,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MessagesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/public/terms': {
+      id: '/public/terms'
+      path: '/public/terms'
+      fullPath: '/public/terms'
+      preLoaderRoute: typeof PublicTermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/public/privacy': {
+      id: '/public/privacy'
+      path: '/public/privacy'
+      fullPath: '/public/privacy'
+      preLoaderRoute: typeof PublicPrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dev/auth': {
       id: '/dev/auth'
       path: '/dev/auth'
@@ -152,6 +198,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DevAuthRoute: DevAuthRoute,
+  PublicPrivacyRoute: PublicPrivacyRoute,
+  PublicTermsRoute: PublicTermsRoute,
   MessagesIndexRoute: MessagesIndexRoute,
   ProfileIndexRoute: ProfileIndexRoute,
   PropsIndexRoute: PropsIndexRoute,

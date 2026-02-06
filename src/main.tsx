@@ -10,6 +10,7 @@ import { routeTree } from './routeTree.gen'
 import { NotFound } from './components/NotFound.tsx'
 import { ThemeProvider } from './contexts/theme'
 import { NetworkProvider } from './contexts/network'
+import { AuthProvider } from './contexts/auth'
 import { Toaster } from './components/ui/Toaster'
 import reportWebVitals from './reportWebVitals'
 import './styles.css'
@@ -46,8 +47,10 @@ if (rootElement && !rootElement.innerHTML) {
 			<TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
 				<ThemeProvider>
 					<NetworkProvider>
-						<RouterProvider router={router} />
-						<Toaster />
+						<AuthProvider>
+							<RouterProvider router={router} />
+							<Toaster />
+						</AuthProvider>
 					</NetworkProvider>
 				</ThemeProvider>
 			</TanStackQueryProvider.Provider>

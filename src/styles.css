@@ -9,6 +9,10 @@
 	@apply h-14;
 }
 
+.app-title {
+	@apply text-xl font-bold tracking-tight;
+}
+
 /* Tighter vertical rhythm for legal/docs prose (privacy, terms) */
 .prose.prose-sm h1 {
 	margin-top: 0;

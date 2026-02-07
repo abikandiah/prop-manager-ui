@@ -19,7 +19,7 @@ function Header() {
 		<header className="header">
 			<Link to={'/'} className="flex items-center gap-2">
 				<img className="h-8 w-8 shrink-0" src={bee} alt="Home Bee" />
-				<span className="hidden text-lg font-semibold text-foreground sm:inline">
+				<span className="app-title hidden text-foreground sm:inline">
 					PropMange
 				</span>
 			</Link>

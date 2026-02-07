@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { cn } from '@abumble/design-system/utils'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
@@ -27,6 +28,7 @@ function formatAddress(p: Prop): string {
 }
 
 export function PropsTableView() {
+	const navigate = useNavigate()
 	const { data: props, isLoading, isError, error } = usePropsList()
 	const createProp = useCreateProp()
 
@@ -77,7 +79,19 @@ export function PropsTableView() {
 								createProp.variables?.legalName === p.legalName
 
 							return (
-								<TableRow key={p.id}>
+								<TableRow
+									key={p.id}
+									className="cursor-pointer hover:bg-muted/50"
+									onClick={() => navigate({ to: '/props/$id', params: { id: p.id } })}
+									onKeyDown={(e) => {
+										if (e.key === 'Enter' || e.key === ' ') {
+											e.preventDefault()
+											navigate({ to: '/props/$id', params: { id: p.id } })
+										}
+									}}
+									tabIndex={0}
+									role="button"
+								>
 									<TableCell className="text-muted-foreground">
 										{p.propertyType.replace(/_/g, ' ')}
 									</TableCell>

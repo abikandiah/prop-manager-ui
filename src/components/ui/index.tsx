@@ -136,4 +136,23 @@ export function PageDescription({
 	)
 }
 
+export interface BannerHeaderProps {
+	title: React.ReactNode
+	description: React.ReactNode
+}
+
+export function BannerHeader({ title, description }: BannerHeaderProps) {
+	return (
+		<div className="relative -mx-4 -mt-4 overflow-hidden border-b bg-card md:-mx-6 md:-mt-6">
+			<div className="image-background absolute inset-0 opacity-10" />
+			<div className="relative px-4 py-8 md:px-6 md:py-12">
+				<div className="space-y-1.5">
+					<PageHeader>{title}</PageHeader>
+					<PageDescription>{description}</PageDescription>
+				</div>
+			</div>
+		</div>
+	)
+}
+
 export * from './Toaster'

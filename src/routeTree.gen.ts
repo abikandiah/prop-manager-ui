@@ -18,6 +18,7 @@ import { Route as MessagesIndexRouteImport } from './routes/messages/index'
 import { Route as DevIndexRouteImport } from './routes/dev/index'
 import { Route as PublicTermsRouteImport } from './routes/public/terms'
 import { Route as PublicPrivacyRouteImport } from './routes/public/privacy'
+import { Route as PropsIdRouteImport } from './routes/props/$id'
 import { Route as DevAuthRouteImport } from './routes/dev/auth'
 
 const DevRouteRoute = DevRouteRouteImport.update({
@@ -65,6 +66,11 @@ const PublicPrivacyRoute = PublicPrivacyRouteImport.update({
   path: '/public/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PropsIdRoute = PropsIdRouteImport.update({
+  id: '/props/$id',
+  path: '/props/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DevAuthRoute = DevAuthRouteImport.update({
   id: '/auth',
   path: '/auth',
@@ -75,6 +81,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dev': typeof DevRouteRouteWithChildren
   '/dev/auth': typeof DevAuthRoute
+  '/props/$id': typeof PropsIdRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
   '/dev/': typeof DevIndexRoute
@@ -86,6 +93,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dev/auth': typeof DevAuthRoute
+  '/props/$id': typeof PropsIdRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
   '/dev': typeof DevIndexRoute
@@ -99,6 +107,7 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/dev': typeof DevRouteRouteWithChildren
   '/dev/auth': typeof DevAuthRoute
+  '/props/$id': typeof PropsIdRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
   '/dev/': typeof DevIndexRoute
@@ -113,6 +122,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dev'
     | '/dev/auth'
+    | '/props/$id'
     | '/public/privacy'
     | '/public/terms'
     | '/dev/'
@@ -124,6 +134,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/dev/auth'
+    | '/props/$id'
     | '/public/privacy'
     | '/public/terms'
     | '/dev'
@@ -136,6 +147,7 @@ export interface FileRouteTypes {
     | '/'
     | '/dev'
     | '/dev/auth'
+    | '/props/$id'
     | '/public/privacy'
     | '/public/terms'
     | '/dev/'
@@ -148,6 +160,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DevRouteRoute: typeof DevRouteRouteWithChildren
+  PropsIdRoute: typeof PropsIdRoute
   PublicPrivacyRoute: typeof PublicPrivacyRoute
   PublicTermsRoute: typeof PublicTermsRoute
   MessagesIndexRoute: typeof MessagesIndexRoute
@@ -221,6 +234,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicPrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/props/$id': {
+      id: '/props/$id'
+      path: '/props/$id'
+      fullPath: '/props/$id'
+      preLoaderRoute: typeof PropsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dev/auth': {
       id: '/dev/auth'
       path: '/auth'
@@ -248,6 +268,7 @@ const DevRouteRouteWithChildren = DevRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DevRouteRoute: DevRouteRouteWithChildren,
+  PropsIdRoute: PropsIdRoute,
   PublicPrivacyRoute: PublicPrivacyRoute,
   PublicTermsRoute: PublicTermsRoute,
   MessagesIndexRoute: MessagesIndexRoute,

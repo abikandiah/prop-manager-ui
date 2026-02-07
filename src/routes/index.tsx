@@ -5,7 +5,7 @@ import {
 } from '@abumble/design-system/components/Card'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { MessageSquare, Package } from 'lucide-react'
-import { PageDescription, PageHeader } from '@/components/ui'
+import { BannerHeader } from '@/components/ui'
 
 export const Route = createFileRoute('/')({
 	component: Home,
@@ -14,19 +14,10 @@ export const Route = createFileRoute('/')({
 function Home() {
 	return (
 		<div className="flex flex-col gap-8">
-			{/* Header Banner */}
-			<div className="relative -mx-4 -mt-4 overflow-hidden border-b bg-card md:-mx-6 md:-mt-6">
-				<div className="image-background absolute inset-0 opacity-10" />
-				<div className="relative px-4 py-8 md:px-6 md:py-12">
-					<div className="space-y-1.5">
-						<PageHeader>Dashboard</PageHeader>
-						<PageDescription>
-							Welcome to PropMange. Manage your properties and messages from one
-							central dashboard.
-						</PageDescription>
-					</div>
-				</div>
-			</div>
+			<BannerHeader
+				title="Dashboard"
+				description="Your home base. From here you can jump to your list of properties or your messages—everything in one place."
+			/>
 
 			<div className="grid gap-4 sm:grid-cols-2">
 				<Link to="/props">
@@ -37,7 +28,7 @@ function Home() {
 						</CardHeader>
 						<CardContent>
 							<p className="text-sm text-muted-foreground">
-								View and manage your properties.
+								See and manage every property you own or look after.
 							</p>
 						</CardContent>
 					</Card>
@@ -50,7 +41,7 @@ function Home() {
 						</CardHeader>
 						<CardContent>
 							<p className="text-sm text-muted-foreground">
-								Browse and manage messages.
+								Read and manage your messages in one place.
 							</p>
 						</CardContent>
 					</Card>

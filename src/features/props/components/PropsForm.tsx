@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
+import { useNavigate } from '@tanstack/react-router'
 import { Button } from '@abumble/design-system/components/Button'
 import { Input } from '@abumble/design-system/components/Input'
 import { toast } from 'sonner'
@@ -58,6 +59,7 @@ function isRequiredFieldsValid(legalName: string, address: AddressFormValue): bo
 }
 
 export function PropsForm() {
+	const navigate = useNavigate()
 	const createProp = useCreateProp()
 	const [isDialogOpen, setIsDialogOpen] = useState(false)
 	const [form, setForm] = useState<FormState>(initialForm)
@@ -127,10 +129,11 @@ export function PropsForm() {
 		}
 
 		createProp.mutate(payload, {
-			onSuccess: () => {
+			onSuccess: (data) => {
 				setForm(initialForm)
 				setIsDialogOpen(false)
 				toast.success('Property created successfully')
+				navigate({ to: '/props/$id', params: { id: data.id } })
 			},
 			onError: (err) => {
 				toast.error(`Failed to create property: ${err.message}`)

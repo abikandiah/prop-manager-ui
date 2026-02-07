@@ -16,8 +16,12 @@ function RouteComponent() {
 					<div className="space-y-1.5">
 						<PageHeader>Properties</PageHeader>
 						<PageDescription>
-							Manage and monitor your properties, units, and tenants from one
-							central dashboard.
+							A property is a real estate asset you own or manage—a building or
+							parcel with a legal name, address, type (residential, commercial,
+							industrial, or mixed-use), and details like parcel number and
+							year built. Use this page to add and edit properties; each one
+							can later be linked to units and tenants for tracking and
+							monitoring.
 						</PageDescription>
 					</div>
 				</div>

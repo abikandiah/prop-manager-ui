@@ -3,29 +3,86 @@ import { BaseService } from '@/api/base-service'
 // --- Constants ---
 export const IDEMPOTENCY_HEADER = 'X-Request-Id'
 
-// --- Types ---
+// --- Types (aligned with backend PropResponse, CreatePropRequest, UpdatePropRequest) ---
+
+export const PROPERTY_TYPES = [
+	'SINGLE_FAMILY_HOME', // A standalone house
+	'APARTMENT_BUILDING', // A multi-unit residential building
+	'CONDO_UNIT',         // A single unit within a shared building
+	'TOWNHOUSE',          // Row housing
+	'COMMERCIAL',         // Offices/Retail
+	'INDUSTRIAL',         // Warehouses
+	'MIXED_USE',          // Commercial + Residential
+] as const
+export type PropertyType = (typeof PROPERTY_TYPES)[number]
+
+export interface Address {
+	id: string
+	addressLine1: string
+	addressLine2: string | null
+	city: string
+	stateProvinceRegion: string
+	postalCode: string
+	countryCode: string
+	latitude: number | null
+	longitude: number | null
+	createdAt: string
+}
+
 export interface Prop {
 	id: string
-	name: string
-	description: string | null
+	legalName: string
+	addressId: string
+	address: Address | null
+	propertyType: PropertyType
+	parcelNumber: string | null
+	ownerId: string | null
+	totalArea: number | null
+	yearBuilt: number | null
+	isActive: boolean
 	createdAt: string
 	updatedAt: string
 }
 
-export interface CreatePropPayload {
-	name: string
-	description?: string | null
+/** Nested address in create payload (composite resource). Backend creates address and links it to the prop in one transaction. */
+export interface CreatePropAddressPayload {
+	addressLine1: string
+	addressLine2?: string | null
+	city: string
+	stateProvinceRegion: string
+	postalCode: string
+	countryCode: string
+	latitude?: number | null
+	longitude?: number | null
 }
 
+export interface CreatePropPayload {
+	legalName: string
+	address: CreatePropAddressPayload
+	propertyType: PropertyType
+	parcelNumber?: string | null
+	ownerId?: string | null
+	totalArea?: number | null
+	yearBuilt?: number | null
+	isActive?: boolean
+}
+
+/** Same shape as create; when present on update, backend creates a new address and links it to the prop. */
 export interface UpdatePropPayload {
-	name?: string
-	description?: string | null
+	legalName?: string
+	address?: CreatePropAddressPayload
+	propertyType?: PropertyType
+	parcelNumber?: string | null
+	ownerId?: string | null
+	totalArea?: number | null
+	yearBuilt?: number | null
+	isActive?: boolean
 }
 
 // --- Service ---
 class PropsApi extends BaseService<Prop, CreatePropPayload, UpdatePropPayload> {
 	constructor() {
-		super('/props')
+		super('props')
 	}
 }
 export const propsApi = new PropsApi()

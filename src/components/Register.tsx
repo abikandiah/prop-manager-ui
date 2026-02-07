@@ -43,7 +43,7 @@ export const Register = () => {
 				type="info"
 				message="This is a dev project. It is not intended for business or commercial use.
 				 No warranty or support is provided. Use at risk."
-				className="mb-4 w-full max-w-md rounded-lg"
+				className="mb-4 w-full max-w-md rounded"
 			/>
 
 			<Card className="w-full max-w-md">

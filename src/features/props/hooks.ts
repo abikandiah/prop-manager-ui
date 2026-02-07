@@ -12,8 +12,15 @@ function applyCreate(
 ): Prop {
 	const optimistic: Prop = {
 		id: generateOptimisticId(),
-		name: payload.name,
-		description: payload.description ?? null,
+		legalName: payload.legalName,
+		addressId: '', // unknown until server responds
+		address: null,
+		propertyType: payload.propertyType,
+		parcelNumber: payload.parcelNumber ?? null,
+		ownerId: payload.ownerId ?? null,
+		totalArea: payload.totalArea ?? null,
+		yearBuilt: payload.yearBuilt ?? null,
+		isActive: payload.isActive ?? true,
 		createdAt: nowIso(),
 		updatedAt: nowIso(),
 	}
@@ -29,14 +36,26 @@ function applyUpdate(
 	payload: UpdatePropPayload,
 ): void {
 	const updatedAt = nowIso()
+	// Omit nested address from cache merge; server response will have full address
+	const { address: _addr, ...propFields } = payload
 	queryClient.setQueryData(
 		propKeys.list(),
 		(old: Array<Prop> | undefined) =>
-			old?.map((p) => (p.id === id ? { ...p, ...payload, updatedAt } : p)) ??
-			[],
+			old?.map((p) =>
+				p.id === id
+					? { ...p, ...propFields, updatedAt, address: _addr != null ? null : p.address }
+					: p,
+			) ?? [],
 	)
 	queryClient.setQueryData(propKeys.detail(id), (old: Prop | undefined) =>
-		old ? { ...old, ...payload, updatedAt } : undefined,
+		old
+			? {
+					...old,
+					...propFields,
+					updatedAt,
+					address: _addr != null ? null : old.address,
+				}
+			: undefined,
 	)
 }
 

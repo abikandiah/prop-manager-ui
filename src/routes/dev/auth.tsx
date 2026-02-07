@@ -56,12 +56,12 @@ function DevAuth() {
 			</div>
 
 			<Card className="w-full max-w-md border-muted/50">
-				<CardHeader className="space-y-1.5 pb-6">
+				<CardHeader className="pb-4">
 					<h2 className="text-2xl font-semibold tracking-tight text-foreground">
 						Login
 					</h2>
 					<p className="text-sm text-muted-foreground">
-						Enter your credentials for <code>/api/dev/login</code>
+						Enter your dev credentials
 					</p>
 				</CardHeader>
 				<CardContent className="grid gap-6">

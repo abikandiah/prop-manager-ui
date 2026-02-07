@@ -1,10 +1,9 @@
 import { useEffect } from 'react'
-import { useMutationState } from '@tanstack/react-query'
 import { cn } from '@abumble/design-system/utils'
 import { toast } from 'sonner'
-import { Button } from '@abumble/design-system/components/Button'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
-import { useCreateProp, useDeleteProp, usePropsList } from '@/features/props'
+import { useCreateProp, usePropsList } from '@/features/props'
+import type { Prop } from '@/features/props/props'
 import {
 	Table,
 	TableBody,
@@ -14,30 +13,37 @@ import {
 	TableRow,
 } from '@/components/ui/table'
 
+function formatAddress(p: Prop): string {
+	const a = p.address
+	if (!a) return '-'
+	const parts = [
+		a.addressLine1,
+		a.addressLine2,
+		[a.city, a.stateProvinceRegion].filter(Boolean).join(', '),
+		a.postalCode,
+		a.countryCode,
+	].filter(Boolean)
+	return parts.join(', ') || '-'
+}
+
 export function PropsTableView() {
 	const { data: props, isLoading, isError, error } = usePropsList()
 	const createProp = useCreateProp()
-	const deleteProp = useDeleteProp()
 
 	useEffect(() => {
 		if (isError) {
-			toast.error(`Error loading properties: ${error.message}`)
+			toast.error(`Error loading properties: ${error?.message ?? 'Unknown'}`)
 		}
 	}, [isError, error])
 
-	const pendingDeletes = useMutationState({
-		filters: { mutationKey: ['deleteProp'], status: 'pending' },
-		select: (m) => m.state.variables as string,
-	})
-
 	return (
-		<div className="rounded-md border bg-card overflow-hidden">
+		<div className="rounded border bg-card overflow-hidden">
 			<Table>
 				<TableHeader>
 					<TableRow>
-						<TableHead>Name</TableHead>
-						<TableHead>Description</TableHead>
-						<TableHead className="w-[100px] text-right">Actions</TableHead>
+						<TableHead>Type</TableHead>
+						<TableHead>Legal name</TableHead>
+						<TableHead>Address</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
@@ -45,13 +51,13 @@ export function PropsTableView() {
 						Array.from({ length: 5 }).map((_, i) => (
 							<TableRow key={i}>
 								<TableCell>
+									<Skeleton className="h-6 w-20" />
+								</TableCell>
+								<TableCell>
 									<Skeleton className="h-6 w-32" />
 								</TableCell>
 								<TableCell>
-									<Skeleton className="h-6 w-full max-w-[300px]" />
-								</TableCell>
-								<TableCell className="text-right">
-									<Skeleton className="ml-auto h-8 w-16" />
+									<Skeleton className="h-6 w-full max-w-[200px]" />
 								</TableCell>
 							</TableRow>
 						))
@@ -67,17 +73,20 @@ export function PropsTableView() {
 					) : (
 						props.map((p) => {
 							const isPendingSync =
-								createProp.isPending && createProp.variables.name === p.name
-							const isDeleting = pendingDeletes.includes(p.id)
+								createProp.isPending &&
+								createProp.variables?.legalName === p.legalName
 
 							return (
 								<TableRow key={p.id}>
+									<TableCell className="text-muted-foreground">
+										{p.propertyType.replace(/_/g, ' ')}
+									</TableCell>
 									<TableCell className="font-medium">
 										<div className="flex flex-col">
 											<span
 												className={cn(isPendingSync && 'text-muted-foreground')}
 											>
-												{p.name}
+												{p.legalName}
 											</span>
 											{isPendingSync && (
 												<span className="text-xs text-muted-foreground">
@@ -86,30 +95,8 @@ export function PropsTableView() {
 											)}
 										</div>
 									</TableCell>
-									<TableCell className="text-muted-foreground">
-										{p.description || '-'}
-									</TableCell>
-									<TableCell className="text-right">
-										<Button
-											variant="outline"
-											size="sm"
-											onClick={() =>
-												deleteProp.mutate(p.id, {
-													onSuccess: () => {
-														toast.success('Property deleted successfully')
-													},
-													onError: (err) => {
-														toast.error(
-															`Failed to delete property: ${err.message}`,
-														)
-													},
-												})
-											}
-											disabled={isDeleting || isPendingSync}
-											className="h-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
-										>
-											{isDeleting ? 'Deleting…' : 'Delete'}
-										</Button>
+									<TableCell className="max-w-[220px] truncate text-muted-foreground">
+										{formatAddress(p)}
 									</TableCell>
 								</TableRow>
 							)

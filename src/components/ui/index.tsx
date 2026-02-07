@@ -94,7 +94,7 @@ export function ExternalSite({
 const pageHeaderVariants = cva('font-bold tracking-tight text-foreground', {
 	variants: {
 		size: {
-			default: 'sm:text-4xl text-3xl',
+			default: 'sm:text-3xl text-2xl',
 			sm: 'sm:text-2xl text-xl',
 		},
 	},
@@ -115,8 +115,8 @@ export function PageHeader({
 const pageDescriptionVariants = cva('text-muted-foreground', {
 	variants: {
 		size: {
-			default: 'sm:text-2xl text-xl',
-			sm: 'sm:text-xl text-lg',
+			default: 'sm:text-xl text-lg',
+			sm: 'sm:text-lg text-md',
 		},
 	},
 	defaultVariants: {

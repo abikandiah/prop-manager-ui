@@ -4,12 +4,13 @@ import {
 	CardContent,
 	CardHeader,
 } from '@abumble/design-system/components/Card'
+import { Input } from '@abumble/design-system/components/Input'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { api, setDevToken } from '@/api/client'
 import { PageDescription, PageHeader } from '@/components/ui'
 import { Label } from '@/components/ui/label'
-import { api, setDevToken } from '@/api/client'
 
 export const Route = createFileRoute('/dev/auth')({
 	component: DevAuth,
@@ -21,14 +22,11 @@ function DevAuth() {
 	const [loading, setLoading] = useState(false)
 	const navigate = useNavigate()
 
-	const handleSubmit = async (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.SubmitEvent) => {
 		e.preventDefault()
 		setLoading(true)
 		try {
-			// Endpoint specified by user: /api/dev/login
-			// Our axios 'api' has baseURL: /api
 			const response = await api.post('/dev/login', { username, password })
-			console.log(response.data)
 			const token = response.data.token
 
 			if (token) {
@@ -70,32 +68,30 @@ function DevAuth() {
 					<form onSubmit={handleSubmit} className="grid gap-5">
 						<div className="grid gap-2">
 							<Label htmlFor="username">Username</Label>
-							<input
+							<Input
 								id="username"
 								type="text"
 								autoComplete="username"
 								value={username}
 								onChange={(e) => setUsername(e.target.value)}
-								className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
 								required
 							/>
 						</div>
 						<div className="grid gap-2">
 							<Label htmlFor="password">Password</Label>
-							<input
+							<Input
 								id="password"
 								type="password"
 								autoComplete="current-password"
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
-								className="flex h-11 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
 								required
 							/>
 						</div>
 						<Button
 							type="submit"
 							className="w-full h-11 mt-2 font-medium"
-							disabled={loading}
+							disabled={loading || !username.trim() || !password}
 						>
 							{loading ? 'Logging in...' : 'Login'}
 						</Button>

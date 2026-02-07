@@ -47,8 +47,7 @@ function Root() {
 	}
 
 	let altContent = null
-
-	if (isPublic || location.pathname === '/dev/auth') {
+	if (isPublic || location.pathname.startsWith('/dev')) {
 		altContent = <Outlet />
 	} else if (isLoadingUser) {
 		altContent = <LoadingScreen />

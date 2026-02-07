@@ -9,15 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as DevRouteRouteImport } from './routes/dev/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as PropsIndexRouteImport } from './routes/props/index'
 import { Route as ProfileIndexRouteImport } from './routes/profile/index'
 import { Route as MessagesIndexRouteImport } from './routes/messages/index'
+import { Route as DevIndexRouteImport } from './routes/dev/index'
 import { Route as PublicTermsRouteImport } from './routes/public/terms'
 import { Route as PublicPrivacyRouteImport } from './routes/public/privacy'
 import { Route as DevAuthRouteImport } from './routes/dev/auth'
 
+const DevRouteRoute = DevRouteRouteImport.update({
+  id: '/dev',
+  path: '/dev',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -43,6 +50,11 @@ const MessagesIndexRoute = MessagesIndexRouteImport.update({
   path: '/messages/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DevIndexRoute = DevIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => DevRouteRoute,
+} as any)
 const PublicTermsRoute = PublicTermsRouteImport.update({
   id: '/public/terms',
   path: '/public/terms',
@@ -54,16 +66,18 @@ const PublicPrivacyRoute = PublicPrivacyRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const DevAuthRoute = DevAuthRouteImport.update({
-  id: '/dev/auth',
-  path: '/dev/auth',
-  getParentRoute: () => rootRouteImport,
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => DevRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dev': typeof DevRouteRouteWithChildren
   '/dev/auth': typeof DevAuthRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
+  '/dev/': typeof DevIndexRoute
   '/messages/': typeof MessagesIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/props/': typeof PropsIndexRoute
@@ -74,6 +88,7 @@ export interface FileRoutesByTo {
   '/dev/auth': typeof DevAuthRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
+  '/dev': typeof DevIndexRoute
   '/messages': typeof MessagesIndexRoute
   '/profile': typeof ProfileIndexRoute
   '/props': typeof PropsIndexRoute
@@ -82,9 +97,11 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dev': typeof DevRouteRouteWithChildren
   '/dev/auth': typeof DevAuthRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
+  '/dev/': typeof DevIndexRoute
   '/messages/': typeof MessagesIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/props/': typeof PropsIndexRoute
@@ -94,9 +111,11 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/dev'
     | '/dev/auth'
     | '/public/privacy'
     | '/public/terms'
+    | '/dev/'
     | '/messages/'
     | '/profile/'
     | '/props/'
@@ -107,6 +126,7 @@ export interface FileRouteTypes {
     | '/dev/auth'
     | '/public/privacy'
     | '/public/terms'
+    | '/dev'
     | '/messages'
     | '/profile'
     | '/props'
@@ -114,9 +134,11 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/dev'
     | '/dev/auth'
     | '/public/privacy'
     | '/public/terms'
+    | '/dev/'
     | '/messages/'
     | '/profile/'
     | '/props/'
@@ -125,7 +147,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DevAuthRoute: typeof DevAuthRoute
+  DevRouteRoute: typeof DevRouteRouteWithChildren
   PublicPrivacyRoute: typeof PublicPrivacyRoute
   PublicTermsRoute: typeof PublicTermsRoute
   MessagesIndexRoute: typeof MessagesIndexRoute
@@ -136,6 +158,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/dev': {
+      id: '/dev'
+      path: '/dev'
+      fullPath: '/dev'
+      preLoaderRoute: typeof DevRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -171,6 +200,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MessagesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/dev/': {
+      id: '/dev/'
+      path: '/'
+      fullPath: '/dev/'
+      preLoaderRoute: typeof DevIndexRouteImport
+      parentRoute: typeof DevRouteRoute
+    }
     '/public/terms': {
       id: '/public/terms'
       path: '/public/terms'
@@ -187,17 +223,31 @@ declare module '@tanstack/react-router' {
     }
     '/dev/auth': {
       id: '/dev/auth'
-      path: '/dev/auth'
+      path: '/auth'
       fullPath: '/dev/auth'
       preLoaderRoute: typeof DevAuthRouteImport
-      parentRoute: typeof rootRouteImport
+      parentRoute: typeof DevRouteRoute
     }
   }
 }
 
+interface DevRouteRouteChildren {
+  DevAuthRoute: typeof DevAuthRoute
+  DevIndexRoute: typeof DevIndexRoute
+}
+
+const DevRouteRouteChildren: DevRouteRouteChildren = {
+  DevAuthRoute: DevAuthRoute,
+  DevIndexRoute: DevIndexRoute,
+}
+
+const DevRouteRouteWithChildren = DevRouteRoute._addFileChildren(
+  DevRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DevAuthRoute: DevAuthRoute,
+  DevRouteRoute: DevRouteRouteWithChildren,
   PublicPrivacyRoute: PublicPrivacyRoute,
   PublicTermsRoute: PublicTermsRoute,
   MessagesIndexRoute: MessagesIndexRoute,

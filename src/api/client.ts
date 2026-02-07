@@ -6,6 +6,7 @@ const DEV_AUTH_TOKEN_KEY = 'DEV_AUTH_TOKEN'
 let cachedToken: string | null = null
 
 export const getDevToken = () => {
+	if (!config.isDevelopment) return null
 	if (cachedToken === null) {
 		cachedToken = localStorage.getItem(DEV_AUTH_TOKEN_KEY)
 	}
@@ -13,11 +14,13 @@ export const getDevToken = () => {
 }
 
 export const setDevToken = (token: string) => {
+	if (!config.isDevelopment) return
 	cachedToken = token
 	localStorage.setItem(DEV_AUTH_TOKEN_KEY, token)
 }
 
 export const clearDevToken = () => {
+	if (!config.isDevelopment) return
 	cachedToken = ''
 	localStorage.removeItem(DEV_AUTH_TOKEN_KEY)
 }
@@ -31,8 +34,9 @@ export const api = axios.create({
 	withCredentials: true,
 })
 
-// Request Interceptor: Add Dev Token
+// Request Interceptor: Add Dev Token (development only)
 api.interceptors.request.use((_config) => {
+	if (!config.isDevelopment) return _config
 	const token = getDevToken()
 	if (token) {
 		_config.headers['Authorization'] = `Bearer ${token}`
@@ -46,7 +50,7 @@ api.interceptors.response.use(
 	(error) => {
 		if (error.response?.status === 401) {
 			console.error('401 Unauthorized')
-			if (config.isDev) {
+			if (config.isDevelopment) {
 				clearDevToken()
 			}
 		}

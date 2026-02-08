@@ -32,13 +32,13 @@ function RouteComponent() {
 				<FormDialog
 					open={addOpen}
 					onOpenChange={setAddOpen}
-					title="Add Property"
+					title="Add property"
 					description="Enter the legal name, address, and property details."
 					trigger={
 						<DialogTrigger asChild>
 							<Button>
 								<Plus className="size-4" />
-								Add Property
+								Add property
 							</Button>
 						</DialogTrigger>
 					}
@@ -46,8 +46,7 @@ function RouteComponent() {
 					<PropsForm
 						onSuccess={(data) => {
 							setAddOpen(false)
-							if (data)
-								navigate({ to: '/props/$id', params: { id: data.id } })
+							if (data) navigate({ to: '/props/$id', params: { id: data.id } })
 						}}
 						onCancel={() => setAddOpen(false)}
 						submitLabel="Create Property"

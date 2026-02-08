@@ -12,8 +12,9 @@ import { MoreVertical, Pencil, Plus, Trash2 } from 'lucide-react'
 import { AddressDisplay, PropsForm } from '@/features/props/components'
 import { usePropDetail, useDeleteProp } from '@/features/props/hooks'
 import { formatAddress } from '@/features/props/props'
+import { DelayedLoadingFallback } from '@/components/ui'
 import type { Prop } from '@/features/props/props'
-import { UnitForm, UnitsTableView } from '@/features/units/components'
+import { UnitForm, UnitDetailSection, UnitsTableView } from '@/features/units/components'
 import {
 	BannerHeader,
 	Dialog,
@@ -22,14 +23,17 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-	DialogTrigger,
 	FormDialog,
+	DialogTrigger,
 	TextLink,
 } from '@/components/ui'
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
 
 export const Route = createFileRoute('/props/$id')({
-	component: PropDetailPage,
+	validateSearch: (s): { unit?: string } => ({
+		unit: typeof s?.unit === 'string' && s.unit.length > 0 ? s.unit : undefined,
+	}),
+	component: PropLayout,
 })
 
 function PropActions({ prop, onEdit }: { prop: Prop; onEdit: () => void }) {
@@ -131,8 +135,11 @@ function PropActions({ prop, onEdit }: { prop: Prop; onEdit: () => void }) {
 	)
 }
 
-function PropDetailPage() {
+function PropLayout() {
 	const { id } = Route.useParams()
+	const navigate = useNavigate()
+	const { unit: unitIdFromSearch } = Route.useSearch()
+
 	const { data: prop, isLoading, isError, error } = usePropDetail(id)
 	const [editingProp, setEditingProp] = useState<Prop | null>(null)
 
@@ -142,39 +149,36 @@ function PropDetailPage() {
 		}
 	}, [isError, error])
 
-	if (isLoading) {
-		return (
-			<div className="flex flex-col gap-6">
-				<div className="flex items-center gap-2">
-					<Skeleton className="h-9 w-9 rounded" />
-					<Skeleton className="h-8 w-48" />
-				</div>
-				<div className="space-y-3">
-					{[1, 2, 3, 4, 5].map((i) => (
-						<div key={i} className="flex gap-6">
-							<Skeleton className="h-5 w-24 shrink-0" />
-							<Skeleton className="h-5 flex-1" />
-						</div>
-					))}
-				</div>
+	const skeleton = (
+		<div className="flex flex-col gap-6">
+			<div className="flex items-center gap-2">
+				<Skeleton className="h-9 w-9 rounded" />
+				<Skeleton className="h-8 w-48" />
 			</div>
-		)
-	}
-
-	if (isError || !prop) {
-		const message = isError
-			? (error?.message ?? 'Failed to load property')
-			: 'The property you were looking for was not found.'
-		return (
-			<CenteredEmptyState
-				title="Property not found"
-				description={message}
-				action={<TextLink to="/props">Back to properties</TextLink>}
-			/>
-		)
-	}
+			<div className="space-y-3">
+				{[1, 2, 3, 4, 5].map((i) => (
+					<div key={i} className="flex gap-6">
+						<Skeleton className="h-5 w-24 shrink-0" />
+						<Skeleton className="h-5 flex-1" />
+					</div>
+				))}
+			</div>
+		</div>
+	)
 
 	return (
+		<DelayedLoadingFallback isLoading={isLoading} fallback={skeleton}>
+			{isError || !prop ? (
+				<CenteredEmptyState
+					title="Property not found"
+					description={
+						isError
+							? (error?.message ?? 'Failed to load property')
+							: 'The property you were looking for was not found.'
+					}
+					action={<TextLink to="/props">Back to properties</TextLink>}
+				/>
+			) : (
 		<div className="flex flex-col gap-6">
 			<BannerHeader
 				title={prop.legalName}
@@ -281,7 +285,40 @@ function PropDetailPage() {
 			</table>
 
 			<UnitsSection propId={prop.id} />
+
+			{unitIdFromSearch != null && (
+				<Dialog
+					open={true}
+					onOpenChange={(open) => {
+						if (!open) {
+							navigate({ to: '/props/$id', params: { id: prop.id }, search: {} })
+						}
+					}}
+				>
+					<DialogContent
+						className="max-w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto p-0 gap-0"
+						showCloseButton={false}
+						onPointerDownOutside={() =>
+							navigate({ to: '/props/$id', params: { id: prop.id }, search: {} })
+						}
+						onEscapeKeyDown={() =>
+							navigate({ to: '/props/$id', params: { id: prop.id }, search: {} })
+						}
+					>
+						<UnitDetailSection
+							propId={prop.id}
+							unitId={unitIdFromSearch}
+							inModal
+							onClose={() =>
+								navigate({ to: '/props/$id', params: { id: prop.id }, search: {} })
+							}
+						/>
+					</DialogContent>
+				</Dialog>
+			)}
 		</div>
+			)}
+		</DelayedLoadingFallback>
 	)
 }
 
@@ -309,7 +346,7 @@ function UnitsSection({ propId }: { propId: string }) {
 						<DialogTrigger asChild>
 							<Button>
 								<Plus className="size-4" />
-								Add Unit
+								Add unit
 							</Button>
 						</DialogTrigger>
 					}

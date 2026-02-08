@@ -19,7 +19,7 @@ import Header from '@/components/Header'
 import { useNetwork } from '@/contexts/network'
 import { useAuth } from '@/contexts/auth'
 import { Register } from '@/components/Register'
-import { LoadingScreen } from '@/components/ui'
+import { DelayedLoadingFallback, LoadingScreen } from '@/components/ui'
 
 interface MyRouterContext {
 	queryClient: QueryClient
@@ -46,16 +46,21 @@ function Root() {
 		)
 	}
 
+	const isPublicOrDev = isPublic || location.pathname.startsWith('/dev')
 	let altContent = null
-	if (isPublic || location.pathname.startsWith('/dev')) {
+	if (isPublicOrDev) {
 		altContent = <Outlet />
 	} else if (isLoadingUser) {
-		altContent = <LoadingScreen />
+		altContent = (
+			<DelayedLoadingFallback isLoading={isLoadingUser} fallback={<LoadingScreen />}>
+				{null}
+			</DelayedLoadingFallback>
+		)
 	} else if (!isUserDefined) {
 		altContent = <Register />
 	}
 
-	if (altContent != null) {
+	if (isPublicOrDev || isLoadingUser || !isUserDefined) {
 		return (
 			<div className="layout-header-full flex min-h-screen w-full flex-col">
 				<Header />

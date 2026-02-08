@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { useCreateProp, usePropsList } from '@/features/props'
 import type { Prop } from '@/features/props/props'
+import { DelayedLoadingFallback } from '@/components/ui'
 import {
 	Table,
 	TableBody,
@@ -49,8 +50,9 @@ export function PropsTableView() {
 					</TableRow>
 				</TableHeader>
 				<TableBody>
-					{isLoading ? (
-						Array.from({ length: 5 }).map((_, i) => (
+					<DelayedLoadingFallback
+						isLoading={isLoading}
+						fallback={Array.from({ length: 5 }).map((_, i) => (
 							<TableRow key={i}>
 								<TableCell>
 									<Skeleton className="h-6 w-20" />
@@ -62,18 +64,19 @@ export function PropsTableView() {
 									<Skeleton className="h-6 w-full max-w-[200px]" />
 								</TableCell>
 							</TableRow>
-						))
-					) : !props || props.length === 0 ? (
-						<TableRow>
-							<TableCell
-								colSpan={3}
-								className="h-24 text-center text-muted-foreground"
-							>
-								No properties yet. Add one above.
-							</TableCell>
-						</TableRow>
-					) : (
-						props.map((p) => {
+						))}
+					>
+						{!props || props.length === 0 ? (
+							<TableRow>
+								<TableCell
+									colSpan={3}
+									className="h-24 text-center text-muted-foreground"
+								>
+									No properties yet. Add one above.
+								</TableCell>
+							</TableRow>
+						) : (
+							props.map((p) => {
 							const isPendingSync =
 								createProp.isPending &&
 								createProp.variables?.legalName === p.legalName
@@ -114,8 +117,8 @@ export function PropsTableView() {
 									</TableCell>
 								</TableRow>
 							)
-						})
-					)}
+						}) )}
+					</DelayedLoadingFallback>
 				</TableBody>
 			</Table>
 		</div>

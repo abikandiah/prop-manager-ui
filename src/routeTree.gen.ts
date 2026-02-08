@@ -18,8 +18,11 @@ import { Route as MessagesIndexRouteImport } from './routes/messages/index'
 import { Route as DevIndexRouteImport } from './routes/dev/index'
 import { Route as PublicTermsRouteImport } from './routes/public/terms'
 import { Route as PublicPrivacyRouteImport } from './routes/public/privacy'
-import { Route as PropsIdRouteImport } from './routes/props/$id'
 import { Route as DevAuthRouteImport } from './routes/dev/auth'
+import { Route as PropsIdRouteRouteImport } from './routes/props/$id/route'
+import { Route as PropsIdIndexRouteImport } from './routes/props/$id/index'
+import { Route as PropsIdUnitsIndexRouteImport } from './routes/props/$id/units/index'
+import { Route as PropsIdUnitsUnitIdRouteImport } from './routes/props/$id/units/$unitId'
 
 const DevRouteRoute = DevRouteRouteImport.update({
   id: '/dev',
@@ -66,22 +69,37 @@ const PublicPrivacyRoute = PublicPrivacyRouteImport.update({
   path: '/public/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PropsIdRoute = PropsIdRouteImport.update({
-  id: '/props/$id',
-  path: '/props/$id',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const DevAuthRoute = DevAuthRouteImport.update({
   id: '/auth',
   path: '/auth',
   getParentRoute: () => DevRouteRoute,
 } as any)
+const PropsIdRouteRoute = PropsIdRouteRouteImport.update({
+  id: '/props/$id',
+  path: '/props/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PropsIdIndexRoute = PropsIdIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => PropsIdRouteRoute,
+} as any)
+const PropsIdUnitsIndexRoute = PropsIdUnitsIndexRouteImport.update({
+  id: '/units/',
+  path: '/units/',
+  getParentRoute: () => PropsIdRouteRoute,
+} as any)
+const PropsIdUnitsUnitIdRoute = PropsIdUnitsUnitIdRouteImport.update({
+  id: '/units/$unitId',
+  path: '/units/$unitId',
+  getParentRoute: () => PropsIdRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dev': typeof DevRouteRouteWithChildren
+  '/props/$id': typeof PropsIdRouteRouteWithChildren
   '/dev/auth': typeof DevAuthRoute
-  '/props/$id': typeof PropsIdRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
   '/dev/': typeof DevIndexRoute
@@ -89,11 +107,13 @@ export interface FileRoutesByFullPath {
   '/profile/': typeof ProfileIndexRoute
   '/props/': typeof PropsIndexRoute
   '/settings/': typeof SettingsIndexRoute
+  '/props/$id/': typeof PropsIdIndexRoute
+  '/props/$id/units/$unitId': typeof PropsIdUnitsUnitIdRoute
+  '/props/$id/units/': typeof PropsIdUnitsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dev/auth': typeof DevAuthRoute
-  '/props/$id': typeof PropsIdRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
   '/dev': typeof DevIndexRoute
@@ -101,13 +121,16 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileIndexRoute
   '/props': typeof PropsIndexRoute
   '/settings': typeof SettingsIndexRoute
+  '/props/$id': typeof PropsIdIndexRoute
+  '/props/$id/units/$unitId': typeof PropsIdUnitsUnitIdRoute
+  '/props/$id/units': typeof PropsIdUnitsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dev': typeof DevRouteRouteWithChildren
+  '/props/$id': typeof PropsIdRouteRouteWithChildren
   '/dev/auth': typeof DevAuthRoute
-  '/props/$id': typeof PropsIdRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
   '/dev/': typeof DevIndexRoute
@@ -115,14 +138,17 @@ export interface FileRoutesById {
   '/profile/': typeof ProfileIndexRoute
   '/props/': typeof PropsIndexRoute
   '/settings/': typeof SettingsIndexRoute
+  '/props/$id/': typeof PropsIdIndexRoute
+  '/props/$id/units/$unitId': typeof PropsIdUnitsUnitIdRoute
+  '/props/$id/units/': typeof PropsIdUnitsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/dev'
-    | '/dev/auth'
     | '/props/$id'
+    | '/dev/auth'
     | '/public/privacy'
     | '/public/terms'
     | '/dev/'
@@ -130,11 +156,13 @@ export interface FileRouteTypes {
     | '/profile/'
     | '/props/'
     | '/settings/'
+    | '/props/$id/'
+    | '/props/$id/units/$unitId'
+    | '/props/$id/units/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/dev/auth'
-    | '/props/$id'
     | '/public/privacy'
     | '/public/terms'
     | '/dev'
@@ -142,12 +170,15 @@ export interface FileRouteTypes {
     | '/profile'
     | '/props'
     | '/settings'
+    | '/props/$id'
+    | '/props/$id/units/$unitId'
+    | '/props/$id/units'
   id:
     | '__root__'
     | '/'
     | '/dev'
-    | '/dev/auth'
     | '/props/$id'
+    | '/dev/auth'
     | '/public/privacy'
     | '/public/terms'
     | '/dev/'
@@ -155,12 +186,15 @@ export interface FileRouteTypes {
     | '/profile/'
     | '/props/'
     | '/settings/'
+    | '/props/$id/'
+    | '/props/$id/units/$unitId'
+    | '/props/$id/units/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DevRouteRoute: typeof DevRouteRouteWithChildren
-  PropsIdRoute: typeof PropsIdRoute
+  PropsIdRouteRoute: typeof PropsIdRouteRouteWithChildren
   PublicPrivacyRoute: typeof PublicPrivacyRoute
   PublicTermsRoute: typeof PublicTermsRoute
   MessagesIndexRoute: typeof MessagesIndexRoute
@@ -234,19 +268,40 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicPrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/props/$id': {
-      id: '/props/$id'
-      path: '/props/$id'
-      fullPath: '/props/$id'
-      preLoaderRoute: typeof PropsIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/dev/auth': {
       id: '/dev/auth'
       path: '/auth'
       fullPath: '/dev/auth'
       preLoaderRoute: typeof DevAuthRouteImport
       parentRoute: typeof DevRouteRoute
+    }
+    '/props/$id': {
+      id: '/props/$id'
+      path: '/props/$id'
+      fullPath: '/props/$id'
+      preLoaderRoute: typeof PropsIdRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/props/$id/': {
+      id: '/props/$id/'
+      path: '/'
+      fullPath: '/props/$id/'
+      preLoaderRoute: typeof PropsIdIndexRouteImport
+      parentRoute: typeof PropsIdRouteRoute
+    }
+    '/props/$id/units/': {
+      id: '/props/$id/units/'
+      path: '/units'
+      fullPath: '/props/$id/units/'
+      preLoaderRoute: typeof PropsIdUnitsIndexRouteImport
+      parentRoute: typeof PropsIdRouteRoute
+    }
+    '/props/$id/units/$unitId': {
+      id: '/props/$id/units/$unitId'
+      path: '/units/$unitId'
+      fullPath: '/props/$id/units/$unitId'
+      preLoaderRoute: typeof PropsIdUnitsUnitIdRouteImport
+      parentRoute: typeof PropsIdRouteRoute
     }
   }
 }
@@ -265,10 +320,26 @@ const DevRouteRouteWithChildren = DevRouteRoute._addFileChildren(
   DevRouteRouteChildren,
 )
 
+interface PropsIdRouteRouteChildren {
+  PropsIdIndexRoute: typeof PropsIdIndexRoute
+  PropsIdUnitsUnitIdRoute: typeof PropsIdUnitsUnitIdRoute
+  PropsIdUnitsIndexRoute: typeof PropsIdUnitsIndexRoute
+}
+
+const PropsIdRouteRouteChildren: PropsIdRouteRouteChildren = {
+  PropsIdIndexRoute: PropsIdIndexRoute,
+  PropsIdUnitsUnitIdRoute: PropsIdUnitsUnitIdRoute,
+  PropsIdUnitsIndexRoute: PropsIdUnitsIndexRoute,
+}
+
+const PropsIdRouteRouteWithChildren = PropsIdRouteRoute._addFileChildren(
+  PropsIdRouteRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DevRouteRoute: DevRouteRouteWithChildren,
-  PropsIdRoute: PropsIdRoute,
+  PropsIdRouteRoute: PropsIdRouteRouteWithChildren,
   PublicPrivacyRoute: PublicPrivacyRoute,
   PublicTermsRoute: PublicTermsRoute,
   MessagesIndexRoute: MessagesIndexRoute,

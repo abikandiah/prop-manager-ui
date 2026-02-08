@@ -90,6 +90,7 @@ export function ExternalSite({
 	)
 }
 
+export * from './DelayedLoadingFallback'
 export * from './page-header'
 export * from './BannerHeader'
 export * from './Toaster'

@@ -200,6 +200,7 @@ export function PropsForm() {
 							))}
 						</select>
 					</div>
+					<AddressFormFields value={address} onChange={updateAddress} />
 					<div className="grid grid-cols-2 gap-2">
 						<div className="space-y-2">
 							<Label htmlFor="totalArea">Total area (sq ft)</Label>
@@ -238,8 +239,6 @@ export function PropsForm() {
 							maxLength={64}
 						/>
 					</div>
-
-					<AddressFormFields value={address} onChange={updateAddress} />
 
 					<DialogFooter>
 						<Button

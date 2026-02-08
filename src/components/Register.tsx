@@ -68,22 +68,22 @@ export const Register = () => {
 								aria-describedby="agreement-desc"
 							/>
 
-							<label className="text-sm font-normal -mt-0.5">
-								By checking this box, you agree to our{' '}
+							<label className="text-sm font-normal -mt-0.5 text-foreground">
+								I've read and agree to the{' '}
 								<TextLink
 									to="/public/terms"
 									target="_blank"
 									rel="noopener noreferrer"
-									className="text-foreground underline-offset-2 hover:underline"
+									className="text-foreground underline underline-offset-2"
 								>
 									Terms of Service
 								</TextLink>{' '}
-								and acknowledge our{' '}
+								and{' '}
 								<TextLink
 									to="/public/privacy"
 									target="_blank"
 									rel="noopener noreferrer"
-									className="text-foreground underline-offset-2 hover:underline"
+									className="text-foreground underline underline-offset-2"
 								>
 									Privacy Policy
 								</TextLink>

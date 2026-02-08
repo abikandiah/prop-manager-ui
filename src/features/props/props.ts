@@ -44,6 +44,19 @@ export interface Prop {
 	updatedAt: string
 }
 
+/** Single-line address string (comma-separated). Returns '—' when address is null/empty. */
+export function formatAddress(address: Address | null): string {
+	if (!address) return '—'
+	const parts = [
+		address.addressLine1,
+		address.addressLine2,
+		[address.city, address.stateProvinceRegion].filter(Boolean).join(', '),
+		address.postalCode,
+		address.countryCode,
+	].filter(Boolean)
+	return parts.join(', ') || '—'
+}
+
 /** Nested address in create payload (composite resource). Backend creates address and links it to the prop in one transaction. */
 export interface CreatePropAddressPayload {
 	addressLine1: string

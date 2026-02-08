@@ -9,7 +9,9 @@ import {
 	PopoverTrigger,
 } from '@abumble/design-system/components/Popover'
 import { MoreVertical, Pencil, Trash2 } from 'lucide-react'
+import { AddressDisplay } from '@/features/props/components'
 import { usePropDetail, useDeleteProp } from '@/features/props/hooks'
+import { formatAddress } from '@/features/props/props'
 import type { Prop } from '@/features/props/props'
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
 import {
@@ -26,19 +28,6 @@ import {
 export const Route = createFileRoute('/props/$id')({
 	component: PropDetailPage,
 })
-
-function formatAddress(p: Prop): string {
-	const a = p.address
-	if (!a) return '—'
-	const parts = [
-		a.addressLine1,
-		a.addressLine2,
-		[a.city, a.stateProvinceRegion].filter(Boolean).join(', '),
-		a.postalCode,
-		a.countryCode,
-	].filter(Boolean)
-	return parts.join(', ') || '—'
-}
 
 function PropActions({ prop }: { prop: Prop }) {
 	const [open, setOpen] = useState(false)
@@ -154,15 +143,18 @@ function PropDetailPage() {
 
 	if (isLoading) {
 		return (
-			<div className="flex flex-col gap-8">
+			<div className="flex flex-col gap-6">
 				<div className="flex items-center gap-2">
 					<Skeleton className="h-9 w-9 rounded" />
 					<Skeleton className="h-8 w-48" />
 				</div>
-				<div className="space-y-4">
-					<Skeleton className="h-8 w-64" />
-					<Skeleton className="h-5 w-full max-w-md" />
-					<Skeleton className="h-5 w-32" />
+				<div className="space-y-3">
+					{[1, 2, 3, 4, 5].map((i) => (
+						<div key={i} className="flex gap-6">
+							<Skeleton className="h-5 w-24 shrink-0" />
+							<Skeleton className="h-5 flex-1" />
+						</div>
+					))}
 				</div>
 			</div>
 		)
@@ -182,13 +174,13 @@ function PropDetailPage() {
 	}
 
 	return (
-		<div className="flex flex-col gap-8">
+		<div className="flex flex-col gap-6">
 			<BannerHeader
 				title={prop.legalName}
 				description={
 					<>
 						{prop.propertyType.replace(/_/g, ' ')}
-						{prop.address && ` · ${formatAddress(prop)}`}
+						{prop.address && ` · ${formatAddress(prop.address)}`}
 					</>
 				}
 				breadcrumbItems={[
@@ -198,78 +190,89 @@ function PropDetailPage() {
 				actions={<PropActions prop={prop} />}
 			/>
 
-			<div className="grid gap-6 sm:grid-cols-2">
-				<dl className="space-y-3">
-					<div>
-						<dt className="text-sm font-medium text-muted-foreground">
-							Legal name
-						</dt>
-						<dd className="mt-0.5 text-foreground">{prop.legalName}</dd>
-					</div>
-					<div>
-						<dt className="text-sm font-medium text-muted-foreground">
-							Property type
-						</dt>
-						<dd className="mt-0.5 text-foreground">
-							{prop.propertyType.replace(/_/g, ' ')}
-						</dd>
-					</div>
-					{prop.parcelNumber && (
-						<div>
-							<dt className="text-sm font-medium text-muted-foreground">
-								Parcel number
-							</dt>
-							<dd className="mt-0.5 text-foreground">{prop.parcelNumber}</dd>
-						</div>
-					)}
-					{prop.totalArea != null && (
-						<div>
-							<dt className="text-sm font-medium text-muted-foreground">
-								Total area
-							</dt>
-							<dd className="mt-0.5 text-foreground">{prop.totalArea} sq ft</dd>
-						</div>
-					)}
-					{prop.yearBuilt != null && (
-						<div>
-							<dt className="text-sm font-medium text-muted-foreground">
-								Year built
-							</dt>
-							<dd className="mt-0.5 text-foreground">{prop.yearBuilt}</dd>
-						</div>
-					)}
-					<div>
-						<dt className="text-sm font-medium text-muted-foreground">
-							Status
-						</dt>
-						<dd className="mt-0.5 text-foreground">
-							{prop.isActive ? 'Active' : 'Inactive'}
-						</dd>
-					</div>
-				</dl>
-				{prop.address && (
-					<dl className="space-y-3">
-						<div>
-							<dt className="text-sm font-medium text-muted-foreground">
-								Address
-							</dt>
-							<dd className="mt-0.5 text-foreground whitespace-pre-line">
-								{[
-									prop.address.addressLine1,
-									prop.address.addressLine2,
-									[prop.address.city, prop.address.stateProvinceRegion]
-										.filter(Boolean)
-										.join(', '),
-									prop.address.postalCode,
-									prop.address.countryCode,
-								]
-									.filter(Boolean)
-									.join('\n')}
-							</dd>
-						</div>
-					</dl>
-				)}
-			</div>
+			<table className="w-full border-0 text-left">
+						<tbody>
+							<tr>
+								<th
+									scope="row"
+									className="py-1.5 pr-4 text-sm font-medium text-muted-foreground w-[10rem]"
+								>
+									Legal name
+								</th>
+								<td className="py-1.5 text-foreground">{prop.legalName}</td>
+							</tr>
+							<tr>
+								<th
+									scope="row"
+									className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
+								>
+									Property type
+								</th>
+								<td className="py-1.5 text-foreground">
+									{prop.propertyType.replace(/_/g, ' ')}
+								</td>
+							</tr>
+							{prop.parcelNumber && (
+								<tr>
+									<th
+										scope="row"
+										className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
+									>
+										Parcel number
+									</th>
+									<td className="py-1.5 text-foreground">{prop.parcelNumber}</td>
+								</tr>
+							)}
+							{prop.totalArea != null && (
+								<tr>
+									<th
+										scope="row"
+										className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
+									>
+										Total area
+									</th>
+									<td className="py-1.5 text-foreground">
+										{prop.totalArea} sq ft
+									</td>
+								</tr>
+							)}
+							{prop.yearBuilt != null && (
+								<tr>
+									<th
+										scope="row"
+										className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
+									>
+										Year built
+									</th>
+									<td className="py-1.5 text-foreground">{prop.yearBuilt}</td>
+								</tr>
+							)}
+							<tr>
+								<th
+									scope="row"
+									className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
+								>
+									Status
+								</th>
+								<td className="py-1.5 text-foreground">
+									{prop.isActive ? 'Active' : 'Inactive'}
+								</td>
+							</tr>
+							{prop.address && (
+								<tr>
+									<th
+										scope="row"
+										className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
+									>
+										Address
+									</th>
+									<td className="py-1.5 text-foreground">
+										<AddressDisplay address={prop.address} />
+									</td>
+								</tr>
+							)}
+						</tbody>
+					</table>
 		</div>
 	)
 }

@@ -14,7 +14,11 @@ import { usePropDetail, useDeleteProp } from '@/features/props/hooks'
 import { formatAddress } from '@/features/props/props'
 import { DelayedLoadingFallback } from '@/components/ui'
 import type { Prop } from '@/features/props/props'
-import { UnitForm, UnitDetailSection, UnitsTableView } from '@/features/units/components'
+import {
+	UnitForm,
+	UnitDetailSection,
+	UnitsTableView,
+} from '@/features/units/components'
 import {
 	BannerHeader,
 	Dialog,
@@ -179,144 +183,166 @@ function PropLayout() {
 					action={<TextLink to="/props">Back to properties</TextLink>}
 				/>
 			) : (
-		<div className="flex flex-col gap-6">
-			<BannerHeader
-				title={prop.legalName}
-				description={
-					<>
-						{prop.propertyType.replace(/_/g, ' ')}
-						{prop.address && ` · ${formatAddress(prop.address)}`}
-					</>
-				}
-				breadcrumbItems={[
-					{ label: 'Properties', to: '/props' },
-					{ label: prop.legalName },
-				]}
-				actions={
-					<PropActions prop={prop} onEdit={() => setEditingProp(prop)} />
-				}
-			/>
-
-			{editingProp && (
-				<FormDialog
-					open={!!editingProp}
-					onOpenChange={() => setEditingProp(null)}
-					title="Edit property"
-					description={`Update ${editingProp.legalName} details.`}
-				>
-					<PropsForm
-						initialProp={editingProp}
-						onSuccess={() => setEditingProp(null)}
-						onCancel={() => setEditingProp(null)}
-						submitLabel="Update Property"
+				<div className="flex flex-col gap-6">
+					<BannerHeader
+						title={prop.legalName}
+						description={
+							<>
+								{prop.propertyType.replace(/_/g, ' ')}
+								{prop.address && ` · ${formatAddress(prop.address)}`}
+							</>
+						}
+						breadcrumbItems={[
+							{ label: 'Properties', to: '/props' },
+							{ label: prop.legalName },
+						]}
+						actions={
+							<PropActions prop={prop} onEdit={() => setEditingProp(prop)} />
+						}
 					/>
-				</FormDialog>
-			)}
 
-			<table className="w-full border-0 text-left">
-				<tbody>
-					<tr>
-						<th
-							scope="row"
-							className="py-1.5 pr-4 text-sm font-medium text-muted-foreground w-[10rem]"
+					{editingProp && (
+						<FormDialog
+							open={!!editingProp}
+							onOpenChange={() => setEditingProp(null)}
+							title="Edit property"
+							description={`Update ${editingProp.legalName} details.`}
 						>
-							Legal name
-						</th>
-						<td className="py-1.5 text-foreground">{prop.legalName}</td>
-					</tr>
-					<tr>
-						<th
-							scope="row"
-							className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
+							<PropsForm
+								initialProp={editingProp}
+								onSuccess={() => setEditingProp(null)}
+								onCancel={() => setEditingProp(null)}
+								submitLabel="Update Property"
+							/>
+						</FormDialog>
+					)}
+
+					<table className="w-full border-0 text-left">
+						<tbody>
+							<tr>
+								<th
+									scope="row"
+									className="py-1.5 pr-4 text-sm font-medium text-muted-foreground w-[10rem]"
+								>
+									Legal name
+								</th>
+								<td className="py-1.5 text-foreground">{prop.legalName}</td>
+							</tr>
+							<tr>
+								<th
+									scope="row"
+									className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
+								>
+									Property type
+								</th>
+								<td className="py-1.5 text-foreground">
+									{prop.propertyType.replace(/_/g, ' ')}
+								</td>
+							</tr>
+							{prop.parcelNumber && (
+								<tr>
+									<th
+										scope="row"
+										className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
+									>
+										Parcel number
+									</th>
+									<td className="py-1.5 text-foreground">
+										{prop.parcelNumber}
+									</td>
+								</tr>
+							)}
+							{prop.totalArea != null && (
+								<tr>
+									<th
+										scope="row"
+										className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
+									>
+										Total area
+									</th>
+									<td className="py-1.5 text-foreground">
+										{prop.totalArea} sq ft
+									</td>
+								</tr>
+							)}
+							{prop.yearBuilt != null && (
+								<tr>
+									<th
+										scope="row"
+										className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
+									>
+										Year built
+									</th>
+									<td className="py-1.5 text-foreground">{prop.yearBuilt}</td>
+								</tr>
+							)}
+							{prop.address && (
+								<tr>
+									<th
+										scope="row"
+										className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
+									>
+										Address
+									</th>
+									<td className="py-1.5 text-foreground">
+										<AddressDisplay address={prop.address} />
+									</td>
+								</tr>
+							)}
+						</tbody>
+					</table>
+
+					<UnitsSection propId={prop.id} />
+
+					{unitIdFromSearch != null && (
+						<Dialog
+							open={true}
+							onOpenChange={(open) => {
+								if (!open) {
+									navigate({
+										to: '/props/$id',
+										params: { id: prop.id },
+										search: {},
+									})
+								}
+							}}
 						>
-							Property type
-						</th>
-						<td className="py-1.5 text-foreground">
-							{prop.propertyType.replace(/_/g, ' ')}
-						</td>
-					</tr>
-					{prop.parcelNumber && (
-						<tr>
-							<th
-								scope="row"
-								className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
+							<DialogContent
+								className="max-w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto p-0 gap-0"
+								showCloseButton={false}
+								aria-describedby={undefined}
+								onPointerDownOutside={() =>
+									navigate({
+										to: '/props/$id',
+										params: { id: prop.id },
+										search: {},
+									})
+								}
+								onEscapeKeyDown={() =>
+									navigate({
+										to: '/props/$id',
+										params: { id: prop.id },
+										search: {},
+									})
+								}
 							>
-								Parcel number
-							</th>
-							<td className="py-1.5 text-foreground">{prop.parcelNumber}</td>
-						</tr>
+								<DialogTitle className="sr-only">Unit details</DialogTitle>
+								<UnitDetailSection
+									propId={prop.id}
+									unitId={unitIdFromSearch}
+									inModal
+									onClose={() =>
+										navigate({
+											to: '/props/$id',
+											params: { id: prop.id },
+											search: {},
+										})
+									}
+								/>
+							</DialogContent>
+						</Dialog>
 					)}
-					{prop.totalArea != null && (
-						<tr>
-							<th
-								scope="row"
-								className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
-							>
-								Total area
-							</th>
-							<td className="py-1.5 text-foreground">{prop.totalArea} sq ft</td>
-						</tr>
-					)}
-					{prop.yearBuilt != null && (
-						<tr>
-							<th
-								scope="row"
-								className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
-							>
-								Year built
-							</th>
-							<td className="py-1.5 text-foreground">{prop.yearBuilt}</td>
-						</tr>
-					)}
-					{prop.address && (
-						<tr>
-							<th
-								scope="row"
-								className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
-							>
-								Address
-							</th>
-							<td className="py-1.5 text-foreground">
-								<AddressDisplay address={prop.address} />
-							</td>
-						</tr>
-					)}
-				</tbody>
-			</table>
-
-			<UnitsSection propId={prop.id} />
-
-			{unitIdFromSearch != null && (
-				<Dialog
-					open={true}
-					onOpenChange={(open) => {
-						if (!open) {
-							navigate({ to: '/props/$id', params: { id: prop.id }, search: {} })
-						}
-					}}
-				>
-					<DialogContent
-						className="max-w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto p-0 gap-0"
-						showCloseButton={false}
-						onPointerDownOutside={() =>
-							navigate({ to: '/props/$id', params: { id: prop.id }, search: {} })
-						}
-						onEscapeKeyDown={() =>
-							navigate({ to: '/props/$id', params: { id: prop.id }, search: {} })
-						}
-					>
-						<UnitDetailSection
-							propId={prop.id}
-							unitId={unitIdFromSearch}
-							inModal
-							onClose={() =>
-								navigate({ to: '/props/$id', params: { id: prop.id }, search: {} })
-							}
-						/>
-					</DialogContent>
-				</Dialog>
-			)}
-		</div>
+				</div>
 			)}
 		</DelayedLoadingFallback>
 	)

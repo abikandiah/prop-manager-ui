@@ -37,7 +37,7 @@ export function BannerHeader({
 	return (
 		<div className="relative -mx-4 -mt-4 overflow-hidden border-b bg-card md:-mx-6 md:-mt-6">
 			<div className="image-background absolute inset-0 opacity-10" />
-			<div className="relative flex items-start justify-between gap-4 px-4 py-8 md:px-6 md:py-12">
+			<div className="relative flex items-start justify-between gap-4 px-4 py-8 md:px-6 md:pt-12 md:pb-8">
 				<div className="min-w-0 flex-1">
 					{useBreadcrumbAsTitle ? (
 						<Breadcrumb>

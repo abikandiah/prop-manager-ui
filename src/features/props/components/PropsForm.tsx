@@ -19,7 +19,6 @@ import {
 import { DialogFooter } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
-import { Checkbox } from '@/components/ui/checkbox'
 
 type FormState = {
 	legalName: string
@@ -28,7 +27,6 @@ type FormState = {
 	parcelNumber: string
 	totalArea: string
 	yearBuilt: string
-	isActive: boolean
 }
 
 const initialForm: FormState = {
@@ -38,7 +36,6 @@ const initialForm: FormState = {
 	parcelNumber: '',
 	totalArea: '',
 	yearBuilt: '',
-	isActive: true,
 }
 
 function propToFormState(prop: Prop): FormState {
@@ -58,7 +55,6 @@ function propToFormState(prop: Prop): FormState {
 		parcelNumber: prop.parcelNumber ?? '',
 		totalArea: prop.totalArea != null ? String(prop.totalArea) : '',
 		yearBuilt: prop.yearBuilt != null ? String(prop.yearBuilt) : '',
-		isActive: prop.isActive,
 	}
 }
 
@@ -105,7 +101,6 @@ export function PropsForm({
 		parcelNumber,
 		totalArea,
 		yearBuilt,
-		isActive,
 	} = form
 
 	useEffect(() => {
@@ -126,7 +121,7 @@ export function PropsForm({
 	const canSubmit = validationError === null
 	const pending = createProp.isPending || updateProp.isPending
 
-	type FormFieldName = Exclude<keyof FormState, 'address' | 'isActive'>
+	type FormFieldName = Exclude<keyof FormState, 'address'>
 	const onFormChange = (
 		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
 	) => {
@@ -154,7 +149,6 @@ export function PropsForm({
 		parcelNumber: parcelNumber.trim() || undefined,
 		totalArea: totalArea.trim() ? parseInt(totalArea, 10) : undefined,
 		yearBuilt: yearBuilt.trim() ? parseInt(yearBuilt, 10) : undefined,
-		isActive,
 	})
 
 	const handleSubmit = (e: React.SubmitEvent) => {
@@ -270,19 +264,6 @@ export function PropsForm({
 					maxLength={64}
 				/>
 			</div>
-			<div className="flex items-center gap-2">
-				<Checkbox
-					id="isActive"
-					checked={isActive}
-					onCheckedChange={(checked) =>
-						setForm((prev) => ({ ...prev, isActive: checked === true }))
-					}
-				/>
-				<Label htmlFor="isActive" className="font-normal cursor-pointer">
-					Active
-				</Label>
-			</div>
-
 			<DialogFooter>
 				{onCancel && (
 					<Button variant="outline" type="button" onClick={onCancel}>

@@ -39,7 +39,6 @@ export interface Prop {
 	ownerId: string | null
 	totalArea: number | null
 	yearBuilt: number | null
-	isActive: boolean
 	createdAt: string
 	updatedAt: string
 }
@@ -77,7 +76,6 @@ export interface CreatePropPayload {
 	ownerId?: string | null
 	totalArea?: number | null
 	yearBuilt?: number | null
-	isActive?: boolean
 }
 
 /** Same shape as create; when present on update, backend creates a new address and links it to the prop. */
@@ -89,7 +87,6 @@ export interface UpdatePropPayload {
 	ownerId?: string | null
 	totalArea?: number | null
 	yearBuilt?: number | null
-	isActive?: boolean
 }
 
 // --- Service ---

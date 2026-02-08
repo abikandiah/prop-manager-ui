@@ -20,7 +20,6 @@ function applyCreate(
 		ownerId: payload.ownerId ?? null,
 		totalArea: payload.totalArea ?? null,
 		yearBuilt: payload.yearBuilt ?? null,
-		isActive: payload.isActive ?? true,
 		createdAt: nowIso(),
 		updatedAt: nowIso(),
 	}

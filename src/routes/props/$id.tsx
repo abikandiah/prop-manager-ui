@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
@@ -9,7 +9,7 @@ import {
 	PopoverTrigger,
 } from '@abumble/design-system/components/Popover'
 import { MoreVertical, Pencil, Plus, Trash2 } from 'lucide-react'
-import { AddressDisplay } from '@/features/props/components'
+import { AddressDisplay, PropsForm } from '@/features/props/components'
 import { usePropDetail, useDeleteProp } from '@/features/props/hooks'
 import { formatAddress } from '@/features/props/props'
 import type { Prop } from '@/features/props/props'
@@ -23,6 +23,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
+	FormDialog,
 	TextLink,
 } from '@/components/ui'
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
@@ -31,7 +32,7 @@ export const Route = createFileRoute('/props/$id')({
 	component: PropDetailPage,
 })
 
-function PropActions({ prop }: { prop: Prop }) {
+function PropActions({ prop, onEdit }: { prop: Prop; onEdit: () => void }) {
 	const [open, setOpen] = useState(false)
 	const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
 	const navigate = useNavigate()
@@ -76,16 +77,13 @@ function PropActions({ prop }: { prop: Prop }) {
 								variant="ghost"
 								size="sm"
 								className="w-full justify-start gap-2"
-								asChild
+								onClick={() => {
+									setOpen(false)
+									onEdit()
+								}}
 							>
-								<Link
-									to="/props/$id"
-									params={{ id: prop.id }}
-									onClick={() => setOpen(false)}
-								>
-									<Pencil className="size-4 shrink-0" />
-									Edit
-								</Link>
+								<Pencil className="size-4 shrink-0" />
+								Edit
 							</Button>
 						</li>
 						<li>
@@ -136,6 +134,7 @@ function PropActions({ prop }: { prop: Prop }) {
 function PropDetailPage() {
 	const { id } = Route.useParams()
 	const { data: prop, isLoading, isError, error } = usePropDetail(id)
+	const [editingProp, setEditingProp] = useState<Prop | null>(null)
 
 	useEffect(() => {
 		if (isError) {
@@ -189,8 +188,26 @@ function PropDetailPage() {
 					{ label: 'Properties', to: '/props' },
 					{ label: prop.legalName },
 				]}
-				actions={<PropActions prop={prop} />}
+				actions={
+					<PropActions prop={prop} onEdit={() => setEditingProp(prop)} />
+				}
 			/>
+
+			{editingProp && (
+				<FormDialog
+					open={!!editingProp}
+					onOpenChange={() => setEditingProp(null)}
+					title="Edit property"
+					description={`Update ${editingProp.legalName} details.`}
+				>
+					<PropsForm
+						initialProp={editingProp}
+						onSuccess={() => setEditingProp(null)}
+						onCancel={() => setEditingProp(null)}
+						submitLabel="Update Property"
+					/>
+				</FormDialog>
+			)}
 
 			<table className="w-full border-0 text-left">
 				<tbody>
@@ -247,17 +264,6 @@ function PropDetailPage() {
 							<td className="py-1.5 text-foreground">{prop.yearBuilt}</td>
 						</tr>
 					)}
-					<tr>
-						<th
-							scope="row"
-							className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
-						>
-							Status
-						</th>
-						<td className="py-1.5 text-foreground">
-							{prop.isActive ? 'Active' : 'Inactive'}
-						</td>
-					</tr>
 					{prop.address && (
 						<tr>
 							<th
@@ -294,29 +300,27 @@ function UnitsSection({ propId }: { propId: string }) {
 				</p>
 			</div>
 			<div>
-				<Dialog open={addUnitOpen} onOpenChange={setAddUnitOpen}>
-					<DialogTrigger asChild>
-						<Button>
-							<Plus className="size-4" />
-							Add Unit
-						</Button>
-					</DialogTrigger>
-					<DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
-						<DialogHeader>
-							<DialogTitle>Add unit</DialogTitle>
-							<DialogDescription>
-								Add a unit to this property. Unit number and status are
-								required.
-							</DialogDescription>
-						</DialogHeader>
-						<UnitForm
-							propId={propId}
-							onSuccess={() => setAddUnitOpen(false)}
-							onCancel={() => setAddUnitOpen(false)}
-							submitLabel="Create Unit"
-						/>
-					</DialogContent>
-				</Dialog>
+				<FormDialog
+					open={addUnitOpen}
+					onOpenChange={setAddUnitOpen}
+					title="Add unit"
+					description="Add a unit to this property. Unit number and status are required."
+					trigger={
+						<DialogTrigger asChild>
+							<Button>
+								<Plus className="size-4" />
+								Add Unit
+							</Button>
+						</DialogTrigger>
+					}
+				>
+					<UnitForm
+						propId={propId}
+						onSuccess={() => setAddUnitOpen(false)}
+						onCancel={() => setAddUnitOpen(false)}
+						submitLabel="Create Unit"
+					/>
+				</FormDialog>
 			</div>
 			<UnitsTableView propId={propId} />
 		</section>

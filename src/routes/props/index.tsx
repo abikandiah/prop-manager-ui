@@ -1,12 +1,18 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useState } from 'react'
+import { Plus } from 'lucide-react'
 import { PropsForm, PropsTableView } from '@/features/props/components'
 import { BannerHeader } from '@/components/ui'
+import { Button } from '@abumble/design-system/components/Button'
+import { DialogTrigger, FormDialog } from '@/components/ui'
 
 export const Route = createFileRoute('/props/')({
 	component: RouteComponent,
 })
 
 function RouteComponent() {
+	const navigate = useNavigate()
+	const [addOpen, setAddOpen] = useState(false)
 	return (
 		<>
 			<BannerHeader
@@ -23,7 +29,30 @@ function RouteComponent() {
 			/>
 
 			<div>
-				<PropsForm />
+				<FormDialog
+					open={addOpen}
+					onOpenChange={setAddOpen}
+					title="Add Property"
+					description="Enter the legal name, address, and property details."
+					trigger={
+						<DialogTrigger asChild>
+							<Button>
+								<Plus className="size-4" />
+								Add Property
+							</Button>
+						</DialogTrigger>
+					}
+				>
+					<PropsForm
+						onSuccess={(data) => {
+							setAddOpen(false)
+							if (data)
+								navigate({ to: '/props/$id', params: { id: data.id } })
+						}}
+						onCancel={() => setAddOpen(false)}
+						submitLabel="Create Property"
+					/>
+				</FormDialog>
 			</div>
 
 			<PropsTableView />

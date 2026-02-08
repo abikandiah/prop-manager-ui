@@ -7,6 +7,10 @@ import { Dialog as DialogPrimitive } from 'radix-ui'
 import { cn } from '@abumble/design-system/utils'
 import { Button } from '@abumble/design-system/components/Button'
 
+/** Class for create/edit form dialogs: consistent width and scroll. Use via FormDialog or apply to DialogContent. */
+export const FORM_DIALOG_CONTENT_CLASS =
+	'max-w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto'
+
 function Dialog({
 	...props
 }: React.ComponentProps<typeof DialogPrimitive.Root>) {
@@ -144,6 +148,39 @@ function DialogDescription({
 	)
 }
 
+export interface FormDialogProps {
+	open: boolean
+	onOpenChange: (open: boolean) => void
+	title: string
+	description: React.ReactNode
+	/** Optional trigger (e.g. "Add" button); when provided, render as first child of Dialog. */
+	trigger?: React.ReactNode
+	children: React.ReactNode
+}
+
+/** Dialog shell for create/edit forms: standard width, header with title + description. */
+function FormDialog({
+	open,
+	onOpenChange,
+	title,
+	description,
+	trigger,
+	children,
+}: FormDialogProps) {
+	return (
+		<Dialog open={open} onOpenChange={onOpenChange}>
+			{trigger}
+			<DialogContent className={FORM_DIALOG_CONTENT_CLASS}>
+				<DialogHeader>
+					<DialogTitle>{title}</DialogTitle>
+					<DialogDescription>{description}</DialogDescription>
+				</DialogHeader>
+				{children}
+			</DialogContent>
+		</Dialog>
+	)
+}
+
 export {
 	Dialog,
 	DialogClose,
@@ -155,4 +192,5 @@ export {
 	DialogPortal,
 	DialogTitle,
 	DialogTrigger,
+	FormDialog,
 }

@@ -23,6 +23,7 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
+	FormDialog,
 } from '@/components/ui/dialog'
 import { useUnitsByPropId, useDeleteUnit } from '@/features/units/hooks'
 import type { Unit } from '@/features/units/units'
@@ -257,23 +258,20 @@ export function UnitsTableView({ propId }: UnitsTableViewProps) {
 			</div>
 
 			{editingUnit && (
-				<Dialog open={!!editingUnit} onOpenChange={() => setEditingUnit(null)}>
-					<DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
-						<DialogHeader>
-							<DialogTitle>Edit unit</DialogTitle>
-							<DialogDescription>
-								Update unit {editingUnit.unitNumber} details.
-							</DialogDescription>
-						</DialogHeader>
-						<UnitForm
-							propId={propId}
-							initialUnit={editingUnit}
-							onSuccess={() => setEditingUnit(null)}
-							onCancel={() => setEditingUnit(null)}
-							submitLabel="Save"
-						/>
-					</DialogContent>
-				</Dialog>
+				<FormDialog
+					open={!!editingUnit}
+					onOpenChange={() => setEditingUnit(null)}
+					title="Edit unit"
+					description={`Update unit ${editingUnit.unitNumber} details.`}
+				>
+					<UnitForm
+						propId={propId}
+						initialUnit={editingUnit}
+						onSuccess={() => setEditingUnit(null)}
+						onCancel={() => setEditingUnit(null)}
+						submitLabel="Save"
+					/>
+				</FormDialog>
 			)}
 		</>
 	)

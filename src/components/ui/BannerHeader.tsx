@@ -1,0 +1,90 @@
+import {
+	Breadcrumb,
+	BreadcrumbItem,
+	BreadcrumbLink,
+	BreadcrumbList,
+	BreadcrumbPage,
+	BreadcrumbSeparator,
+} from '@abumble/design-system/components/Breadcrumb'
+import { cn } from '@abumble/design-system/utils'
+import * as React from 'react'
+import { Link } from '@tanstack/react-router'
+import { PageDescription, PageHeader } from './page-header'
+
+export interface BreadcrumbItemType {
+	label: string
+	to?: string
+}
+
+export interface BannerHeaderProps {
+	title: React.ReactNode
+	description: React.ReactNode
+	/** When set, the breadcrumb is the page title (no separate title line). Parent-to-current trail. */
+	breadcrumbItems?: BreadcrumbItemType[]
+	/** Optional actions (e.g. triple-dot menu) shown at the top-right of the banner. */
+	actions?: React.ReactNode
+}
+
+export function BannerHeader({
+	title,
+	description,
+	breadcrumbItems,
+	actions,
+}: BannerHeaderProps) {
+	const useBreadcrumbAsTitle =
+		breadcrumbItems != null && breadcrumbItems.length > 0
+
+	return (
+		<div className="relative -mx-4 -mt-4 overflow-hidden border-b bg-card md:-mx-6 md:-mt-6">
+			<div className="image-background absolute inset-0 opacity-10" />
+			<div className="relative flex items-start justify-between gap-4 px-4 py-8 md:px-6 md:py-12">
+				<div className="min-w-0 flex-1">
+					{useBreadcrumbAsTitle ? (
+						<Breadcrumb>
+							<BreadcrumbList
+								className={cn('tracking-tight sm:text-3xl text-2xl')}
+							>
+								{breadcrumbItems!.map((item, i) => {
+									const isLast = i === breadcrumbItems!.length - 1
+									return (
+										<React.Fragment key={i}>
+											{i > 0 && <BreadcrumbSeparator />}
+											<BreadcrumbItem>
+												{isLast ? (
+													<BreadcrumbPage className="text-foreground">
+														{item.label}
+													</BreadcrumbPage>
+												) : item.to != null ? (
+													<BreadcrumbLink asChild>
+														<Link
+															to={item.to}
+															className="font-normal text-muted-foreground hover:text-foreground hover:underline"
+														>
+															{item.label}
+														</Link>
+													</BreadcrumbLink>
+												) : (
+													<span className="font-normal text-muted-foreground">
+														{item.label}
+													</span>
+												)}
+											</BreadcrumbItem>
+										</React.Fragment>
+									)
+								})}
+							</BreadcrumbList>
+						</Breadcrumb>
+					) : (
+						<PageHeader>{title}</PageHeader>
+					)}
+					<div className={cn(useBreadcrumbAsTitle ? 'mt-1.5' : 'space-y-1.5')}>
+						<PageDescription>{description}</PageDescription>
+					</div>
+				</div>
+				{actions != null ? (
+					<div className="shrink-0 pt-0.5">{actions}</div>
+				) : null}
+			</div>
+		</div>
+	)
+}

@@ -11,6 +11,7 @@ import {
 import { MoreVertical, Pencil, Trash2 } from 'lucide-react'
 import { usePropDetail, useDeleteProp } from '@/features/props/hooks'
 import type { Prop } from '@/features/props/props'
+import { CenteredEmptyState } from '@/components/CenteredEmptyState'
 import {
 	BannerHeader,
 	Dialog,
@@ -19,8 +20,8 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
+	TextLink,
 } from '@/components/ui'
-import { ChevronLeft } from 'lucide-react'
 
 export const Route = createFileRoute('/props/$id')({
 	component: PropDetailPage,
@@ -80,8 +81,17 @@ function PropActions({ prop }: { prop: Prop }) {
 				<PopoverContent align="end" className="w-40 p-0 mt-1">
 					<ul className="flex flex-col gap-0.5 p-1.5">
 						<li>
-							<Button variant="ghost" size="sm" className="w-full justify-start gap-2" asChild>
-								<Link to="/props/$id" params={{ id: prop.id }} onClick={() => setOpen(false)}>
+							<Button
+								variant="ghost"
+								size="sm"
+								className="w-full justify-start gap-2"
+								asChild
+							>
+								<Link
+									to="/props/$id"
+									params={{ id: prop.id }}
+									onClick={() => setOpen(false)}
+								>
 									<Pencil className="size-4 shrink-0" />
 									Edit
 								</Link>
@@ -159,21 +169,15 @@ function PropDetailPage() {
 	}
 
 	if (isError || !prop) {
+		const message = isError
+			? (error?.message ?? 'Failed to load property')
+			: 'The property you were looking for was not found.'
 		return (
-			<div className="flex flex-col gap-4">
-				<Link
-					to="/props"
-					className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-				>
-					<ChevronLeft className="size-4" />
-					Back to Properties
-				</Link>
-				<p className="text-destructive">
-					{isError
-						? (error?.message ?? 'Failed to load property')
-						: 'Property not found.'}
-				</p>
-			</div>
+			<CenteredEmptyState
+				title="Property not found"
+				description={message}
+				action={<TextLink to="/props">Back to properties</TextLink>}
+			/>
 		)
 	}
 

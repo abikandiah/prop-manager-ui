@@ -1,6 +1,6 @@
 import { cn } from '@abumble/design-system/utils'
-import type { Address } from '@/features/props/props'
-import { formatAddress } from '@/features/props/props'
+import type { Address } from '@/domain/address'
+import { formatAddress } from '@/lib/format'
 
 export interface AddressDisplayProps {
 	address: Address | null

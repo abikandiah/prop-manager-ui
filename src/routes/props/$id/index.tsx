@@ -1,25 +1,19 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Skeleton } from '@abumble/design-system/components/Skeleton'
-import { Button } from '@abumble/design-system/components/Button'
-import { Plus } from 'lucide-react'
-import { AddressDisplay, PropsForm } from '@/features/props/components'
-import { usePropDetail, useDeleteProp } from '@/features/props/hooks'
-import { formatAddress } from '@/features/props/props'
-import type { Prop } from '@/features/props/props'
-import { UnitForm, UnitsTableView } from '@/features/units/components'
+import { AddressDisplay, PropsForm, usePropDetail, useDeleteProp } from '@/features/props'
+import { formatAddress } from '@/lib/format'
+import type { Prop } from '@/domain/property'
 import {
 	ActionsPopover,
 	BannerHeader,
 	ConfirmDeleteDialog,
 	DelayedLoadingFallback,
-	FieldsTable,
 	FormDialog,
-	DialogTrigger,
 	TextLink,
 } from '@/components/ui'
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
+import { Skeleton } from '@abumble/design-system/components/Skeleton'
 
 export const Route = createFileRoute('/props/$id/')({
 	component: PropLayout,
@@ -76,52 +70,33 @@ function PropLayout() {
 		}
 	}, [isError, error])
 
-	// Memoize field rows unconditionally to satisfy Rules of Hooks
-	const fieldRows = useMemo(() => {
-		if (!prop) return []
-		return [
-			{ label: 'Legal name', value: prop.legalName },
-			{
-				label: 'Property type',
-				value: prop.propertyType.replace(/_/g, ' '),
-			},
-			prop.description && {
-				label: 'Description',
-				value: prop.description,
-				multiline: true,
-			},
-			prop.parcelNumber && {
-				label: 'Parcel number',
-				value: prop.parcelNumber,
-			},
-			prop.totalArea != null && {
-				label: 'Total area',
-				value: `${prop.totalArea} sq ft`,
-			},
-			prop.yearBuilt != null && {
-				label: 'Year built',
-				value: prop.yearBuilt,
-			},
-			prop.address && {
-				label: 'Address',
-				value: <AddressDisplay address={prop.address} />,
-			},
-		]
-	}, [prop])
-
 	const skeleton = (
 		<div className="flex flex-col gap-6">
 			<div className="flex items-center gap-2">
 				<Skeleton className="h-9 w-9 rounded" />
 				<Skeleton className="h-8 w-48" />
 			</div>
-			<div className="space-y-3">
-				{[1, 2, 3, 4, 5].map((i) => (
-					<div key={i} className="flex gap-6">
-						<Skeleton className="h-5 w-24 shrink-0" />
-						<Skeleton className="h-5 flex-1" />
-					</div>
-				))}
+			<div className="grid gap-x-8 gap-y-6 md:grid-cols-2">
+				<div className="space-y-6">
+					{[1, 2].map((i) => (
+						<div key={i} className="space-y-2">
+							<Skeleton className="h-4 w-24" />
+							<Skeleton className="h-6 w-48" />
+						</div>
+					))}
+				</div>
+				<div className="grid grid-cols-2 gap-6">
+					{[1, 2, 3].map((i) => (
+						<div key={i} className={i === 3 ? 'col-span-2 space-y-2' : 'space-y-2'}>
+							<Skeleton className="h-4 w-24" />
+							<Skeleton className="h-6 w-full" />
+						</div>
+					))}
+				</div>
+				<div className="md:col-span-2 pt-4 border-t space-y-2">
+					<Skeleton className="h-4 w-24" />
+					<Skeleton className="h-6 w-full" />
+				</div>
 			</div>
 		</div>
 	)
@@ -148,7 +123,6 @@ function PropLayout() {
 								{prop.address && ` · ${formatAddress(prop.address)}`}
 							</>
 						}
-						breadcrumbItems={[{ label: 'Properties', to: '/props' }]}
 						actions={
 							<PropActions prop={prop} onEdit={() => setEditingProp(prop)} />
 						}
@@ -170,53 +144,79 @@ function PropLayout() {
 						</FormDialog>
 					)}
 
-					<FieldsTable rows={fieldRows} />
+					<div className="grid gap-x-8 gap-y-6 md:grid-cols-2">
+						{/* Group: Primary Info */}
+						<div className="space-y-6">
+							<div>
+								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+									Legal Name
+								</label>
+								<p className="mt-1 text-lg font-semibold text-foreground">
+									{prop.legalName}
+								</p>
+							</div>
+							<div>
+								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+									Property Type
+								</label>
+								<p className="mt-1 text-foreground">
+									{prop.propertyType.replace(/_/g, ' ')}
+								</p>
+							</div>
+						</div>
 
-					<UnitsSection propId={prop.id} />
+						{/* Group: Details */}
+						<div className="grid grid-cols-2 gap-6">
+							<div>
+								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+									Total Area
+								</label>
+								<p className="mt-1 text-foreground">
+									{prop.totalArea != null
+										? `${prop.totalArea.toLocaleString()} sq ft`
+										: '—'}
+								</p>
+							</div>
+							<div>
+								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+									Year Built
+								</label>
+								<p className="mt-1 text-foreground">{prop.yearBuilt ?? '—'}</p>
+							</div>
+							<div className="col-span-2">
+								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+									Parcel Number
+								</label>
+								<p className="mt-1 text-foreground font-mono">
+									{prop.parcelNumber ?? '—'}
+								</p>
+							</div>
+						</div>
+
+						{/* Group: Location (Full Width) */}
+						<div className="md:col-span-2 pt-4 border-t">
+							<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+								Location
+							</label>
+							<div className="mt-2">
+								<AddressDisplay address={prop.address} className="text-foreground" />
+							</div>
+						</div>
+
+						{/* Group: Description (Full Width) */}
+						{prop.description && (
+							<div className="md:col-span-2 pt-4 border-t">
+								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+									Description
+								</label>
+								<p className="mt-2 text-foreground whitespace-pre-wrap leading-relaxed">
+									{prop.description}
+								</p>
+							</div>
+						)}
+					</div>
 				</div>
 			)}
 		</DelayedLoadingFallback>
-	)
-}
-
-function UnitsSection({ propId }: { propId: string }) {
-	const [addUnitOpen, setAddUnitOpen] = useState(false)
-	return (
-		<section className="space-y-4 mt-2">
-			<div className="space-y-1.5">
-				<h2 className="tracking-tight text-foreground sm:text-2xl text-xl">
-					Units
-				</h2>
-				<p className="text-muted-foreground">
-					Units within this property—apartments, suites, or rentable spaces. Add
-					each with a unit number and details; you can attach tenants and leases
-					later.
-				</p>
-			</div>
-			<div>
-				<FormDialog
-					open={addUnitOpen}
-					onOpenChange={setAddUnitOpen}
-					title="Add unit"
-					description="Add a unit to this property. Unit number and status are required."
-					trigger={
-						<DialogTrigger asChild>
-							<Button>
-								<Plus className="size-4" />
-								Add unit
-							</Button>
-						</DialogTrigger>
-					}
-				>
-					<UnitForm
-						propId={propId}
-						onSuccess={() => setAddUnitOpen(false)}
-						onCancel={() => setAddUnitOpen(false)}
-						submitLabel="Create Unit"
-					/>
-				</FormDialog>
-			</div>
-			<UnitsTableView propId={propId} />
-		</section>
 	)
 }

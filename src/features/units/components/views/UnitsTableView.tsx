@@ -16,10 +16,10 @@ import {
 	DelayedLoadingFallback,
 	FormDialog,
 } from '@/components/ui'
-import { useUnitsByPropId, useDeleteUnit } from '@/features/units/hooks'
-import type { Unit } from '@/features/units/units'
+import { useUnitsByPropId, useUnitsList, useDeleteUnit } from '@/features/units'
+import type { Unit } from '@/domain/unit'
 import { formatCurrency } from '@/lib/format'
-import { UnitForm } from './UnitForm.tsx'
+import { UnitForm } from '../forms/UnitForm'
 
 function UnitRowActions({ unit, onEdit }: { unit: Unit; onEdit: () => void }) {
 	const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
@@ -66,18 +66,21 @@ function UnitRowActions({ unit, onEdit }: { unit: Unit; onEdit: () => void }) {
 }
 
 export interface UnitsTableViewProps {
-	propId: string
+	propId?: string
 }
 
 export function UnitsTableView({ propId }: UnitsTableViewProps) {
 	const navigate = useNavigate()
-	const { data: units, isLoading, isError, error } = useUnitsByPropId(propId)
+	const unitsByProp = useUnitsByPropId(propId ?? null)
+	const unitsAll = useUnitsList()
+
+	const { data: units, isLoading, isError, error } = propId ? unitsByProp : unitsAll
 	const [editingUnit, setEditingUnit] = useState<Unit | null>(null)
 
-	const handleRowClick = (unitId: string) => {
+	const handleRowClick = (unit: Unit) => {
 		navigate({
-			to: '/props/$id/units/$unitId',
-			params: { id: propId, unitId },
+			to: '/units/$unitId',
+			params: { unitId: unit.id },
 		})
 	}
 
@@ -161,7 +164,7 @@ export function UnitsTableView({ propId }: UnitsTableViewProps) {
 								<TableRow
 									key={unit.id}
 									className="cursor-pointer hover:bg-muted/50"
-									onClick={() => handleRowClick(unit.id)}
+									onClick={() => handleRowClick(unit)}
 								>
 									<TableCell className="font-medium">
 										{unit.unitNumber}

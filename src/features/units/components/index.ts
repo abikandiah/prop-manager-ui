@@ -1,2 +1,2 @@
-export { UnitForm } from './UnitForm'
-export { UnitsTableView } from './UnitsTableView'
+export * from './forms/UnitForm'
+export * from './views/UnitsTableView'

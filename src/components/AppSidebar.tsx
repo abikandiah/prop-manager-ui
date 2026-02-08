@@ -14,11 +14,11 @@ import {
 } from '@abumble/design-system/components/Sidebar'
 import { Link, type LinkComponentProps } from '@tanstack/react-router'
 import type { LucideIcon } from 'lucide-react'
-import { Home, MessageSquare, Package } from 'lucide-react'
+import { Home, MessageSquare, Package, LayoutGrid } from 'lucide-react'
 import { useCallback } from 'react'
 
 type NavItem = {
-	to: '/' | '/props' | '/messages'
+	to: '/' | '/props' | '/units' | '/messages'
 	label: string
 	icon: LucideIcon
 }
@@ -47,6 +47,7 @@ function SidebarNavLink({
 const navItems: NavItem[] = [
 	{ to: '/', label: 'Home', icon: Home },
 	{ to: '/props', label: 'Props', icon: Package },
+	{ to: '/units', label: 'Units', icon: LayoutGrid },
 	{ to: '/messages', label: 'Messages', icon: MessageSquare },
 ] as const
 

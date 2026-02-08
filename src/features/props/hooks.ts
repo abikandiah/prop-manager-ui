@@ -1,8 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { IDEMPOTENCY_HEADER, propKeys, propsApi } from './props'
-import type { CreatePropPayload, Prop, UpdatePropPayload } from './props'
+import { propKeys } from './keys'
+import { propsApi } from './api'
+import type { CreatePropPayload, Prop, UpdatePropPayload } from '@/domain/property'
 import { stableRequestId } from '@/lib/offline-types'
 import { generateOptimisticId, nowIso } from '@/lib/util'
+import { IDEMPOTENCY_HEADER } from '@/lib/constants'
 
 // --- Helpers: Optimistic Updates ---
 

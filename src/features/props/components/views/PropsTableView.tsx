@@ -4,8 +4,8 @@ import { cn } from '@abumble/design-system/utils'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { useCreateProp, usePropsList } from '@/features/props'
-import type { Prop } from '@/features/props/props'
-import { formatAddress } from '@/features/props/props'
+import type { Prop } from '@/domain/property'
+import { formatAddress } from '@/lib/format'
 import { DelayedLoadingFallback } from '@/components/ui'
 import {
 	Table,

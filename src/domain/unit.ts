@@ -1,8 +1,3 @@
-import { api } from '@/api/client'
-import { BaseService } from '@/api/base-service'
-
-// --- Types (aligned with backend UnitResponse, CreateUnitRequest, UpdateUnitRequest) ---
-
 export const UNIT_STATUSES = [
 	'VACANT',
 	'OCCUPIED',
@@ -60,36 +55,4 @@ export interface UpdateUnitPayload {
 	hardwoodFloors?: boolean | null
 	/** Required for optimistic-lock verification */
 	version: number
-}
-
-// --- Service ---
-
-const ENDPOINT = 'units'
-
-class UnitsApi extends BaseService<Unit, CreateUnitPayload, UpdateUnitPayload> {
-	constructor() {
-		super(ENDPOINT)
-	}
-
-	async listByPropId(propId: string): Promise<Unit[]> {
-		const res = await api.get<Unit[]>(this.endpoint, {
-			params: { propId },
-		})
-		return res.data
-	}
-}
-
-export const unitsApi = new UnitsApi()
-
-// --- Query Keys ---
-
-export const unitKeys = {
-	all: ['units'] as const,
-	lists: () => [...unitKeys.all, 'list'] as const,
-	list: (propId: string | null) =>
-		propId == null
-			? (['units', 'list'] as const)
-			: ([...unitKeys.all, 'list', propId] as const),
-	details: () => [...unitKeys.all, 'detail'] as const,
-	detail: (id: string) => [...unitKeys.details(), id] as const,
 }

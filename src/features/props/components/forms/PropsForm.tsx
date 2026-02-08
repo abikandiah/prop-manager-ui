@@ -10,7 +10,7 @@ import {
 	type Prop,
 	type PropertyType,
 	type UpdatePropPayload,
-} from '@/features/props/props'
+} from '@/domain/property'
 import {
 	AddressFormFields,
 	ADDRESS_FORM_INITIAL,

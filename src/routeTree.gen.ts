@@ -11,17 +11,18 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as DevRouteRouteImport } from './routes/dev/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as UnitsIndexRouteImport } from './routes/units/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as PropsIndexRouteImport } from './routes/props/index'
 import { Route as ProfileIndexRouteImport } from './routes/profile/index'
 import { Route as MessagesIndexRouteImport } from './routes/messages/index'
 import { Route as DevIndexRouteImport } from './routes/dev/index'
+import { Route as UnitsUnitIdRouteImport } from './routes/units/$unitId'
 import { Route as PublicTermsRouteImport } from './routes/public/terms'
 import { Route as PublicPrivacyRouteImport } from './routes/public/privacy'
 import { Route as DevAuthRouteImport } from './routes/dev/auth'
 import { Route as PropsIdRouteRouteImport } from './routes/props/$id/route'
 import { Route as PropsIdIndexRouteImport } from './routes/props/$id/index'
-import { Route as PropsIdUnitsUnitIdRouteImport } from './routes/props/$id/units.$unitId'
 
 const DevRouteRoute = DevRouteRouteImport.update({
   id: '/dev',
@@ -31,6 +32,11 @@ const DevRouteRoute = DevRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const UnitsIndexRoute = UnitsIndexRouteImport.update({
+  id: '/units/',
+  path: '/units/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsIndexRoute = SettingsIndexRouteImport.update({
@@ -58,6 +64,11 @@ const DevIndexRoute = DevIndexRouteImport.update({
   path: '/',
   getParentRoute: () => DevRouteRoute,
 } as any)
+const UnitsUnitIdRoute = UnitsUnitIdRouteImport.update({
+  id: '/units/$unitId',
+  path: '/units/$unitId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PublicTermsRoute = PublicTermsRouteImport.update({
   id: '/public/terms',
   path: '/public/terms',
@@ -83,11 +94,6 @@ const PropsIdIndexRoute = PropsIdIndexRouteImport.update({
   path: '/',
   getParentRoute: () => PropsIdRouteRoute,
 } as any)
-const PropsIdUnitsUnitIdRoute = PropsIdUnitsUnitIdRouteImport.update({
-  id: '/units/$unitId',
-  path: '/units/$unitId',
-  getParentRoute: () => PropsIdRouteRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -96,26 +102,28 @@ export interface FileRoutesByFullPath {
   '/dev/auth': typeof DevAuthRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
+  '/units/$unitId': typeof UnitsUnitIdRoute
   '/dev/': typeof DevIndexRoute
   '/messages/': typeof MessagesIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/props/': typeof PropsIndexRoute
   '/settings/': typeof SettingsIndexRoute
+  '/units/': typeof UnitsIndexRoute
   '/props/$id/': typeof PropsIdIndexRoute
-  '/props/$id/units/$unitId': typeof PropsIdUnitsUnitIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dev/auth': typeof DevAuthRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
+  '/units/$unitId': typeof UnitsUnitIdRoute
   '/dev': typeof DevIndexRoute
   '/messages': typeof MessagesIndexRoute
   '/profile': typeof ProfileIndexRoute
   '/props': typeof PropsIndexRoute
   '/settings': typeof SettingsIndexRoute
+  '/units': typeof UnitsIndexRoute
   '/props/$id': typeof PropsIdIndexRoute
-  '/props/$id/units/$unitId': typeof PropsIdUnitsUnitIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -125,13 +133,14 @@ export interface FileRoutesById {
   '/dev/auth': typeof DevAuthRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
+  '/units/$unitId': typeof UnitsUnitIdRoute
   '/dev/': typeof DevIndexRoute
   '/messages/': typeof MessagesIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/props/': typeof PropsIndexRoute
   '/settings/': typeof SettingsIndexRoute
+  '/units/': typeof UnitsIndexRoute
   '/props/$id/': typeof PropsIdIndexRoute
-  '/props/$id/units/$unitId': typeof PropsIdUnitsUnitIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -142,26 +151,28 @@ export interface FileRouteTypes {
     | '/dev/auth'
     | '/public/privacy'
     | '/public/terms'
+    | '/units/$unitId'
     | '/dev/'
     | '/messages/'
     | '/profile/'
     | '/props/'
     | '/settings/'
+    | '/units/'
     | '/props/$id/'
-    | '/props/$id/units/$unitId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/dev/auth'
     | '/public/privacy'
     | '/public/terms'
+    | '/units/$unitId'
     | '/dev'
     | '/messages'
     | '/profile'
     | '/props'
     | '/settings'
+    | '/units'
     | '/props/$id'
-    | '/props/$id/units/$unitId'
   id:
     | '__root__'
     | '/'
@@ -170,13 +181,14 @@ export interface FileRouteTypes {
     | '/dev/auth'
     | '/public/privacy'
     | '/public/terms'
+    | '/units/$unitId'
     | '/dev/'
     | '/messages/'
     | '/profile/'
     | '/props/'
     | '/settings/'
+    | '/units/'
     | '/props/$id/'
-    | '/props/$id/units/$unitId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -185,10 +197,12 @@ export interface RootRouteChildren {
   PropsIdRouteRoute: typeof PropsIdRouteRouteWithChildren
   PublicPrivacyRoute: typeof PublicPrivacyRoute
   PublicTermsRoute: typeof PublicTermsRoute
+  UnitsUnitIdRoute: typeof UnitsUnitIdRoute
   MessagesIndexRoute: typeof MessagesIndexRoute
   ProfileIndexRoute: typeof ProfileIndexRoute
   PropsIndexRoute: typeof PropsIndexRoute
   SettingsIndexRoute: typeof SettingsIndexRoute
+  UnitsIndexRoute: typeof UnitsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -205,6 +219,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/units/': {
+      id: '/units/'
+      path: '/units'
+      fullPath: '/units/'
+      preLoaderRoute: typeof UnitsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings/': {
@@ -242,6 +263,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DevIndexRouteImport
       parentRoute: typeof DevRouteRoute
     }
+    '/units/$unitId': {
+      id: '/units/$unitId'
+      path: '/units/$unitId'
+      fullPath: '/units/$unitId'
+      preLoaderRoute: typeof UnitsUnitIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/public/terms': {
       id: '/public/terms'
       path: '/public/terms'
@@ -277,13 +305,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PropsIdIndexRouteImport
       parentRoute: typeof PropsIdRouteRoute
     }
-    '/props/$id/units/$unitId': {
-      id: '/props/$id/units/$unitId'
-      path: '/units/$unitId'
-      fullPath: '/props/$id/units/$unitId'
-      preLoaderRoute: typeof PropsIdUnitsUnitIdRouteImport
-      parentRoute: typeof PropsIdRouteRoute
-    }
   }
 }
 
@@ -303,12 +324,10 @@ const DevRouteRouteWithChildren = DevRouteRoute._addFileChildren(
 
 interface PropsIdRouteRouteChildren {
   PropsIdIndexRoute: typeof PropsIdIndexRoute
-  PropsIdUnitsUnitIdRoute: typeof PropsIdUnitsUnitIdRoute
 }
 
 const PropsIdRouteRouteChildren: PropsIdRouteRouteChildren = {
   PropsIdIndexRoute: PropsIdIndexRoute,
-  PropsIdUnitsUnitIdRoute: PropsIdUnitsUnitIdRoute,
 }
 
 const PropsIdRouteRouteWithChildren = PropsIdRouteRoute._addFileChildren(
@@ -321,10 +340,12 @@ const rootRouteChildren: RootRouteChildren = {
   PropsIdRouteRoute: PropsIdRouteRouteWithChildren,
   PublicPrivacyRoute: PublicPrivacyRoute,
   PublicTermsRoute: PublicTermsRoute,
+  UnitsUnitIdRoute: UnitsUnitIdRoute,
   MessagesIndexRoute: MessagesIndexRoute,
   ProfileIndexRoute: ProfileIndexRoute,
   PropsIndexRoute: PropsIndexRoute,
   SettingsIndexRoute: SettingsIndexRoute,
+  UnitsIndexRoute: UnitsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

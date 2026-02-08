@@ -1,11 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { unitKeys, unitsApi } from './units'
-import type { CreateUnitPayload, Unit, UpdateUnitPayload } from './units'
+import { unitKeys } from './keys'
+import { unitsApi } from './api'
+import type { CreateUnitPayload, Unit, UpdateUnitPayload } from '@/domain/unit'
 import { stableRequestId } from '@/lib/offline-types'
 import { generateOptimisticId, nowIso } from '@/lib/util'
-
-// --- Constants ---
-export const IDEMPOTENCY_HEADER = 'X-Request-Id'
+import { IDEMPOTENCY_HEADER } from '@/lib/constants'
 
 // --- Helpers: Optimistic Updates ---
 
@@ -108,6 +107,13 @@ function applyDelete(
 }
 
 // --- Queries ---
+
+export function useUnitsList() {
+	return useQuery({
+		queryKey: unitKeys.list(null),
+		queryFn: () => unitsApi.list(),
+	})
+}
 
 export function useUnitsByPropId(propId: string | null) {
 	return useQuery({

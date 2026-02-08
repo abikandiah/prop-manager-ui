@@ -7,15 +7,17 @@ import { DialogFooter } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
 import { useCreateUnit, useUpdateUnit } from '@/features/units/hooks'
+import { usePropsList } from '@/features/props'
 import {
 	UNIT_STATUSES,
 	type CreateUnitPayload,
 	type Unit,
 	type UnitStatus,
 	type UpdateUnitPayload,
-} from '@/features/units/units'
+} from '@/domain/unit'
 
 type FormState = {
+	propertyId: string
 	unitNumber: string
 	status: UnitStatus
 	description: string
@@ -30,6 +32,7 @@ type FormState = {
 }
 
 const initialFormState: FormState = {
+	propertyId: '',
 	unitNumber: '',
 	status: 'VACANT',
 	description: '',
@@ -45,6 +48,7 @@ const initialFormState: FormState = {
 
 function unitToFormState(unit: Unit): FormState {
 	return {
+		propertyId: unit.propertyId,
 		unitNumber: unit.unitNumber,
 		status: unit.status,
 		description: unit.description ?? '',
@@ -61,7 +65,7 @@ function unitToFormState(unit: Unit): FormState {
 }
 
 export interface UnitFormProps {
-	propId: string
+	propId?: string
 	initialUnit?: Unit | null
 	onSuccess?: () => void
 	onCancel?: () => void
@@ -76,19 +80,22 @@ export function UnitForm({
 	submitLabel = 'Create Unit',
 }: UnitFormProps) {
 	const isEdit = initialUnit != null
-	const [form, setForm] = useState<FormState>(() =>
-		initialUnit ? unitToFormState(initialUnit) : initialFormState,
-	)
+	const [form, setForm] = useState<FormState>(() => {
+		const state = initialUnit ? unitToFormState(initialUnit) : initialFormState
+		if (propId) state.propertyId = propId
+		return state
+	})
 	const createUnit = useCreateUnit()
 	const updateUnit = useUpdateUnit()
+	const { data: propsList } = usePropsList()
 
 	useEffect(() => {
 		if (initialUnit) {
 			setForm(unitToFormState(initialUnit))
 		} else {
-			setForm(initialFormState)
+			setForm((prev) => ({ ...initialFormState, propertyId: propId ?? prev.propertyId }))
 		}
-	}, [initialUnit])
+	}, [initialUnit, propId])
 
 	const pending = createUnit.isPending || updateUnit.isPending
 
@@ -113,7 +120,7 @@ export function UnitForm({
 	}
 
 	const buildCreatePayload = (): CreateUnitPayload => ({
-		propertyId: propId,
+		propertyId: form.propertyId || propId || '',
 		unitNumber: form.unitNumber.trim(),
 		status: form.status,
 		description: form.description.trim() || undefined,
@@ -134,6 +141,7 @@ export function UnitForm({
 	})
 
 	const buildUpdatePayload = (): UpdateUnitPayload => ({
+		propertyId: form.propertyId,
 		unitNumber: form.unitNumber.trim(),
 		status: form.status,
 		description: form.description.trim() || null,
@@ -154,6 +162,10 @@ export function UnitForm({
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
+		if (!form.propertyId && !propId) {
+			toast.error('Property is required')
+			return
+		}
 		if (!form.unitNumber.trim()) {
 			toast.error('Unit number is required')
 			return
@@ -219,6 +231,32 @@ export function UnitForm({
 
 	return (
 		<form onSubmit={handleSubmit} className="space-y-4 pt-4">
+			{!propId && (
+				<div className="space-y-2">
+					<Label htmlFor="propertyId">
+						Property{' '}
+						<span className="text-destructive" aria-hidden>
+							*
+						</span>
+					</Label>
+					<Select
+						id="propertyId"
+						name="propertyId"
+						value={form.propertyId}
+						onChange={handleChange}
+						required
+					>
+						<option value="" disabled>
+							Select a property
+						</option>
+						{propsList?.map((p) => (
+							<option key={p.id} value={p.id}>
+								{p.legalName}
+							</option>
+						))}
+					</Select>
+				</div>
+			)}
 			<div className="space-y-2">
 				<Label htmlFor="unitNumber">
 					Unit number{' '}

@@ -42,6 +42,7 @@ export interface Prop {
 	yearBuilt: number | null
 	createdAt: string
 	updatedAt: string
+	version: number
 }
 
 /** Single-line address string (comma-separated). Returns '—' when address is null/empty. */
@@ -90,6 +91,8 @@ export interface UpdatePropPayload {
 	ownerId?: string | null
 	totalArea?: number | null
 	yearBuilt?: number | null
+	/** Required for optimistic-lock verification */
+	version: number
 }
 
 // --- Service ---

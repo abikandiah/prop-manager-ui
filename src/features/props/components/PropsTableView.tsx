@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { useCreateProp, usePropsList } from '@/features/props'
 import type { Prop } from '@/features/props/props'
+import { formatAddress } from '@/features/props/props'
 import { DelayedLoadingFallback } from '@/components/ui'
 import {
 	Table,
@@ -14,19 +15,6 @@ import {
 	TableHeader,
 	TableRow,
 } from '@/components/ui/table'
-
-function formatAddress(p: Prop): string {
-	const a = p.address
-	if (!a) return '-'
-	const parts = [
-		a.addressLine1,
-		a.addressLine2,
-		[a.city, a.stateProvinceRegion].filter(Boolean).join(', '),
-		a.postalCode,
-		a.countryCode,
-	].filter(Boolean)
-	return parts.join(', ') || '-'
-}
 
 export function PropsTableView() {
 	const navigate = useNavigate()
@@ -113,7 +101,7 @@ export function PropsTableView() {
 										</div>
 									</TableCell>
 									<TableCell className="max-w-[220px] truncate text-muted-foreground">
-										{formatAddress(p)}
+										{formatAddress(p.address)}
 									</TableCell>
 								</TableRow>
 							)

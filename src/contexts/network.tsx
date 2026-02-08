@@ -46,8 +46,8 @@ export function NetworkProvider({ children }: { children: React.ReactNode }) {
 						},
 					)
 					actualOnline = true
-				} catch (err: any) {
-					if (err.name === 'AbortError') return
+				} catch (err: unknown) {
+					if (err instanceof Error && err.name === 'AbortError') return
 					actualOnline = false // It's "Lie-Fi"
 				}
 			}

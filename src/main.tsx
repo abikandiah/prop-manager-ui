@@ -8,6 +8,7 @@ import * as TanStackQueryProvider from './integrations/tanstack-query/root-provi
 import { routeTree } from './routeTree.gen'
 
 import { NotFound } from './components/NotFound.tsx'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { ThemeProvider } from './contexts/theme'
 import { NetworkProvider } from './contexts/network'
 import { AuthProvider } from './contexts/auth'
@@ -44,16 +45,18 @@ if (rootElement && !rootElement.innerHTML) {
 	const root = createRoot(rootElement)
 	root.render(
 		<StrictMode>
-			<TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
-				<ThemeProvider>
-					<NetworkProvider>
-						<AuthProvider>
-							<RouterProvider router={router} />
-							<Toaster />
-						</AuthProvider>
-					</NetworkProvider>
-				</ThemeProvider>
-			</TanStackQueryProvider.Provider>
+			<ErrorBoundary>
+				<TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
+					<ThemeProvider>
+						<NetworkProvider>
+							<AuthProvider>
+								<RouterProvider router={router} />
+								<Toaster />
+							</AuthProvider>
+						</NetworkProvider>
+					</ThemeProvider>
+				</TanStackQueryProvider.Provider>
+			</ErrorBoundary>
 		</StrictMode>,
 	)
 }

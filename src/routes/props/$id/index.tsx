@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { Button } from '@abumble/design-system/components/Button'
@@ -76,6 +76,39 @@ function PropLayout() {
 		}
 	}, [isError, error])
 
+	// Memoize field rows unconditionally to satisfy Rules of Hooks
+	const fieldRows = useMemo(() => {
+		if (!prop) return []
+		return [
+			{ label: 'Legal name', value: prop.legalName },
+			{
+				label: 'Property type',
+				value: prop.propertyType.replace(/_/g, ' '),
+			},
+			prop.description && {
+				label: 'Description',
+				value: prop.description,
+				multiline: true,
+			},
+			prop.parcelNumber && {
+				label: 'Parcel number',
+				value: prop.parcelNumber,
+			},
+			prop.totalArea != null && {
+				label: 'Total area',
+				value: `${prop.totalArea} sq ft`,
+			},
+			prop.yearBuilt != null && {
+				label: 'Year built',
+				value: prop.yearBuilt,
+			},
+			prop.address && {
+				label: 'Address',
+				value: <AddressDisplay address={prop.address} />,
+			},
+		]
+	}, [prop])
+
 	const skeleton = (
 		<div className="flex flex-col gap-6">
 			<div className="flex items-center gap-2">
@@ -115,10 +148,7 @@ function PropLayout() {
 								{prop.address && ` · ${formatAddress(prop.address)}`}
 							</>
 						}
-						breadcrumbItems={[
-							{ label: 'Properties', to: '/props' },
-							{ label: prop.legalName },
-						]}
+						breadcrumbItems={[{ label: 'Properties', to: '/props' }]}
 						actions={
 							<PropActions prop={prop} onEdit={() => setEditingProp(prop)} />
 						}
@@ -140,36 +170,7 @@ function PropLayout() {
 						</FormDialog>
 					)}
 
-					<FieldsTable
-						rows={[
-							{ label: 'Legal name', value: prop.legalName },
-							{
-								label: 'Property type',
-								value: prop.propertyType.replace(/_/g, ' '),
-							},
-							prop.description && {
-								label: 'Description',
-								value: prop.description,
-								multiline: true,
-							},
-							prop.parcelNumber && {
-								label: 'Parcel number',
-								value: prop.parcelNumber,
-							},
-							prop.totalArea != null && {
-								label: 'Total area',
-								value: `${prop.totalArea} sq ft`,
-							},
-							prop.yearBuilt != null && {
-								label: 'Year built',
-								value: prop.yearBuilt,
-							},
-							prop.address && {
-								label: 'Address',
-								value: <AddressDisplay address={prop.address} />,
-							},
-						]}
-					/>
+					<FieldsTable rows={fieldRows} />
 
 					<UnitsSection propId={prop.id} />
 				</div>
@@ -181,7 +182,7 @@ function PropLayout() {
 function UnitsSection({ propId }: { propId: string }) {
 	const [addUnitOpen, setAddUnitOpen] = useState(false)
 	return (
-		<section className="space-y-4 mt-22">
+		<section className="space-y-4 mt-2">
 			<div className="space-y-1.5">
 				<h2 className="tracking-tight text-foreground sm:text-2xl text-xl">
 					Units

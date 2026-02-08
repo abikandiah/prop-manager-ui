@@ -26,15 +26,18 @@ function UnitRowActions({ unit, onEdit }: { unit: Unit; onEdit: () => void }) {
 	const deleteUnit = useDeleteUnit()
 
 	const handleDeleteConfirm = () => {
-		deleteUnit.mutate(unit.id, {
-			onSuccess: () => {
-				setDeleteConfirmOpen(false)
-				toast.success('Unit deleted')
+		deleteUnit.mutate(
+			{ id: unit.id, propertyId: unit.propertyId },
+			{
+				onSuccess: () => {
+					setDeleteConfirmOpen(false)
+					toast.success('Unit deleted')
+				},
+				onError: (err) => {
+					toast.error(err?.message ?? 'Failed to delete unit')
+				},
 			},
-			onError: (err) => {
-				toast.error(err?.message ?? 'Failed to delete unit')
-			},
-		})
+		)
 	}
 
 	return (

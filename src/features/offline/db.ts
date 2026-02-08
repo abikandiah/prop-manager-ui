@@ -18,7 +18,10 @@ export interface MutationRow {
 }
 
 export class AppDatabase extends Dexie {
-	queries!: Dexie.Table<{ id: string; value: any; updatedAt: number }, string>
+	queries!: Dexie.Table<
+		{ id: string; value: PersistedClient; updatedAt: number },
+		string
+	>
 	mutations!: Dexie.Table<MutationRow, string>
 
 	constructor() {
@@ -46,7 +49,7 @@ export class AppDatabase extends Dexie {
 		await this.queries.delete(CACHE_KEY)
 	}
 
-	async addMutation(mutationKey: any, variables: any) {
+	async addMutation(mutationKey: readonly unknown[], variables: unknown) {
 		const mutation = {
 			mutationKey,
 			state: {

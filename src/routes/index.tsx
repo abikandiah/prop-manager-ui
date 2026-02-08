@@ -17,7 +17,6 @@ function Home() {
 			<BannerHeader
 				title="Dashboard"
 				description="Your home base. From here you can jump to your list of properties or your messages—everything in one place."
-				breadcrumbItems={[{ label: 'Dashboard' }]}
 			/>
 
 			<div className="grid gap-4 sm:grid-cols-2">

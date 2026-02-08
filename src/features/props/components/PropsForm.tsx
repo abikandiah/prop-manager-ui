@@ -157,6 +157,8 @@ export function PropsForm({
 		parcelNumber: parcelNumber.trim() || undefined,
 		totalArea: totalArea.trim() ? parseInt(totalArea, 10) : undefined,
 		yearBuilt: yearBuilt.trim() ? parseInt(yearBuilt, 10) : undefined,
+		// version is required for updates (optimistic locking); ignored on create
+		version: initialProp?.version ?? 0,
 	})
 
 	const handleSubmit = (e: React.SubmitEvent) => {
@@ -166,6 +168,17 @@ export function PropsForm({
 			toast.error(err)
 			return
 		}
+
+		// Validate numeric fields
+		if (totalArea.trim() && isNaN(parseInt(totalArea, 10))) {
+			toast.error('Total area must be a valid number')
+			return
+		}
+		if (yearBuilt.trim() && isNaN(parseInt(yearBuilt, 10))) {
+			toast.error('Year built must be a valid number')
+			return
+		}
+
 		const payload = buildPayload()
 
 		if (isEdit && initialProp) {

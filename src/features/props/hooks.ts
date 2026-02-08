@@ -23,6 +23,7 @@ function applyCreate(
 		yearBuilt: payload.yearBuilt ?? null,
 		createdAt: nowIso(),
 		updatedAt: nowIso(),
+		version: 0,
 	}
 	queryClient.setQueryData(propKeys.list(), (old: Array<Prop> | undefined) =>
 		old ? [...old, optimistic] : [optimistic],
@@ -48,6 +49,7 @@ function applyUpdate(
 							...propFields,
 							updatedAt,
 							address: _addr != null ? null : p.address,
+							version: p.version + 1,
 						}
 					: p,
 			) ?? [],
@@ -59,6 +61,7 @@ function applyUpdate(
 					...propFields,
 					updatedAt,
 					address: _addr != null ? null : old.address,
+					version: old.version + 1,
 				}
 			: undefined,
 	)

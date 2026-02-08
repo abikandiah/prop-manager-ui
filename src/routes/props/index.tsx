@@ -25,7 +25,6 @@ function RouteComponent() {
 						can attach units and tenants to them.
 					</>
 				}
-				breadcrumbItems={[{ label: 'Properties' }]}
 			/>
 
 			<div>

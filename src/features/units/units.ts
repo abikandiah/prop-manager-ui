@@ -27,6 +27,7 @@ export interface Unit {
 	hardwoodFloors: boolean | null
 	createdAt: string
 	updatedAt: string
+	version: number
 }
 
 export interface CreateUnitPayload {
@@ -57,6 +58,8 @@ export interface UpdateUnitPayload {
 	balcony?: boolean | null
 	laundryInUnit?: boolean | null
 	hardwoodFloors?: boolean | null
+	/** Required for optimistic-lock verification */
+	version: number
 }
 
 // --- Service ---

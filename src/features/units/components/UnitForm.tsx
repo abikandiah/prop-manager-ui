@@ -128,9 +128,9 @@ export function UnitForm({
 		squareFootage: form.squareFootage.trim()
 			? parseInt(form.squareFootage, 10)
 			: undefined,
-		balcony: form.balcony || undefined,
-		laundryInUnit: form.laundryInUnit || undefined,
-		hardwoodFloors: form.hardwoodFloors || undefined,
+		balcony: form.balcony ? true : undefined,
+		laundryInUnit: form.laundryInUnit ? true : undefined,
+		hardwoodFloors: form.hardwoodFloors ? true : undefined,
 	})
 
 	const buildUpdatePayload = (): UpdateUnitPayload => ({
@@ -149,12 +149,41 @@ export function UnitForm({
 		balcony: form.balcony,
 		laundryInUnit: form.laundryInUnit,
 		hardwoodFloors: form.hardwoodFloors,
+		version: initialUnit?.version ?? 0,
 	})
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()
 		if (!form.unitNumber.trim()) {
 			toast.error('Unit number is required')
+			return
+		}
+
+		// Validate numeric fields
+		if (form.rentAmount.trim() && isNaN(parseFloat(form.rentAmount))) {
+			toast.error('Rent amount must be a valid number')
+			return
+		}
+		if (
+			form.securityDeposit.trim() &&
+			isNaN(parseFloat(form.securityDeposit))
+		) {
+			toast.error('Security deposit must be a valid number')
+			return
+		}
+		if (form.bedrooms.trim() && isNaN(parseInt(form.bedrooms, 10))) {
+			toast.error('Bedrooms must be a valid number')
+			return
+		}
+		if (form.bathrooms.trim() && isNaN(parseInt(form.bathrooms, 10))) {
+			toast.error('Bathrooms must be a valid number')
+			return
+		}
+		if (
+			form.squareFootage.trim() &&
+			isNaN(parseInt(form.squareFootage, 10))
+		) {
+			toast.error('Square footage must be a valid number')
 			return
 		}
 

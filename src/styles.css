@@ -5,6 +5,11 @@
 @import '@abumble/design-system/styles.css';
 @source "../node_modules/@abumble/design-system";
 
+/* Override border-container to use theme border color in dark mode */
+@utility border-container {
+	@apply border border-border;
+}
+
 /* Checkbox: light = olive checked, gray border unchecked; dark = matching contrast */
 :root {
 	--checkbox-checked: oklch(0.78 0.15 125);

@@ -1,5 +1,5 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { usePropDetail } from '@/features/props/hooks'
@@ -36,16 +36,19 @@ function UnitActions({
 	const deleteUnit = useDeleteUnit()
 
 	const handleDeleteConfirm = () => {
-		deleteUnit.mutate(unit.id, {
-			onSuccess: () => {
-				setDeleteConfirmOpen(false)
-				toast.success('Unit deleted')
-				navigate({ to: '/props/$id', params: { id: propId } })
+		deleteUnit.mutate(
+			{ id: unit.id, propertyId: unit.propertyId },
+			{
+				onSuccess: () => {
+					setDeleteConfirmOpen(false)
+					toast.success('Unit deleted')
+					navigate({ to: '/props/$id', params: { id: propId } })
+				},
+				onError: (err) => {
+					toast.error(err?.message ?? 'Failed to delete unit')
+				},
 			},
-			onError: (err) => {
-				toast.error(err?.message ?? 'Failed to delete unit')
-			},
-		})
+		)
 	}
 
 	return (
@@ -91,6 +94,52 @@ function UnitDetailPage() {
 			toast.error(`Error loading unit: ${error?.message ?? 'Unknown'}`)
 		}
 	}, [isError, error])
+
+	// Memoize field rows unconditionally to satisfy Rules of Hooks
+	const fieldRows = useMemo(() => {
+		if (!unit) return []
+		return [
+			{ label: 'Unit number', value: unit.unitNumber },
+			{
+				label: 'Status',
+				value: unit.status.replace(/_/g, ' '),
+			},
+			unit.description && {
+				label: 'Description',
+				value: unit.description,
+				multiline: true,
+			},
+			{
+				label: 'Rent',
+				value: formatCurrency(unit.rentAmount),
+			},
+			unit.securityDeposit != null && {
+				label: 'Security deposit',
+				value: formatCurrency(unit.securityDeposit),
+			},
+			(unit.bedrooms != null || unit.bathrooms != null) && {
+				label: 'Beds / Baths',
+				value: `${unit.bedrooms ?? '—'} / ${unit.bathrooms ?? '—'}`,
+			},
+			unit.squareFootage != null && {
+				label: 'Square footage',
+				value: `${unit.squareFootage} sq ft`,
+			},
+			(unit.balcony != null ||
+				unit.laundryInUnit != null ||
+				unit.hardwoodFloors != null) && {
+				label: 'Features',
+				value:
+					[
+						unit.balcony && 'Balcony',
+						unit.laundryInUnit && 'Laundry in unit',
+						unit.hardwoodFloors && 'Hardwood floors',
+					]
+						.filter(Boolean)
+						.join(' · ') || '—',
+			},
+		]
+	}, [unit])
 
 	const skeleton = (
 		<div className="flex flex-col gap-6">
@@ -141,7 +190,6 @@ function UnitDetailPage() {
 						breadcrumbItems={[
 							{ label: 'Properties', to: '/props' },
 							{ label: propName, to: `/props/${propId}` },
-							{ label: `Unit ${unit.unitNumber}` },
 						]}
 						actions={
 							<UnitActions
@@ -152,49 +200,7 @@ function UnitDetailPage() {
 						}
 					/>
 
-					<FieldsTable
-						rows={[
-							{ label: 'Unit number', value: unit.unitNumber },
-							{
-								label: 'Status',
-								value: unit.status.replace(/_/g, ' '),
-							},
-							unit.description && {
-								label: 'Description',
-								value: unit.description,
-								multiline: true,
-							},
-							{
-								label: 'Rent',
-								value: formatCurrency(unit.rentAmount),
-							},
-							unit.securityDeposit != null && {
-								label: 'Security deposit',
-								value: formatCurrency(unit.securityDeposit),
-							},
-							(unit.bedrooms != null || unit.bathrooms != null) && {
-								label: 'Beds / Baths',
-								value: `${unit.bedrooms ?? '—'} / ${unit.bathrooms ?? '—'}`,
-							},
-							unit.squareFootage != null && {
-								label: 'Square footage',
-								value: `${unit.squareFootage} sq ft`,
-							},
-							(unit.balcony != null ||
-								unit.laundryInUnit != null ||
-								unit.hardwoodFloors != null) && {
-								label: 'Features',
-								value:
-									[
-										unit.balcony && 'Balcony',
-										unit.laundryInUnit && 'Laundry in unit',
-										unit.hardwoodFloors && 'Hardwood floors',
-									]
-										.filter(Boolean)
-										.join(' · ') || '—',
-							},
-						]}
-					/>
+					<FieldsTable rows={fieldRows} />
 
 					{editingUnit && (
 						<FormDialog

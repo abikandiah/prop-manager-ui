@@ -48,14 +48,7 @@ function DevAuth() {
 
 	return (
 		<div className="flex flex-col items-center justify-center flex-1 gap-12 px-4 py-12 min-h-[60vh]">
-			<div className="text-center space-y-4">
-				<PageHeader>Dev Authentication</PageHeader>
-				<PageDescription className="max-w-2xl mx-auto">
-					Use this to authenticate against the backend
-				</PageDescription>
-			</div>
-
-			<Card className="w-full max-w-md border-muted/50">
+			<Card className="w-full max-w-md">
 				<CardHeader className="pb-4">
 					<h2 className="text-2xl font-semibold tracking-tight text-foreground">
 						Login

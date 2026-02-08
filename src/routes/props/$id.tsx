@@ -1,10 +1,25 @@
-import { createFileRoute, Link } from '@tanstack/react-router'
+import { createFileRoute, Link, useNavigate } from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
-import { usePropDetail } from '@/features/props/hooks'
+import { Button } from '@abumble/design-system/components/Button'
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from '@abumble/design-system/components/Popover'
+import { MoreVertical, Pencil, Trash2 } from 'lucide-react'
+import { usePropDetail, useDeleteProp } from '@/features/props/hooks'
 import type { Prop } from '@/features/props/props'
-import { BannerHeader } from '@/components/ui'
-import { useEffect } from 'react'
+import {
+	BannerHeader,
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+} from '@/components/ui'
 import { ChevronLeft } from 'lucide-react'
 
 export const Route = createFileRoute('/props/$id')({
@@ -22,6 +37,99 @@ function formatAddress(p: Prop): string {
 		a.countryCode,
 	].filter(Boolean)
 	return parts.join(', ') || '—'
+}
+
+function PropActions({ prop }: { prop: Prop }) {
+	const [open, setOpen] = useState(false)
+	const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
+	const navigate = useNavigate()
+	const deleteProp = useDeleteProp()
+
+	const openDeleteConfirm = () => {
+		setOpen(false)
+		setDeleteConfirmOpen(true)
+	}
+
+	const handleDeleteConfirm = () => {
+		deleteProp.mutate(prop.id, {
+			onSuccess: () => {
+				setDeleteConfirmOpen(false)
+				toast.success('Property deleted')
+				navigate({ to: '/props' })
+			},
+			onError: (err) => {
+				toast.error(err?.message ?? 'Failed to delete property')
+			},
+		})
+	}
+
+	return (
+		<>
+			<Popover open={open} onOpenChange={setOpen}>
+				<PopoverTrigger asChild>
+					<Button
+						type="button"
+						variant="ghost"
+						size="icon"
+						className="size-8 shrink-0"
+						aria-label="Actions"
+					>
+						<MoreVertical className="size-4" />
+					</Button>
+				</PopoverTrigger>
+				<PopoverContent align="end" className="w-40 p-0 mt-1">
+					<ul className="flex flex-col gap-0.5 p-1.5">
+						<li>
+							<Button variant="ghost" size="sm" className="w-full justify-start gap-2" asChild>
+								<Link to="/props/$id" params={{ id: prop.id }} onClick={() => setOpen(false)}>
+									<Pencil className="size-4 shrink-0" />
+									Edit
+								</Link>
+							</Button>
+						</li>
+						<li>
+							<Button
+								variant="ghost"
+								size="sm"
+								className="w-full justify-start gap-2 text-destructive hover:text-destructive"
+								onClick={openDeleteConfirm}
+								disabled={deleteProp.isPending}
+							>
+								<Trash2 className="size-4 shrink-0" />
+								Delete
+							</Button>
+						</li>
+					</ul>
+				</PopoverContent>
+			</Popover>
+
+			<Dialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+				<DialogContent showCloseButton={true}>
+					<DialogHeader>
+						<DialogTitle>Delete property?</DialogTitle>
+						<DialogDescription>
+							{prop.legalName} will be removed. This can&apos;t be undone.
+						</DialogDescription>
+					</DialogHeader>
+					<DialogFooter showCloseButton={false}>
+						<Button
+							variant="outline"
+							onClick={() => setDeleteConfirmOpen(false)}
+						>
+							Cancel
+						</Button>
+						<Button
+							variant="destructive"
+							onClick={handleDeleteConfirm}
+							disabled={deleteProp.isPending}
+						>
+							{deleteProp.isPending ? 'Deleting…' : 'Delete'}
+						</Button>
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+		</>
+	)
 }
 
 function PropDetailPage() {
@@ -71,16 +179,6 @@ function PropDetailPage() {
 
 	return (
 		<div className="flex flex-col gap-8">
-			<div className="flex flex-col gap-2">
-				<Link
-					to="/props"
-					className="inline-flex w-fit items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
-				>
-					<ChevronLeft className="size-4" />
-					Back to Properties
-				</Link>
-			</div>
-
 			<BannerHeader
 				title={prop.legalName}
 				description={
@@ -89,6 +187,11 @@ function PropDetailPage() {
 						{prop.address && ` · ${formatAddress(prop)}`}
 					</>
 				}
+				breadcrumbItems={[
+					{ label: 'Properties', to: '/props' },
+					{ label: prop.legalName },
+				]}
+				actions={<PropActions prop={prop} />}
 			/>
 
 			<div className="grid gap-6 sm:grid-cols-2">

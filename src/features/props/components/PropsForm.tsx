@@ -47,7 +47,10 @@ const initialForm: FormState = {
 	isActive: true,
 }
 
-function isRequiredFieldsValid(legalName: string, address: AddressFormValue): boolean {
+function isRequiredFieldsValid(
+	legalName: string,
+	address: AddressFormValue,
+): boolean {
 	return (
 		legalName.trim().length > 0 &&
 		address.addressLine1.trim().length > 0 &&
@@ -82,7 +85,9 @@ export function PropsForm() {
 	const canSubmit = isRequiredFieldsValid(legalName, address)
 
 	type FormFieldName = Exclude<keyof FormState, 'address'>
-	const onFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+	const onFormChange = (
+		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+	) => {
 		const { name, value } = e.target
 		const field = name as FormFieldName
 		if (name in initialForm && name !== 'address') {
@@ -161,8 +166,11 @@ export function PropsForm() {
 				<form onSubmit={handleCreate} className="space-y-4 pt-4">
 					<div className="space-y-2">
 						<Label htmlFor="legalName">
-						Legal name <span className="text-destructive" aria-hidden>*</span>
-					</Label>
+							Legal name{' '}
+							<span className="text-destructive" aria-hidden>
+								*
+							</span>
+						</Label>
 						<Input
 							id="legalName"
 							name="legalName"
@@ -181,7 +189,7 @@ export function PropsForm() {
 							value={propertyType}
 							onChange={onFormChange}
 							className={cn(
-								'flex h-9 w-full rounded border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors',
+								'flex h-9 w-full rounded border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors',
 								'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
 							)}
 						>
@@ -241,10 +249,7 @@ export function PropsForm() {
 						>
 							Cancel
 						</Button>
-						<Button
-							type="submit"
-							disabled={createProp.isPending || !canSubmit}
-						>
+						<Button type="submit" disabled={createProp.isPending || !canSubmit}>
 							{createProp.isPending ? 'Creating…' : 'Create Property'}
 						</Button>
 					</DialogFooter>

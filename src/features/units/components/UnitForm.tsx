@@ -18,6 +18,7 @@ import {
 type FormState = {
 	unitNumber: string
 	status: UnitStatus
+	description: string
 	rentAmount: string
 	securityDeposit: string
 	bedrooms: string
@@ -31,6 +32,7 @@ type FormState = {
 const initialFormState: FormState = {
 	unitNumber: '',
 	status: 'VACANT',
+	description: '',
 	rentAmount: '',
 	securityDeposit: '',
 	bedrooms: '',
@@ -45,6 +47,7 @@ function unitToFormState(unit: Unit): FormState {
 	return {
 		unitNumber: unit.unitNumber,
 		status: unit.status,
+		description: unit.description ?? '',
 		rentAmount: unit.rentAmount != null ? String(unit.rentAmount) : '',
 		securityDeposit:
 			unit.securityDeposit != null ? String(unit.securityDeposit) : '',
@@ -105,10 +108,15 @@ export function UnitForm({
 		}))
 	}
 
+	const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+		setForm((prev) => ({ ...prev, description: e.target.value }))
+	}
+
 	const buildCreatePayload = (): CreateUnitPayload => ({
 		propertyId: propId,
 		unitNumber: form.unitNumber.trim(),
 		status: form.status,
+		description: form.description.trim() || undefined,
 		rentAmount: form.rentAmount.trim()
 			? parseFloat(form.rentAmount)
 			: undefined,
@@ -128,6 +136,7 @@ export function UnitForm({
 	const buildUpdatePayload = (): UpdateUnitPayload => ({
 		unitNumber: form.unitNumber.trim(),
 		status: form.status,
+		description: form.description.trim() || null,
 		rentAmount: form.rentAmount.trim() ? parseFloat(form.rentAmount) : null,
 		securityDeposit: form.securityDeposit.trim()
 			? parseFloat(form.securityDeposit)
@@ -213,6 +222,65 @@ export function UnitForm({
 					))}
 				</Select>
 			</div>
+			<div className="space-y-2">
+				<Label htmlFor="description">Description (optional)</Label>
+				<textarea
+					id="description"
+					value={form.description}
+					onChange={handleTextareaChange}
+					placeholder="Notes about this unit"
+					maxLength={2000}
+					rows={3}
+					className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+				/>
+			</div>
+			<div className="flex flex-col gap-2">
+				<div className="flex items-center gap-2">
+					<Checkbox
+						id="balcony"
+						checked={form.balcony}
+						onCheckedChange={(checked) =>
+							setForm((prev) => ({ ...prev, balcony: !!checked }))
+						}
+					/>
+					<Label
+						htmlFor="balcony"
+						className="text-sm font-normal cursor-pointer"
+					>
+						Balcony
+					</Label>
+				</div>
+				<div className="flex items-center gap-2">
+					<Checkbox
+						id="laundryInUnit"
+						checked={form.laundryInUnit}
+						onCheckedChange={(checked) =>
+							setForm((prev) => ({ ...prev, laundryInUnit: !!checked }))
+						}
+					/>
+					<Label
+						htmlFor="laundryInUnit"
+						className="text-sm font-normal cursor-pointer"
+					>
+						Laundry in unit
+					</Label>
+				</div>
+				<div className="flex items-center gap-2">
+					<Checkbox
+						id="hardwoodFloors"
+						checked={form.hardwoodFloors}
+						onCheckedChange={(checked) =>
+							setForm((prev) => ({ ...prev, hardwoodFloors: !!checked }))
+						}
+					/>
+					<Label
+						htmlFor="hardwoodFloors"
+						className="text-sm font-normal cursor-pointer"
+					>
+						Hardwood floors
+					</Label>
+				</div>
+			</div>
 			<div className="grid grid-cols-3 gap-4">
 				<div className="space-y-2">
 					<Label htmlFor="bedrooms">Bedrooms</Label>
@@ -278,50 +346,6 @@ export function UnitForm({
 						onChange={handleChange}
 						placeholder="Optional"
 					/>
-				</div>
-			</div>
-			<div className="flex flex-col gap-2">
-				<div className="flex items-center gap-2">
-					<Checkbox
-						id="balcony"
-						checked={form.balcony}
-						onCheckedChange={(checked) =>
-							setForm((prev) => ({ ...prev, balcony: !!checked }))
-						}
-					/>
-					<Label htmlFor="balcony" className="text-sm font-normal cursor-pointer">
-						Balcony
-					</Label>
-				</div>
-				<div className="flex items-center gap-2">
-					<Checkbox
-						id="laundryInUnit"
-						checked={form.laundryInUnit}
-						onCheckedChange={(checked) =>
-							setForm((prev) => ({ ...prev, laundryInUnit: !!checked }))
-						}
-					/>
-					<Label
-						htmlFor="laundryInUnit"
-						className="text-sm font-normal cursor-pointer"
-					>
-						Laundry in unit
-					</Label>
-				</div>
-				<div className="flex items-center gap-2">
-					<Checkbox
-						id="hardwoodFloors"
-						checked={form.hardwoodFloors}
-						onCheckedChange={(checked) =>
-							setForm((prev) => ({ ...prev, hardwoodFloors: !!checked }))
-						}
-					/>
-					<Label
-						htmlFor="hardwoodFloors"
-						className="text-sm font-normal cursor-pointer"
-					>
-						Hardwood floors
-					</Label>
 				</div>
 			</div>
 

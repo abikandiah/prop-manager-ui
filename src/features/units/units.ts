@@ -16,6 +16,7 @@ export interface Unit {
 	propertyId: string
 	unitNumber: string
 	status: UnitStatus
+	description: string | null
 	rentAmount: number | null
 	securityDeposit: number | null
 	bedrooms: number | null
@@ -32,6 +33,7 @@ export interface CreateUnitPayload {
 	propertyId: string
 	unitNumber: string
 	status: UnitStatus
+	description?: string | null
 	rentAmount?: number | null
 	securityDeposit?: number | null
 	bedrooms?: number | null
@@ -46,6 +48,7 @@ export interface UpdateUnitPayload {
 	propertyId?: string
 	unitNumber?: string
 	status?: UnitStatus
+	description?: string | null
 	rentAmount?: number | null
 	securityDeposit?: number | null
 	bedrooms?: number | null

@@ -16,6 +16,7 @@ function applyCreate(
 		addressId: '', // unknown until server responds
 		address: null,
 		propertyType: payload.propertyType,
+		description: payload.description ?? null,
 		parcelNumber: payload.parcelNumber ?? null,
 		ownerId: payload.ownerId ?? null,
 		totalArea: payload.totalArea ?? null,
@@ -42,7 +43,12 @@ function applyUpdate(
 		(old: Array<Prop> | undefined) =>
 			old?.map((p) =>
 				p.id === id
-					? { ...p, ...propFields, updatedAt, address: _addr != null ? null : p.address }
+					? {
+							...p,
+							...propFields,
+							updatedAt,
+							address: _addr != null ? null : p.address,
+						}
 					: p,
 			) ?? [],
 	)

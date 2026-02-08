@@ -90,7 +90,10 @@ export function ExternalSite({
 	)
 }
 
+export * from './ActionsPopover'
+export * from './ConfirmDeleteDialog'
 export * from './DelayedLoadingFallback'
+export * from './FieldsTable'
 export * from './page-header'
 export * from './BannerHeader'
 export * from './Toaster'

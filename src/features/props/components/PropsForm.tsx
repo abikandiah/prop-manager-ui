@@ -23,6 +23,7 @@ import { Select } from '@/components/ui/select'
 type FormState = {
 	legalName: string
 	propertyType: PropertyType
+	description: string
 	address: AddressFormValue
 	parcelNumber: string
 	totalArea: string
@@ -32,6 +33,7 @@ type FormState = {
 const initialForm: FormState = {
 	legalName: '',
 	propertyType: 'CONDO_UNIT',
+	description: '',
 	address: ADDRESS_FORM_INITIAL,
 	parcelNumber: '',
 	totalArea: '',
@@ -42,6 +44,7 @@ function propToFormState(prop: Prop): FormState {
 	return {
 		legalName: prop.legalName,
 		propertyType: prop.propertyType,
+		description: prop.description ?? '',
 		address: prop.address
 			? {
 					addressLine1: prop.address.addressLine1,
@@ -68,7 +71,8 @@ function validatePropForm(
 	if (!address.city.trim()) return 'Please fill in all required address fields'
 	if (!address.stateProvinceRegion.trim())
 		return 'Please fill in all required address fields'
-	if (!address.postalCode.trim()) return 'Please fill in all required address fields'
+	if (!address.postalCode.trim())
+		return 'Please fill in all required address fields'
 	if (address.countryCode.trim().length !== 2)
 		return 'Country code must be 2 characters (e.g. US)'
 	return null
@@ -97,6 +101,7 @@ export function PropsForm({
 	const {
 		legalName,
 		propertyType,
+		description,
 		address,
 		parcelNumber,
 		totalArea,
@@ -123,7 +128,9 @@ export function PropsForm({
 
 	type FormFieldName = Exclude<keyof FormState, 'address'>
 	const onFormChange = (
-		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+		e: React.ChangeEvent<
+			HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+		>,
 	) => {
 		const { name, value } = e.target
 		const field = name as FormFieldName
@@ -146,6 +153,7 @@ export function PropsForm({
 			countryCode: address.countryCode.trim().toUpperCase(),
 		},
 		propertyType,
+		description: description.trim() || undefined,
 		parcelNumber: parcelNumber.trim() || undefined,
 		totalArea: totalArea.trim() ? parseInt(totalArea, 10) : undefined,
 		yearBuilt: yearBuilt.trim() ? parseInt(yearBuilt, 10) : undefined,
@@ -224,6 +232,19 @@ export function PropsForm({
 						</option>
 					))}
 				</Select>
+			</div>
+			<div className="space-y-2">
+				<Label htmlFor="description">Description (optional)</Label>
+				<textarea
+					id="description"
+					name="description"
+					value={description}
+					onChange={onFormChange}
+					placeholder="Notes about this property"
+					maxLength={2000}
+					rows={3}
+					className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+				/>
 			</div>
 			<AddressFormFields value={address} onChange={updateAddress} />
 			<div className="grid grid-cols-2 gap-2">

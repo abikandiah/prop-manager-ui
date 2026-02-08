@@ -8,11 +8,11 @@ export const IDEMPOTENCY_HEADER = 'X-Request-Id'
 export const PROPERTY_TYPES = [
 	'SINGLE_FAMILY_HOME', // A standalone house
 	'APARTMENT_BUILDING', // A multi-unit residential building
-	'CONDO_UNIT',         // A single unit within a shared building
-	'TOWNHOUSE',          // Row housing
-	'COMMERCIAL',         // Offices/Retail
-	'INDUSTRIAL',         // Warehouses
-	'MIXED_USE',          // Commercial + Residential
+	'CONDO_UNIT', // A single unit within a shared building
+	'TOWNHOUSE', // Row housing
+	'COMMERCIAL', // Offices/Retail
+	'INDUSTRIAL', // Warehouses
+	'MIXED_USE', // Commercial + Residential
 ] as const
 export type PropertyType = (typeof PROPERTY_TYPES)[number]
 
@@ -35,6 +35,7 @@ export interface Prop {
 	addressId: string
 	address: Address | null
 	propertyType: PropertyType
+	description: string | null
 	parcelNumber: string | null
 	ownerId: string | null
 	totalArea: number | null
@@ -72,6 +73,7 @@ export interface CreatePropPayload {
 	legalName: string
 	address: CreatePropAddressPayload
 	propertyType: PropertyType
+	description?: string | null
 	parcelNumber?: string | null
 	ownerId?: string | null
 	totalArea?: number | null
@@ -83,6 +85,7 @@ export interface UpdatePropPayload {
 	legalName?: string
 	address?: CreatePropAddressPayload
 	propertyType?: PropertyType
+	description?: string | null
 	parcelNumber?: string | null
 	ownerId?: string | null
 	totalArea?: number | null

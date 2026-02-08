@@ -8,12 +8,12 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from '@abumble/design-system/components/Popover'
-import { MoreVertical, Pencil, Trash2 } from 'lucide-react'
+import { MoreVertical, Pencil, Plus, Trash2 } from 'lucide-react'
 import { AddressDisplay } from '@/features/props/components'
 import { usePropDetail, useDeleteProp } from '@/features/props/hooks'
 import { formatAddress } from '@/features/props/props'
 import type { Prop } from '@/features/props/props'
-import { CenteredEmptyState } from '@/components/CenteredEmptyState'
+import { UnitForm, UnitsTableView } from '@/features/units/components'
 import {
 	BannerHeader,
 	Dialog,
@@ -22,8 +22,10 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
+	DialogTrigger,
 	TextLink,
 } from '@/components/ui'
+import { CenteredEmptyState } from '@/components/CenteredEmptyState'
 
 export const Route = createFileRoute('/props/$id')({
 	component: PropDetailPage,
@@ -191,88 +193,132 @@ function PropDetailPage() {
 			/>
 
 			<table className="w-full border-0 text-left">
-						<tbody>
-							<tr>
-								<th
-									scope="row"
-									className="py-1.5 pr-4 text-sm font-medium text-muted-foreground w-[10rem]"
-								>
-									Legal name
-								</th>
-								<td className="py-1.5 text-foreground">{prop.legalName}</td>
-							</tr>
-							<tr>
-								<th
-									scope="row"
-									className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
-								>
-									Property type
-								</th>
-								<td className="py-1.5 text-foreground">
-									{prop.propertyType.replace(/_/g, ' ')}
-								</td>
-							</tr>
-							{prop.parcelNumber && (
-								<tr>
-									<th
-										scope="row"
-										className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
-									>
-										Parcel number
-									</th>
-									<td className="py-1.5 text-foreground">{prop.parcelNumber}</td>
-								</tr>
-							)}
-							{prop.totalArea != null && (
-								<tr>
-									<th
-										scope="row"
-										className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
-									>
-										Total area
-									</th>
-									<td className="py-1.5 text-foreground">
-										{prop.totalArea} sq ft
-									</td>
-								</tr>
-							)}
-							{prop.yearBuilt != null && (
-								<tr>
-									<th
-										scope="row"
-										className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
-									>
-										Year built
-									</th>
-									<td className="py-1.5 text-foreground">{prop.yearBuilt}</td>
-								</tr>
-							)}
-							<tr>
-								<th
-									scope="row"
-									className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
-								>
-									Status
-								</th>
-								<td className="py-1.5 text-foreground">
-									{prop.isActive ? 'Active' : 'Inactive'}
-								</td>
-							</tr>
-							{prop.address && (
-								<tr>
-									<th
-										scope="row"
-										className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
-									>
-										Address
-									</th>
-									<td className="py-1.5 text-foreground">
-										<AddressDisplay address={prop.address} />
-									</td>
-								</tr>
-							)}
-						</tbody>
-					</table>
+				<tbody>
+					<tr>
+						<th
+							scope="row"
+							className="py-1.5 pr-4 text-sm font-medium text-muted-foreground w-[10rem]"
+						>
+							Legal name
+						</th>
+						<td className="py-1.5 text-foreground">{prop.legalName}</td>
+					</tr>
+					<tr>
+						<th
+							scope="row"
+							className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
+						>
+							Property type
+						</th>
+						<td className="py-1.5 text-foreground">
+							{prop.propertyType.replace(/_/g, ' ')}
+						</td>
+					</tr>
+					{prop.parcelNumber && (
+						<tr>
+							<th
+								scope="row"
+								className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
+							>
+								Parcel number
+							</th>
+							<td className="py-1.5 text-foreground">{prop.parcelNumber}</td>
+						</tr>
+					)}
+					{prop.totalArea != null && (
+						<tr>
+							<th
+								scope="row"
+								className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
+							>
+								Total area
+							</th>
+							<td className="py-1.5 text-foreground">{prop.totalArea} sq ft</td>
+						</tr>
+					)}
+					{prop.yearBuilt != null && (
+						<tr>
+							<th
+								scope="row"
+								className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
+							>
+								Year built
+							</th>
+							<td className="py-1.5 text-foreground">{prop.yearBuilt}</td>
+						</tr>
+					)}
+					<tr>
+						<th
+							scope="row"
+							className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
+						>
+							Status
+						</th>
+						<td className="py-1.5 text-foreground">
+							{prop.isActive ? 'Active' : 'Inactive'}
+						</td>
+					</tr>
+					{prop.address && (
+						<tr>
+							<th
+								scope="row"
+								className="py-1.5 pr-4 text-sm font-medium text-muted-foreground"
+							>
+								Address
+							</th>
+							<td className="py-1.5 text-foreground">
+								<AddressDisplay address={prop.address} />
+							</td>
+						</tr>
+					)}
+				</tbody>
+			</table>
+
+			<UnitsSection propId={prop.id} />
 		</div>
+	)
+}
+
+function UnitsSection({ propId }: { propId: string }) {
+	const [addUnitOpen, setAddUnitOpen] = useState(false)
+	return (
+		<section className="space-y-4 mt-22">
+			<div className="space-y-1.5">
+				<h2 className="tracking-tight text-foreground sm:text-2xl text-xl">
+					Units
+				</h2>
+				<p className="text-muted-foreground">
+					Units within this property—apartments, suites, or rentable spaces. Add
+					each with a unit number and details; you can attach tenants and leases
+					later.
+				</p>
+			</div>
+			<div>
+				<Dialog open={addUnitOpen} onOpenChange={setAddUnitOpen}>
+					<DialogTrigger asChild>
+						<Button>
+							<Plus className="size-4" />
+							Add Unit
+						</Button>
+					</DialogTrigger>
+					<DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+						<DialogHeader>
+							<DialogTitle>Add unit</DialogTitle>
+							<DialogDescription>
+								Add a unit to this property. Unit number and status are
+								required.
+							</DialogDescription>
+						</DialogHeader>
+						<UnitForm
+							propId={propId}
+							onSuccess={() => setAddUnitOpen(false)}
+							onCancel={() => setAddUnitOpen(false)}
+							submitLabel="Create Unit"
+						/>
+					</DialogContent>
+				</Dialog>
+			</div>
+			<UnitsTableView propId={propId} />
+		</section>
 	)
 }

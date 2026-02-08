@@ -25,7 +25,7 @@ import {
 	DialogTrigger,
 } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
-import { cn } from '@abumble/design-system/utils'
+import { Select } from '@/components/ui/select'
 
 type FormState = {
 	legalName: string
@@ -183,22 +183,18 @@ export function PropsForm() {
 					</div>
 					<div className="space-y-2">
 						<Label htmlFor="propertyType">Property type</Label>
-						<select
+						<Select
 							id="propertyType"
 							name="propertyType"
 							value={propertyType}
 							onChange={onFormChange}
-							className={cn(
-								'flex h-9 w-full rounded border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors',
-								'focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring',
-							)}
 						>
 							{PROPERTY_TYPES.map((t) => (
 								<option key={t} value={t}>
 									{t.replace(/_/g, ' ')}
 								</option>
 							))}
-						</select>
+						</Select>
 					</div>
 					<AddressFormFields value={address} onChange={updateAddress} />
 					<div className="grid grid-cols-2 gap-2">

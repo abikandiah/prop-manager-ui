@@ -60,6 +60,14 @@ This project uses **@abumble/design-system** for shared components, base styles/
 - **Class merging**: Use `cn()` from `@abumble/design-system/utils` on all composite `className` values.
 - **Variants**: Use **class-variance-authority** (`cva`) for components with size/variant APIs; keep variants in the same file as the component.
 
+## Form dialogs (standard design and width)
+
+Use this for all create/edit forms opened in a dialog (e.g. Add Property, Add Unit, Edit Unit):
+
+- **DialogContent** `className`: `max-w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto`
+- Keeps form width consistent (42rem at `sm` and up), allows vertical scroll on small viewports, and avoids overflow on narrow screens.
+- Apply the same class to any dialog that contains a form (create or edit) so all form dialogs match.
+
 ## Code style (formatting only)
 
 - Prettier: no semicolons, single quotes, trailing commas, tabs for indentation. Run format/lint from project scripts; do not hard-code formatter or linter versions in this rule.

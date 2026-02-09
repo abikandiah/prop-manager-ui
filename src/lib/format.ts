@@ -27,3 +27,17 @@ export function formatCurrency(n: number | null): string {
 		maximumFractionDigits: 0,
 	}).format(n)
 }
+
+export function formatDate(dateString: string | null): string {
+	if (!dateString) return '—'
+	try {
+		const date = new Date(dateString)
+		return new Intl.DateTimeFormat(undefined, {
+			year: 'numeric',
+			month: 'short',
+			day: 'numeric',
+		}).format(date)
+	} catch {
+		return '—'
+	}
+}

@@ -41,7 +41,7 @@ function UnitActions({
 					navigate({ to: '/units' })
 				},
 				onError: (err) => {
-					toast.error(err?.message ?? 'Failed to delete unit')
+					toast.error(err.message || 'Failed to delete unit')
 				},
 			},
 		)
@@ -89,7 +89,7 @@ function UnitDetailPage() {
 
 	useEffect(() => {
 		if (isError) {
-			toast.error(`Error loading unit: ${error?.message ?? 'Unknown'}`)
+			toast.error(`Error loading unit: ${error?.message || 'Unknown'}`)
 		}
 	}, [isError, error])
 
@@ -117,7 +117,7 @@ function UnitDetailPage() {
 					title="Unit not found"
 					description={
 						isError
-							? (error?.message ?? 'Failed to load unit')
+							? (error?.message || 'Failed to load unit')
 							: 'The unit you were looking for was not found.'
 					}
 					action={

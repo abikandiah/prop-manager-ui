@@ -23,7 +23,7 @@ export function PropsTableView() {
 
 	useEffect(() => {
 		if (isError) {
-			toast.error(`Error loading properties: ${error?.message ?? 'Unknown'}`)
+			toast.error(`Error loading properties: ${error?.message || 'Unknown'}`)
 		}
 	}, [isError, error])
 

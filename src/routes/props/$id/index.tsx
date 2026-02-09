@@ -1,9 +1,10 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { AddressDisplay, PropsForm, usePropDetail, useDeleteProp } from '@/features/props'
-import { formatAddress } from '@/lib/format'
+import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import type { Prop } from '@/domain/property'
+import { AddressDisplay, PropsForm, useDeleteProp, usePropDetail } from '@/features/props'
+import { formatAddress } from '@/lib/format'
 import {
 	ActionsPopover,
 	BannerHeader,
@@ -13,7 +14,6 @@ import {
 	TextLink,
 } from '@/components/ui'
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
-import { Skeleton } from '@abumble/design-system/components/Skeleton'
 
 export const Route = createFileRoute('/props/$id/')({
 	component: PropLayout,
@@ -32,7 +32,7 @@ function PropActions({ prop, onEdit }: { prop: Prop; onEdit: () => void }) {
 				navigate({ to: '/props' })
 			},
 			onError: (err) => {
-				toast.error(err?.message ?? 'Failed to delete property')
+				toast.error(err.message || 'Failed to delete property')
 			},
 		})
 	}
@@ -66,7 +66,7 @@ function PropLayout() {
 
 	useEffect(() => {
 		if (isError) {
-			toast.error(`Error loading property: ${error?.message ?? 'Unknown'}`)
+			toast.error(`Error loading property: ${error?.message || 'Unknown'}`)
 		}
 	}, [isError, error])
 
@@ -108,7 +108,7 @@ function PropLayout() {
 					title="Property not found"
 					description={
 						isError
-							? (error?.message ?? 'Failed to load property')
+							? (error?.message || 'Failed to load property')
 							: 'The property you were looking for was not found.'
 					}
 					action={<TextLink to="/props">Back to properties</TextLink>}

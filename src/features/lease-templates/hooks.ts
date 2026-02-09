@@ -1,0 +1,254 @@
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { leaseTemplateKeys } from './keys'
+import { leaseTemplatesApi } from './api'
+import type {
+	CreateLeaseTemplatePayload,
+	LeaseTemplate,
+	UpdateLeaseTemplatePayload,
+} from '@/domain/lease-template'
+import { stableRequestId } from '@/lib/offline-types'
+import { generateOptimisticId, nowIso } from '@/lib/util'
+import { IDEMPOTENCY_HEADER } from '@/lib/constants'
+
+// --- Helpers: Optimistic Updates ---
+
+function applyCreate(
+	queryClient: ReturnType<typeof useQueryClient>,
+	payload: CreateLeaseTemplatePayload,
+): LeaseTemplate {
+	const optimistic: LeaseTemplate = {
+		id: generateOptimisticId(),
+		name: payload.name,
+		versionTag: payload.versionTag ?? null,
+		version: 0,
+		templateMarkdown: payload.templateMarkdown,
+		defaultLateFeeType: payload.defaultLateFeeType ?? null,
+		defaultLateFeeAmount: payload.defaultLateFeeAmount ?? null,
+		defaultNoticePeriodDays: payload.defaultNoticePeriodDays ?? null,
+		active: true,
+		createdAt: nowIso(),
+		updatedAt: nowIso(),
+	}
+	queryClient.setQueryData(
+		leaseTemplateKeys.list(),
+		(old: Array<LeaseTemplate> | undefined) =>
+			old ? [...old, optimistic] : [optimistic],
+	)
+	return optimistic
+}
+
+function applyUpdate(
+	queryClient: ReturnType<typeof useQueryClient>,
+	id: string,
+	payload: UpdateLeaseTemplatePayload,
+): void {
+	const updatedAt = nowIso()
+	const { version: _version, ...templateFields } = payload
+
+	// Update list cache
+	queryClient.setQueryData(
+		leaseTemplateKeys.list(),
+		(old: Array<LeaseTemplate> | undefined) =>
+			old?.map((t) =>
+				t.id === id
+					? {
+							...t,
+							...templateFields,
+							updatedAt,
+							version: t.version + 1,
+						}
+					: t,
+			) ?? [],
+	)
+
+	// Update detail cache
+	queryClient.setQueryData(
+		leaseTemplateKeys.detail(id),
+		(old: LeaseTemplate | undefined) =>
+			old
+				? {
+						...old,
+						...templateFields,
+						updatedAt,
+						version: old.version + 1,
+					}
+				: undefined,
+	)
+}
+
+function applyDelete(
+	queryClient: ReturnType<typeof useQueryClient>,
+	id: string,
+): void {
+	queryClient.setQueryData(
+		leaseTemplateKeys.list(),
+		(old: Array<LeaseTemplate> | undefined) =>
+			old?.filter((t) => t.id !== id) ?? [],
+	)
+	queryClient.removeQueries({ queryKey: leaseTemplateKeys.detail(id) })
+}
+
+// --- Queries ---
+
+export function useLeaseTemplatesList() {
+	return useQuery({
+		queryKey: leaseTemplateKeys.list(),
+		queryFn: () => leaseTemplatesApi.list(),
+	})
+}
+
+export function useLeaseTemplatesActive() {
+	return useQuery({
+		queryKey: leaseTemplateKeys.list({ active: true }),
+		queryFn: () => leaseTemplatesApi.listActive(),
+	})
+}
+
+export function useLeaseTemplatesSearch(query: string | null) {
+	return useQuery({
+		queryKey: leaseTemplateKeys.list({ search: query }),
+		queryFn: () => leaseTemplatesApi.search(query!),
+		enabled: query != null && query.trim().length > 0,
+	})
+}
+
+export function useLeaseTemplateDetail(id: string | null) {
+	return useQuery({
+		queryKey: leaseTemplateKeys.detail(id!),
+		queryFn: () => leaseTemplatesApi.getById(id!),
+		enabled: id != null,
+	})
+}
+
+// --- Mutations ---
+
+export function useCreateLeaseTemplate() {
+	const queryClient = useQueryClient()
+
+	return useMutation({
+		mutationKey: ['createLeaseTemplate'],
+		networkMode: 'offlineFirst',
+		mutationFn: (payload: CreateLeaseTemplatePayload) => {
+			const requestId = stableRequestId(['createLeaseTemplate'], payload)
+			return leaseTemplatesApi.create(payload, {
+				[IDEMPOTENCY_HEADER]: requestId,
+			})
+		},
+		onMutate: async (payload) => {
+			await queryClient.cancelQueries({ queryKey: leaseTemplateKeys.lists() })
+			const previousTemplates = queryClient.getQueryData<Array<LeaseTemplate>>(
+				leaseTemplateKeys.list(),
+			)
+			const optimistic = applyCreate(queryClient, payload)
+			return { previousTemplates, optimisticId: optimistic.id }
+		},
+		onError: (err, _, context) => {
+			if (context?.previousTemplates) {
+				queryClient.setQueryData(
+					leaseTemplateKeys.list(),
+					context.previousTemplates,
+				)
+			}
+			console.error('[Mutation] Create lease template failed:', err)
+		},
+		onSettled: () => {
+			queryClient.invalidateQueries({ queryKey: leaseTemplateKeys.all })
+		},
+	})
+}
+
+export function useUpdateLeaseTemplate() {
+	const queryClient = useQueryClient()
+
+	return useMutation({
+		mutationKey: ['updateLeaseTemplate'],
+		networkMode: 'offlineFirst',
+		mutationFn: async ({
+			id,
+			payload,
+		}: {
+			id: string
+			payload: UpdateLeaseTemplatePayload
+		}) => {
+			const variables = { id, payload }
+			const requestId = stableRequestId(['updateLeaseTemplate'], variables)
+			return leaseTemplatesApi.update(id, payload, {
+				[IDEMPOTENCY_HEADER]: requestId,
+			})
+		},
+		onMutate: async ({ id, payload }) => {
+			await queryClient.cancelQueries({ queryKey: leaseTemplateKeys.all })
+			const previousTemplates = queryClient.getQueryData<Array<LeaseTemplate>>(
+				leaseTemplateKeys.list(),
+			)
+			const previousTemplate = queryClient.getQueryData<LeaseTemplate>(
+				leaseTemplateKeys.detail(id),
+			)
+
+			applyUpdate(queryClient, id, payload)
+
+			return { previousTemplates, previousTemplate }
+		},
+		onError: (err, { id }, context) => {
+			if (context?.previousTemplates) {
+				queryClient.setQueryData(
+					leaseTemplateKeys.list(),
+					context.previousTemplates,
+				)
+			}
+			if (context?.previousTemplate) {
+				queryClient.setQueryData(
+					leaseTemplateKeys.detail(id),
+					context.previousTemplate,
+				)
+			}
+			console.error('[Mutation] Update lease template failed:', err)
+		},
+		onSettled: (_, __, { id }) => {
+			queryClient.invalidateQueries({ queryKey: leaseTemplateKeys.detail(id) })
+			queryClient.invalidateQueries({ queryKey: leaseTemplateKeys.all })
+		},
+	})
+}
+
+export function useDeleteLeaseTemplate() {
+	const queryClient = useQueryClient()
+
+	return useMutation({
+		mutationKey: ['deleteLeaseTemplate'],
+		networkMode: 'offlineFirst',
+		mutationFn: async (id: string) => {
+			const requestId = stableRequestId(['deleteLeaseTemplate'], id)
+			return leaseTemplatesApi.delete(id, { [IDEMPOTENCY_HEADER]: requestId })
+		},
+		onMutate: async (id) => {
+			await queryClient.cancelQueries({ queryKey: leaseTemplateKeys.all })
+			const previousTemplates = queryClient.getQueryData<Array<LeaseTemplate>>(
+				leaseTemplateKeys.list(),
+			)
+			const previousTemplate = queryClient.getQueryData<LeaseTemplate>(
+				leaseTemplateKeys.detail(id),
+			)
+			applyDelete(queryClient, id)
+			return { previousTemplates, previousTemplate }
+		},
+		onError: (err, id, context) => {
+			if (context?.previousTemplates) {
+				queryClient.setQueryData(
+					leaseTemplateKeys.list(),
+					context.previousTemplates,
+				)
+			}
+			if (context?.previousTemplate) {
+				queryClient.setQueryData(
+					leaseTemplateKeys.detail(id),
+					context.previousTemplate,
+				)
+			}
+			console.error('[Mutation] Delete lease template failed:', err)
+		},
+		onSettled: () => {
+			queryClient.invalidateQueries({ queryKey: leaseTemplateKeys.all })
+		},
+	})
+}

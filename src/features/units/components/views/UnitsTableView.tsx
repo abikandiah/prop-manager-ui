@@ -34,7 +34,7 @@ function UnitRowActions({ unit, onEdit }: { unit: Unit; onEdit: () => void }) {
 					toast.success('Unit deleted')
 				},
 				onError: (err) => {
-					toast.error(err?.message ?? 'Failed to delete unit')
+					toast.error(err.message || 'Failed to delete unit')
 				},
 			},
 		)
@@ -86,7 +86,7 @@ export function UnitsTableView({ propId }: UnitsTableViewProps) {
 
 	useEffect(() => {
 		if (isError) {
-			toast.error(`Error loading units: ${error?.message ?? 'Unknown'}`)
+			toast.error(`Error loading units: ${error?.message || 'Unknown'}`)
 		}
 	}, [isError, error])
 

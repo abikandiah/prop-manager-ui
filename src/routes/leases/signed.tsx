@@ -2,10 +2,10 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Button } from '@abumble/design-system/components/Button'
-import { PropsForm, PropsTableView } from '@/features/props'
-import { BannerHeader, DialogTrigger, FormDialog  } from '@/components/ui'
+import { LeaseForm, LeasesTableView } from '@/features/leases'
+import { BannerHeader, DialogTrigger, FormDialog } from '@/components/ui'
 
-export const Route = createFileRoute('/props/')({
+export const Route = createFileRoute('/leases/signed')({
 	component: RouteComponent,
 })
 
@@ -15,13 +15,12 @@ function RouteComponent() {
 	return (
 		<>
 			<BannerHeader
-				title="Properties"
+				title="Signed Leases"
 				description={
 					<>
-						This is where you keep a list of every property you own or
-						manage—your house, a rental building, a commercial space, or a piece
-						of land. Add each one with its address and a few details; later you
-						can attach units and tenants to them.
+						View and manage all active, expired, and terminated lease
+						agreements. These are leases that have been signed by tenants and
+						are in effect or have completed their term.
 					</>
 				}
 			/>
@@ -30,29 +29,33 @@ function RouteComponent() {
 				<FormDialog
 					open={addOpen}
 					onOpenChange={setAddOpen}
-					title="Add property"
-					description="Enter the legal name, address, and property details."
+					title="Add signed lease"
+					description="Create a new signed lease agreement."
 					trigger={
 						<DialogTrigger asChild>
 							<Button>
 								<Plus className="size-4" />
-								Add property
+								Add lease
 							</Button>
 						</DialogTrigger>
 					}
 				>
-					<PropsForm
+					<LeaseForm
 						onSuccess={(data) => {
 							setAddOpen(false)
-							if (data) navigate({ to: '/props/$id', params: { id: data.id } })
+							if (data)
+								navigate({
+									to: '/leases/$leaseId',
+									params: { leaseId: data.id },
+								})
 						}}
 						onCancel={() => setAddOpen(false)}
-						submitLabel="Create Property"
+						submitLabel="Create Lease"
 					/>
 				</FormDialog>
 			</div>
 
-			<PropsTableView />
+			<LeasesTableView status="ACTIVE" />
 		</>
 	)
 }

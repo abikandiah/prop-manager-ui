@@ -211,7 +211,7 @@ export function UnitForm({
 						onSuccess?.()
 					},
 					onError: (err) => {
-						toast.error(err?.message ?? 'Failed to update unit')
+						toast.error(err.message || 'Failed to update unit')
 					},
 				},
 			)
@@ -223,7 +223,7 @@ export function UnitForm({
 					onSuccess?.()
 				},
 				onError: (err) => {
-					toast.error(err?.message ?? 'Failed to create unit')
+					toast.error(err.message || 'Failed to create unit')
 				},
 			})
 		}

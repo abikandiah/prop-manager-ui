@@ -9,7 +9,8 @@ import {
 
 export interface ActionsPopoverProps {
 	label?: string
-	onEdit: () => void
+	/** Omit or pass undefined to hide the Edit action. */
+	onEdit?: () => void
 	onDelete: () => void
 	isDeleteDisabled?: boolean
 	/** Pass true to add stopPropagation on the trigger (e.g. inside table rows). */
@@ -43,20 +44,22 @@ export function ActionsPopover({
 			</PopoverTrigger>
 			<PopoverContent align="end" className="w-40 p-0 mt-1">
 				<ul className="flex flex-col gap-0.5 p-1.5">
-					<li>
-						<Button
-							variant="ghost"
-							size="sm"
-							className="w-full justify-start gap-2"
-							onClick={() => {
-								setOpen(false)
-								onEdit()
-							}}
-						>
-							<Pencil className="size-4 shrink-0" />
-							Edit
-						</Button>
-					</li>
+					{onEdit != null && (
+						<li>
+							<Button
+								variant="ghost"
+								size="sm"
+								className="w-full justify-start gap-2"
+								onClick={() => {
+									setOpen(false)
+									onEdit()
+								}}
+							>
+								<Pencil className="size-4 shrink-0" />
+								Edit
+							</Button>
+						</li>
+					)}
 					<li>
 						<Button
 							variant="ghost"

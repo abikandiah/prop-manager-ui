@@ -1,21 +1,23 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Button } from '@abumble/design-system/components/Button'
 import { Input } from '@abumble/design-system/components/Input'
 import { toast } from 'sonner'
+import {
+	ADDRESS_FORM_INITIAL,
+	AddressFormFields
+	
+} from './AddressFormFields'
+import type {AddressFormValue} from './AddressFormFields';
+import type {CreatePropPayload, Prop, PropertyType, UpdatePropPayload} from '@/domain/property';
 import { useCreateProp, useUpdateProp } from '@/features/props/hooks'
 import {
-	PROPERTY_TYPES,
-	type CreatePropPayload,
-	type Prop,
-	type PropertyType,
-	type UpdatePropPayload,
+	
+	PROPERTY_TYPES
+	
+	
+	
 } from '@/domain/property'
-import {
-	AddressFormFields,
-	ADDRESS_FORM_INITIAL,
-	type AddressFormValue,
-} from './AddressFormFields'
 import { DialogFooter } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
@@ -190,7 +192,7 @@ export function PropsForm({
 						onSuccess?.()
 					},
 					onError: (err) => {
-						toast.error(err?.message ?? 'Failed to update property')
+						toast.error(err.message || 'Failed to update property')
 					},
 				},
 			)
@@ -206,7 +208,7 @@ export function PropsForm({
 					}
 				},
 				onError: (err) => {
-					toast.error(`Failed to create property: ${err.message}`)
+					toast.error(`Failed to create property: ${err.message || 'Unknown'}`)
 				},
 			})
 		}

@@ -116,6 +116,7 @@ function PropLayout() {
 			) : (
 				<div className="flex flex-col gap-6">
 					<BannerHeader
+						backLink={{ label: 'Back to properties' }}
 						title={prop.legalName}
 						description={
 							<>

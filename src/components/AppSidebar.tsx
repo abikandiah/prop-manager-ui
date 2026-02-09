@@ -4,10 +4,12 @@ import {
 	SidebarFooter,
 	SidebarGroup,
 	SidebarGroupContent,
-	SidebarGroupLabel,
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
+	SidebarMenuSub,
+	SidebarMenuSubButton,
+	SidebarMenuSubItem,
 	SidebarRail,
 	SidebarTrigger,
 	useSidebar,
@@ -44,10 +46,7 @@ function SidebarNavLink({
 	)
 }
 
-const navItems: NavItem[] = [
-	{ to: '/', label: 'Home', icon: Home },
-	{ to: '/props', label: 'Props', icon: Package },
-	{ to: '/units', label: 'Units', icon: LayoutGrid },
+const navItemsAfterProps: NavItem[] = [
 	{ to: '/messages', label: 'Messages', icon: MessageSquare },
 ] as const
 
@@ -73,18 +72,45 @@ export function AppSidebar() {
 			>
 				<SidebarContent>
 					<SidebarGroup>
-						<SidebarGroupLabel className="group-data-[collapsible=icon]:hidden">
-							Navigation
-						</SidebarGroupLabel>
 						<SidebarGroupContent>
 							<SidebarMenu>
-								{navItems.map((item) => (
-									<SidebarNavLink
-										key={item.to}
-										item={item}
-										onClick={closeMobileSidebar}
-									/>
-								))}
+								<SidebarNavLink
+									item={{ to: '/', label: 'Home', icon: Home }}
+									onClick={closeMobileSidebar}
+								/>
+								<SidebarMenuItem>
+									<Link to="/props" onClick={closeMobileSidebar}>
+										{({ isActive }) => (
+											<SidebarMenuButton asChild isActive={isActive}>
+												<span className="flex items-center gap-2">
+													<Package className="size-4 shrink-0" />
+													<span>Props</span>
+												</span>
+											</SidebarMenuButton>
+										)}
+									</Link>
+									<SidebarMenuSub>
+										<SidebarMenuSubItem>
+											<Link to="/units" onClick={closeMobileSidebar}>
+												{({ isActive }) => (
+													<SidebarMenuSubButton asChild isActive={isActive}>
+														<span className="flex items-center gap-2">
+															<LayoutGrid className="size-4 shrink-0" />
+															<span>Units</span>
+														</span>
+													</SidebarMenuSubButton>
+												)}
+											</Link>
+										</SidebarMenuSubItem>
+									</SidebarMenuSub>
+								</SidebarMenuItem>
+								{navItemsAfterProps.map((item) => (
+										<SidebarNavLink
+											key={item.to}
+											item={item}
+											onClick={closeMobileSidebar}
+										/>
+									))}
 							</SidebarMenu>
 						</SidebarGroupContent>
 					</SidebarGroup>

@@ -52,7 +52,10 @@ function Root() {
 		altContent = <Outlet />
 	} else if (isLoadingUser) {
 		altContent = (
-			<DelayedLoadingFallback isLoading={isLoadingUser} fallback={<LoadingScreen />}>
+			<DelayedLoadingFallback
+				isLoading={isLoadingUser}
+				fallback={<LoadingScreen />}
+			>
 				{null}
 			</DelayedLoadingFallback>
 		)
@@ -82,7 +85,7 @@ function Root() {
 					<SidebarInset>
 						<main className="flex flex-col p-4 md:p-6">
 							{!isOnline && <OfflineWarningBanner />}
-							<div className="flex flex-col gap-6">
+							<div className="flex flex-col gap-4">
 								<Outlet />
 							</div>
 						</main>

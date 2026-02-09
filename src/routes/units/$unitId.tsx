@@ -129,6 +129,7 @@ function UnitDetailPage() {
 			) : (
 				<div className="flex flex-col gap-6">
 					<BannerHeader
+						backLink={{ label: 'Back to units' }}
 						title={`Unit ${unit.unitNumber}`}
 						description={
 							<>

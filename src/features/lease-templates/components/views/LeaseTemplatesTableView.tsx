@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
+import { cn } from '@abumble/design-system/utils'
 import { useNavigate } from '@tanstack/react-router'
 import { LeaseTemplateForm } from '../forms/LeaseTemplateForm'
 import type { LeaseTemplate } from '@/domain/lease-template'
@@ -190,11 +191,12 @@ export function LeaseTemplatesTableView({
 										</TableCell>
 										<TableCell>
 											<span
-												className={`inline-flex items-center rounded-full px-2 py-1 text-xs font-medium ${
+												className={cn(
+													'inline-flex items-center rounded-full px-2 py-1 text-xs font-medium',
 													template.active
-														? 'bg-green-50 text-green-700'
-														: 'bg-gray-50 text-gray-700'
-												}`}
+														? 'bg-primary/10 text-primary'
+														: 'bg-muted text-muted-foreground',
+												)}
 											>
 												{template.active ? 'Active' : 'Inactive'}
 											</span>

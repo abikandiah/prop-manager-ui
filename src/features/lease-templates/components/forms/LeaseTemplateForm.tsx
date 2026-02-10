@@ -9,6 +9,7 @@ import type {
 } from '@/domain/lease-template'
 import type { LateFeeType } from '@/domain/lease'
 import { LATE_FEE_TYPES } from '@/domain/lease'
+import { Checkbox } from '@/components/ui/checkbox'
 import { DialogFooter } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
@@ -24,6 +25,7 @@ type FormState = {
 	defaultLateFeeType: LateFeeType | ''
 	defaultLateFeeAmount: string
 	defaultNoticePeriodDays: string
+	active: boolean
 }
 
 const initialFormState: FormState = {
@@ -33,6 +35,7 @@ const initialFormState: FormState = {
 	defaultLateFeeType: '',
 	defaultLateFeeAmount: '',
 	defaultNoticePeriodDays: '',
+	active: true,
 }
 
 function templateToFormState(template: LeaseTemplate): FormState {
@@ -49,6 +52,7 @@ function templateToFormState(template: LeaseTemplate): FormState {
 			template.defaultNoticePeriodDays != null
 				? String(template.defaultNoticePeriodDays)
 				: '',
+		active: template.active,
 	}
 }
 
@@ -123,6 +127,7 @@ export function LeaseTemplateForm({
 		defaultNoticePeriodDays: form.defaultNoticePeriodDays.trim()
 			? parseInt(form.defaultNoticePeriodDays, 10)
 			: undefined,
+		active: form.active,
 		version: initialTemplate?.version ?? 0,
 	})
 
@@ -293,6 +298,21 @@ export function LeaseTemplateForm({
 					placeholder="Optional"
 				/>
 			</div>
+
+			{isEdit && (
+				<div className="flex items-center gap-2">
+					<Checkbox
+						id="active"
+						checked={form.active}
+						onCheckedChange={(checked) =>
+							setForm((prev) => ({ ...prev, active: checked === true }))
+						}
+					/>
+					<Label htmlFor="active" className="cursor-pointer font-normal">
+						Active (available when creating new leases)
+					</Label>
+				</div>
+			)}
 
 			<DialogFooter>
 				{onCancel && (

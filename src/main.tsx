@@ -3,6 +3,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { StrictMode, useMemo } from 'react'
 import { createRoot } from 'react-dom/client'
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
+import { createBootstrapDefaults } from './integrations/tanstack-query/client-config'
 import { routeTree } from './routeTree.gen'
 import { NotFound } from './components/NotFound.tsx'
 import { ErrorBoundary } from './components/ErrorBoundary'
@@ -14,7 +15,9 @@ import reportWebVitals from './reportWebVitals'
 import './styles.css'
 
 // Bootstrap client used only for auth (e.g. /me). User-scoped client lives inside AppWithProviders.
-const bootstrapQueryClient = new QueryClient()
+const bootstrapQueryClient = new QueryClient({
+	defaultOptions: createBootstrapDefaults(),
+})
 
 const router = createRouter({
 	routeTree,

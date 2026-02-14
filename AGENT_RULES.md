@@ -297,7 +297,7 @@ When you notice repetitive patterns (like multiple collapsible sections), abstra
   icon={FileText}
   items={[
     { to: '/leases/templates', label: 'Templates', icon: FileSignature },
-    { to: '/leases/signed', label: 'Signed', icon: FileCheck },
+    { to: '/leases/agreements', label: 'Agreements', icon: FileCheck },
   ]}
 />
 ```

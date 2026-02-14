@@ -135,7 +135,7 @@ function LeaseDetailPage() {
 							? error.message
 							: 'The lease you were looking for was not found.'
 					}
-					action={<TextLink to="/leases/signed">Back to leases</TextLink>}
+					action={<TextLink to="/leases/agreements">Back to leases</TextLink>}
 				/>
 			) : (
 				<div className="flex flex-col gap-6">

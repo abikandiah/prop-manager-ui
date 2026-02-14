@@ -5,7 +5,7 @@ import { Button } from '@abumble/design-system/components/Button'
 import { LeaseForm, LeasesTableView } from '@/features/leases'
 import { BannerHeader, DialogTrigger, FormDialog } from '@/components/ui'
 
-export const Route = createFileRoute('/leases/signed')({
+export const Route = createFileRoute('/leases/agreements')({
 	component: RouteComponent,
 })
 
@@ -15,21 +15,15 @@ function RouteComponent() {
 	return (
 		<>
 			<BannerHeader
-				title="Signed Leases"
-				description={
-					<>
-						View and manage all active, expired, and terminated lease
-						agreements. These are leases that have been signed by tenants and
-						are in effect or have completed their term.
-					</>
-				}
+				title="Lease Agreements"
+				description="Create and manage lease agreements that connect tenants to your properties and units. Track active, expired, and past leases."
 			/>
 
 			<div>
 				<FormDialog
 					open={addOpen}
 					onOpenChange={setAddOpen}
-					title="Add signed lease"
+					title="Add lease agreement"
 					description="Create a new signed lease agreement."
 					trigger={
 						<DialogTrigger asChild>

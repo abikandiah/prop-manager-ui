@@ -104,8 +104,8 @@ export function AppSidebar() {
 											icon: FileSignature,
 										},
 										{
-											to: '/leases/signed',
-											label: 'Signed',
+											to: '/leases/agreements',
+											label: 'Agreements',
 											icon: FileCheck,
 										},
 									]}

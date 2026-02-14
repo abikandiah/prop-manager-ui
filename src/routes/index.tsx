@@ -1,11 +1,13 @@
+import { createFileRoute } from '@tanstack/react-router'
 import {
-	Card,
-	CardContent,
-	CardHeader,
-} from '@abumble/design-system/components/Card'
-import { Link, createFileRoute } from '@tanstack/react-router'
-import { MessageSquare, Package, LayoutGrid } from 'lucide-react'
+	MessageSquare,
+	Package,
+	LayoutGrid,
+	FileSignature,
+	FileCheck,
+} from 'lucide-react'
 import { BannerHeader } from '@/components/ui'
+import { DashboardCard } from '@/components/DashboardCard'
 
 export const Route = createFileRoute('/')({
 	component: Home,
@@ -20,45 +22,36 @@ function Home() {
 			/>
 
 			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-				<Link to="/props">
-					<Card className="card transition-colors hover:bg-muted/50 h-full">
-						<CardHeader className="flex flex-row items-center gap-2">
-							<Package className="size-5 text-muted-foreground" />
-							<span className="font-semibold">Properties</span>
-						</CardHeader>
-						<CardContent>
-							<p className="text-sm text-muted-foreground">
-								See and manage every property you own or look after.
-							</p>
-						</CardContent>
-					</Card>
-				</Link>
-				<Link to="/units">
-					<Card className="card transition-colors hover:bg-muted/50 h-full">
-						<CardHeader className="flex flex-row items-center gap-2">
-							<LayoutGrid className="size-5 text-muted-foreground" />
-							<span className="font-semibold">Units</span>
-						</CardHeader>
-						<CardContent>
-							<p className="text-sm text-muted-foreground">
-								Manage every unit across all your properties in one place.
-							</p>
-						</CardContent>
-					</Card>
-				</Link>
-				<Link to="/messages">
-					<Card className="card transition-colors hover:bg-muted/50 h-full">
-						<CardHeader className="flex flex-row items-center gap-2">
-							<MessageSquare className="size-5 text-muted-foreground" />
-							<span className="font-semibold">Messages</span>
-						</CardHeader>
-						<CardContent>
-							<p className="text-sm text-muted-foreground">
-								Read and manage your messages in one place.
-							</p>
-						</CardContent>
-					</Card>
-				</Link>
+				<DashboardCard
+					to="/props"
+					icon={Package}
+					title="Properties"
+					description="See and manage every property you own or look after."
+				/>
+				<DashboardCard
+					to="/units"
+					icon={LayoutGrid}
+					title="Units"
+					description="Manage every unit across all your properties in one place."
+				/>
+				<DashboardCard
+					to="/leases/templates"
+					icon={FileSignature}
+					title="Lease Templates"
+					description="Create and manage lease templates for your properties."
+				/>
+				<DashboardCard
+					to="/leases/agreements"
+					icon={FileCheck}
+					title="Lease Agreements"
+					description="Manage lease agreements that connect tenants to your properties and units."
+				/>
+				<DashboardCard
+					to="/messages"
+					icon={MessageSquare}
+					title="Messages"
+					description="Read and manage your messages in one place."
+				/>
 			</div>
 		</div>
 	)

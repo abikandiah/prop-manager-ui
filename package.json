@@ -21,7 +21,7 @@
 		"@tanstack/react-router": "^1.132.0",
 		"@tanstack/react-router-devtools": "^1.132.0",
 		"@tanstack/router-plugin": "^1.132.0",
-		"axios": "^1.13.4",
+		"axios": "^1.13.5",
 		"class-variance-authority": "^0.7.1",
 		"dexie": "^4.0.11",
 		"lucide-react": "^0.561.0",

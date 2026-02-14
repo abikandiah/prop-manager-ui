@@ -1,7 +1,7 @@
-import { useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { cn } from '@abumble/design-system/utils'
-import { Eye, Code } from 'lucide-react'
+import { Code, Eye } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 
 export interface MarkdownEditorProps {
@@ -26,37 +26,43 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
 		'split',
 	)
 
-	const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		onChange(e.target.value)
-	}
+	const handleTextareaChange = useCallback(
+		(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+			onChange(e.target.value)
+		},
+		[onChange],
+	)
 
-	const insertPlaceholder = (placeholder: string) => {
-		const textarea = document.getElementById(
-			'templateMarkdown',
-		) as HTMLTextAreaElement
-		if (!textarea) return
+	const insertPlaceholder = useCallback(
+		(placeholder: string) => {
+			const textarea = document.getElementById(
+				'templateMarkdown',
+			) as HTMLTextAreaElement | null
+			if (!textarea) return
 
-		const start = textarea.selectionStart
-		const end = textarea.selectionEnd
-		const text = value
-		const before = text.substring(0, start)
-		const after = text.substring(end)
-		const newValue = `${before}{{${placeholder}}}${after}`
+			const start = textarea.selectionStart
+			const end = textarea.selectionEnd
+			const text = value
+			const before = text.substring(0, start)
+			const after = text.substring(end)
+			const newValue = `${before}{{${placeholder}}}${after}`
 
-		onChange(newValue)
+			onChange(newValue)
 
-		// Set cursor position after the inserted placeholder
-		setTimeout(() => {
-			textarea.focus()
-			textarea.setSelectionRange(
-				start + placeholder.length + 4,
-				start + placeholder.length + 4,
-			)
-		}, 0)
-	}
+			// Set cursor position after the inserted placeholder
+			setTimeout(() => {
+				textarea.focus()
+				textarea.setSelectionRange(
+					start + placeholder.length + 4,
+					start + placeholder.length + 4,
+				)
+			}, 0)
+		},
+		[value, onChange],
+	)
 
-	// Replace placeholders with example values for preview
-	const getPreviewMarkdown = () => {
+	// Replace placeholders with example values for preview (memoized to avoid recomputing on every render)
+	const previewMarkdown = useMemo(() => {
 		return value
 			.replace(/\{\{property_name\}\}/g, '**123 Main Street**')
 			.replace(/\{\{unit_number\}\}/g, '**Unit 4B**')
@@ -67,7 +73,7 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
 			.replace(/\{\{security_deposit\}\}/g, '**$1,500**')
 			.replace(/\{\{tenant_name\}\}/g, '**John Smith**')
 			.replace(/\{\{landlord_name\}\}/g, '**Jane Doe**')
-	}
+	}, [value])
 
 	return (
 		<div className="space-y-4">
@@ -187,7 +193,7 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
 						>
 							{value.trim() ? (
 								<div className="prose prose-sm dark:prose-invert max-w-none">
-									<ReactMarkdown>{getPreviewMarkdown()}</ReactMarkdown>
+									<ReactMarkdown>{previewMarkdown}</ReactMarkdown>
 								</div>
 							) : (
 								<p className="text-sm text-muted-foreground italic">

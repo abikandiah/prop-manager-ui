@@ -1,14 +1,15 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@abumble/design-system/components/Button'
 import { Input } from '@abumble/design-system/components/Input'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
+import { MarkdownEditor } from './MarkdownEditor'
+import type { LateFeeType } from '@/domain/lease'
 import type {
 	CreateLeaseTemplatePayload,
 	LeaseTemplate,
 	UpdateLeaseTemplatePayload,
 } from '@/domain/lease-template'
-import type { LateFeeType } from '@/domain/lease'
 import { LATE_FEE_TYPES } from '@/domain/lease'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DialogFooter } from '@/components/ui/dialog'
@@ -18,7 +19,6 @@ import {
 	useCreateLeaseTemplate,
 	useUpdateLeaseTemplate,
 } from '@/features/lease-templates/hooks'
-import { MarkdownEditor } from './MarkdownEditor'
 import { generateId } from '@/lib/util'
 
 type FormState = {
@@ -80,33 +80,26 @@ export function LeaseTemplateFormWizard({
 	const createTemplate = useCreateLeaseTemplate()
 	const updateTemplate = useUpdateLeaseTemplate()
 
-	useEffect(() => {
-		if (initialTemplate) {
-			setForm(templateToFormState(initialTemplate))
-		} else {
-			setForm(initialFormState)
-		}
-	}, [initialTemplate])
-
 	const pending = createTemplate.isPending || updateTemplate.isPending
 
-	const handleChange = (
-		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-	) => {
-		const { name, value } = e.target
-		setForm((prev) => ({
-			...prev,
-			[name]:
-				name === 'defaultLateFeeType' ? (value as LateFeeType | '') : value,
-		}))
-	}
+	const handleChange = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+			const { name, value } = e.target
+			setForm((prev) => ({
+				...prev,
+				[name]:
+					name === 'defaultLateFeeType' ? (value as LateFeeType | '') : value,
+			}))
+		},
+		[],
+	)
 
-	const handleMarkdownChange = (value: string) => {
+	const handleMarkdownChange = useCallback((value: string) => {
 		setForm((prev) => ({ ...prev, templateMarkdown: value }))
-	}
+	}, [])
 
 	const buildCreatePayload = (): CreateLeaseTemplatePayload => ({
-		id: generateId(), // ✅ Generate client-side ID for idempotency
+		id: generateId(), // Generate client-side ID for idempotency
 		name: form.name.trim(),
 		versionTag: form.versionTag.trim() || undefined,
 		templateMarkdown: form.templateMarkdown.trim(),
@@ -160,17 +153,17 @@ export function LeaseTemplateFormWizard({
 		return true
 	}
 
-	const handleNext = () => {
+	const handleNext = useCallback(() => {
 		if (step === 1 && validateStep1()) {
 			setStep(2)
 		}
-	}
+	}, [step, form.name, form.defaultLateFeeAmount, form.defaultNoticePeriodDays])
 
-	const handleBack = () => {
+	const handleBack = useCallback(() => {
 		if (step === 2) {
 			setStep(1)
 		}
-	}
+	}, [step])
 
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault()

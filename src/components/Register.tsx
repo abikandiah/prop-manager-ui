@@ -5,10 +5,11 @@ import {
 	CardContent,
 	CardHeader,
 } from '@abumble/design-system/components/Card'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import type { User } from '@/contexts/auth'
+import { useAuth } from '@/contexts/auth'
 import { Checkbox } from '@/components/ui/checkbox'
 import { TextLink } from '@/components/ui'
 import { api, getDevToken } from '@/api/client'
@@ -18,15 +19,14 @@ import { DevAuthForm } from '@/components/DevAuthForm'
 export const Register = () => {
 	const [agreedToTermsAndPrivacy, setAgreedToTermsAndPrivacy] = useState(false)
 	const [hasDevToken, setHasDevToken] = useState(() => !!getDevToken())
-	const queryClient = useQueryClient()
+	const { refetchUser } = useAuth()
 
 	const isDevNoToken = config.isDevelopment && !hasDevToken
 
 	const registerMutation = useMutation({
 		mutationFn: () => api.post<User>('/register', {}),
-		onSuccess: (response) => {
-			const user = response.data
-			queryClient.setQueryData(['me'], user)
+		onSuccess: () => {
+			refetchUser()
 			toast.success('Account created successfully.')
 		},
 	})

@@ -15,13 +15,14 @@ interface AuthContextType {
 	isLoadingUser: boolean
 	isUserDefined: boolean
 	logout: () => Promise<void>
+	refetchUser: () => Promise<unknown>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const queryClient = useQueryClient()
-	const { data: user, isLoading } = useQuery({
+	const { data: user, isLoading, refetch } = useQuery({
 		queryKey: ['me'],
 		queryFn: async () => {
 			const { data } = await api.get<User>('/me')
@@ -47,6 +48,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		window.location.href = '/'
 	}
 
+	const refetchUser = async () => {
+		return refetch()
+	}
+
 	return (
 		<AuthContext.Provider
 			value={{
@@ -54,6 +59,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 				isLoadingUser: isLoading,
 				isUserDefined: !!user,
 				logout,
+				refetchUser,
 			}}
 		>
 			{children}

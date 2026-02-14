@@ -1,24 +1,26 @@
 {
-	"name": "PropMange UI",
-	"image": "mcr.microsoft.com/devcontainers/javascript-node:1-22-bookworm",
-	"features": {
-		"ghcr.io/devcontainers/features/pnpm:2": {}
-	},
-	"forwardPorts": [3000],
+	"name": "PropManage UI",
+	"image": "mcr.microsoft.com/devcontainers/javascript-node:20-bookworm",
+	"forwardPorts": [
+		3000
+	],
 	"portsAttributes": {
 		"3000": {
 			"label": "Vite dev server",
 			"onAutoForward": "notify"
 		}
 	},
-	"postCreateCommand": "pnpm install",
+	"features": {},
+	"postCreateCommand": "pnpm install && curl -fsSL https://claude.ai/install.sh | bash",
 	"customizations": {
 		"vscode": {
 			"extensions": [
 				"dbaeumer.vscode-eslint",
 				"esbenp.prettier-vscode",
+				"redhat.vscode-yaml",
 				"bradlc.vscode-tailwindcss",
-				"dsznajder.es7-react-js-snippets"
+				"dsznajder.es7-react-js-snippets",
+				"anthropic.claude-code"
 			],
 			"settings": {
 				"editor.defaultFormatter": "esbenp.prettier-vscode",
@@ -29,5 +31,18 @@
 			}
 		}
 	},
+	"mounts": [
+		{
+			"source": "${localWorkspaceFolder}/../prop-manager",
+			"target": "/workspaces/prop-manager",
+			"type": "bind",
+			"consistency": "cached"
+		},
+		{
+			"source": "${localEnv:HOME}/.claude",
+			"target": "/home/node/.claude",
+			"type": "bind"
+		}
+	],
 	"remoteUser": "node"
 }

@@ -4,7 +4,6 @@ import { cn } from '@abumble/design-system/utils'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { useCreateProp, usePropsList } from '@/features/props'
-import type { Prop } from '@/domain/property'
 import { formatAddress } from '@/lib/format'
 import { DelayedLoadingFallback } from '@/components/ui'
 import {
@@ -23,7 +22,7 @@ export function PropsTableView() {
 
 	useEffect(() => {
 		if (isError) {
-			toast.error(`Error loading properties: ${error?.message || 'Unknown'}`)
+			toast.error(`Error loading properties: ${error.message || 'Unknown'}`)
 		}
 	}, [isError, error])
 
@@ -65,47 +64,52 @@ export function PropsTableView() {
 							</TableRow>
 						) : (
 							props.map((p) => {
-							const isPendingSync =
-								createProp.isPending &&
-								createProp.variables?.legalName === p.legalName
+								const isPendingSync =
+									createProp.isPending &&
+									createProp.variables.legalName === p.legalName
 
-							return (
-								<TableRow
-									key={p.id}
-									className="cursor-pointer hover:bg-muted/50"
-									onClick={() => navigate({ to: '/props/$id', params: { id: p.id } })}
-									onKeyDown={(e) => {
-										if (e.key === 'Enter' || e.key === ' ') {
-											e.preventDefault()
+								return (
+									<TableRow
+										key={p.id}
+										className="cursor-pointer hover:bg-muted/50"
+										onClick={() =>
 											navigate({ to: '/props/$id', params: { id: p.id } })
 										}
-									}}
-									tabIndex={0}
-									role="button"
-								>
-									<TableCell className="text-muted-foreground">
-										{p.propertyType.replace(/_/g, ' ')}
-									</TableCell>
-									<TableCell className="font-medium">
-										<div className="flex flex-col">
-											<span
-												className={cn(isPendingSync && 'text-muted-foreground')}
-											>
-												{p.legalName}
-											</span>
-											{isPendingSync && (
-												<span className="text-xs text-muted-foreground">
-													pending sync
+										onKeyDown={(e) => {
+											if (e.key === 'Enter' || e.key === ' ') {
+												e.preventDefault()
+												navigate({ to: '/props/$id', params: { id: p.id } })
+											}
+										}}
+										tabIndex={0}
+										role="button"
+									>
+										<TableCell className="text-muted-foreground">
+											{p.propertyType.replace(/_/g, ' ')}
+										</TableCell>
+										<TableCell className="font-medium">
+											<div className="flex flex-col">
+												<span
+													className={cn(
+														isPendingSync && 'text-muted-foreground',
+													)}
+												>
+													{p.legalName}
 												</span>
-											)}
-										</div>
-									</TableCell>
-									<TableCell className="max-w-[220px] truncate text-muted-foreground">
-										{formatAddress(p.address)}
-									</TableCell>
-								</TableRow>
-							)
-						}) )}
+												{isPendingSync && (
+													<span className="text-xs text-muted-foreground">
+														pending sync
+													</span>
+												)}
+											</div>
+										</TableCell>
+										<TableCell className="max-w-[220px] truncate text-muted-foreground">
+											{formatAddress(p.address)}
+										</TableCell>
+									</TableRow>
+								)
+							})
+						)}
 					</DelayedLoadingFallback>
 				</TableBody>
 			</Table>

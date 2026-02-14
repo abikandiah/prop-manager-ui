@@ -18,3 +18,31 @@ export function generateId(): string {
 export function generateOptimisticId(): string {
 	return uuidv7()
 }
+
+/**
+ * Trim a string; return undefined if the result is empty.
+ * Useful for optional form fields that should become undefined when blank.
+ */
+export function trimOrUndefined(s: string): string | undefined {
+	const t = s.trim()
+	return t === '' ? undefined : t
+}
+
+/**
+ * Parse a string as a float; return undefined if the string is empty or only whitespace.
+ */
+export function parseFloatOrUndefined(s: string): number | undefined {
+	const t = s.trim()
+	return t === '' ? undefined : parseFloat(t)
+}
+
+/**
+ * Parse a string as an integer with the given radix; return undefined if the string is empty or only whitespace.
+ */
+export function parseIntOrUndefined(
+	s: string,
+	radix: number,
+): number | undefined {
+	const t = s.trim()
+	return t === '' ? undefined : parseInt(t, radix)
+}

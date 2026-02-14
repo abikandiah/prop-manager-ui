@@ -158,6 +158,68 @@ export interface FormDialogProps {
 	children: React.ReactNode
 	/** Optional custom className for DialogContent (overrides FORM_DIALOG_CONTENT_CLASS). Use for wider dialogs (e.g., sm:max-w-5xl for wizards). */
 	className?: string
+	/** Optional wizard configuration for multi-step forms. Renders a stepper bar at the top of the header. */
+	wizard?: {
+		currentStep: number
+		totalSteps: number
+		stepTitle: string
+		stepLabels?: string[]
+	}
+}
+
+/** Compact glass-styled stepper for top-right corner of wizard dialogs. */
+function WizardStepper({
+	currentStep,
+	totalSteps,
+	stepLabels,
+}: {
+	currentStep: number
+	totalSteps: number
+	stepLabels?: string[]
+}) {
+	const steps = Array.from({ length: totalSteps }, (_, i) => i + 1)
+	const currentLabel = stepLabels?.[currentStep - 1]
+
+	return (
+		<div
+			className="absolute top-4 right-14 z-20 flex items-center gap-2 rounded-full border border-border/50 bg-background/80 px-3 py-1.5 backdrop-blur-sm"
+			aria-label="Progress"
+		>
+			{/* Step dots */}
+			<div className="flex items-center gap-1.5">
+				{steps.map((step) => {
+					const isCompleted = step < currentStep
+					const isCurrent = step === currentStep
+
+					return (
+						<div
+							key={step}
+							className={cn(
+								'h-1.5 w-1.5 rounded-full transition-all duration-300',
+								isCurrent && 'bg-primary w-6',
+								isCompleted && 'bg-primary',
+								!isCurrent && !isCompleted && 'bg-muted',
+							)}
+							aria-current={isCurrent ? 'step' : undefined}
+						/>
+					)
+				})}
+			</div>
+
+			{/* Step label/counter */}
+			<div className="text-muted-foreground flex items-center gap-1.5 text-xs font-medium">
+				<span className="text-foreground">{currentStep}</span>
+				<span>/</span>
+				<span>{totalSteps}</span>
+				{currentLabel && (
+					<>
+						<span className="text-border">·</span>
+						<span className="hidden sm:inline">{currentLabel}</span>
+					</>
+				)}
+			</div>
+		</div>
+	)
 }
 
 /** Dialog shell for create/edit forms: standard width, header with title + description. */
@@ -169,15 +231,23 @@ function FormDialog({
 	trigger,
 	children,
 	className,
+	wizard,
 }: FormDialogProps) {
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			{trigger}
 			<DialogContent className={className ?? FORM_DIALOG_CONTENT_CLASS}>
-				<DialogHeader>
+				{wizard && (
+					<WizardStepper
+						currentStep={wizard.currentStep}
+						totalSteps={wizard.totalSteps}
+						stepLabels={wizard.stepLabels}
+					/>
+				)}
+				<div className="bg-muted -m-6 p-6 -mb-4">
 					<DialogTitle>{title}</DialogTitle>
 					<DialogDescription>{description}</DialogDescription>
-				</DialogHeader>
+				</div>
 				{children}
 			</DialogContent>
 		</Dialog>

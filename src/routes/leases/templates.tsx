@@ -14,6 +14,20 @@ export const Route = createFileRoute('/leases/templates')({
 
 function RouteComponent() {
 	const [addOpen, setAddOpen] = useState(false)
+	const [wizardStep, setWizardStep] = useState<1 | 2>(1)
+
+	const getStepTitle = (step: 1 | 2) => {
+		return step === 1 ? 'Template Details' : 'Template Content'
+	}
+
+	const handleOpenChange = (open: boolean) => {
+		setAddOpen(open)
+		if (!open) {
+			// Reset wizard step when dialog closes
+			setWizardStep(1)
+		}
+	}
+
 	return (
 		<>
 			<BannerHeader
@@ -31,10 +45,16 @@ function RouteComponent() {
 			<div>
 				<FormDialog
 					open={addOpen}
-					onOpenChange={setAddOpen}
+					onOpenChange={handleOpenChange}
 					title="Add lease template"
 					description="Create a new reusable lease template with standard terms."
 					className="max-w-[calc(100vw-2rem)] sm:max-w-5xl"
+					wizard={{
+						currentStep: wizardStep,
+						totalSteps: 2,
+						stepTitle: getStepTitle(wizardStep),
+						stepLabels: ['Details', 'Content'],
+					}}
 					trigger={
 						<DialogTrigger asChild>
 							<Button>
@@ -45,6 +65,8 @@ function RouteComponent() {
 					}
 				>
 					<LeaseTemplateFormWizard
+						step={wizardStep}
+						onStepChange={setWizardStep}
 						onSuccess={() => setAddOpen(false)}
 						onCancel={() => setAddOpen(false)}
 						submitLabel="Create Template"

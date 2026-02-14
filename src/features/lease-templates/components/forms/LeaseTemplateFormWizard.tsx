@@ -1,25 +1,26 @@
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@abumble/design-system/components/Button'
-import { Input } from '@abumble/design-system/components/Input'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
-import { MarkdownEditor } from './MarkdownEditor'
+import { TemplateDetailsStep } from './TemplateDetailsStep'
+import { TemplateMarkdownStep } from './TemplateMarkdownStep'
 import type { LateFeeType } from '@/domain/lease'
 import type {
 	CreateLeaseTemplatePayload,
 	LeaseTemplate,
 	UpdateLeaseTemplatePayload,
 } from '@/domain/lease-template'
-import { LATE_FEE_TYPES } from '@/domain/lease'
-import { Checkbox } from '@/components/ui/checkbox'
 import { DialogFooter } from '@/components/ui/dialog'
-import { Label } from '@/components/ui/label'
-import { Select } from '@/components/ui/select'
 import {
 	useCreateLeaseTemplate,
 	useUpdateLeaseTemplate,
 } from '@/features/lease-templates/hooks'
-import { generateId } from '@/lib/util'
+import {
+	generateId,
+	parseFloatOrUndefined,
+	parseIntOrUndefined,
+	trimOrUndefined,
+} from '@/lib/util'
 
 type FormState = {
 	name: string
@@ -59,11 +60,29 @@ function templateToFormState(template: LeaseTemplate): FormState {
 	}
 }
 
+function formToPayloadFields(form: FormState) {
+	return {
+		name: form.name.trim(),
+		versionTag: trimOrUndefined(form.versionTag),
+		templateMarkdown: form.templateMarkdown.trim(),
+		defaultLateFeeType: form.defaultLateFeeType || undefined,
+		defaultLateFeeAmount: parseFloatOrUndefined(form.defaultLateFeeAmount),
+		defaultNoticePeriodDays: parseIntOrUndefined(
+			form.defaultNoticePeriodDays,
+			10,
+		),
+	}
+}
+
 export interface LeaseTemplateFormWizardProps {
 	initialTemplate?: LeaseTemplate | null
 	onSuccess?: (data?: LeaseTemplate) => void
 	onCancel?: () => void
 	submitLabel?: string
+	/** Current wizard step (controlled by parent for FormDialog integration) */
+	step?: 1 | 2
+	/** Step change handler (controlled by parent for FormDialog integration) */
+	onStepChange?: (step: 1 | 2) => void
 }
 
 export function LeaseTemplateFormWizard({
@@ -71,9 +90,15 @@ export function LeaseTemplateFormWizard({
 	onSuccess,
 	onCancel,
 	submitLabel = 'Create Template',
+	step: controlledStep,
+	onStepChange,
 }: LeaseTemplateFormWizardProps) {
 	const isEdit = initialTemplate != null
-	const [step, setStep] = useState<1 | 2>(1)
+	const [internalStep, setInternalStep] = useState<1 | 2>(1)
+
+	// Use controlled step if provided, otherwise use internal state
+	const step = controlledStep ?? internalStep
+	const setStep = onStepChange ?? setInternalStep
 	const [form, setForm] = useState<FormState>(() =>
 		initialTemplate ? templateToFormState(initialTemplate) : initialFormState,
 	)
@@ -99,30 +124,12 @@ export function LeaseTemplateFormWizard({
 	}, [])
 
 	const buildCreatePayload = (): CreateLeaseTemplatePayload => ({
-		id: generateId(), // Generate client-side ID for idempotency
-		name: form.name.trim(),
-		versionTag: form.versionTag.trim() || undefined,
-		templateMarkdown: form.templateMarkdown.trim(),
-		defaultLateFeeType: form.defaultLateFeeType || undefined,
-		defaultLateFeeAmount: form.defaultLateFeeAmount.trim()
-			? parseFloat(form.defaultLateFeeAmount)
-			: undefined,
-		defaultNoticePeriodDays: form.defaultNoticePeriodDays.trim()
-			? parseInt(form.defaultNoticePeriodDays, 10)
-			: undefined,
+		id: generateId(),
+		...formToPayloadFields(form),
 	})
 
 	const buildUpdatePayload = (): UpdateLeaseTemplatePayload => ({
-		name: form.name.trim() || undefined,
-		versionTag: form.versionTag.trim() || undefined,
-		templateMarkdown: form.templateMarkdown.trim() || undefined,
-		defaultLateFeeType: form.defaultLateFeeType || undefined,
-		defaultLateFeeAmount: form.defaultLateFeeAmount.trim()
-			? parseFloat(form.defaultLateFeeAmount)
-			: undefined,
-		defaultNoticePeriodDays: form.defaultNoticePeriodDays.trim()
-			? parseInt(form.defaultNoticePeriodDays, 10)
-			: undefined,
+		...formToPayloadFields(form),
 		active: form.active,
 		version: initialTemplate?.version ?? 0,
 	})
@@ -205,122 +212,30 @@ export function LeaseTemplateFormWizard({
 	}
 
 	return (
-		<form onSubmit={handleSubmit} className="space-y-4 relative">
-			{/* Step Indicator (beside close button) */}
-			<div className="absolute -top-2 right-10">
-				<span className="inline-flex items-center rounded-md bg-muted px-2 py-1 text-xs font-medium text-muted-foreground">
-					Step {step} of 2
-				</span>
-			</div>
-
+		<form onSubmit={handleSubmit} className="space-y-4">
 			{/* Step 1: Template Details */}
 			{step === 1 && (
-				<div className="space-y-4 pt-4">
-					<div className="space-y-2">
-						<Label htmlFor="name">
-							Template name{' '}
-							<span className="text-destructive" aria-hidden>
-								*
-							</span>
-						</Label>
-						<Input
-							id="name"
-							name="name"
-							value={form.name}
-							onChange={handleChange}
-							placeholder="e.g. Ontario Residential Standard 2026"
-							maxLength={255}
-							required
-						/>
-					</div>
-
-					<div className="space-y-2">
-						<Label htmlFor="versionTag">Version tag (optional)</Label>
-						<Input
-							id="versionTag"
-							name="versionTag"
-							value={form.versionTag}
-							onChange={handleChange}
-							placeholder="e.g. v2.1"
-							maxLength={50}
-						/>
-					</div>
-
-					<div className="grid grid-cols-2 gap-4">
-						<div className="space-y-2">
-							<Label htmlFor="defaultLateFeeType">Default late fee type</Label>
-							<Select
-								id="defaultLateFeeType"
-								name="defaultLateFeeType"
-								value={form.defaultLateFeeType}
-								onChange={handleChange}
-							>
-								<option value="">None</option>
-								{LATE_FEE_TYPES.map((type) => (
-									<option key={type} value={type}>
-										{type.replace(/_/g, ' ')}
-									</option>
-								))}
-							</Select>
-						</div>
-
-						<div className="space-y-2">
-							<Label htmlFor="defaultLateFeeAmount">
-								Default late fee amount
-							</Label>
-							<Input
-								id="defaultLateFeeAmount"
-								name="defaultLateFeeAmount"
-								type="number"
-								min={0}
-								step={0.01}
-								value={form.defaultLateFeeAmount}
-								onChange={handleChange}
-								placeholder="Optional"
-							/>
-						</div>
-					</div>
-
-					<div className="space-y-2">
-						<Label htmlFor="defaultNoticePeriodDays">
-							Default notice period (days)
-						</Label>
-						<Input
-							id="defaultNoticePeriodDays"
-							name="defaultNoticePeriodDays"
-							type="number"
-							min={1}
-							value={form.defaultNoticePeriodDays}
-							onChange={handleChange}
-							placeholder="Optional"
-						/>
-					</div>
-
-					{isEdit && (
-						<div className="flex items-center gap-2">
-							<Checkbox
-								id="active"
-								checked={form.active}
-								onCheckedChange={(checked) =>
-									setForm((prev) => ({ ...prev, active: checked === true }))
-								}
-							/>
-							<Label htmlFor="active" className="cursor-pointer font-normal">
-								Active (available when creating new leases)
-							</Label>
-						</div>
-					)}
-				</div>
+				<TemplateDetailsStep
+					name={form.name}
+					versionTag={form.versionTag}
+					defaultLateFeeType={form.defaultLateFeeType}
+					defaultLateFeeAmount={form.defaultLateFeeAmount}
+					defaultNoticePeriodDays={form.defaultNoticePeriodDays}
+					active={form.active}
+					onFieldChange={handleChange}
+					onActiveChange={(checked) =>
+						setForm((prev) => ({ ...prev, active: checked }))
+					}
+					isEdit={isEdit}
+				/>
 			)}
 
 			{/* Step 2: Markdown Editor */}
 			{step === 2 && (
-				<div className="space-y-2 pt-4">
-					<MarkdownEditor
-						value={form.templateMarkdown}
-						onChange={handleMarkdownChange}
-					/>
-				</div>
+				<TemplateMarkdownStep
+					value={form.templateMarkdown}
+					onChange={handleMarkdownChange}
+				/>
 			)}
 
 			{/* Footer with Navigation */}
@@ -339,7 +254,7 @@ export function LeaseTemplateFormWizard({
 							onClick={handleBack}
 							disabled={pending}
 						>
-							<ArrowLeft className="h-4 w-4 mr-2" />
+							<ArrowLeft className="h-4 w-4" />
 							Back
 						</Button>
 					)}
@@ -347,7 +262,7 @@ export function LeaseTemplateFormWizard({
 					{step === 1 && (
 						<Button type="button" onClick={handleNext}>
 							Next
-							<ArrowRight className="h-4 w-4 ml-2" />
+							<ArrowRight className="h-4 w-4" />
 						</Button>
 					)}
 
@@ -357,7 +272,7 @@ export function LeaseTemplateFormWizard({
 								'Saving…'
 							) : (
 								<>
-									<Check className="h-4 w-4 mr-2" />
+									<Check className="h-4 w-4" />
 									{submitLabel}
 								</>
 							)}

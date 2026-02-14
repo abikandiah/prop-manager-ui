@@ -94,6 +94,16 @@ export function LeaseTemplatesTableView({
 	const [editingTemplate, setEditingTemplate] = useState<LeaseTemplate | null>(
 		null,
 	)
+	const [wizardStep, setWizardStep] = useState<1 | 2>(1)
+
+	const getStepTitle = (step: 1 | 2) => {
+		return step === 1 ? 'Template Details' : 'Template Content'
+	}
+
+	const handleEditClose = () => {
+		setEditingTemplate(null)
+		setWizardStep(1) // Reset wizard step when closing
+	}
 
 	const handleRowClick = (template: LeaseTemplate) => {
 		setEditingTemplate(template)
@@ -228,15 +238,22 @@ export function LeaseTemplatesTableView({
 				{editingTemplate && (
 					<FormDialog
 						open={!!editingTemplate}
-						onOpenChange={() => setEditingTemplate(null)}
+						onOpenChange={handleEditClose}
 						title="Edit template"
 						description="Update template details."
 						className="max-w-[calc(100vw-2rem)] sm:max-w-5xl"
+						wizard={{
+							currentStep: wizardStep,
+							totalSteps: 2,
+							stepTitle: getStepTitle(wizardStep),
+						}}
 					>
 						<LeaseTemplateFormWizard
+							step={wizardStep}
+							onStepChange={setWizardStep}
 							initialTemplate={editingTemplate}
-							onSuccess={() => setEditingTemplate(null)}
-							onCancel={() => setEditingTemplate(null)}
+							onSuccess={handleEditClose}
+							onCancel={handleEditClose}
 							submitLabel="Save"
 						/>
 					</FormDialog>

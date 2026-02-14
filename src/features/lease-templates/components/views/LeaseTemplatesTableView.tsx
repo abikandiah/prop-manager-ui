@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { cn } from '@abumble/design-system/utils'
-import { useNavigate } from '@tanstack/react-router'
-import { LeaseTemplateForm } from '../forms/LeaseTemplateForm'
+import { LeaseTemplateFormWizard } from '../forms/LeaseTemplateFormWizard'
 import type { LeaseTemplate } from '@/domain/lease-template'
 import {
 	Table,
@@ -82,7 +81,6 @@ export interface LeaseTemplatesTableViewProps {
 export function LeaseTemplatesTableView({
 	activeOnly = false,
 }: LeaseTemplatesTableViewProps) {
-	const navigate = useNavigate()
 	const allTemplates = useLeaseTemplatesList()
 	const activeTemplates = useLeaseTemplatesActive()
 
@@ -233,8 +231,9 @@ export function LeaseTemplatesTableView({
 						onOpenChange={() => setEditingTemplate(null)}
 						title="Edit template"
 						description="Update template details."
+						className="max-w-[calc(100vw-2rem)] sm:max-w-5xl"
 					>
-						<LeaseTemplateForm
+						<LeaseTemplateFormWizard
 							initialTemplate={editingTemplate}
 							onSuccess={() => setEditingTemplate(null)}
 							onCancel={() => setEditingTemplate(null)}

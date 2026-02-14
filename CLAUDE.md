@@ -77,12 +77,16 @@ All feature API clients extend `BaseService`:
 ```typescript
 // src/features/props/api.ts
 import { BaseService } from '@/api/base-service'
-import type { Prop, CreatePropPayload, UpdatePropPayload } from '@/domain/property'
+import type {
+	Prop,
+	CreatePropPayload,
+	UpdatePropPayload,
+} from '@/domain/property'
 
 class PropsApi extends BaseService<Prop, CreatePropPayload, UpdatePropPayload> {
-  constructor() {
-    super('props') // endpoint = /api/props
-  }
+	constructor() {
+		super('props') // endpoint = /api/props
+	}
 }
 export const propsApi = new PropsApi()
 ```
@@ -94,58 +98,64 @@ export const propsApi = new PropsApi()
 Feature hooks follow this pattern:
 
 1. **Query keys** (in `keys.ts`):
+
 ```typescript
 export const propKeys = {
-  all: ['props'] as const,
-  lists: () => [...propKeys.all, 'list'] as const,
-  list: () => propKeys.lists(),
-  details: () => [...propKeys.all, 'detail'] as const,
-  detail: (id: string) => [...propKeys.details(), id] as const,
+	all: ['props'] as const,
+	lists: () => [...propKeys.all, 'list'] as const,
+	list: () => propKeys.lists(),
+	details: () => [...propKeys.all, 'detail'] as const,
+	detail: (id: string) => [...propKeys.details(), id] as const,
 }
 ```
 
 2. **Queries** (in `hooks.ts`):
+
 ```typescript
 export function usePropsList() {
-  return useQuery({
-    queryKey: propKeys.list(),
-    queryFn: () => propsApi.list(),
-  })
+	return useQuery({
+		queryKey: propKeys.list(),
+		queryFn: () => propsApi.list(),
+	})
 }
 ```
 
 3. **Mutations with optimistic updates** (in `hooks.ts`):
+
 ```typescript
 export function useCreateProp() {
-  const queryClient = useQueryClient()
-  return useMutation({
-    mutationKey: ['createProp'],
-    networkMode: 'online',
-    mutationFn: (payload: CreatePropPayload) => {
-      const requestId = stableRequestId(['createProp'], payload)
-      return propsApi.create(payload, { [IDEMPOTENCY_HEADER]: requestId })
-    },
-    onMutate: async (payload) => {
-      // Apply optimistic update to cache
-      await queryClient.cancelQueries({ queryKey: propKeys.list() })
-      const previousProps = queryClient.getQueryData<Array<Prop>>(propKeys.list())
-      const optimistic = applyCreate(queryClient, payload) // helper function
-      return { previousProps, optimisticId: optimistic.id }
-    },
-    onError: (err, _, context) => {
-      // Rollback on error
-      if (context?.previousProps) {
-        queryClient.setQueryData(propKeys.list(), context.previousProps)
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: propKeys.all })
-    },
-  })
+	const queryClient = useQueryClient()
+	return useMutation({
+		mutationKey: ['createProp'],
+		networkMode: 'online',
+		mutationFn: (payload: CreatePropPayload) => {
+			const requestId = stableRequestId(['createProp'], payload)
+			return propsApi.create(payload, { [IDEMPOTENCY_HEADER]: requestId })
+		},
+		onMutate: async (payload) => {
+			// Apply optimistic update to cache
+			await queryClient.cancelQueries({ queryKey: propKeys.list() })
+			const previousProps = queryClient.getQueryData<Array<Prop>>(
+				propKeys.list(),
+			)
+			const optimistic = applyCreate(queryClient, payload) // helper function
+			return { previousProps, optimisticId: optimistic.id }
+		},
+		onError: (err, _, context) => {
+			// Rollback on error
+			if (context?.previousProps) {
+				queryClient.setQueryData(propKeys.list(), context.previousProps)
+			}
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: propKeys.all })
+		},
+	})
 }
 ```
 
 **Key patterns**:
+
 - All mutations use `stableRequestId()` + `IDEMPOTENCY_HEADER` for idempotent requests
 - Optimistic updates applied in `onMutate`, rolled back in `onError`
 - Query cache invalidated in `onSuccess` or `onSettled`
@@ -203,6 +213,7 @@ Follow the rule in `.cursor/rules/constants-vs-config.mdc`:
 - **Use code constants** for fixed domain/protocol values (sentinel IDs like `OPTIMISTIC_PROP_ID`, storage keys, magic numbers)
 
 Ask: "Would we ever want to change this without changing code?"
+
 - **Yes** → config (consider env override)
 - **No** → constant in code
 

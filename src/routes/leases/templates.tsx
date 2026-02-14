@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Button } from '@abumble/design-system/components/Button'
 import {
-	LeaseTemplateForm,
+	LeaseTemplateFormWizard,
 	LeaseTemplatesTableView,
 } from '@/features/lease-templates'
 import { BannerHeader, DialogTrigger, FormDialog } from '@/components/ui'
@@ -34,6 +34,7 @@ function RouteComponent() {
 					onOpenChange={setAddOpen}
 					title="Add lease template"
 					description="Create a new reusable lease template with standard terms."
+					className="max-w-[calc(100vw-2rem)] sm:max-w-5xl"
 					trigger={
 						<DialogTrigger asChild>
 							<Button>
@@ -43,7 +44,7 @@ function RouteComponent() {
 						</DialogTrigger>
 					}
 				>
-					<LeaseTemplateForm
+					<LeaseTemplateFormWizard
 						onSuccess={() => setAddOpen(false)}
 						onCancel={() => setAddOpen(false)}
 						submitLabel="Create Template"

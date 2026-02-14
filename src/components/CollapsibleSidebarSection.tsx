@@ -52,9 +52,7 @@ function Badge({
 	variant?: 'default' | 'dot'
 }) {
 	if (variant === 'dot') {
-		return (
-			<span className="size-2 rounded-full bg-primary animate-pulse" />
-		)
+		return <span className="size-2 rounded-full bg-primary animate-pulse" />
 	}
 
 	return (

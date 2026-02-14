@@ -7,10 +7,8 @@ const badgeVariants = cva(
 	{
 		variants: {
 			variant: {
-				default:
-					'border-transparent bg-primary text-primary-foreground',
-				secondary:
-					'border-transparent bg-secondary text-secondary-foreground',
+				default: 'border-transparent bg-primary text-primary-foreground',
+				secondary: 'border-transparent bg-secondary text-secondary-foreground',
 				success:
 					'border-transparent bg-green-600 text-white dark:bg-green-700 dark:text-white',
 				warning:
@@ -32,9 +30,6 @@ export function Badge({
 	...props
 }: React.ComponentProps<'div'> & VariantProps<typeof badgeVariants>) {
 	return (
-		<div
-			className={cn(badgeVariants({ variant }), className)}
-			{...props}
-		/>
+		<div className={cn(badgeVariants({ variant }), className)} {...props} />
 	)
 }

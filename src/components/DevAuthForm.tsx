@@ -17,7 +17,10 @@ interface DevAuthFormProps {
 	wrappedInCard?: boolean
 }
 
-export function DevAuthForm({ onSuccess, wrappedInCard = true }: DevAuthFormProps) {
+export function DevAuthForm({
+	onSuccess,
+	wrappedInCard = true,
+}: DevAuthFormProps) {
 	const [username, setUsername] = useState('')
 	const [password, setPassword] = useState('')
 	const [loading, setLoading] = useState(false)
@@ -41,7 +44,10 @@ export function DevAuthForm({ onSuccess, wrappedInCard = true }: DevAuthFormProp
 			}
 		} catch (error: unknown) {
 			console.error('Login failed', error)
-			const err = error as { response?: { data?: { message?: string }; message?: string }; message?: string }
+			const err = error as {
+				response?: { data?: { message?: string }; message?: string }
+				message?: string
+			}
 			const message =
 				err.response?.data?.message ?? err.message ?? 'Login failed'
 			toast.error(message)

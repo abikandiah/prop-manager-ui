@@ -156,6 +156,8 @@ export interface FormDialogProps {
 	/** Optional trigger (e.g. "Add" button); when provided, render as first child of Dialog. */
 	trigger?: React.ReactNode
 	children: React.ReactNode
+	/** Optional custom className for DialogContent (overrides FORM_DIALOG_CONTENT_CLASS). Use for wider dialogs (e.g., sm:max-w-5xl for wizards). */
+	className?: string
 }
 
 /** Dialog shell for create/edit forms: standard width, header with title + description. */
@@ -166,11 +168,12 @@ function FormDialog({
 	description,
 	trigger,
 	children,
+	className,
 }: FormDialogProps) {
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			{trigger}
-			<DialogContent className={FORM_DIALOG_CONTENT_CLASS}>
+			<DialogContent className={className ?? FORM_DIALOG_CONTENT_CLASS}>
 				<DialogHeader>
 					<DialogTitle>{title}</DialogTitle>
 					<DialogDescription>{description}</DialogDescription>

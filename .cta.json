@@ -1,15 +1,12 @@
 {
-  "projectName": "prop-manager-ui",
-  "mode": "file-router",
-  "typescript": true,
-  "packageManager": "pnpm",
-  "tailwind": true,
-  "addOnOptions": {},
-  "git": true,
-  "version": 1,
-  "framework": "react-cra",
-  "chosenAddOns": [
-    "eslint",
-    "start"
-  ]
+	"projectName": "prop-manager-ui",
+	"mode": "file-router",
+	"typescript": true,
+	"packageManager": "pnpm",
+	"tailwind": true,
+	"addOnOptions": {},
+	"git": true,
+	"version": 1,
+	"framework": "react-cra",
+	"chosenAddOns": ["eslint", "start"]
 }

@@ -64,11 +64,12 @@ src/features/{feature-name}/
 - **`src/domain/`**: TypeScript types for domain entities (Prop, Unit, Lease, Address, etc.). These define the shape of data throughout the app.
 - **`src/api/`**: Shared API infrastructure (`client.ts` = axios instance with interceptors; `base-service.ts` = generic CRUD service class)
 - **`src/config/`**: Runtime configuration from env vars (`config.apiBaseUrl`, `config.queryCacheStaleTimeMs`, etc.). See Constants vs Config rule below.
-- **`src/lib/`**: Pure utility functions (formatting, offline helpers, constants)
+- **`src/lib/`**: Pure utility functions (formatting, offline helpers, constants, `generateId()` for UUIDs)
 - **`src/contexts/`**: React context providers (theme, network, auth)
 - **`src/components/`**: Shared/global components (ErrorBoundary, NotFound, etc.)
 - **`src/routes/`**: TanStack Router file-based routes (each `.tsx` file = route)
-- **`src/integrations/tanstack-query/`**: React Query setup with persistence
+- **`src/integrations/tanstack-query/`**: React Query setup with user-scoped persistence
+- **`src/features/offline/`**: Offline infrastructure (Dexie DB schema for mutation outbox, cache persistor)
 
 ### API Client Pattern
 
@@ -157,19 +158,42 @@ export function useCreateProp() {
 **Key patterns**:
 
 - All mutations use `stableRequestId()` + `IDEMPOTENCY_HEADER` for idempotent requests
+- Create payloads must include client-generated `id` field (via `generateId()`)
+- Optimistic updates use `payload.id` (not generated IDs):
+  ```typescript
+  function applyCreate(
+    queryClient: ReturnType<typeof useQueryClient>,
+    payload: CreatePropPayload,
+  ): Prop {
+    const optimistic: Prop = {
+      id: payload.id, // Use client-generated ID from payload
+      legalName: payload.legalName,
+      // ... rest of fields with defaults
+    }
+    queryClient.setQueryData(propKeys.list(), (old: Prop[] | undefined) =>
+      old ? [...old, optimistic] : [optimistic]
+    )
+    return optimistic
+  }
+  ```
 - Optimistic updates applied in `onMutate`, rolled back in `onError`
 - Query cache invalidated in `onSuccess` or `onSettled`
+- Mutations use `networkMode: 'online'` (not `'offlineFirst'`)
 
 ### Offline-First Architecture
 
-The app uses TanStack Query's persistence with Dexie (IndexedDB):
+The app uses TanStack Query's persistence with Dexie (IndexedDB) and a **Pure TanStack** approach (no custom mutation queue or sync engine):
 
-- **Cache persistence**: Query results saved to IndexedDB (`src/features/offline/cachePersistor.ts`)
-- **Mutation outbox**: Pending mutations saved to IndexedDB for offline support (`src/features/offline/db.ts`)
-- **Network mode**: `offlineFirst` for queries and mutations
+- **User-scoped databases**: Each user gets their own IndexedDB database (`prop-manager-{userId}`) for data privacy. Query clients are created per user and cleared on logout.
+- **Cache persistence**: Query results saved to IndexedDB (`src/integrations/tanstack-query/root-provider.tsx`)
+- **Mutation persistence**: Pending mutations automatically saved to IndexedDB with `shouldDehydrateMutation`
+- **Client-generated IDs**: All create payloads require a `id: string` field generated via `generateId()` (uses `crypto.randomUUID()`) for idempotency. This prevents race conditions and enables optimistic updates with stable IDs.
+- **Network mode**: Mutations use `networkMode: 'online'` (pause when offline, auto-resume when back online). Queries use default network mode.
+- **Idempotency headers**: All mutations include `X-Request-Id` header via `stableRequestId()` to prevent duplicate operations
+- **Router context**: The user-scoped query client is passed to TanStack Router via context: `<RouterProvider router={router} context={{ queryClient }} />`
 - **Dev mode**: Persistence disabled by default in dev (enable with `VITE_PERSIST_OFFLINE=true`)
 
-See `src/integrations/tanstack-query/root-provider.tsx` for the React Query setup.
+See `src/integrations/tanstack-query/root-provider.tsx` for the React Query setup and user-scoped database management.
 
 ### Routing
 
@@ -229,6 +253,22 @@ import type { Prop } from '@/domain/property'
 
 ## Development Notes
 
+### Code Style & Comments
+
+Follow the code comment and style guidelines in `.cursor/rules/code-comments-and-style.mdc`:
+
+- **No emojis in code** (comments, console logs, variable names)
+- Emojis are fine for user-facing UI text and markdown documentation
+- Use clear, concise comments for complex logic
+- Use JSDoc for public APIs
+- Use log prefixes in square brackets: `console.log('[Network] Going offline')`
+- Don't comment obvious code
+
+See also:
+- `.cursor/rules/design-system-and-architecture.mdc` for UI and styling conventions
+- `.cursor/rules/copy-and-descriptions.mdc` for user-facing text guidelines
+- `.cursor/rules/constants-vs-config.mdc` for configuration patterns
+
 ### API Proxy
 
 The dev server proxies `/api` to `http://localhost:4080` (see `vite.config.ts`). The backend is expected to run on port 4080 during development.
@@ -245,14 +285,32 @@ TanStack Router and Query devtools are available in dev mode (bottom-right of sc
 
 To add a new domain feature (e.g., "tenants"):
 
-1. **Define domain types** in `src/domain/tenant.ts` (entity, create/update payloads)
+1. **Define domain types** in `src/domain/tenant.ts`:
+   - Entity type (e.g., `Tenant`)
+   - Create payload **must include `id: string`** for client-generated UUID
+   - Update payload (no ID needed)
+
+   Example:
+   ```typescript
+   export interface CreateTenantPayload {
+     id: string // Client-generated UUID for idempotency
+     name: string
+     email: string
+     // ... other fields
+   }
+   ```
+
 2. **Create feature directory** `src/features/tenants/` with:
    - `api.ts`: Extend `BaseService<Tenant, CreateTenantPayload, UpdateTenantPayload>`
    - `keys.ts`: Query key factory following existing pattern
    - `hooks.ts`: Query and mutation hooks with optimistic updates
+     - In `applyCreate()`, use `payload.id` (not `generateId()`)
+     - Use `networkMode: 'online'` for all mutations
    - `components/forms/`: Create/edit forms
+     - Call `generateId()` in `buildCreatePayload()` or before mutation
    - `components/views/`: List/detail views
    - `index.ts`: Re-export public API
+
 3. **Add route** in `src/routes/tenants/index.tsx`
 4. **Update navigation** in `src/routes/__root.tsx` or sidebar
 

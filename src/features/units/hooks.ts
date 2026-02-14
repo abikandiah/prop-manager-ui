@@ -3,7 +3,7 @@ import { unitKeys } from './keys'
 import { unitsApi } from './api'
 import type { CreateUnitPayload, Unit, UpdateUnitPayload } from '@/domain/unit'
 import { stableRequestId } from '@/lib/offline-types'
-import { generateOptimisticId, nowIso } from '@/lib/util'
+import { nowIso } from '@/lib/util'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
 
 // --- Helpers: Optimistic Updates ---
@@ -13,7 +13,7 @@ function applyCreate(
 	payload: CreateUnitPayload,
 ): Unit {
 	const optimistic: Unit = {
-		id: generateOptimisticId(),
+		id: payload.id, // ✅ Use client-generated ID from payload
 		propertyId: payload.propertyId,
 		unitNumber: payload.unitNumber,
 		status: payload.status,

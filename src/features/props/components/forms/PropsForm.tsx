@@ -6,21 +6,22 @@ import { toast } from 'sonner'
 import {
 	ADDRESS_FORM_INITIAL,
 	AddressFormFields
-	
+
 } from './AddressFormFields'
 import type {AddressFormValue} from './AddressFormFields';
 import type {CreatePropPayload, Prop, PropertyType, UpdatePropPayload} from '@/domain/property';
 import { useCreateProp, useUpdateProp } from '@/features/props/hooks'
 import {
-	
+
 	PROPERTY_TYPES
-	
-	
-	
+
+
+
 } from '@/domain/property'
 import { DialogFooter } from '@/components/ui/dialog'
 import { Label } from '@/components/ui/label'
 import { Select } from '@/components/ui/select'
+import { generateId } from '@/lib/util'
 
 type FormState = {
 	legalName: string
@@ -197,7 +198,12 @@ export function PropsForm({
 				},
 			)
 		} else {
-			createProp.mutate(payload, {
+			// ✅ Generate client-side ID for idempotency
+			const createPayload: CreatePropPayload = {
+				...payload,
+				id: generateId(),
+			}
+			createProp.mutate(createPayload, {
 				onSuccess: (data) => {
 					setForm(initialForm)
 					toast.success('Property created successfully')

@@ -19,6 +19,7 @@ import {
 	useUpdateLeaseTemplate,
 } from '@/features/lease-templates/hooks'
 import { MarkdownEditor } from './MarkdownEditor'
+import { generateId } from '@/lib/util'
 
 type FormState = {
 	name: string
@@ -105,6 +106,7 @@ export function LeaseTemplateFormWizard({
 	}
 
 	const buildCreatePayload = (): CreateLeaseTemplatePayload => ({
+		id: generateId(), // ✅ Generate client-side ID for idempotency
 		name: form.name.trim(),
 		versionTag: form.versionTag.trim() || undefined,
 		templateMarkdown: form.templateMarkdown.trim(),

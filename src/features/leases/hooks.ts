@@ -3,7 +3,7 @@ import { leaseKeys } from './keys'
 import { leasesApi } from './api'
 import type { CreateLeasePayload, Lease, UpdateLeasePayload } from '@/domain/lease'
 import { stableRequestId } from '@/lib/offline-types'
-import { generateOptimisticId, nowIso } from '@/lib/util'
+import { nowIso } from '@/lib/util'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
 
 // --- Helpers: Optimistic Updates ---
@@ -13,7 +13,7 @@ function applyCreate(
 	payload: CreateLeasePayload,
 ): Lease {
 	const optimistic: Lease = {
-		id: generateOptimisticId(),
+		id: payload.id, // ✅ Use client-generated ID from payload
 		leaseTemplateId: payload.leaseTemplateId,
 		leaseTemplateName: null,
 		leaseTemplateVersionTag: null,
@@ -191,7 +191,7 @@ export function useCreateLease() {
 
 	return useMutation({
 		mutationKey: ['createLease'],
-		networkMode: 'offlineFirst',
+		networkMode: 'online',
 		mutationFn: (payload: CreateLeasePayload) => {
 			const requestId = stableRequestId(['createLease'], payload)
 			return leasesApi.create(payload, { [IDEMPOTENCY_HEADER]: requestId })
@@ -246,7 +246,7 @@ export function useUpdateLease() {
 
 	return useMutation({
 		mutationKey: ['updateLease'],
-		networkMode: 'offlineFirst',
+		networkMode: 'online',
 		mutationFn: async ({ id, payload }: UpdateLeaseVariables) => {
 			const variables = { id, payload }
 			const requestId = stableRequestId(['updateLease'], variables)
@@ -308,7 +308,7 @@ export function useDeleteLease() {
 
 	return useMutation({
 		mutationKey: ['deleteLease'],
-		networkMode: 'offlineFirst',
+		networkMode: 'online',
 		mutationFn: async (variables: {
 			id: string
 			unitId: string
@@ -378,7 +378,7 @@ export function useSubmitLeaseForReview() {
 
 	return useMutation({
 		mutationKey: ['submitLeaseForReview'],
-		networkMode: 'offlineFirst',
+		networkMode: 'online',
 		mutationFn: (id: string) => leasesApi.submitForReview(id),
 		onMutate: async (id) => {
 			const currentLease = queryClient.getQueryData<Lease>(leaseKeys.detail(id))
@@ -422,7 +422,7 @@ export function useActivateLease() {
 
 	return useMutation({
 		mutationKey: ['activateLease'],
-		networkMode: 'offlineFirst',
+		networkMode: 'online',
 		mutationFn: (id: string) => leasesApi.activate(id),
 		onMutate: async (id) => {
 			const currentLease = queryClient.getQueryData<Lease>(leaseKeys.detail(id))
@@ -466,7 +466,7 @@ export function useRevertLeaseToDraft() {
 
 	return useMutation({
 		mutationKey: ['revertLeaseToDraft'],
-		networkMode: 'offlineFirst',
+		networkMode: 'online',
 		mutationFn: (id: string) => leasesApi.revertToDraft(id),
 		onMutate: async (id) => {
 			const currentLease = queryClient.getQueryData<Lease>(leaseKeys.detail(id))
@@ -510,7 +510,7 @@ export function useTerminateLease() {
 
 	return useMutation({
 		mutationKey: ['terminateLease'],
-		networkMode: 'offlineFirst',
+		networkMode: 'online',
 		mutationFn: (id: string) => leasesApi.terminate(id),
 		onMutate: async (id) => {
 			const currentLease = queryClient.getQueryData<Lease>(leaseKeys.detail(id))

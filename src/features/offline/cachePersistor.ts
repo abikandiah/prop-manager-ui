@@ -1,4 +1,4 @@
-import { db } from './db'
+import { getDb } from './db'
 import type {
 	PersistedClient,
 	Persister,
@@ -36,13 +36,33 @@ function throttle<T extends (client: PersistedClient) => void>(
 	}) as T
 }
 
-export const createThrottledCachePersister = (throttleMs = 1000): Persister => {
+/**
+ * Create a user-scoped cache persister for TanStack Query.
+ * Throttles writes to IndexedDB to avoid excessive disk I/O.
+ *
+ * @param userId - User ID for database scoping
+ * @param throttleMs - Throttle delay in milliseconds (default: 1000ms)
+ */
+export const createThrottledCachePersister = (
+	userId: string,
+	throttleMs = 1000,
+): Persister => {
+	const db = getDb(userId)
+
 	const saveToDisk = async (client: PersistedClient) => {
 		try {
-			console.log('Persisting TanStack cache to Dexie...')
+			console.log('[Cache] Persisting to IndexedDB for user:', userId)
 			await db.saveCacheBlob(client)
 		} catch (err) {
-			console.error('Failed to persist TanStack cache:', err)
+			console.error('[Cache] Failed to persist:', err)
+
+			// Handle quota exceeded
+			if (err instanceof Error && err.name === 'QuotaExceededError') {
+				console.error(
+					'[Cache] Storage quota exceeded! Consider clearing old data.',
+				)
+				// TODO: Show user warning toast
+			}
 		}
 	}
 
@@ -58,20 +78,26 @@ export const createThrottledCachePersister = (throttleMs = 1000): Persister => {
 		restoreClient: async () => {
 			try {
 				const cache = await db.loadCacheBlob()
-				if (!cache) return undefined
+				if (!cache) {
+					console.log('[Cache] No cached data found for user:', userId)
+					return undefined
+				}
 
 				// Structural validation
 				if (!cache.timestamp || !cache.clientState) {
-					console.warn('Persisted cache is invalid, ignoring.')
+					console.warn('[Cache] Invalid cache structure, ignoring')
 					return undefined
 				}
+
+				console.log('[Cache] Restored from IndexedDB for user:', userId)
 				return cache
 			} catch (error) {
-				console.error('Failed to restore cache:', error)
+				console.error('[Cache] Failed to restore:', error)
 				return undefined
 			}
 		},
 		removeClient: async () => {
+			console.log('[Cache] Removing cache for user:', userId)
 			return await db.deleteCacheBlob()
 		},
 	}

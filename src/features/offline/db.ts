@@ -1,34 +1,29 @@
 import Dexie from 'dexie'
-import type { DehydratedState } from '@tanstack/react-query'
 import type { PersistedClient } from '@tanstack/react-query-persist-client'
-import { config } from '@/config'
-import { stableMutationId } from '@/lib/offline-types'
-
-export type DehydratedMutation = DehydratedState['mutations'][number]
-export type MutationOutboxStatus = 'pending' | 'failed' | 'synced'
 
 const CACHE_KEY = 'react-query-cache'
 
-export interface MutationRow {
-	id: string
-	value: DehydratedMutation
-	status: MutationOutboxStatus
-	timestamp: number
-	retryCount: number
-}
-
+/**
+ * User-scoped IndexedDB database for offline caching.
+ * Each user gets their own isolated database for privacy and security.
+ *
+ * Pure TanStack Query approach:
+ * - TanStack handles mutation persistence internally
+ * - No custom mutation outbox needed
+ * - Simpler, more reliable
+ */
 export class AppDatabase extends Dexie {
 	queries!: Dexie.Table<
 		{ id: string; value: PersistedClient; updatedAt: number },
 		string
 	>
-	mutations!: Dexie.Table<MutationRow, string>
 
-	constructor() {
-		super('prop-manager-db')
+	constructor(userId: string) {
+		// User-scoped database name for privacy/security
+		super(`prop-manager-db-${userId}`)
+
 		this.version(1).stores({
 			queries: 'id, updatedAt',
-			mutations: 'id, status, timestamp, [status+timestamp]',
 		})
 	}
 
@@ -48,48 +43,51 @@ export class AppDatabase extends Dexie {
 	async deleteCacheBlob() {
 		await this.queries.delete(CACHE_KEY)
 	}
-
-	async addMutation(mutationKey: readonly unknown[], variables: unknown) {
-		const mutation = {
-			mutationKey,
-			state: {
-				variables,
-				submittedAt: Date.now(),
-			},
-		} as DehydratedMutation
-
-		return this.mutations.put({
-			id: stableMutationId(mutation),
-			value: mutation,
-			status: 'pending',
-			timestamp: Date.now(),
-			retryCount: 0,
-		})
-	}
-
-	async getNextPending() {
-		return this.mutations
-			.where('[status+timestamp]')
-			.between(['pending', Dexie.minKey], ['pending', Dexie.maxKey])
-			.first()
-	}
-
-	async autoPrune() {
-		const count = await this.mutations.where('status').equals('synced').count()
-		if (count > 1000) {
-			await this.pruneSyncedMutations(config.mutationOutboxMaxAgeDays)
-		}
-	}
-
-	async pruneSyncedMutations(daysToKeep: number) {
-		const threshold = Date.now() - daysToKeep * 24 * 60 * 60 * 1000
-		console.log('Pruning synced mutations older than', threshold)
-
-		return this.mutations
-			.where('[status+timestamp]')
-			.between(['synced', Dexie.minKey], ['synced', threshold])
-			.delete()
-	}
 }
 
-export const db = new AppDatabase()
+// Singleton management for user-scoped databases
+let currentDb: AppDatabase | null = null
+let currentUserId: string | null = null
+
+/**
+ * Get the database for a specific user.
+ * Manages singleton to avoid creating multiple database instances.
+ */
+export function getDb(userId: string): AppDatabase {
+	if (currentDb && currentUserId === userId) {
+		return currentDb
+	}
+
+	// Close old database if switching users
+	if (currentDb) {
+		console.log('[DB] Closing database for user:', currentUserId)
+		currentDb.close()
+	}
+
+	console.log('[DB] Opening database for user:', userId)
+	currentDb = new AppDatabase(userId)
+	currentUserId = userId
+	return currentDb
+}
+
+/**
+ * Clear all offline data for a specific user.
+ * Called on logout to ensure data privacy.
+ */
+export async function clearUserDb(userId: string) {
+	const dbName = `prop-manager-db-${userId}`
+	console.log('[DB] Clearing database for user:', userId)
+
+	try {
+		await Dexie.delete(dbName)
+		console.log('[DB] Database cleared successfully')
+	} catch (error) {
+		console.error('[DB] Failed to clear database:', error)
+	}
+
+	// Clear singleton if it's the current user
+	if (currentUserId === userId) {
+		currentDb = null
+		currentUserId = null
+	}
+}

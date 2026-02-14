@@ -28,6 +28,7 @@ export interface Prop {
 }
 
 export interface CreatePropPayload {
+	id: string // Client-generated UUID for idempotency
 	legalName: string
 	address: CreatePropAddressPayload
 	propertyType: PropertyType

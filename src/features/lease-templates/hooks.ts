@@ -7,7 +7,7 @@ import type {
 	UpdateLeaseTemplatePayload,
 } from '@/domain/lease-template'
 import { stableRequestId } from '@/lib/offline-types'
-import { generateOptimisticId, nowIso } from '@/lib/util'
+import { nowIso } from '@/lib/util'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
 
 // --- Helpers: Optimistic Updates ---
@@ -17,7 +17,7 @@ function applyCreate(
 	payload: CreateLeaseTemplatePayload,
 ): LeaseTemplate {
 	const optimistic: LeaseTemplate = {
-		id: generateOptimisticId(),
+		id: payload.id, // ✅ Use client-generated ID from payload
 		name: payload.name,
 		versionTag: payload.versionTag ?? null,
 		version: 0,
@@ -127,7 +127,7 @@ export function useCreateLeaseTemplate() {
 
 	return useMutation({
 		mutationKey: ['createLeaseTemplate'],
-		networkMode: 'offlineFirst',
+		networkMode: 'online',
 		mutationFn: (payload: CreateLeaseTemplatePayload) => {
 			const requestId = stableRequestId(['createLeaseTemplate'], payload)
 			return leaseTemplatesApi.create(payload, {
@@ -162,7 +162,7 @@ export function useUpdateLeaseTemplate() {
 
 	return useMutation({
 		mutationKey: ['updateLeaseTemplate'],
-		networkMode: 'offlineFirst',
+		networkMode: 'online',
 		mutationFn: async ({
 			id,
 			payload,
@@ -216,7 +216,7 @@ export function useDeleteLeaseTemplate() {
 
 	return useMutation({
 		mutationKey: ['deleteLeaseTemplate'],
-		networkMode: 'offlineFirst',
+		networkMode: 'online',
 		mutationFn: async (id: string) => {
 			const requestId = stableRequestId(['deleteLeaseTemplate'], id)
 			return leaseTemplatesApi.delete(id, { [IDEMPOTENCY_HEADER]: requestId })

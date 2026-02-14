@@ -1,29 +1,23 @@
 import { RouterProvider, createRouter } from '@tanstack/react-router'
-import { StrictMode } from 'react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { StrictMode, useMemo } from 'react'
 import { createRoot } from 'react-dom/client'
-
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
-
-// Import the generated route tree
 import { routeTree } from './routeTree.gen'
-
 import { NotFound } from './components/NotFound.tsx'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { ThemeProvider } from './contexts/theme'
 import { NetworkProvider } from './contexts/network'
-import { AuthProvider } from './contexts/auth'
+import { AuthProvider, useAuth } from './contexts/auth'
 import { Toaster } from './components/ui/Toaster'
 import reportWebVitals from './reportWebVitals'
 import './styles.css'
 
-// Create a new router instance
+// Bootstrap client used only for auth (e.g. /me). User-scoped client lives inside AppWithProviders.
+const bootstrapQueryClient = new QueryClient()
 
-const TanStackQueryProviderContext = TanStackQueryProvider.getContext()
 const router = createRouter({
 	routeTree,
-	context: {
-		...TanStackQueryProviderContext,
-	},
 	defaultPreload: 'intent',
 	scrollRestoration: true,
 	defaultStructuralSharing: true,
@@ -38,30 +32,49 @@ declare module '@tanstack/react-router' {
 	}
 }
 
-// Render the app
+/**
+ * App with user-scoped providers.
+ * Must be inside AuthProvider to access user ID.
+ */
+function AppWithProviders() {
+	const { user } = useAuth()
 
+	// Use 'anonymous' for unauthenticated users (will be cleared on login)
+	const userId = user?.id || 'anonymous'
+
+	// Create user-scoped query client
+	const queryContext = useMemo(() => {
+		console.log('[App] Creating query client for user:', userId)
+		return TanStackQueryProvider.getContext(userId)
+	}, [userId])
+
+	return (
+		<TanStackQueryProvider.Provider {...queryContext}>
+			<ThemeProvider>
+				<NetworkProvider>
+					<RouterProvider router={router} />
+					<Toaster />
+				</NetworkProvider>
+			</ThemeProvider>
+		</TanStackQueryProvider.Provider>
+	)
+}
+
+// Render the app
 const rootElement = document.getElementById('app')
 if (rootElement && !rootElement.innerHTML) {
 	const root = createRoot(rootElement)
 	root.render(
 		<StrictMode>
 			<ErrorBoundary>
-				<TanStackQueryProvider.Provider {...TanStackQueryProviderContext}>
-					<ThemeProvider>
-						<NetworkProvider>
-							<AuthProvider>
-								<RouterProvider router={router} />
-								<Toaster />
-							</AuthProvider>
-						</NetworkProvider>
-					</ThemeProvider>
-				</TanStackQueryProvider.Provider>
+				<QueryClientProvider client={bootstrapQueryClient}>
+					<AuthProvider>
+						<AppWithProviders />
+					</AuthProvider>
+				</QueryClientProvider>
 			</ErrorBoundary>
 		</StrictMode>,
 	)
 }
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals()

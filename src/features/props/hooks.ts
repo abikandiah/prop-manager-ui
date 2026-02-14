@@ -3,7 +3,7 @@ import { propKeys } from './keys'
 import { propsApi } from './api'
 import type { CreatePropPayload, Prop, UpdatePropPayload } from '@/domain/property'
 import { stableRequestId } from '@/lib/offline-types'
-import { generateOptimisticId, nowIso } from '@/lib/util'
+import { nowIso } from '@/lib/util'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
 
 // --- Helpers: Optimistic Updates ---
@@ -13,7 +13,7 @@ function applyCreate(
 	payload: CreatePropPayload,
 ): Prop {
 	const optimistic: Prop = {
-		id: generateOptimisticId(),
+		id: payload.id, // ✅ Use client-generated ID from payload
 		legalName: payload.legalName,
 		addressId: '', // unknown until server responds
 		address: null,

@@ -5,13 +5,8 @@ import {
 } from '@abumble/design-system/components/Sidebar'
 import { cn } from '@abumble/design-system/utils'
 import { UnderConstruction } from '@abumble/design-system/components/UnderConstruction'
-import {
-	Outlet,
-	createRootRouteWithContext,
-	useLocation,
-} from '@tanstack/react-router'
-import { WifiOff } from 'lucide-react'
-import type { QueryClient } from '@tanstack/react-query'
+import { Outlet, createRootRoute, useLocation } from '@tanstack/react-router'
+import { WifiOff, ServerOff } from 'lucide-react'
 import { AppSidebar } from '@/components/AppSidebar'
 import Footer from '@/components/Footer'
 import { config } from '@/config'
@@ -21,11 +16,7 @@ import { useAuth } from '@/contexts/auth'
 import { Register } from '@/components/Register'
 import { DelayedLoadingFallback, LoadingScreen } from '@/components/ui'
 
-interface MyRouterContext {
-	queryClient: QueryClient
-}
-
-export const Route = createRootRouteWithContext<MyRouterContext>()({
+export const Route = createRootRoute({
 	component: Root,
 })
 
@@ -98,16 +89,37 @@ function Root() {
 }
 
 function OfflineWarningBanner() {
+	const { isServerReachable, consecutiveFailures } = useNetwork()
+
 	return (
 		<MessageBanner
 			type="warning"
 			hideIcon
 			message={
-				<span className="flex items-center gap-2">
-					<WifiOff className="size-4 shrink-0" aria-hidden />
-					<span>
-						You're offline. Changes will sync when you're back online.
+				<span className="flex flex-col gap-1">
+					<span className="flex items-center gap-2">
+						{isServerReachable ? (
+							<>
+								<WifiOff className="size-4 shrink-0" aria-hidden />
+								<span>
+									You're offline. Changes will sync when you're back online.
+								</span>
+							</>
+						) : (
+							<>
+								<ServerOff className="size-4 shrink-0" aria-hidden />
+								<span>
+									Server unavailable. Changes will sync when the server is back
+									online.
+								</span>
+							</>
+						)}
 					</span>
+					{config.isDevelopment && consecutiveFailures > 0 && (
+						<span className="text-xs opacity-75">
+							Debug: {consecutiveFailures} consecutive failures
+						</span>
+					)}
 				</span>
 			}
 			className={cn('mb-4 md:-mt-2')}

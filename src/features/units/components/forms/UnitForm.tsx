@@ -15,6 +15,7 @@ import {
 	type UnitStatus,
 	type UpdateUnitPayload,
 } from '@/domain/unit'
+import { generateId } from '@/lib/util'
 
 type FormState = {
 	propertyId: string
@@ -120,6 +121,7 @@ export function UnitForm({
 	}
 
 	const buildCreatePayload = (): CreateUnitPayload => ({
+		id: generateId(), // ✅ Generate client-side ID for idempotency
 		propertyId: form.propertyId || propId || '',
 		unitNumber: form.unitNumber.trim(),
 		status: form.status,

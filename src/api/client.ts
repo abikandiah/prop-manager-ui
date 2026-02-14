@@ -44,16 +44,38 @@ api.interceptors.request.use((_config) => {
 	return _config
 })
 
-// Response Interceptor: Global Error Handling
+// Response Interceptor: Global Error Handling + Network Detection
 api.interceptors.response.use(
-	(response) => response,
+	(response) => {
+		// Report successful request to NetworkProvider
+		if (typeof (window as any).__reportRequestSuccess === 'function') {
+			;(window as any).__reportRequestSuccess()
+		}
+		return response
+	},
 	(error) => {
+		// Handle 401 Unauthorized
 		if (error.response?.status === 401) {
 			console.error('401 Unauthorized')
 			if (config.isDevelopment) {
 				clearDevToken()
 			}
 		}
+
+		// Report failed request to NetworkProvider
+		// Only report server errors and network errors (not 4xx client errors)
+		const shouldReport =
+			!error.response || // Network error
+			error.code === 'ECONNABORTED' || // Timeout
+			error.code === 'ERR_NETWORK' || // Network error
+			(error.response?.status >= 500 && error.response?.status < 600) // 5xx errors
+
+		if (shouldReport) {
+			if (typeof (window as any).__reportRequestFailure === 'function') {
+				;(window as any).__reportRequestFailure()
+			}
+		}
+
 		return Promise.reject(error)
 	},
 )

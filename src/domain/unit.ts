@@ -26,6 +26,7 @@ export interface Unit {
 }
 
 export interface CreateUnitPayload {
+	id: string // Client-generated UUID for idempotency
 	propertyId: string
 	unitNumber: string
 	status: UnitStatus

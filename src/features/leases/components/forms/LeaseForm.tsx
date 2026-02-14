@@ -16,6 +16,7 @@ import { useUnitsList } from '@/features/units'
 import { usePropsList } from '@/features/props'
 import { useLeaseTemplatesActive } from '@/features/lease-templates'
 import { LATE_FEE_TYPES } from '@/domain/lease'
+import { generateId } from '@/lib/util'
 
 type FormState = {
 	leaseTemplateId: string
@@ -122,6 +123,7 @@ export function LeaseForm({
 	}
 
 	const buildCreatePayload = (): CreateLeasePayload => ({
+		id: generateId(), // ✅ Generate client-side ID for idempotency
 		leaseTemplateId: form.leaseTemplateId,
 		propertyId: form.propertyId || propertyId || '',
 		unitId: form.unitId || unitId || '',

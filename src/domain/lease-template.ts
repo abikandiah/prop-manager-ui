@@ -19,6 +19,7 @@ export interface LeaseTemplate {
 // --- LeaseTemplate Requests ---
 
 export interface CreateLeaseTemplatePayload {
+	id: string // Client-generated UUID for idempotency
 	name: string
 	versionTag?: string | null
 	templateMarkdown: string

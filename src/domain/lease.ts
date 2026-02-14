@@ -43,6 +43,7 @@ export interface Lease {
 
 /** Stamps a new lease from a template */
 export interface CreateLeasePayload {
+	id: string // Client-generated UUID for idempotency
 	leaseTemplateId: string
 	unitId: string
 	propertyId: string

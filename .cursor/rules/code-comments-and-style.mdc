@@ -1,0 +1,273 @@
+---
+description: Code comment guidelines and style rules for maintainable, professional code
+alwaysApply: true
+---
+
+# Code Comments & Style
+
+Use this rule to maintain consistent, professional code comments throughout the codebase.
+
+## Comment Guidelines
+
+### No Emojis in Code
+
+**NEVER use emojis in code comments, console logs, or any code-level content.**
+
+```typescript
+// ❌ BAD - Don't use emojis in code
+// ✅ This function handles user authentication
+// 🚨 CRITICAL: Check permissions first
+console.log('✅ User created successfully')
+
+// ✅ GOOD - Use clear, descriptive text
+// This function handles user authentication
+// CRITICAL: Check permissions first
+console.log('[Success] User created successfully')
+```
+
+**Rationale:**
+- Emojis are fine for user-facing content (UI text, toasts, error messages)
+- Emojis are fine for documentation files (*.md)
+- Emojis are NOT appropriate for code comments or logs
+- Code should be professional, searchable, and work in all editors
+- Some tools and terminals don't render emojis correctly
+- Screen readers handle text better than emojis
+
+### When to Use Comments
+
+**DO comment:**
+- Complex business logic that isn't self-evident
+- Workarounds for known bugs or limitations
+- Performance optimizations that look unusual
+- Security considerations
+- External API contracts or data formats
+- Regex patterns or complex algorithms
+
+```typescript
+// GOOD - Explains non-obvious business rule
+// Health check requires 3 consecutive failures to prevent
+// false positives from transient network issues
+if (consecutiveFailures >= 3) {
+  setIsServerReachable(false)
+}
+
+// GOOD - Documents workaround
+// Safari doesn't support crypto.randomUUID() in insecure contexts,
+// fallback to polyfill for local development
+const id = crypto.randomUUID?.() ?? generateUUIDPolyfill()
+```
+
+**DON'T comment:**
+- Obvious code (the code itself is the documentation)
+- Commented-out code (use git history instead)
+- Redundant explanations of what the code does
+
+```typescript
+// ❌ BAD - Comment states the obvious
+// Set the user's name to the provided name
+setUserName(name)
+
+// ❌ BAD - Redundant
+// Return true if the user is an admin
+return user.role === 'admin'
+
+// ✅ GOOD - No comment needed, code is clear
+return user.role === 'admin'
+```
+
+### Comment Style
+
+**Use clear, concise language:**
+
+```typescript
+// ✅ GOOD - Clear and brief
+// Retry 404 errors - dependent mutation might be waiting for parent
+if (status === 404 && failureCount < 3) {
+  return true
+}
+
+// ❌ BAD - Overly verbose
+// In the event that we receive a 404 status code from the server,
+// and we haven't already attempted to retry this request more than
+// three times, we should retry because...
+```
+
+**Use proper capitalization and punctuation:**
+
+```typescript
+// ✅ GOOD - Proper sentence structure
+// Cancel in-flight queries to prevent race conditions.
+
+// ❌ BAD - Poor formatting
+// cancel in flight queries to prevent race conditions
+```
+
+**Use TODO/FIXME/NOTE markers appropriately:**
+
+```typescript
+// TODO: Add pagination support
+// FIXME: Race condition when multiple users edit simultaneously
+// NOTE: This regex must match the backend validation pattern
+// HACK: Workaround for Safari bug (remove after Safari 18)
+```
+
+### JSDoc for Public APIs
+
+Use JSDoc comments for:
+- Exported functions
+- Public class methods
+- Complex type definitions
+- Hook APIs
+
+```typescript
+/**
+ * Generate a new UUID for client-side ID generation.
+ * These are REAL IDs sent to the backend, not temporary optimistic IDs.
+ *
+ * @returns A v4 UUID string
+ */
+export function generateId(): string {
+  return crypto.randomUUID()
+}
+
+/**
+ * Custom hook for managing network connectivity state.
+ *
+ * @returns Object with isOnline boolean indicating combined network and server status
+ */
+export function useNetwork(): NetworkContextValue {
+  // ...
+}
+```
+
+### Inline Comments
+
+Place inline comments above the code they describe, not at the end of the line:
+
+```typescript
+// ✅ GOOD - Comment above
+// Reset failure count on successful request
+consecutiveFailures = 0
+
+// ❌ BAD - Comment at end of line (harder to read)
+consecutiveFailures = 0  // Reset failure count on successful request
+```
+
+Exception: Very short clarifications can go at the end:
+
+```typescript
+// ✅ OK - Brief clarification
+const timeout = 10000  // 10 seconds
+```
+
+## Console Logging
+
+### Log Prefixes
+
+Use consistent prefixes in square brackets for filtering and debugging:
+
+```typescript
+// ✅ GOOD - Clear, filterable prefixes
+console.log('[Network] Going offline:', reason)
+console.error('[Auth] Login failed:', error)
+console.warn('[Offline] Storage quota exceeded')
+console.debug('[Mutation] Retrying create property')
+
+// ❌ BAD - Emojis or inconsistent formatting
+console.log('🌐 Going offline')
+console.log('network: going offline')
+```
+
+### Log Levels
+
+Use appropriate log levels:
+
+```typescript
+// Info - Normal operation
+console.log('[Network] Server is reachable')
+
+// Warn - Something unexpected but handled
+console.warn('[Offline] Cache restore failed, using empty state')
+
+// Error - Something went wrong
+console.error('[Auth] Failed to refresh token:', error)
+
+// Debug - Verbose info for development
+console.debug('[Query] Cache hit for key:', queryKey)
+```
+
+### Structured Logging
+
+For complex state, log objects separately:
+
+```typescript
+// ✅ GOOD - Structured data
+console.log('[Network] State changed:', {
+  isOnline,
+  isServerReachable,
+  consecutiveFailures,
+  timestamp: Date.now(),
+})
+
+// ❌ BAD - Hard to read
+console.log(`[Network] State changed: isOnline=${isOnline}, isServerReachable=${isServerReachable}...`)
+```
+
+## Code Organization
+
+### File Header Comments
+
+Don't add file header comments unless the purpose isn't obvious from the file path:
+
+```typescript
+// ❌ BAD - Redundant
+// File: src/features/props/hooks.ts
+// Description: React Query hooks for properties
+
+// ✅ GOOD - No header needed, path is clear
+import { useQuery } from '@tanstack/react-query'
+// ...
+```
+
+### Section Dividers
+
+For long files, use simple comment dividers:
+
+```typescript
+// =============================================================================
+// Query Hooks
+// =============================================================================
+
+export function usePropsList() { ... }
+export function usePropById() { ... }
+
+// =============================================================================
+// Mutation Hooks
+// =============================================================================
+
+export function useCreateProp() { ... }
+export function useUpdateProp() { ... }
+```
+
+Or simpler:
+
+```typescript
+// --- Queries ---
+
+export function usePropsList() { ... }
+
+// --- Mutations ---
+
+export function useCreateProp() { ... }
+```
+
+## Summary
+
+- ❌ **No emojis in code** (comments, logs, variable names)
+- ✅ **Use emojis in user-facing UI** and markdown docs
+- ✅ **Comment complex logic**, not obvious code
+- ✅ **Use clear, concise language**
+- ✅ **Proper capitalization and punctuation**
+- ✅ **JSDoc for public APIs**
+- ✅ **Log prefixes in [brackets]**
+- ✅ **Appropriate log levels**

@@ -1,3 +1,4 @@
+/** API response for an address. Matches backend AddressView (Instant → ISO string). */
 export interface Address {
 	id: string
 	addressLine1: string
@@ -9,6 +10,7 @@ export interface Address {
 	latitude: number | null
 	longitude: number | null
 	createdAt: string
+	updatedAt: string
 }
 
 export interface CreatePropAddressPayload {

@@ -3,10 +3,6 @@ import { useNavigate } from '@tanstack/react-router'
 import { cn } from '@abumble/design-system/utils'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
-import { useCreateProp, usePropsList } from '@/features/props'
-import { config } from '@/config'
-import { formatAddress } from '@/lib/format'
-import { DelayedLoadingFallback } from '@/components/ui'
 import {
 	Table,
 	TableBody,
@@ -15,6 +11,10 @@ import {
 	TableHeader,
 	TableRow,
 } from '@abumble/design-system/components/Table'
+import { useCreateProp, usePropsList } from '@/features/props'
+import { config } from '@/config'
+import { formatAddress } from '@/lib/format'
+import { DelayedLoadingFallback } from '@/components/ui'
 
 export function PropsTableView() {
 	const navigate = useNavigate()

@@ -1,6 +1,7 @@
-import { Component, ReactNode } from 'react'
+import { Component } from 'react'
 import { Card, CardContent } from '@abumble/design-system/components/Card'
 import { Button } from '@abumble/design-system/components/Button'
+import type { ReactNode } from 'react'
 
 interface ErrorBoundaryProps {
 	children: ReactNode

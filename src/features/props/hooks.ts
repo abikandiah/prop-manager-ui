@@ -1,10 +1,18 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { propKeys } from './keys'
 import { propsApi } from './api'
-import type { CreatePropPayload, Prop, UpdatePropPayload } from '@/domain/property'
+import type {
+	CreatePropPayload,
+	CreatePropRequest,
+	Prop,
+	UpdatePropPayload,
+} from '@/domain/property'
 import { stableRequestId } from '@/lib/offline-types'
-import { nowIso } from '@/lib/util'
+import { generateId, nowIso } from '@/lib/util'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
+
+/** Payload for create without id (hook adds it for optimistic update; request body matches CreatePropRequest). */
+export type CreatePropPayloadWithoutId = CreatePropRequest
 
 // --- Helpers: Optimistic Updates ---
 
@@ -102,14 +110,15 @@ export function usePropDetail(id: string | null) {
 export function useCreateProp() {
 	const queryClient = useQueryClient()
 
-	return useMutation({
+	const mutation = useMutation({
 		mutationKey: ['createProp'],
 		networkMode: 'online',
 		mutationFn: (payload: CreatePropPayload) => {
 			const requestId = stableRequestId(['createProp'], payload)
-			return propsApi.create(payload, { [IDEMPOTENCY_HEADER]: requestId })
+			const { id: _id, ...body } = payload
+			return propsApi.create(body, { [IDEMPOTENCY_HEADER]: requestId })
 		},
-		onMutate: async (payload) => {
+		onMutate: async (payload: CreatePropPayload) => {
 			await queryClient.cancelQueries({ queryKey: propKeys.list() })
 			const previousProps = queryClient.getQueryData<Array<Prop>>(
 				propKeys.list(),
@@ -127,6 +136,14 @@ export function useCreateProp() {
 			queryClient.invalidateQueries({ queryKey: propKeys.all })
 		},
 	})
+
+	return {
+		...mutation,
+		mutate: (payload: CreatePropPayloadWithoutId, options?: Parameters<typeof mutation.mutate>[1]) =>
+			mutation.mutate({ ...payload, id: generateId() }, options),
+		mutateAsync: (payload: CreatePropPayloadWithoutId, options?: Parameters<typeof mutation.mutateAsync>[1]) =>
+			mutation.mutateAsync({ ...payload, id: generateId() }, options),
+	}
 }
 
 export function useUpdateProp() {

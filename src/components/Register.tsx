@@ -47,7 +47,7 @@ export const Register = () => {
 			<MessageBanner
 				type="info"
 				message="This is a dev project. It is not intended for business or commercial use.
-				 No warranty or support is provided. User at risk."
+				 No warranty or support is provided. Use at own risk."
 				className="w-full max-w-md rounded"
 			/>
 

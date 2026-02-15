@@ -1,27 +1,17 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { Button } from '@abumble/design-system/components/Button'
 import { Input } from '@abumble/design-system/components/Input'
 import { toast } from 'sonner'
-import {
-	ADDRESS_FORM_INITIAL,
-	AddressFormFields
-
-} from './AddressFormFields'
-import type {AddressFormValue} from './AddressFormFields';
-import type {CreatePropPayload, Prop, PropertyType, UpdatePropPayload} from '@/domain/property';
-import { useCreateProp, useUpdateProp } from '@/features/props/hooks'
-import {
-
-	PROPERTY_TYPES
-
-
-
-} from '@/domain/property'
 import { DialogFooter } from '@abumble/design-system/components/Dialog'
 import { Label } from '@abumble/design-system/components/Label'
 import { Select } from '@abumble/design-system/components/Select'
-import { generateId } from '@/lib/util'
+import { Textarea } from '@abumble/design-system/components/Textarea'
+import { ADDRESS_FORM_INITIAL, AddressFormFields } from './AddressFormFields'
+import type { AddressFormValue } from './AddressFormFields'
+import type { CreatePropPayload, Prop, PropertyType } from '@/domain/property'
+import { useCreateProp, useUpdateProp } from '@/features/props/hooks'
+import { PROPERTY_TYPES } from '@/domain/property'
 
 type FormState = {
 	legalName: string
@@ -42,6 +32,8 @@ const initialForm: FormState = {
 	totalArea: '',
 	yearBuilt: '',
 }
+
+const MAX_YEAR_BUILT = new Date().getFullYear() + 1
 
 function propToFormState(prop: Prop): FormState {
 	return {
@@ -111,114 +103,133 @@ export function PropsForm({
 		yearBuilt,
 	} = form
 
+	const syncedInitialIdRef = useRef<string | undefined>(initialProp?.id)
 	useEffect(() => {
-		if (initialProp) {
-			setForm(propToFormState(initialProp))
-		} else {
-			setForm(initialForm)
-		}
+		const nextId = initialProp?.id
+		if (syncedInitialIdRef.current === nextId) return
+		syncedInitialIdRef.current = nextId
+		setForm(initialProp ? propToFormState(initialProp) : initialForm)
 	}, [initialProp])
 
-	const updateAddress = (field: keyof AddressFormValue, value: string) =>
-		setForm((prev) => ({
-			...prev,
-			address: { ...prev.address, [field]: value },
-		}))
+	const updateAddress = useCallback(
+		(field: keyof AddressFormValue, value: string) => {
+			setForm((prev) => ({
+				...prev,
+				address: { ...prev.address, [field]: value },
+			}))
+		},
+		[],
+	)
 
 	const validationError = validatePropForm(legalName, address)
 	const canSubmit = validationError === null
 	const pending = createProp.isPending || updateProp.isPending
 
 	type FormFieldName = Exclude<keyof FormState, 'address'>
-	const onFormChange = (
-		e: React.ChangeEvent<
-			HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-		>,
-	) => {
-		const { name, value } = e.target
-		const field = name as FormFieldName
-		if (field in initialForm) {
-			setForm((prev) => ({
-				...prev,
-				[field]: field === 'propertyType' ? (value as PropertyType) : value,
-			}))
-		}
-	}
-
-	const buildPayload = (): CreatePropPayload & UpdatePropPayload => ({
-		legalName: legalName.trim(),
-		address: {
-			addressLine1: address.addressLine1.trim(),
-			addressLine2: address.addressLine2.trim() || undefined,
-			city: address.city.trim(),
-			stateProvinceRegion: address.stateProvinceRegion.trim(),
-			postalCode: address.postalCode.trim(),
-			countryCode: address.countryCode.trim().toUpperCase(),
-		},
-		propertyType,
-		description: description.trim() || undefined,
-		parcelNumber: parcelNumber.trim() || undefined,
-		totalArea: totalArea.trim() ? parseInt(totalArea, 10) : undefined,
-		yearBuilt: yearBuilt.trim() ? parseInt(yearBuilt, 10) : undefined,
-		// version is required for updates (optimistic locking); ignored on create
-		version: initialProp?.version ?? 0,
-	})
-
-	const handleSubmit = (e: React.SubmitEvent) => {
-		e.preventDefault()
-		const err = validatePropForm(legalName, address)
-		if (err) {
-			toast.error(err)
-			return
-		}
-
-		// Validate numeric fields
-		if (totalArea.trim() && isNaN(parseInt(totalArea, 10))) {
-			toast.error('Total area must be a valid number')
-			return
-		}
-		if (yearBuilt.trim() && isNaN(parseInt(yearBuilt, 10))) {
-			toast.error('Year built must be a valid number')
-			return
-		}
-
-		const payload = buildPayload()
-
-		if (isEdit && initialProp) {
-			updateProp.mutate(
-				{ id: initialProp.id, payload },
-				{
-					onSuccess: () => {
-						toast.success('Property updated')
-						onSuccess?.()
-					},
-					onError: (err) => {
-						toast.error(err.message || 'Failed to update property')
-					},
-				},
-			)
-		} else {
-			// ✅ Generate client-side ID for idempotency
-			const createPayload: CreatePropPayload = {
-				...payload,
-				id: generateId(),
+	const onFormChange = useCallback(
+		(
+			e: React.ChangeEvent<
+				HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+			>,
+		) => {
+			const { name, value } = e.target
+			const field = name as FormFieldName
+			if (field in initialForm) {
+				setForm((prev) => ({
+					...prev,
+					[field]: field === 'propertyType' ? (value as PropertyType) : value,
+				}))
 			}
-			createProp.mutate(createPayload, {
-				onSuccess: (data) => {
-					setForm(initialForm)
-					toast.success('Property created successfully')
-					if (onSuccess) {
-						onSuccess(data)
-					} else {
-						navigate({ to: '/props/$id', params: { id: data.id } })
-					}
+		},
+		[],
+	)
+
+	const handleSubmit = useCallback(
+		(e: React.SubmitEvent<HTMLFormElement>) => {
+			e.preventDefault()
+			const validationErr = validatePropForm(legalName, address)
+			if (validationErr) {
+				toast.error(validationErr)
+				return
+			}
+			if (totalArea.trim() && isNaN(parseInt(totalArea, 10))) {
+				toast.error('Total area must be a valid number')
+				return
+			}
+			if (yearBuilt.trim() && isNaN(parseInt(yearBuilt, 10))) {
+				toast.error('Year built must be a valid number')
+				return
+			}
+
+			const payload: Omit<CreatePropPayload, 'id'> & { version: number } = {
+				legalName: legalName.trim(),
+				address: {
+					addressLine1: address.addressLine1.trim(),
+					addressLine2: address.addressLine2.trim() || undefined,
+					city: address.city.trim(),
+					stateProvinceRegion: address.stateProvinceRegion.trim(),
+					postalCode: address.postalCode.trim(),
+					countryCode: address.countryCode.trim().toUpperCase(),
 				},
-				onError: (err) => {
-					toast.error(`Failed to create property: ${err.message || 'Unknown'}`)
-				},
-			})
-		}
-	}
+				propertyType,
+				description: description.trim() || undefined,
+				parcelNumber: parcelNumber.trim() || undefined,
+				totalArea: totalArea.trim() ? parseInt(totalArea, 10) : undefined,
+				yearBuilt: yearBuilt.trim() ? parseInt(yearBuilt, 10) : undefined,
+				version: initialProp?.version ?? 0,
+			}
+
+			if (isEdit) {
+				updateProp.mutate(
+					{ id: initialProp.id, payload },
+					{
+						onSuccess: () => {
+							toast.success('Property updated')
+							onSuccess?.()
+						},
+						onError: (error) => {
+							toast.error(error.message || 'Failed to update property')
+						},
+					},
+				)
+			} else {
+				createProp.mutate(
+					payload,
+					{
+						onSuccess: (data) => {
+							setForm(initialForm)
+							toast.success('Property created successfully')
+							if (onSuccess) {
+								onSuccess(data)
+							} else {
+								navigate({ to: '/props/$id', params: { id: data.id } })
+							}
+						},
+						onError: (error) => {
+							toast.error(
+								`Failed to create property: ${error.message || 'Unknown'}`,
+							)
+						},
+					},
+				)
+			}
+		},
+		[
+			legalName,
+			address,
+			propertyType,
+			description,
+			parcelNumber,
+			totalArea,
+			yearBuilt,
+			isEdit,
+			initialProp,
+			createProp,
+			updateProp,
+			onSuccess,
+			navigate,
+		],
+	)
 
 	return (
 		<form onSubmit={handleSubmit} className="space-y-4 pt-4">
@@ -256,7 +267,7 @@ export function PropsForm({
 			</div>
 			<div className="space-y-2">
 				<Label htmlFor="description">Description (optional)</Label>
-				<textarea
+				<Textarea
 					id="description"
 					name="description"
 					value={description}
@@ -264,7 +275,7 @@ export function PropsForm({
 					placeholder="Notes about this property"
 					maxLength={2000}
 					rows={3}
-					className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+					className="min-h-[80px]"
 				/>
 			</div>
 			<AddressFormFields value={address} onChange={updateAddress} />
@@ -288,7 +299,7 @@ export function PropsForm({
 						name="yearBuilt"
 						type="number"
 						min={1800}
-						max={new Date().getFullYear() + 1}
+						max={MAX_YEAR_BUILT}
 						value={yearBuilt}
 						onChange={onFormChange}
 						placeholder="Optional"

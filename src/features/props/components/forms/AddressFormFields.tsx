@@ -1,5 +1,6 @@
 import { Input } from '@abumble/design-system/components/Input'
 import { Label } from '@abumble/design-system/components/Label'
+
 export const ADDRESS_FORM_INITIAL = {
 	addressLine1: '',
 	addressLine2: '',
@@ -37,7 +38,10 @@ export function AddressFormFields({ value: address, onChange }: Props) {
 			<div className="grid gap-4">
 				<div className="space-y-1.5">
 					<Label htmlFor="addressLine1" className="text-foreground">
-						Street Address <span className="text-destructive" aria-hidden>*</span>
+						Street Address{' '}
+						<span className="text-destructive" aria-hidden>
+							*
+						</span>
 					</Label>
 					<Input
 						id="addressLine1"
@@ -65,7 +69,10 @@ export function AddressFormFields({ value: address, onChange }: Props) {
 				<div className="grid grid-cols-2 gap-4">
 					<div className="space-y-1.5">
 						<Label htmlFor="countryCode" className="text-foreground">
-							Country <span className="text-destructive" aria-hidden>*</span>
+							Country{' '}
+							<span className="text-destructive" aria-hidden>
+								*
+							</span>
 						</Label>
 						<Input
 							id="countryCode"
@@ -79,7 +86,10 @@ export function AddressFormFields({ value: address, onChange }: Props) {
 					</div>
 					<div className="space-y-1.5">
 						<Label htmlFor="stateProvinceRegion" className="text-foreground">
-							Province / State <span className="text-destructive" aria-hidden>*</span>
+							Province / State{' '}
+							<span className="text-destructive" aria-hidden>
+								*
+							</span>
 						</Label>
 						<Input
 							id="stateProvinceRegion"
@@ -94,7 +104,10 @@ export function AddressFormFields({ value: address, onChange }: Props) {
 				<div className="grid grid-cols-2 gap-4">
 					<div className="space-y-1.5">
 						<Label htmlFor="city" className="text-foreground">
-							City <span className="text-destructive" aria-hidden>*</span>
+							City{' '}
+							<span className="text-destructive" aria-hidden>
+								*
+							</span>
 						</Label>
 						<Input
 							id="city"
@@ -107,7 +120,10 @@ export function AddressFormFields({ value: address, onChange }: Props) {
 					</div>
 					<div className="space-y-1.5">
 						<Label htmlFor="postalCode" className="text-foreground">
-							Zip / Postal Code <span className="text-destructive" aria-hidden>*</span>
+							Zip / Postal Code{' '}
+							<span className="text-destructive" aria-hidden>
+								*
+							</span>
 						</Label>
 						<Input
 							id="postalCode"

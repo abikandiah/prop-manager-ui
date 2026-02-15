@@ -1,11 +1,11 @@
 import { BaseService } from '@/api/base-service'
 import type {
 	Prop,
-	CreatePropPayload,
+	CreatePropRequest,
 	UpdatePropPayload,
 } from '@/domain/property'
 
-class PropsApi extends BaseService<Prop, CreatePropPayload, UpdatePropPayload> {
+class PropsApi extends BaseService<Prop, CreatePropRequest, UpdatePropPayload> {
 	constructor() {
 		super('props')
 	}

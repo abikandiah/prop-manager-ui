@@ -2,13 +2,6 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@abumble/design-system/components/Button'
 import { FileCheck, SendHorizontal, Undo2, XCircle } from 'lucide-react'
-import type { Lease } from '@/domain/lease'
-import {
-	useSubmitLeaseForReview,
-	useActivateLease,
-	useRevertLeaseToDraft,
-	useTerminateLease,
-} from '@/features/leases'
 import {
 	Dialog,
 	DialogContent,
@@ -17,6 +10,13 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '@abumble/design-system/components/Dialog'
+import type { Lease } from '@/domain/lease'
+import {
+	useActivateLease,
+	useRevertLeaseToDraft,
+	useSubmitLeaseForReview,
+	useTerminateLease,
+} from '@/features/leases'
 
 interface LeaseStatusActionsProps {
 	lease: Lease

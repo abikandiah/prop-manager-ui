@@ -11,10 +11,11 @@ export const PROPERTY_TYPES = [
 ] as const
 export type PropertyType = (typeof PROPERTY_TYPES)[number]
 
+/** API response for a property. Matches backend PropResponse (addressId/address null when address not set). */
 export interface Prop {
 	id: string
 	legalName: string
-	addressId: string
+	addressId: string | null
 	address: Address | null
 	propertyType: PropertyType
 	description: string | null
@@ -28,7 +29,8 @@ export interface Prop {
 }
 
 export interface CreatePropPayload {
-	id: string // Client-generated UUID for idempotency
+	/** Client-generated id for optimistic update and idempotency key; not sent in request body. */
+	id: string
 	legalName: string
 	address: CreatePropAddressPayload
 	propertyType: PropertyType
@@ -37,8 +39,14 @@ export interface CreatePropPayload {
 	ownerId?: string | null
 	totalArea?: number | null
 	yearBuilt?: number | null
+	/** Optional; shared form shape with UpdatePropPayload. Not sent to create API. */
+	version?: number
 }
 
+/** Request body for POST /props. Matches backend CreatePropRequest (no id; server generates it). */
+export type CreatePropRequest = Omit<CreatePropPayload, 'id'>
+
+/** Request body for PATCH /props/{id}. Matches backend UpdatePropRequest (version required for optimistic locking). */
 export interface UpdatePropPayload {
 	legalName?: string
 	address?: CreatePropAddressPayload

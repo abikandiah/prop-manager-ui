@@ -13,9 +13,10 @@ function applyCreate(
 	payload: CreateUnitPayload,
 ): Unit {
 	const optimistic: Unit = {
-		id: payload.id, // ✅ Use client-generated ID from payload
+		id: payload.id, // Use client-generated ID from payload
 		propertyId: payload.propertyId,
 		unitNumber: payload.unitNumber,
+		unitType: payload.unitType ?? null,
 		status: payload.status,
 		description: payload.description ?? null,
 		rentAmount: payload.rentAmount ?? null,
@@ -32,7 +33,8 @@ function applyCreate(
 	}
 	queryClient.setQueryData(
 		unitKeys.list(payload.propertyId),
-		(old: Array<Unit> | undefined) => (old ? [...old, optimistic] : [optimistic]),
+		(old: Array<Unit> | undefined) =>
+			old ? [...old, optimistic] : [optimistic],
 	)
 	return optimistic
 }
@@ -206,7 +208,7 @@ export function useUpdateUnit() {
 			return { previousUnits, previousUnit, propertyId }
 		},
 		onError: (err, { id }, context) => {
-			if (context?.previousUnits && context?.propertyId) {
+			if (context?.previousUnits && context.propertyId) {
 				queryClient.setQueryData(
 					unitKeys.list(context.propertyId),
 					context.previousUnits,
@@ -255,7 +257,7 @@ export function useDeleteUnit() {
 			return { previousUnits, previousUnit, propertyId: variables.propertyId }
 		},
 		onError: (err, variables, context) => {
-			if (context?.previousUnits && context?.propertyId) {
+			if (context?.previousUnits && context.propertyId) {
 				queryClient.setQueryData(
 					unitKeys.list(context.propertyId),
 					context.previousUnits,

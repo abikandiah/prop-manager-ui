@@ -22,6 +22,7 @@ function applyCreate(
 		versionTag: payload.versionTag ?? null,
 		version: 0,
 		templateMarkdown: payload.templateMarkdown,
+		templateParameters: payload.templateParameters ?? {},
 		defaultLateFeeType: payload.defaultLateFeeType ?? null,
 		defaultLateFeeAmount: payload.defaultLateFeeAmount ?? null,
 		defaultNoticePeriodDays: payload.defaultNoticePeriodDays ?? null,

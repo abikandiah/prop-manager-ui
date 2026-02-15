@@ -10,9 +10,11 @@ import { useCreateUnit, useUpdateUnit } from '@/features/units/hooks'
 import { usePropsList } from '@/features/props'
 import {
 	UNIT_STATUSES,
+	UNIT_TYPES,
 	type CreateUnitPayload,
 	type Unit,
 	type UnitStatus,
+	type UnitType,
 	type UpdateUnitPayload,
 } from '@/domain/unit'
 import { generateId } from '@/lib/util'
@@ -20,6 +22,7 @@ import { generateId } from '@/lib/util'
 type FormState = {
 	propertyId: string
 	unitNumber: string
+	unitType: UnitType | ''
 	status: UnitStatus
 	description: string
 	rentAmount: string
@@ -35,6 +38,7 @@ type FormState = {
 const initialFormState: FormState = {
 	propertyId: '',
 	unitNumber: '',
+	unitType: '',
 	status: 'VACANT',
 	description: '',
 	rentAmount: '',
@@ -51,6 +55,7 @@ function unitToFormState(unit: Unit): FormState {
 	return {
 		propertyId: unit.propertyId,
 		unitNumber: unit.unitNumber,
+		unitType: unit.unitType ?? '',
 		status: unit.status,
 		description: unit.description ?? '',
 		rentAmount: unit.rentAmount != null ? String(unit.rentAmount) : '',
@@ -112,7 +117,9 @@ export function UnitForm({
 					? checked
 					: name === 'status'
 						? (value as UnitStatus)
-						: value,
+						: name === 'unitType'
+							? (value as UnitType | '')
+							: value,
 		}))
 	}
 
@@ -124,6 +131,7 @@ export function UnitForm({
 		id: generateId(), // ✅ Generate client-side ID for idempotency
 		propertyId: form.propertyId || propId || '',
 		unitNumber: form.unitNumber.trim(),
+		unitType: form.unitType || undefined,
 		status: form.status,
 		description: form.description.trim() || undefined,
 		rentAmount: form.rentAmount.trim()
@@ -145,6 +153,7 @@ export function UnitForm({
 	const buildUpdatePayload = (): UpdateUnitPayload => ({
 		propertyId: form.propertyId,
 		unitNumber: form.unitNumber.trim(),
+		unitType: form.unitType || null,
 		status: form.status,
 		description: form.description.trim() || null,
 		rentAmount: form.rentAmount.trim() ? parseFloat(form.rentAmount) : null,
@@ -287,6 +296,22 @@ export function UnitForm({
 					{UNIT_STATUSES.map((s) => (
 						<option key={s} value={s}>
 							{s.replace(/_/g, ' ')}
+						</option>
+					))}
+				</Select>
+			</div>
+			<div className="space-y-2">
+				<Label htmlFor="unitType">Unit type (optional)</Label>
+				<Select
+					id="unitType"
+					name="unitType"
+					value={form.unitType}
+					onChange={handleChange}
+				>
+					<option value="">Not specified</option>
+					{UNIT_TYPES.map((t) => (
+						<option key={t} value={t}>
+							{t.replace(/_/g, ' ')}
 						</option>
 					))}
 				</Select>

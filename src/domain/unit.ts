@@ -6,10 +6,23 @@ export const UNIT_STATUSES = [
 ] as const
 export type UnitStatus = (typeof UNIT_STATUSES)[number]
 
+export const UNIT_TYPES = [
+	'APARTMENT',
+	'CONDO',
+	'STUDIO',
+	'LOFT',
+	'SUITE',
+	'RETAIL',
+	'WAREHOUSE',
+	'OTHER',
+] as const
+export type UnitType = (typeof UNIT_TYPES)[number]
+
 export interface Unit {
 	id: string
 	propertyId: string
 	unitNumber: string
+	unitType: UnitType | null
 	status: UnitStatus
 	description: string | null
 	rentAmount: number | null
@@ -29,6 +42,7 @@ export interface CreateUnitPayload {
 	id: string // Client-generated UUID for idempotency
 	propertyId: string
 	unitNumber: string
+	unitType?: UnitType | null
 	status: UnitStatus
 	description?: string | null
 	rentAmount?: number | null
@@ -44,6 +58,7 @@ export interface CreateUnitPayload {
 export interface UpdateUnitPayload {
 	propertyId?: string
 	unitNumber?: string
+	unitType?: UnitType | null
 	status?: UnitStatus
 	description?: string | null
 	rentAmount?: number | null

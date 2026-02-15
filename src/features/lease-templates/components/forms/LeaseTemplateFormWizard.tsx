@@ -26,6 +26,7 @@ type FormState = {
 	name: string
 	versionTag: string
 	templateMarkdown: string
+	templateParameters: Record<string, string>
 	defaultLateFeeType: LateFeeType | ''
 	defaultLateFeeAmount: string
 	defaultNoticePeriodDays: string
@@ -36,6 +37,7 @@ const initialFormState: FormState = {
 	name: '',
 	versionTag: '',
 	templateMarkdown: '',
+	templateParameters: {},
 	defaultLateFeeType: '',
 	defaultLateFeeAmount: '',
 	defaultNoticePeriodDays: '',
@@ -47,6 +49,7 @@ function templateToFormState(template: LeaseTemplate): FormState {
 		name: template.name,
 		versionTag: template.versionTag ?? '',
 		templateMarkdown: template.templateMarkdown,
+		templateParameters: template.templateParameters ?? {},
 		defaultLateFeeType: template.defaultLateFeeType ?? '',
 		defaultLateFeeAmount:
 			template.defaultLateFeeAmount != null
@@ -65,6 +68,10 @@ function formToPayloadFields(form: FormState) {
 		name: form.name.trim(),
 		versionTag: trimOrUndefined(form.versionTag),
 		templateMarkdown: form.templateMarkdown.trim(),
+		templateParameters:
+			Object.keys(form.templateParameters).length > 0
+				? form.templateParameters
+				: undefined,
 		defaultLateFeeType: form.defaultLateFeeType || undefined,
 		defaultLateFeeAmount: parseFloatOrUndefined(form.defaultLateFeeAmount),
 		defaultNoticePeriodDays: parseIntOrUndefined(

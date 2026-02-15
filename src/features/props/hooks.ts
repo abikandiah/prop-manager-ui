@@ -105,6 +105,14 @@ export function usePropDetail(id: string | null) {
 	})
 }
 
+export function usePropUnits(propId: string | null) {
+	return useQuery({
+		queryKey: propKeys.units(propId!),
+		queryFn: () => propsApi.listUnits(propId!),
+		enabled: propId != null,
+	})
+}
+
 // --- Mutations ---
 
 export function useCreateProp() {

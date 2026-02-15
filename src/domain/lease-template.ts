@@ -8,6 +8,7 @@ export interface LeaseTemplate {
 	versionTag: string | null
 	version: number
 	templateMarkdown: string
+	templateParameters: Record<string, string>
 	defaultLateFeeType: LateFeeType | null
 	defaultLateFeeAmount: number | null
 	defaultNoticePeriodDays: number | null
@@ -23,6 +24,7 @@ export interface CreateLeaseTemplatePayload {
 	name: string
 	versionTag?: string | null
 	templateMarkdown: string
+	templateParameters?: Record<string, string>
 	defaultLateFeeType?: LateFeeType | null
 	defaultLateFeeAmount?: number | null
 	defaultNoticePeriodDays?: number | null
@@ -32,6 +34,7 @@ export interface UpdateLeaseTemplatePayload {
 	name?: string
 	versionTag?: string | null
 	templateMarkdown?: string
+	templateParameters?: Record<string, string>
 	defaultLateFeeType?: LateFeeType | null
 	defaultLateFeeAmount?: number | null
 	defaultNoticePeriodDays?: number | null

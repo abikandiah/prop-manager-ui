@@ -25,7 +25,7 @@ type FormState = {
 
 const initialForm: FormState = {
 	legalName: '',
-	propertyType: 'CONDO_UNIT',
+	propertyType: 'CONDOMINIUM',
 	description: '',
 	address: ADDRESS_FORM_INITIAL,
 	parcelNumber: '',

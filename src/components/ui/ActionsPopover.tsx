@@ -1,11 +1,6 @@
-import { useState } from 'react'
-import { MoreVertical, Pencil, Trash2 } from 'lucide-react'
-import { Button } from '@abumble/design-system/components/Button'
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from '@abumble/design-system/components/Popover'
+import { Pencil, Trash2 } from 'lucide-react'
+import { ActionsPopover as DesignSystemActionsPopover } from '@abumble/design-system/components/ActionsPopover'
+import { useMemo } from 'react'
 
 export interface ActionsPopoverProps {
 	label?: string
@@ -17,6 +12,9 @@ export interface ActionsPopoverProps {
 	stopTriggerPropagation?: boolean
 }
 
+/**
+ * Edit + Delete row actions. Wraps design-system ActionsPopover with a fixed Edit/Delete API.
+ */
 export function ActionsPopover({
 	label = 'Actions',
 	onEdit,
@@ -24,59 +22,33 @@ export function ActionsPopover({
 	isDeleteDisabled = false,
 	stopTriggerPropagation = false,
 }: ActionsPopoverProps) {
-	const [open, setOpen] = useState(false)
+	const items = useMemo(
+		() => [
+			...(onEdit != null
+				? [
+						{
+							label: 'Edit' as const,
+							icon: <Pencil className="size-4 shrink-0" />,
+							onClick: onEdit,
+						},
+					]
+				: []),
+			{
+				label: 'Delete' as const,
+				icon: <Trash2 className="size-4 shrink-0" />,
+				onClick: onDelete,
+				variant: 'destructive' as const,
+				disabled: isDeleteDisabled,
+			},
+		],
+		[onEdit, onDelete, isDeleteDisabled],
+	)
 
 	return (
-		<Popover open={open} onOpenChange={setOpen}>
-			<PopoverTrigger asChild>
-				<Button
-					type="button"
-					variant="ghost"
-					size="icon"
-					className="size-8 shrink-0"
-					aria-label={label}
-					onClick={
-						stopTriggerPropagation ? (e) => e.stopPropagation() : undefined
-					}
-				>
-					<MoreVertical className="size-4" />
-				</Button>
-			</PopoverTrigger>
-			<PopoverContent align="end" className="w-40 p-0 mt-1">
-				<ul className="flex flex-col gap-0.5 p-1.5">
-					{onEdit != null && (
-						<li>
-							<Button
-								variant="ghost"
-								size="sm"
-								className="w-full justify-start gap-2"
-								onClick={() => {
-									setOpen(false)
-									onEdit()
-								}}
-							>
-								<Pencil className="size-4 shrink-0" />
-								Edit
-							</Button>
-						</li>
-					)}
-					<li>
-						<Button
-							variant="ghost"
-							size="sm"
-							className="w-full justify-start gap-2 text-destructive hover:text-destructive"
-							onClick={() => {
-								setOpen(false)
-								onDelete()
-							}}
-							disabled={isDeleteDisabled}
-						>
-							<Trash2 className="size-4 shrink-0" />
-							Delete
-						</Button>
-					</li>
-				</ul>
-			</PopoverContent>
-		</Popover>
+		<DesignSystemActionsPopover
+			label={label}
+			items={items}
+			stopTriggerPropagation={stopTriggerPropagation}
+		/>
 	)
 }

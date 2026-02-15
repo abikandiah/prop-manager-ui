@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
+import { Pencil, Trash2 } from 'lucide-react'
 import { LeaseForm } from '../forms/LeaseForm'
 import type { Lease, LeaseStatus } from '@/domain/lease'
-import { Badge } from '@/components/ui/badge'
+import { Badge } from '@abumble/design-system/components/Badge'
 import {
 	Table,
 	TableBody,
@@ -12,7 +13,7 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from '@/components/ui/table'
+} from '@abumble/design-system/components/Table'
 import {
 	ActionsPopover,
 	ConfirmDeleteDialog,
@@ -25,6 +26,7 @@ import {
 	useLeasesByUnitId,
 	useLeasesList,
 } from '@/features/leases'
+import { config } from '@/config'
 import { formatCurrency, formatDate } from '@/lib/format'
 
 function LeaseRowActions({
@@ -57,9 +59,21 @@ function LeaseRowActions({
 		<>
 			<ActionsPopover
 				label="Lease actions"
-				onEdit={isDraft ? onEdit : undefined}
-				onDelete={() => setDeleteConfirmOpen(true)}
-				isDeleteDisabled={deleteLease.isPending}
+				items={[
+					{
+						label: 'Edit',
+						icon: <Pencil className="size-4" />,
+						onClick: onEdit,
+						disabled: !isDraft,
+					},
+					{
+						label: 'Delete',
+						icon: <Trash2 className="size-4" />,
+						onClick: () => setDeleteConfirmOpen(true),
+						variant: 'destructive',
+						disabled: deleteLease.isPending,
+					},
+				]}
 				stopTriggerPropagation
 			/>
 			<ConfirmDeleteDialog
@@ -165,7 +179,11 @@ export function LeasesTableView({
 	)
 
 	return (
-		<DelayedLoadingFallback isLoading={isLoading} fallback={skeletonTable}>
+		<DelayedLoadingFallback
+			isLoading={isLoading}
+			delayMs={config.loadingFallbackDelayMs}
+			fallback={skeletonTable}
+		>
 			<>
 				<div className="rounded border bg-card overflow-hidden">
 					<Table>

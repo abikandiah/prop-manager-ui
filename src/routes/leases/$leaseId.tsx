@@ -1,9 +1,10 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
+import { Pencil, Trash2 } from 'lucide-react'
+import { Badge } from '@abumble/design-system/components/Badge'
 import type { Lease } from '@/domain/lease'
-import { Badge } from '@/components/ui/badge'
 import { useUnitDetail } from '@/features/units'
 import { usePropDetail } from '@/features/props'
 import {
@@ -21,6 +22,7 @@ import {
 	FormDialog,
 	TextLink,
 } from '@/components/ui'
+import { config } from '@/config'
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
 
 export const Route = createFileRoute('/leases/$leaseId')({
@@ -65,9 +67,21 @@ function LeaseActions({ lease, onEdit }: { lease: Lease; onEdit: () => void }) {
 		<>
 			<ActionsPopover
 				label="Lease actions"
-				onEdit={handleEdit}
-				onDelete={() => setDeleteConfirmOpen(true)}
-				isDeleteDisabled={deleteLease.isPending}
+				items={[
+					{
+						label: 'Edit',
+						icon: <Pencil className="size-4" />,
+						onClick: handleEdit,
+						disabled: !isDraft,
+					},
+					{
+						label: 'Delete',
+						icon: <Trash2 className="size-4" />,
+						onClick: () => setDeleteConfirmOpen(true),
+						variant: 'destructive',
+						disabled: deleteLease.isPending,
+					},
+				]}
 			/>
 			<ConfirmDeleteDialog
 				open={deleteConfirmOpen}
@@ -126,7 +140,11 @@ function LeaseDetailPage() {
 	)
 
 	return (
-		<DelayedLoadingFallback isLoading={isLoading} fallback={skeleton}>
+		<DelayedLoadingFallback
+			isLoading={isLoading}
+			delayMs={config.loadingFallbackDelayMs}
+			fallback={skeleton}
+		>
 			{isError || !lease ? (
 				<CenteredEmptyState
 					title="Lease not found"
@@ -140,6 +158,7 @@ function LeaseDetailPage() {
 			) : (
 				<div className="flex flex-col gap-6">
 					<BannerHeader
+						linkComponent={Link}
 						backLink={{ label: 'Back to leases' }}
 						title={lease.leaseTemplateName || 'Lease'}
 						description={

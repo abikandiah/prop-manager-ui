@@ -45,6 +45,7 @@ function Root() {
 		altContent = (
 			<DelayedLoadingFallback
 				isLoading={isLoadingUser}
+				delayMs={config.loadingFallbackDelayMs}
 				fallback={<LoadingScreen />}
 			>
 				{null}

@@ -1,7 +1,8 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
+import { Pencil, Trash2 } from 'lucide-react'
 import { usePropDetail } from '@/features/props'
 import { useUnitDetail, useDeleteUnit, UnitForm } from '@/features/units'
 import type { Unit } from '@/domain/unit'
@@ -14,6 +15,7 @@ import {
 	FormDialog,
 	TextLink,
 } from '@/components/ui'
+import { config } from '@/config'
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
 
 export const Route = createFileRoute('/units/$unitId')({
@@ -51,9 +53,20 @@ function UnitActions({
 		<>
 			<ActionsPopover
 				label="Unit actions"
-				onEdit={onEdit}
-				onDelete={() => setDeleteConfirmOpen(true)}
-				isDeleteDisabled={deleteUnit.isPending}
+				items={[
+					{
+						label: 'Edit',
+						icon: <Pencil className="size-4" />,
+						onClick: onEdit,
+					},
+					{
+						label: 'Delete',
+						icon: <Trash2 className="size-4" />,
+						onClick: () => setDeleteConfirmOpen(true),
+						variant: 'destructive',
+						disabled: deleteUnit.isPending,
+					},
+				]}
 			/>
 			<ConfirmDeleteDialog
 				open={deleteConfirmOpen}
@@ -111,7 +124,11 @@ function UnitDetailPage() {
 	)
 
 	return (
-		<DelayedLoadingFallback isLoading={isLoading} fallback={skeleton}>
+		<DelayedLoadingFallback
+			isLoading={isLoading}
+			delayMs={config.loadingFallbackDelayMs}
+			fallback={skeleton}
+		>
 			{isError || !unit ? (
 				<CenteredEmptyState
 					title="Unit not found"
@@ -129,6 +146,7 @@ function UnitDetailPage() {
 			) : (
 				<div className="flex flex-col gap-6">
 					<BannerHeader
+						linkComponent={Link}
 						backLink={{ label: 'Back to units' }}
 						title={`Unit ${unit.unitNumber}`}
 						description={

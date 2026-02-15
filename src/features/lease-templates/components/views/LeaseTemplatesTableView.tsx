@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { cn } from '@abumble/design-system/utils'
-import { LeaseTemplateFormWizard } from '../forms/LeaseTemplateFormWizard'
-import type { LeaseTemplate } from '@/domain/lease-template'
+import { Pencil, Trash2 } from 'lucide-react'
 import {
 	Table,
 	TableBody,
@@ -11,18 +10,15 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from '@/components/ui/table'
-import {
-	ActionsPopover,
-	ConfirmDeleteDialog,
-	DelayedLoadingFallback,
-	FormDialog,
-} from '@/components/ui'
+} from '@abumble/design-system/components/Table'
+import { LeaseTemplateFormWizard } from '../forms/LeaseTemplateFormWizard'
+import type { LeaseTemplate } from '@/domain/lease-template'
 import {
 	useDeleteLeaseTemplate,
 	useLeaseTemplatesActive,
 	useLeaseTemplatesList,
 } from '@/features/lease-templates/hooks'
+import { config } from '@/config'
 import { formatDate } from '@/lib/format'
 
 function LeaseTemplateRowActions({
@@ -51,9 +47,20 @@ function LeaseTemplateRowActions({
 		<>
 			<ActionsPopover
 				label="Template actions"
-				onEdit={onEdit}
-				onDelete={() => setDeleteConfirmOpen(true)}
-				isDeleteDisabled={deleteTemplate.isPending}
+				items={[
+					{
+						label: 'Edit',
+						icon: <Pencil className="size-4" />,
+						onClick: onEdit,
+					},
+					{
+						label: 'Delete',
+						icon: <Trash2 className="size-4" />,
+						onClick: () => setDeleteConfirmOpen(true),
+						variant: 'destructive',
+						disabled: deleteTemplate.isPending,
+					},
+				]}
 				stopTriggerPropagation
 			/>
 			<ConfirmDeleteDialog
@@ -159,7 +166,11 @@ export function LeaseTemplatesTableView({
 	)
 
 	return (
-		<DelayedLoadingFallback isLoading={isLoading} fallback={skeletonTable}>
+		<DelayedLoadingFallback
+			isLoading={isLoading}
+			delayMs={config.loadingFallbackDelayMs}
+			fallback={skeletonTable}
+		>
 			<>
 				<div className="rounded border bg-card overflow-hidden">
 					<Table>

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
+import { Pencil, Trash2 } from 'lucide-react'
 import {
 	Table,
 	TableBody,
@@ -9,7 +10,7 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from '@/components/ui/table'
+} from '@abumble/design-system/components/Table'
 import {
 	ActionsPopover,
 	ConfirmDeleteDialog,
@@ -18,6 +19,7 @@ import {
 } from '@/components/ui'
 import { useUnitsByPropId, useUnitsList, useDeleteUnit } from '@/features/units'
 import type { Unit } from '@/domain/unit'
+import { config } from '@/config'
 import { formatCurrency } from '@/lib/format'
 import { UnitForm } from '../forms/UnitForm'
 
@@ -44,9 +46,20 @@ function UnitRowActions({ unit, onEdit }: { unit: Unit; onEdit: () => void }) {
 		<>
 			<ActionsPopover
 				label="Unit actions"
-				onEdit={onEdit}
-				onDelete={() => setDeleteConfirmOpen(true)}
-				isDeleteDisabled={deleteUnit.isPending}
+				items={[
+					{
+						label: 'Edit',
+						icon: <Pencil className="size-4" />,
+						onClick: onEdit,
+					},
+					{
+						label: 'Delete',
+						icon: <Trash2 className="size-4" />,
+						onClick: () => setDeleteConfirmOpen(true),
+						variant: 'destructive',
+						disabled: deleteUnit.isPending,
+					},
+				]}
 				stopTriggerPropagation
 			/>
 			<ConfirmDeleteDialog
@@ -134,7 +147,11 @@ export function UnitsTableView({ propId }: UnitsTableViewProps) {
 	)
 
 	return (
-		<DelayedLoadingFallback isLoading={isLoading} fallback={skeletonTable}>
+		<DelayedLoadingFallback
+			isLoading={isLoading}
+			delayMs={config.loadingFallbackDelayMs}
+			fallback={skeletonTable}
+		>
 			<>
 			<div className="rounded border bg-card overflow-hidden">
 				<Table>

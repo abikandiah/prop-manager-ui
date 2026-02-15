@@ -1,17 +1,19 @@
-import { cn } from '@abumble/design-system/utils'
 import { Link } from '@tanstack/react-router'
-import { ChevronLeft } from 'lucide-react'
+import { BackLink as DesignSystemBackLink } from '@abumble/design-system/components/BackLink'
 
 export interface BackLinkProps {
 	/** Target path. Defaults to ".." (parent route). */
 	to?: string
 	/** Link text, e.g. "Back to properties". */
 	label: string
-	/** When true (default), replace current history entry instead of pushing. Keeps browser back consistent. */
+	/** When true (default), replace current history entry instead of pushing. */
 	replace?: boolean
 	className?: string
 }
 
+/**
+ * Back link with chevron. Wraps design-system BackLink with TanStack Router Link.
+ */
 export function BackLink({
 	to = '..',
 	label,
@@ -19,16 +21,8 @@ export function BackLink({
 	className,
 }: BackLinkProps) {
 	return (
-		<Link
-			to={to}
-			replace={replace}
-			className={cn(
-				'inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground',
-				className,
-			)}
-		>
-			<ChevronLeft className="size-4 shrink-0" aria-hidden />
-			<span>{label}</span>
-		</Link>
+		<DesignSystemBackLink asChild label={label}>
+			<Link to={to} replace={replace} className={className} />
+		</DesignSystemBackLink>
 	)
 }

@@ -91,11 +91,54 @@ export function ExternalSite({
 }
 
 export * from './ActionsPopover'
-export * from './ConfirmDeleteDialog'
-export * from './DelayedLoadingFallback'
-export * from './FieldsTable'
-export * from './page-header'
+export {
+	ConfirmDeleteDialog,
+	type ConfirmDeleteDialogProps,
+} from '@abumble/design-system/components/ConfirmDeleteDialog'
+export {
+	DelayedLoadingFallback,
+	type DelayedLoadingFallbackProps,
+} from '@abumble/design-system/components/DelayedLoadingFallback'
+export { Badge } from '@abumble/design-system/components/Badge'
+export {
+	Table,
+	TableHeader,
+	TableBody,
+	TableFooter,
+	TableHead,
+	TableRow,
+	TableCell,
+	TableCaption,
+} from '@abumble/design-system/components/Table'
+export { Checkbox } from '@abumble/design-system/components/Checkbox'
+export { Label } from '@abumble/design-system/components/Label'
+export { Select } from '@abumble/design-system/components/Select'
+export { Textarea } from '@abumble/design-system/components/Textarea'
+export {
+	PageHeader,
+	PageDescription,
+} from '@abumble/design-system/components/PageHeader'
+export {
+	FieldsTable,
+	type FieldRow,
+	type FieldsTableProps,
+} from '@abumble/design-system/components/FieldsTable'
 export * from './BackLink'
 export * from './BannerHeader'
 export * from './Toaster'
-export * from './dialog'
+export {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogOverlay,
+	DialogPortal,
+	DialogTitle,
+	DialogTrigger,
+	FormDialog,
+	type FormDialogProps,
+	FORM_DIALOG_CONTENT_CLASS,
+	WizardStepper,
+} from '@abumble/design-system/components/Dialog'

@@ -4,6 +4,7 @@ import { cn } from '@abumble/design-system/utils'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { useCreateProp, usePropsList } from '@/features/props'
+import { config } from '@/config'
 import { formatAddress } from '@/lib/format'
 import { DelayedLoadingFallback } from '@/components/ui'
 import {
@@ -13,7 +14,7 @@ import {
 	TableHead,
 	TableHeader,
 	TableRow,
-} from '@/components/ui/table'
+} from '@abumble/design-system/components/Table'
 
 export function PropsTableView() {
 	const navigate = useNavigate()
@@ -39,6 +40,7 @@ export function PropsTableView() {
 				<TableBody>
 					<DelayedLoadingFallback
 						isLoading={isLoading}
+						delayMs={config.loadingFallbackDelayMs}
 						fallback={Array.from({ length: 5 }).map((_, i) => (
 							<TableRow key={i}>
 								<TableCell>

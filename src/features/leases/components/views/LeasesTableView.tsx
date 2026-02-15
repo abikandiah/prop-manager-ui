@@ -11,14 +11,11 @@ import {
 	TableHeader,
 	TableRow,
 } from '@abumble/design-system/components/Table'
+import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
+import { FormDialog } from '@abumble/design-system/components/Dialog'
 import { LeaseForm } from '../forms/LeaseForm'
 import type { Lease, LeaseStatus } from '@/domain/lease'
-import {
-	ActionsPopover,
-	ConfirmDeleteDialog,
-	DelayedLoadingFallback,
-	FormDialog,
-} from '@/components/ui'
+import { EntityActions } from '@/components/ui'
 import {
 	useDeleteLease,
 	useLeasesByPropertyId,
@@ -35,43 +32,28 @@ function LeaseRowActions({
 	lease: Lease
 	onEdit: () => void
 }) {
-	const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
 	const deleteLease = useDeleteLease()
 	const isDraft = lease.status === 'DRAFT'
 
-	const handleDeleteConfirm = () => {
-		deleteLease.mutate(
-			{ id: lease.id, unitId: lease.unitId, propertyId: lease.propertyId },
-			{
-				onSuccess: () => {
-					setDeleteConfirmOpen(false)
-					toast.success('Lease deleted')
-				},
-				onError: (err) => {
-					toast.error(err.message || 'Failed to delete lease')
-				},
-			},
-		)
-	}
-
 	return (
-		<>
-			<ActionsPopover
-				label="Lease actions"
-				onEdit={isDraft ? onEdit : undefined}
-				onDelete={() => setDeleteConfirmOpen(true)}
-				isDeleteDisabled={deleteLease.isPending}
-				stopTriggerPropagation
-			/>
-			<ConfirmDeleteDialog
-				open={deleteConfirmOpen}
-				onOpenChange={setDeleteConfirmOpen}
-				title="Delete lease?"
-				description="This lease will be removed. This can't be undone."
-				onConfirm={handleDeleteConfirm}
-				isPending={deleteLease.isPending}
-			/>
-		</>
+		<EntityActions
+			label="Lease actions"
+			onEdit={isDraft ? onEdit : undefined}
+			onDelete={() => {
+				deleteLease.mutate(
+					{ id: lease.id, unitId: lease.unitId, propertyId: lease.propertyId },
+					{
+						onSuccess: () => toast.success('Lease deleted'),
+						onError: (err) =>
+							toast.error(err.message || 'Failed to delete lease'),
+					},
+				)
+			}}
+			isDeletePending={deleteLease.isPending}
+			deleteTitle="Delete lease?"
+			deleteDescription="This lease will be removed. This can't be undone."
+			stopTriggerPropagation
+		/>
 	)
 }
 

@@ -5,7 +5,10 @@ import {
 } from '@abumble/design-system/components/Card'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { Hammer } from 'lucide-react'
-import { PageDescription, PageHeader } from '@/components/ui'
+import {
+	PageDescription,
+	PageHeader,
+} from '@abumble/design-system/components/PageHeader'
 
 export const Route = createFileRoute('/dev/')({
 	component: DevIndex,

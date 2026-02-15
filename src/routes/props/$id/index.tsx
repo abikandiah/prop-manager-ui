@@ -1,18 +1,19 @@
-import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
+import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
+import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
+import { FormDialog } from '@abumble/design-system/components/Dialog'
 import type { Prop } from '@/domain/property'
-import { AddressDisplay, PropsForm, useDeleteProp, usePropDetail } from '@/features/props'
-import { formatAddress } from '@/lib/format'
 import {
-	ActionsPopover,
-	BannerHeader,
-	ConfirmDeleteDialog,
-	DelayedLoadingFallback,
-	FormDialog,
-	TextLink,
-} from '@/components/ui'
+	AddressDisplay,
+	PropsForm,
+	useDeleteProp,
+	usePropDetail,
+} from '@/features/props'
+import { formatAddress } from '@/lib/format'
+import { EntityActions, TextLink } from '@/components/ui'
 import { config } from '@/config'
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
 
@@ -21,41 +22,30 @@ export const Route = createFileRoute('/props/$id/')({
 })
 
 function PropActions({ prop, onEdit }: { prop: Prop; onEdit: () => void }) {
-	const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
 	const navigate = useNavigate()
 	const deleteProp = useDeleteProp()
 
-	const handleDeleteConfirm = () => {
-		deleteProp.mutate(prop.id, {
-			onSuccess: () => {
-				setDeleteConfirmOpen(false)
-				toast.success('Property deleted')
-				navigate({ to: '/props' })
-			},
-			onError: (err) => {
-				toast.error(err.message || 'Failed to delete property')
-			},
-		})
-	}
-
 	return (
-		<>
-			<ActionsPopover
-				onEdit={onEdit}
-				onDelete={() => setDeleteConfirmOpen(true)}
-				isDeleteDisabled={deleteProp.isPending}
-			/>
-			<ConfirmDeleteDialog
-				open={deleteConfirmOpen}
-				onOpenChange={setDeleteConfirmOpen}
-				title="Delete property?"
-				description={
-					<>{prop.legalName} will be removed. This can&apos;t be undone.</>
-				}
-				onConfirm={handleDeleteConfirm}
-				isPending={deleteProp.isPending}
-			/>
-		</>
+		<EntityActions
+			label="Property actions"
+			onEdit={onEdit}
+			onDelete={() => {
+				deleteProp.mutate(prop.id, {
+					onSuccess: () => {
+						toast.success('Property deleted')
+						navigate({ to: '/props' })
+					},
+					onError: (err) => {
+						toast.error(err.message || 'Failed to delete property')
+					},
+				})
+			}}
+			isDeletePending={deleteProp.isPending}
+			deleteTitle="Delete property?"
+			deleteDescription={
+				<>{prop.legalName} will be removed. This can&apos;t be undone.</>
+			}
+		/>
 	)
 }
 
@@ -67,7 +57,7 @@ function PropLayout() {
 
 	useEffect(() => {
 		if (isError) {
-			toast.error(`Error loading property: ${error?.message || 'Unknown'}`)
+			toast.error(`Error loading property: ${error.message || 'Unknown'}`)
 		}
 	}, [isError, error])
 
@@ -88,7 +78,10 @@ function PropLayout() {
 				</div>
 				<div className="grid grid-cols-2 gap-6">
 					{[1, 2, 3].map((i) => (
-						<div key={i} className={i === 3 ? 'col-span-2 space-y-2' : 'space-y-2'}>
+						<div
+							key={i}
+							className={i === 3 ? 'col-span-2 space-y-2' : 'space-y-2'}
+						>
 							<Skeleton className="h-4 w-24" />
 							<Skeleton className="h-6 w-full" />
 						</div>
@@ -113,7 +106,7 @@ function PropLayout() {
 					title="Property not found"
 					description={
 						isError
-							? (error?.message || 'Failed to load property')
+							? error.message || 'Failed to load property'
 							: 'The property you were looking for was not found.'
 					}
 					action={<TextLink to="/props">Back to properties</TextLink>}
@@ -206,7 +199,10 @@ function PropLayout() {
 								Location
 							</label>
 							<div className="mt-2">
-								<AddressDisplay address={prop.address} className="text-foreground" />
+								<AddressDisplay
+									address={prop.address}
+									className="text-foreground"
+								/>
 							</div>
 						</div>
 

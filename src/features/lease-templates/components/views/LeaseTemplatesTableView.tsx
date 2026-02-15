@@ -17,12 +17,9 @@ import {
 	useLeaseTemplatesActive,
 	useLeaseTemplatesList,
 } from '@/features/lease-templates/hooks'
-import {
-	ActionsPopover,
-	ConfirmDeleteDialog,
-	DelayedLoadingFallback,
-	FormDialog,
-} from '@/components/ui'
+import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
+import { FormDialog } from '@abumble/design-system/components/Dialog'
+import { EntityActions } from '@/components/ui'
 import { config } from '@/config'
 import { formatDate } from '@/lib/format'
 
@@ -33,45 +30,29 @@ function LeaseTemplateRowActions({
 	template: LeaseTemplate
 	onEdit: () => void
 }) {
-	const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
 	const deleteTemplate = useDeleteLeaseTemplate()
 
-	const handleDeleteConfirm = () => {
-		deleteTemplate.mutate(template.id, {
-			onSuccess: () => {
-				setDeleteConfirmOpen(false)
-				toast.success('Template deleted')
-			},
-			onError: (err) => {
-				toast.error(err.message || 'Failed to delete template')
-			},
-		})
-	}
-
 	return (
-		<>
-			<ActionsPopover
-				label="Template actions"
-				onEdit={onEdit}
-				onDelete={() => setDeleteConfirmOpen(true)}
-				isDeleteDisabled={deleteTemplate.isPending}
-				stopTriggerPropagation
-			/>
-			<ConfirmDeleteDialog
-				open={deleteConfirmOpen}
-				onOpenChange={setDeleteConfirmOpen}
-				title="Delete template?"
-				description={
-					<>
-						Template &quot;{template.name}&quot; will be removed. Existing
-						leases stamped from this template will keep their content but the
-						template reference will be cleared.
-					</>
-				}
-				onConfirm={handleDeleteConfirm}
-				isPending={deleteTemplate.isPending}
-			/>
-		</>
+		<EntityActions
+			label="Template actions"
+			onEdit={onEdit}
+			onDelete={() => {
+				deleteTemplate.mutate(template.id, {
+					onSuccess: () => toast.success('Template deleted'),
+					onError: (err) => toast.error(err.message || 'Failed to delete template'),
+				})
+			}}
+			isDeletePending={deleteTemplate.isPending}
+			deleteTitle="Delete template?"
+			deleteDescription={
+				<>
+					Template &quot;{template.name}&quot; will be removed. Existing
+					leases stamped from this template will keep their content but the
+					template reference will be cleared.
+				</>
+			}
+			stopTriggerPropagation
+		/>
 	)
 }
 

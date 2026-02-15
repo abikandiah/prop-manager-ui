@@ -6,7 +6,11 @@ import {
 	LeaseTemplateFormWizard,
 	LeaseTemplatesTableView,
 } from '@/features/lease-templates'
-import { BannerHeader, DialogTrigger, FormDialog } from '@/components/ui'
+import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
+import {
+	DialogTrigger,
+	FormDialog,
+} from '@abumble/design-system/components/Dialog'
 
 export const Route = createFileRoute('/leases/templates')({
 	component: RouteComponent,

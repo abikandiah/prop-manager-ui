@@ -1,19 +1,15 @@
-import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
-import { usePropDetail } from '@/features/props'
-import { useUnitDetail, useDeleteUnit, UnitForm } from '@/features/units'
 import type { Unit } from '@/domain/unit'
+import { usePropDetail } from '@/features/props'
+import { UnitForm, useDeleteUnit, useUnitDetail } from '@/features/units'
 import { formatCurrency } from '@/lib/format'
-import {
-	ActionsPopover,
-	BannerHeader,
-	ConfirmDeleteDialog,
-	DelayedLoadingFallback,
-	FormDialog,
-	TextLink,
-} from '@/components/ui'
+import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
+import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
+import { FormDialog } from '@abumble/design-system/components/Dialog'
+import { EntityActions, TextLink } from '@/components/ui'
 import { config } from '@/config'
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
 
@@ -29,46 +25,34 @@ function UnitActions({
 	onEdit: () => void
 }) {
 	const navigate = useNavigate()
-	const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
 	const deleteUnit = useDeleteUnit()
 
-	const handleDeleteConfirm = () => {
-		deleteUnit.mutate(
-			{ id: unit.id, propertyId: unit.propertyId },
-			{
-				onSuccess: () => {
-					setDeleteConfirmOpen(false)
-					toast.success('Unit deleted')
-					navigate({ to: '/units' })
-				},
-				onError: (err) => {
-					toast.error(err.message || 'Failed to delete unit')
-				},
-			},
-		)
-	}
-
 	return (
-		<>
-			<ActionsPopover
-				label="Unit actions"
-				onEdit={onEdit}
-				onDelete={() => setDeleteConfirmOpen(true)}
-				isDeleteDisabled={deleteUnit.isPending}
-			/>
-			<ConfirmDeleteDialog
-				open={deleteConfirmOpen}
-				onOpenChange={setDeleteConfirmOpen}
-				title="Delete unit?"
-				description={
-					<>
-						Unit {unit.unitNumber} will be removed. This can&apos;t be undone.
-					</>
-				}
-				onConfirm={handleDeleteConfirm}
-				isPending={deleteUnit.isPending}
-			/>
-		</>
+		<EntityActions
+			label="Unit actions"
+			onEdit={onEdit}
+			onDelete={() => {
+				deleteUnit.mutate(
+					{ id: unit.id, propertyId: unit.propertyId },
+					{
+						onSuccess: () => {
+							toast.success('Unit deleted')
+							navigate({ to: '/units' })
+						},
+						onError: (err) => {
+							toast.error(err.message || 'Failed to delete unit')
+						},
+					},
+				)
+			}}
+			isDeletePending={deleteUnit.isPending}
+			deleteTitle="Delete unit?"
+			deleteDescription={
+				<>
+					Unit {unit.unitNumber} will be removed. This can&apos;t be undone.
+				</>
+			}
+		/>
 	)
 }
 

@@ -2,8 +2,12 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Button } from '@abumble/design-system/components/Button'
+import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
+import {
+	DialogTrigger,
+	FormDialog,
+} from '@abumble/design-system/components/Dialog'
 import { PropsForm, PropsTableView } from '@/features/props'
-import { BannerHeader, DialogTrigger, FormDialog  } from '@/components/ui'
 
 export const Route = createFileRoute('/props/')({
 	component: RouteComponent,

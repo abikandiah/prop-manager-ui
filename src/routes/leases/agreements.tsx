@@ -3,7 +3,11 @@ import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Button } from '@abumble/design-system/components/Button'
 import { LeaseForm, LeasesTableView } from '@/features/leases'
-import { BannerHeader, DialogTrigger, FormDialog } from '@/components/ui'
+import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
+import {
+	DialogTrigger,
+	FormDialog,
+} from '@abumble/design-system/components/Dialog'
 
 export const Route = createFileRoute('/leases/agreements')({
 	component: RouteComponent,

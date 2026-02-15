@@ -14,7 +14,7 @@ import {
 import { useCreateProp, usePropsList } from '@/features/props'
 import { config } from '@/config'
 import { formatAddress } from '@/lib/format'
-import { DelayedLoadingFallback } from '@/components/ui'
+import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
 
 export function PropsTableView() {
 	const navigate = useNavigate()

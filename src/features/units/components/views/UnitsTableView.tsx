@@ -10,59 +10,40 @@ import {
 	TableHeader,
 	TableRow,
 } from '@abumble/design-system/components/Table'
-import {
-	ActionsPopover,
-	ConfirmDeleteDialog,
-	DelayedLoadingFallback,
-	FormDialog,
-} from '@/components/ui'
-import { useUnitsByPropId, useUnitsList, useDeleteUnit } from '@/features/units'
 import type { Unit } from '@/domain/unit'
+import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
+import { FormDialog } from '@abumble/design-system/components/Dialog'
+import { EntityActions } from '@/components/ui'
+import { useDeleteUnit, useUnitsByPropId, useUnitsList } from '@/features/units'
 import { config } from '@/config'
 import { formatCurrency } from '@/lib/format'
 import { UnitForm } from '../forms/UnitForm'
 
 function UnitRowActions({ unit, onEdit }: { unit: Unit; onEdit: () => void }) {
-	const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
 	const deleteUnit = useDeleteUnit()
 
-	const handleDeleteConfirm = () => {
-		deleteUnit.mutate(
-			{ id: unit.id, propertyId: unit.propertyId },
-			{
-				onSuccess: () => {
-					setDeleteConfirmOpen(false)
-					toast.success('Unit deleted')
-				},
-				onError: (err) => {
-					toast.error(err.message || 'Failed to delete unit')
-				},
-			},
-		)
-	}
-
 	return (
-		<>
-			<ActionsPopover
-				label="Unit actions"
-				onEdit={onEdit}
-				onDelete={() => setDeleteConfirmOpen(true)}
-				isDeleteDisabled={deleteUnit.isPending}
-				stopTriggerPropagation
-			/>
-			<ConfirmDeleteDialog
-				open={deleteConfirmOpen}
-				onOpenChange={setDeleteConfirmOpen}
-				title="Delete unit?"
-				description={
-					<>
-						Unit {unit.unitNumber} will be removed. This can&apos;t be undone.
-					</>
-				}
-				onConfirm={handleDeleteConfirm}
-				isPending={deleteUnit.isPending}
-			/>
-		</>
+		<EntityActions
+			label="Unit actions"
+			onEdit={onEdit}
+			onDelete={() => {
+				deleteUnit.mutate(
+					{ id: unit.id, propertyId: unit.propertyId },
+					{
+						onSuccess: () => toast.success('Unit deleted'),
+						onError: (err) => toast.error(err.message || 'Failed to delete unit'),
+					},
+				)
+			}}
+			isDeletePending={deleteUnit.isPending}
+			deleteTitle="Delete unit?"
+			deleteDescription={
+				<>
+					Unit {unit.unitNumber} will be removed. This can&apos;t be undone.
+				</>
+			}
+			stopTriggerPropagation
+		/>
 	)
 }
 

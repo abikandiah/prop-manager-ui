@@ -2,9 +2,12 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { UnitForm, UnitsTableView } from '@/features/units'
-import { BannerHeader } from '@/components/ui'
 import { Button } from '@abumble/design-system/components/Button'
-import { DialogTrigger, FormDialog } from '@/components/ui'
+import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
+import {
+	DialogTrigger,
+	FormDialog,
+} from '@abumble/design-system/components/Dialog'
 
 export const Route = createFileRoute('/units/')({
 	component: UnitsPage,

@@ -1,12 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 import {
+	FileCheck,
+	FileSignature,
+	LayoutGrid,
 	MessageSquare,
 	Package,
-	LayoutGrid,
-	FileSignature,
-	FileCheck,
 } from 'lucide-react'
-import { BannerHeader } from '@/components/ui'
+import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
 import { DashboardCard } from '@/components/DashboardCard'
 
 export const Route = createFileRoute('/')({

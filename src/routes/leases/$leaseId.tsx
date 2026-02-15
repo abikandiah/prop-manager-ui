@@ -13,14 +13,10 @@ import {
 	useLeaseDetail,
 } from '@/features/leases'
 import { formatAddress, formatCurrency, formatDate } from '@/lib/format'
-import {
-	ActionsPopover,
-	BannerHeader,
-	ConfirmDeleteDialog,
-	DelayedLoadingFallback,
-	FormDialog,
-	TextLink,
-} from '@/components/ui'
+import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
+import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
+import { FormDialog } from '@abumble/design-system/components/Dialog'
+import { EntityActions, TextLink } from '@/components/ui'
 import { config } from '@/config'
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
 
@@ -30,55 +26,35 @@ export const Route = createFileRoute('/leases/$leaseId')({
 
 function LeaseActions({ lease, onEdit }: { lease: Lease; onEdit: () => void }) {
 	const navigate = useNavigate()
-	const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false)
 	const deleteLease = useDeleteLease()
 	const isDraft = lease.status === 'DRAFT'
 
-	const handleDeleteConfirm = () => {
-		deleteLease.mutate(
-			{
-				id: lease.id,
-				unitId: lease.unitId,
-				propertyId: lease.propertyId,
-			},
-			{
-				onSuccess: () => {
-					setDeleteConfirmOpen(false)
-					toast.success('Lease deleted')
-					navigate({ to: '/leases/templates' })
-				},
-				onError: (err) => {
-					toast.error(err.message || 'Failed to delete lease')
-				},
-			},
-		)
-	}
-
-	const handleEdit = () => {
-		if (isDraft) {
-			onEdit()
-		} else {
-			toast.error('Only DRAFT leases can be edited')
-		}
-	}
-
 	return (
-		<>
-			<ActionsPopover
-				label="Lease actions"
-				onEdit={isDraft ? handleEdit : undefined}
-				onDelete={() => setDeleteConfirmOpen(true)}
-				isDeleteDisabled={deleteLease.isPending}
-			/>
-			<ConfirmDeleteDialog
-				open={deleteConfirmOpen}
-				onOpenChange={setDeleteConfirmOpen}
-				title="Delete lease?"
-				description="This lease will be removed. This can't be undone."
-				onConfirm={handleDeleteConfirm}
-				isPending={deleteLease.isPending}
-			/>
-		</>
+		<EntityActions
+			label="Lease actions"
+			onEdit={isDraft ? onEdit : undefined}
+			onDelete={() => {
+				deleteLease.mutate(
+					{
+						id: lease.id,
+						unitId: lease.unitId,
+						propertyId: lease.propertyId,
+					},
+					{
+						onSuccess: () => {
+							toast.success('Lease deleted')
+							navigate({ to: '/leases/templates' })
+						},
+						onError: (err) => {
+							toast.error(err.message || 'Failed to delete lease')
+						},
+					},
+				)
+			}}
+			isDeletePending={deleteLease.isPending}
+			deleteTitle="Delete lease?"
+			deleteDescription="This lease will be removed. This can't be undone."
+		/>
 	)
 }
 

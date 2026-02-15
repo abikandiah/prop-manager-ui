@@ -6,7 +6,8 @@ import {
 import { cn } from '@abumble/design-system/utils'
 import { UnderConstruction } from '@abumble/design-system/components/UnderConstruction'
 import { Outlet, createRootRoute, useLocation } from '@tanstack/react-router'
-import { WifiOff, ServerOff } from 'lucide-react'
+import { ServerOff, WifiOff } from 'lucide-react'
+import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
 import { AppSidebar } from '@/components/AppSidebar'
 import Footer from '@/components/Footer'
 import { config } from '@/config'
@@ -14,7 +15,7 @@ import Header from '@/components/Header'
 import { useNetwork } from '@/contexts/network'
 import { useAuth } from '@/contexts/auth'
 import { Register } from '@/components/Register'
-import { DelayedLoadingFallback, LoadingScreen } from '@/components/ui'
+import { LoadingScreen } from '@/components/ui'
 
 export const Route = createRootRoute({
 	component: Root,

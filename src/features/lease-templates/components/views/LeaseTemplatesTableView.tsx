@@ -76,10 +76,12 @@ export function LeaseTemplatesTableView({
 	const [editingTemplate, setEditingTemplate] = useState<LeaseTemplate | null>(
 		null,
 	)
-	const [wizardStep, setWizardStep] = useState<1 | 2>(1)
+	const [wizardStep, setWizardStep] = useState<1 | 2 | 3>(1)
 
-	const getStepTitle = (step: 1 | 2) => {
-		return step === 1 ? 'Template Details' : 'Template Content'
+	const getStepTitle = (step: 1 | 2 | 3) => {
+		if (step === 1) return 'Template Details'
+		if (step === 2) return 'Template Parameters'
+		return 'Template Content'
 	}
 
 	const handleEditClose = () => {
@@ -230,7 +232,7 @@ export function LeaseTemplatesTableView({
 						className="max-w-[calc(100vw-2rem)] sm:max-w-5xl"
 						wizard={{
 							currentStep: wizardStep,
-							totalSteps: 2,
+							totalSteps: 3,
 							stepTitle: getStepTitle(wizardStep),
 						}}
 					>

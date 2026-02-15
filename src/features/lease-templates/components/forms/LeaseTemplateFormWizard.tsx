@@ -4,6 +4,7 @@ import { Button } from '@abumble/design-system/components/Button'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
 import { DialogFooter } from '@abumble/design-system/components/Dialog'
 import { TemplateDetailsStep } from './TemplateDetailsStep'
+import { TemplateParametersStep } from './TemplateParametersStep'
 import { TemplateMarkdownStep } from './TemplateMarkdownStep'
 import type { LateFeeType } from '@/domain/lease'
 import type {
@@ -87,9 +88,9 @@ export interface LeaseTemplateFormWizardProps {
 	onCancel?: () => void
 	submitLabel?: string
 	/** Current wizard step (controlled by parent for FormDialog integration) */
-	step?: 1 | 2
+	step?: 1 | 2 | 3
 	/** Step change handler (controlled by parent for FormDialog integration) */
-	onStepChange?: (step: 1 | 2) => void
+	onStepChange?: (step: 1 | 2 | 3) => void
 }
 
 export function LeaseTemplateFormWizard({
@@ -101,7 +102,7 @@ export function LeaseTemplateFormWizard({
 	onStepChange,
 }: LeaseTemplateFormWizardProps) {
 	const isEdit = initialTemplate != null
-	const [internalStep, setInternalStep] = useState<1 | 2>(1)
+	const [internalStep, setInternalStep] = useState<1 | 2 | 3>(1)
 
 	// Use controlled step if provided, otherwise use internal state
 	const step = controlledStep ?? internalStep
@@ -129,6 +130,13 @@ export function LeaseTemplateFormWizard({
 	const handleMarkdownChange = useCallback((value: string) => {
 		setForm((prev) => ({ ...prev, templateMarkdown: value }))
 	}, [])
+
+	const handleParametersChange = useCallback(
+		(parameters: Record<string, string>) => {
+			setForm((prev) => ({ ...prev, templateParameters: parameters }))
+		},
+		[],
+	)
 
 	const buildCreatePayload = (): CreateLeaseTemplatePayload => ({
 		id: generateId(),
@@ -170,12 +178,16 @@ export function LeaseTemplateFormWizard({
 	const handleNext = useCallback(() => {
 		if (step === 1 && validateStep1()) {
 			setStep(2)
+		} else if (step === 2) {
+			setStep(3)
 		}
 	}, [step, form.name, form.defaultLateFeeAmount, form.defaultNoticePeriodDays])
 
 	const handleBack = useCallback(() => {
 		if (step === 2) {
 			setStep(1)
+		} else if (step === 3) {
+			setStep(2)
 		}
 	}, [step])
 
@@ -237,8 +249,16 @@ export function LeaseTemplateFormWizard({
 				/>
 			)}
 
-			{/* Step 2: Markdown Editor */}
+			{/* Step 2: Template Parameters */}
 			{step === 2 && (
+				<TemplateParametersStep
+					templateParameters={form.templateParameters}
+					onParametersChange={handleParametersChange}
+				/>
+			)}
+
+			{/* Step 3: Markdown Editor */}
+			{step === 3 && (
 				<TemplateMarkdownStep
 					value={form.templateMarkdown}
 					onChange={handleMarkdownChange}
@@ -254,7 +274,7 @@ export function LeaseTemplateFormWizard({
 				)}
 
 				<div className="flex gap-2">
-					{step === 2 && (
+					{(step === 2 || step === 3) && (
 						<Button
 							type="button"
 							variant="outline"
@@ -266,14 +286,14 @@ export function LeaseTemplateFormWizard({
 						</Button>
 					)}
 
-					{step === 1 && (
+					{(step === 1 || step === 2) && (
 						<Button type="button" onClick={handleNext}>
 							Next
 							<ArrowRight className="h-4 w-4" />
 						</Button>
 					)}
 
-					{step === 2 && (
+					{step === 3 && (
 						<Button type="submit" disabled={pending}>
 							{pending ? (
 								'Saving…'

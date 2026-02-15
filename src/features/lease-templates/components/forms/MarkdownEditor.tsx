@@ -2,7 +2,7 @@ import { memo, useCallback, useMemo, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { cn } from '@abumble/design-system/utils'
 import { Code, Eye } from 'lucide-react'
-import { Label } from '@/components/ui/label'
+import { Label } from '@abumble/design-system/components/Label'
 
 export interface MarkdownEditorProps {
 	value: string

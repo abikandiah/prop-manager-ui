@@ -1,9 +1,9 @@
 import { Input } from '@abumble/design-system/components/Input'
+import { Checkbox } from '@abumble/design-system/components/Checkbox'
+import { Label } from '@abumble/design-system/components/Label'
+import { Select } from '@abumble/design-system/components/Select'
 import type { LateFeeType } from '@/domain/lease'
 import { LATE_FEE_TYPES } from '@/domain/lease'
-import { Checkbox } from '@/components/ui/checkbox'
-import { Label } from '@/components/ui/label'
-import { Select } from '@/components/ui/select'
 
 export interface TemplateDetailsStepProps {
 	name: string
@@ -12,7 +12,9 @@ export interface TemplateDetailsStepProps {
 	defaultLateFeeAmount: string
 	defaultNoticePeriodDays: string
 	active: boolean
-	onFieldChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void
+	onFieldChange: (
+		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+	) => void
 	onActiveChange: (checked: boolean) => void
 	isEdit: boolean
 }

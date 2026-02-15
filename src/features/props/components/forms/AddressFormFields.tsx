@@ -1,5 +1,5 @@
 import { Input } from '@abumble/design-system/components/Input'
-import { Label } from '@/components/ui/label'
+import { Label } from '@abumble/design-system/components/Label'
 export const ADDRESS_FORM_INITIAL = {
 	addressLine1: '',
 	addressLine2: '',

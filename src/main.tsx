@@ -10,7 +10,7 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { ThemeProvider } from './contexts/theme'
 import { NetworkProvider } from './contexts/network'
 import { AuthProvider, useAuth } from './contexts/auth'
-import { Toaster } from './components/ui/Toaster'
+import { Toaster } from './components/ui'
 import reportWebVitals from './reportWebVitals'
 import './styles.css'
 

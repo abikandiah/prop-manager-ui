@@ -16,7 +16,7 @@ import {
 	DialogFooter,
 	DialogHeader,
 	DialogTitle,
-} from '@/components/ui/dialog'
+} from '@abumble/design-system/components/Dialog'
 
 interface LeaseStatusActionsProps {
 	lease: Lease

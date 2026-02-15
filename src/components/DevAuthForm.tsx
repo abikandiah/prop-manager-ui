@@ -7,8 +7,8 @@ import {
 import { Input } from '@abumble/design-system/components/Input'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { Label } from '@abumble/design-system/components/Label'
 import { api, setDevToken } from '@/api/client'
-import { Label } from '@/components/ui/label'
 
 interface DevAuthFormProps {
 	/** Called after successful login (e.g. to re-render parent or navigate). */
@@ -33,7 +33,7 @@ export function DevAuthForm({
 				username,
 				password,
 			})
-			const token = response.data?.token
+			const token = response.data.token
 
 			if (token) {
 				setDevToken(token)

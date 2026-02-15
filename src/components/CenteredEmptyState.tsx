@@ -6,8 +6,8 @@ import {
 	EmptyTitle,
 } from '@abumble/design-system/components/Empty'
 import { FileQuestionMark } from 'lucide-react'
-import type { ReactNode } from 'react'
 import { cn } from '@abumble/design-system/utils'
+import type { ReactNode } from 'react'
 
 export interface CenteredEmptyStateProps {
 	title: ReactNode

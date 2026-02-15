@@ -8,9 +8,9 @@ import type {
 	LateFeeType,
 	UpdateLeasePayload,
 } from '@/domain/lease'
-import { DialogFooter } from '@/components/ui/dialog'
-import { Label } from '@/components/ui/label'
-import { Select } from '@/components/ui/select'
+import { DialogFooter } from '@abumble/design-system/components/Dialog'
+import { Label } from '@abumble/design-system/components/Label'
+import { Select } from '@abumble/design-system/components/Select'
 import { useCreateLease, useUpdateLease } from '@/features/leases/hooks'
 import { useUnitsList } from '@/features/units'
 import { usePropsList } from '@/features/props'

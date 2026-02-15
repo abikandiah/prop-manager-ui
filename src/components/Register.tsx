@@ -8,9 +8,9 @@ import {
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { Checkbox } from '@abumble/design-system/components/Checkbox'
 import type { User } from '@/contexts/auth'
 import { useAuth } from '@/contexts/auth'
-import { Checkbox } from '@/components/ui/checkbox'
 import { TextLink } from '@/components/ui'
 import { api, getDevToken } from '@/api/client'
 import { config } from '@/config'
@@ -47,7 +47,7 @@ export const Register = () => {
 			<MessageBanner
 				type="info"
 				message="This is a dev project. It is not intended for business or commercial use.
-				 No warranty or support is provided. Use at risk."
+				 No warranty or support is provided. User at risk."
 				className="w-full max-w-md rounded"
 			/>
 

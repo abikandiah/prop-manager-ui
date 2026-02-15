@@ -7,10 +7,7 @@ import { config } from '@/config'
  * Avoids flashing skeletons/spinners on fast navigations or cached data.
  * Uses config.loadingFallbackDelayMs when delayMs is not passed (overridable via VITE_LOADING_FALLBACK_DELAY_MS).
  */
-export function useDelayedLoading(
-	loading: boolean,
-	delayMs?: number,
-): boolean {
+export function useDelayedLoading(loading: boolean, delayMs?: number): boolean {
 	const delay = delayMs ?? config.loadingFallbackDelayMs
 	const [showLoading, setShowLoading] = useState(false)
 

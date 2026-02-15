@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@abumble/design-system/components/Button'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
+import { DialogFooter } from '@abumble/design-system/components/Dialog'
 import { TemplateDetailsStep } from './TemplateDetailsStep'
 import { TemplateMarkdownStep } from './TemplateMarkdownStep'
 import type { LateFeeType } from '@/domain/lease'
@@ -10,7 +11,6 @@ import type {
 	LeaseTemplate,
 	UpdateLeaseTemplatePayload,
 } from '@/domain/lease-template'
-import { DialogFooter } from '@/components/ui/dialog'
 import {
 	useCreateLeaseTemplate,
 	useUpdateLeaseTemplate,

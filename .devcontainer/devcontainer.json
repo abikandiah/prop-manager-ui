@@ -1,7 +1,7 @@
 {
 	"name": "PropManage UI",
 	"image": "mcr.microsoft.com/devcontainers/javascript-node:20-bookworm",
-	"forwardPorts": [3000],
+	"forwardPorts": [3001],
 	"portsAttributes": {
 		"3000": {
 			"label": "Vite dev server",
@@ -33,6 +33,12 @@
 		{
 			"source": "${localWorkspaceFolder}/../prop-manager",
 			"target": "/workspaces/prop-manager",
+			"type": "bind",
+			"consistency": "cached"
+		},
+		{
+			"source": "${localWorkspaceFolder}/../design-system",
+			"target": "/workspaces/design-system",
 			"type": "bind",
 			"consistency": "cached"
 		},

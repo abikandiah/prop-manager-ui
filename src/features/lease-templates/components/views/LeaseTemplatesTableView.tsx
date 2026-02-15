@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { cn } from '@abumble/design-system/utils'
-import { Pencil, Trash2 } from 'lucide-react'
 import {
 	Table,
 	TableBody,
@@ -18,6 +17,12 @@ import {
 	useLeaseTemplatesActive,
 	useLeaseTemplatesList,
 } from '@/features/lease-templates/hooks'
+import {
+	ActionsPopover,
+	ConfirmDeleteDialog,
+	DelayedLoadingFallback,
+	FormDialog,
+} from '@/components/ui'
 import { config } from '@/config'
 import { formatDate } from '@/lib/format'
 
@@ -47,20 +52,9 @@ function LeaseTemplateRowActions({
 		<>
 			<ActionsPopover
 				label="Template actions"
-				items={[
-					{
-						label: 'Edit',
-						icon: <Pencil className="size-4" />,
-						onClick: onEdit,
-					},
-					{
-						label: 'Delete',
-						icon: <Trash2 className="size-4" />,
-						onClick: () => setDeleteConfirmOpen(true),
-						variant: 'destructive',
-						disabled: deleteTemplate.isPending,
-					},
-				]}
+				onEdit={onEdit}
+				onDelete={() => setDeleteConfirmOpen(true)}
+				isDeleteDisabled={deleteTemplate.isPending}
 				stopTriggerPropagation
 			/>
 			<ConfirmDeleteDialog

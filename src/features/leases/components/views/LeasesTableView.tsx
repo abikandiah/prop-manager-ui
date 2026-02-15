@@ -2,9 +2,6 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
-import { Pencil, Trash2 } from 'lucide-react'
-import { LeaseForm } from '../forms/LeaseForm'
-import type { Lease, LeaseStatus } from '@/domain/lease'
 import { Badge } from '@abumble/design-system/components/Badge'
 import {
 	Table,
@@ -14,6 +11,8 @@ import {
 	TableHeader,
 	TableRow,
 } from '@abumble/design-system/components/Table'
+import { LeaseForm } from '../forms/LeaseForm'
+import type { Lease, LeaseStatus } from '@/domain/lease'
 import {
 	ActionsPopover,
 	ConfirmDeleteDialog,
@@ -59,21 +58,9 @@ function LeaseRowActions({
 		<>
 			<ActionsPopover
 				label="Lease actions"
-				items={[
-					{
-						label: 'Edit',
-						icon: <Pencil className="size-4" />,
-						onClick: onEdit,
-						disabled: !isDraft,
-					},
-					{
-						label: 'Delete',
-						icon: <Trash2 className="size-4" />,
-						onClick: () => setDeleteConfirmOpen(true),
-						variant: 'destructive',
-						disabled: deleteLease.isPending,
-					},
-				]}
+				onEdit={isDraft ? onEdit : undefined}
+				onDelete={() => setDeleteConfirmOpen(true)}
+				isDeleteDisabled={deleteLease.isPending}
 				stopTriggerPropagation
 			/>
 			<ConfirmDeleteDialog

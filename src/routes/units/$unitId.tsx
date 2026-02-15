@@ -2,7 +2,6 @@ import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
-import { Pencil, Trash2 } from 'lucide-react'
 import { usePropDetail } from '@/features/props'
 import { useUnitDetail, useDeleteUnit, UnitForm } from '@/features/units'
 import type { Unit } from '@/domain/unit'
@@ -53,20 +52,9 @@ function UnitActions({
 		<>
 			<ActionsPopover
 				label="Unit actions"
-				items={[
-					{
-						label: 'Edit',
-						icon: <Pencil className="size-4" />,
-						onClick: onEdit,
-					},
-					{
-						label: 'Delete',
-						icon: <Trash2 className="size-4" />,
-						onClick: () => setDeleteConfirmOpen(true),
-						variant: 'destructive',
-						disabled: deleteUnit.isPending,
-					},
-				]}
+				onEdit={onEdit}
+				onDelete={() => setDeleteConfirmOpen(true)}
+				isDeleteDisabled={deleteUnit.isPending}
 			/>
 			<ConfirmDeleteDialog
 				open={deleteConfirmOpen}

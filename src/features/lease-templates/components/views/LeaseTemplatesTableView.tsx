@@ -10,6 +10,8 @@ import {
 	TableHeader,
 	TableRow,
 } from '@abumble/design-system/components/Table'
+import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
+import { FormDialog } from '@abumble/design-system/components/Dialog'
 import { LeaseTemplateFormWizard } from '../forms/LeaseTemplateFormWizard'
 import type { LeaseTemplate } from '@/domain/lease-template'
 import {
@@ -17,8 +19,6 @@ import {
 	useLeaseTemplatesActive,
 	useLeaseTemplatesList,
 } from '@/features/lease-templates/hooks'
-import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
-import { FormDialog } from '@abumble/design-system/components/Dialog'
 import { EntityActions } from '@/components/ui'
 import { config } from '@/config'
 import { formatDate } from '@/lib/format'
@@ -39,16 +39,17 @@ function LeaseTemplateRowActions({
 			onDelete={() => {
 				deleteTemplate.mutate(template.id, {
 					onSuccess: () => toast.success('Template deleted'),
-					onError: (err) => toast.error(err.message || 'Failed to delete template'),
+					onError: (err) =>
+						toast.error(err.message || 'Failed to delete template'),
 				})
 			}}
 			isDeletePending={deleteTemplate.isPending}
 			deleteTitle="Delete template?"
 			deleteDescription={
 				<>
-					Template &quot;{template.name}&quot; will be removed. Existing
-					leases stamped from this template will keep their content but the
-					template reference will be cleared.
+					Template &quot;{template.name}&quot; will be removed. Existing leases
+					stamped from this template will keep their content but the template
+					reference will be cleared.
 				</>
 			}
 			stopTriggerPropagation

@@ -2,15 +2,15 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Button } from '@abumble/design-system/components/Button'
-import {
-	LeaseTemplateFormWizard,
-	LeaseTemplatesTableView,
-} from '@/features/lease-templates'
 import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
 import {
 	DialogTrigger,
 	FormDialog,
 } from '@abumble/design-system/components/Dialog'
+import {
+	LeaseTemplateFormWizard,
+	LeaseTemplatesTableView,
+} from '@/features/lease-templates'
 
 export const Route = createFileRoute('/leases/templates')({
 	component: RouteComponent,

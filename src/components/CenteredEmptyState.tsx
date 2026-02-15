@@ -25,7 +25,7 @@ export function CenteredEmptyState({
 	className,
 }: CenteredEmptyStateProps) {
 	return (
-		<div className={cn('flex relative top-[100%] flex-col', className)}>
+		<div className={cn('flex relative top-full flex-col', className)}>
 			<Empty className="min-h-0 flex-1 w-full">
 				<EmptyHeader>
 					{icon ?? <FileQuestionMark size={128} className="mb-2" />}

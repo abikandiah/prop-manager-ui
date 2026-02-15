@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@abumble/design-system/components/Button'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
@@ -7,11 +7,7 @@ import { TemplateDetailsStep } from './TemplateDetailsStep'
 import { TemplateParametersStep } from './TemplateParametersStep'
 import { TemplateMarkdownStep } from './TemplateMarkdownStep'
 import type { LateFeeType } from '@/domain/lease'
-import type {
-	CreateLeaseTemplatePayload,
-	LeaseTemplate,
-	UpdateLeaseTemplatePayload,
-} from '@/domain/lease-template'
+import type { LeaseTemplate } from '@/domain/lease-template'
 import {
 	useCreateLeaseTemplate,
 	useUpdateLeaseTemplate,
@@ -50,7 +46,7 @@ function templateToFormState(template: LeaseTemplate): FormState {
 		name: template.name,
 		versionTag: template.versionTag ?? '',
 		templateMarkdown: template.templateMarkdown,
-		templateParameters: template.templateParameters ?? {},
+		templateParameters: template.templateParameters,
 		defaultLateFeeType: template.defaultLateFeeType ?? '',
 		defaultLateFeeAmount:
 			template.defaultLateFeeAmount != null
@@ -115,6 +111,14 @@ export function LeaseTemplateFormWizard({
 
 	const pending = createTemplate.isPending || updateTemplate.isPending
 
+	// Refs for stable callbacks
+	const formRef = useRef(form)
+	const createTemplateRef = useRef(createTemplate)
+	const updateTemplateRef = useRef(updateTemplate)
+	formRef.current = form
+	createTemplateRef.current = createTemplate
+	updateTemplateRef.current = updateTemplate
+
 	const handleChange = useCallback(
 		(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
 			const { name, value } = e.target
@@ -138,42 +142,32 @@ export function LeaseTemplateFormWizard({
 		[],
 	)
 
-	const buildCreatePayload = (): CreateLeaseTemplatePayload => ({
-		id: generateId(),
-		...formToPayloadFields(form),
-	})
-
-	const buildUpdatePayload = (): UpdateLeaseTemplatePayload => ({
-		...formToPayloadFields(form),
-		active: form.active,
-		version: initialTemplate?.version ?? 0,
-	})
-
-	const validateStep1 = (): boolean => {
-		if (!form.name.trim()) {
+	const validateStep1 = useCallback((): boolean => {
+		const currentForm = formRef.current
+		if (!currentForm.name.trim()) {
 			toast.error('Template name is required')
 			return false
 		}
 
 		if (
-			form.defaultLateFeeAmount.trim() &&
-			isNaN(parseFloat(form.defaultLateFeeAmount))
+			currentForm.defaultLateFeeAmount.trim() &&
+			isNaN(parseFloat(currentForm.defaultLateFeeAmount))
 		) {
 			toast.error('Default late fee amount must be a valid number')
 			return false
 		}
 
 		if (
-			form.defaultNoticePeriodDays.trim() &&
-			(isNaN(parseInt(form.defaultNoticePeriodDays, 10)) ||
-				parseInt(form.defaultNoticePeriodDays, 10) < 1)
+			currentForm.defaultNoticePeriodDays.trim() &&
+			(isNaN(parseInt(currentForm.defaultNoticePeriodDays, 10)) ||
+				parseInt(currentForm.defaultNoticePeriodDays, 10) < 1)
 		) {
 			toast.error('Notice period must be at least 1 day')
 			return false
 		}
 
 		return true
-	}
+	}, [])
 
 	const handleNext = useCallback(() => {
 		if (step === 1 && validateStep1()) {
@@ -181,7 +175,7 @@ export function LeaseTemplateFormWizard({
 		} else if (step === 2) {
 			setStep(3)
 		}
-	}, [step, form.name, form.defaultLateFeeAmount, form.defaultNoticePeriodDays])
+	}, [step, setStep, validateStep1])
 
 	const handleBack = useCallback(() => {
 		if (step === 2) {
@@ -189,49 +183,67 @@ export function LeaseTemplateFormWizard({
 		} else if (step === 3) {
 			setStep(2)
 		}
-	}, [step])
+	}, [step, setStep])
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault()
+	const handleActiveChange = useCallback((checked: boolean) => {
+		setForm((prev) => ({ ...prev, active: checked }))
+	}, [])
 
-		if (!form.templateMarkdown.trim()) {
-			toast.error('Template markdown is required')
-			return
-		}
+	const handleSubmit = useCallback(
+		(e: React.FormEvent) => {
+			e.preventDefault()
 
-		if (isEdit) {
-			updateTemplate.mutate(
-				{
-					id: initialTemplate.id,
-					payload: buildUpdatePayload(),
-				},
-				{
-					onSuccess: () => {
-						toast.success('Template updated')
-						onSuccess?.()
+			const currentForm = formRef.current
+			if (!currentForm.templateMarkdown.trim()) {
+				toast.error('Template markdown is required')
+				return
+			}
+
+			if (initialTemplate != null) {
+				updateTemplateRef.current.mutate(
+					{
+						id: initialTemplate.id,
+						payload: {
+							...formToPayloadFields(currentForm),
+							active: currentForm.active,
+							version: initialTemplate.version,
+						},
 					},
-					onError: (err) => {
-						toast.error(err.message || 'Failed to update template')
+					{
+						onSuccess: () => {
+							toast.success('Template updated')
+							onSuccess?.()
+						},
+						onError: (err) => {
+							toast.error(err.message || 'Failed to update template')
+						},
 					},
-				},
-			)
-		} else {
-			createTemplate.mutate(buildCreatePayload(), {
-				onSuccess: () => {
-					toast.success('Template created')
-					setForm(initialFormState)
-					setStep(1)
-					onSuccess?.()
-				},
-				onError: (err) => {
-					toast.error(err.message || 'Failed to create template')
-				},
-			})
-		}
-	}
+				)
+			} else {
+				createTemplateRef.current.mutate(
+					{
+						id: generateId(),
+						...formToPayloadFields(currentForm),
+					},
+					{
+						onSuccess: () => {
+							toast.success('Template created')
+							setForm(initialFormState)
+							setStep(1)
+							onSuccess?.()
+						},
+						onError: (err) => {
+							toast.error(err.message || 'Failed to create template')
+						},
+					},
+				)
+			}
+		},
+		[initialTemplate, onSuccess, setStep],
+	)
 
 	return (
-		<form onSubmit={handleSubmit} className="space-y-4">
+		<form onSubmit={handleSubmit} className="space-y-4 pt-4">
 			{/* Step 1: Template Details */}
 			{step === 1 && (
 				<TemplateDetailsStep
@@ -242,9 +254,7 @@ export function LeaseTemplateFormWizard({
 					defaultNoticePeriodDays={form.defaultNoticePeriodDays}
 					active={form.active}
 					onFieldChange={handleChange}
-					onActiveChange={(checked) =>
-						setForm((prev) => ({ ...prev, active: checked }))
-					}
+					onActiveChange={handleActiveChange}
 					isEdit={isEdit}
 				/>
 			)}
@@ -262,6 +272,7 @@ export function LeaseTemplateFormWizard({
 				<TemplateMarkdownStep
 					value={form.templateMarkdown}
 					onChange={handleMarkdownChange}
+					templateParameters={form.templateParameters}
 				/>
 			)}
 

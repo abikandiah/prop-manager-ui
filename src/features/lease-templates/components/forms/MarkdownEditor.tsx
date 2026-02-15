@@ -3,34 +3,12 @@ import ReactMarkdown from 'react-markdown'
 import { cn } from '@abumble/design-system/utils'
 import { Code, Eye } from 'lucide-react'
 import { Label } from '@abumble/design-system/components/Label'
+import { ALL_BUILTIN_PARAMETERS, PREVIEW_VALUES } from '../../constants'
 
 export interface MarkdownEditorProps {
 	value: string
 	onChange: (value: string) => void
-}
-
-const PLACEHOLDERS = [
-	{ key: 'property_name', desc: 'Property name' },
-	{ key: 'unit_number', desc: 'Unit number' },
-	{ key: 'start_date', desc: 'Lease start date' },
-	{ key: 'end_date', desc: 'Lease end date' },
-	{ key: 'rent_amount', desc: 'Monthly rent amount' },
-	{ key: 'rent_due_day', desc: 'Day rent is due' },
-	{ key: 'security_deposit', desc: 'Security deposit amount' },
-	{ key: 'tenant_name', desc: 'Tenant full name' },
-	{ key: 'landlord_name', desc: 'Landlord name' },
-] as const
-
-const PREVIEW_VALUES: Record<string, string> = {
-	property_name: '**123 Main Street**',
-	unit_number: '**Unit 4B**',
-	start_date: '**January 1, 2026**',
-	end_date: '**December 31, 2026**',
-	rent_amount: '**$1,500**',
-	rent_due_day: '**1st**',
-	security_deposit: '**$1,500**',
-	tenant_name: '**John Smith**',
-	landlord_name: '**Jane Doe**',
+	customParameters?: Record<string, string>
 }
 
 const MarkdownPreviewContent = memo(function MarkdownPreviewContent({
@@ -56,29 +34,63 @@ const MarkdownPreviewContent = memo(function MarkdownPreviewContent({
 
 const PlaceholderButtons = memo(function PlaceholderButtons({
 	onInsert,
+	customParameters = {},
 }: {
 	onInsert: (key: string) => void
+	customParameters?: Record<string, string>
 }) {
+	const customKeys = Object.keys(customParameters).filter(
+		(key) => !ALL_BUILTIN_PARAMETERS.some((p) => p.key === key),
+	)
+	const hasCustomParams = customKeys.length > 0
+
 	return (
-		<div className="rounded-md border bg-muted/30 p-3">
-			<p className="text-xs font-medium text-muted-foreground mb-2">
-				Click to insert placeholder:
-			</p>
-			<div className="flex flex-wrap gap-1.5">
-				{PLACEHOLDERS.map(({ key, desc }) => (
-					<button
-						key={key}
-						type="button"
-						onClick={() => onInsert(key)}
-						className="inline-flex items-center rounded-md bg-background border px-2 py-1 text-xs font-mono hover:bg-accent hover:text-accent-foreground transition-colors"
-						title={desc}
-					>
-						{'{{'}
-						{key}
-						{'}}'}
-					</button>
-				))}
+		<div className="rounded-md border bg-muted/30 p-3 space-y-3">
+			{/* Built-in Parameters */}
+			<div>
+				<p className="text-xs font-medium text-muted-foreground mb-2">
+					Click to insert placeholder:
+				</p>
+				<div className="flex flex-wrap gap-1.5">
+					{ALL_BUILTIN_PARAMETERS.map(({ key, description }) => (
+						<button
+							key={key}
+							type="button"
+							onClick={() => onInsert(key)}
+							className="inline-flex items-center rounded-md bg-background border px-2 py-1 text-xs font-mono hover:bg-accent hover:text-accent-foreground transition-colors"
+							title={description}
+						>
+							{'{{'}
+							{key}
+							{'}}'}
+						</button>
+					))}
+				</div>
 			</div>
+
+			{/* Custom Parameters */}
+			{hasCustomParams && (
+				<div>
+					<p className="text-xs font-medium text-muted-foreground mb-2">
+						Custom parameters:
+					</p>
+					<div className="flex flex-wrap gap-1.5">
+						{customKeys.map((key) => (
+							<button
+								key={key}
+								type="button"
+								onClick={() => onInsert(key)}
+								className="inline-flex items-center rounded-md bg-background border border-primary/50 px-2 py-1 text-xs font-mono hover:bg-accent hover:text-accent-foreground transition-colors"
+								title={`Custom: ${customParameters[key] || 'No default value'}`}
+							>
+								{'{{'}
+								{key}
+								{'}}'}
+							</button>
+						))}
+					</div>
+				</div>
+			)}
 		</div>
 	)
 })
@@ -135,7 +147,11 @@ const ViewModeToggle = memo(function ViewModeToggle({
 	)
 })
 
-export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
+const MarkdownEditorComponent = function MarkdownEditor({
+	value,
+	onChange,
+	customParameters = {},
+}: MarkdownEditorProps) {
 	const [viewMode, setViewMode] = useState<'split' | 'edit' | 'preview'>(
 		'split',
 	)
@@ -179,13 +195,23 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
 		[onChange],
 	)
 
+	// Combine system preview values with custom parameter values
+	const allPreviewValues = useMemo(() => {
+		const customPreviewValues: Record<string, string> = {}
+		Object.entries(customParameters).forEach(([key, value]) => {
+			// Wrap custom values in bold markdown for preview
+			customPreviewValues[key] = value ? `**${value}**` : `**[${key}]**`
+		})
+		return { ...PREVIEW_VALUES, ...customPreviewValues }
+	}, [customParameters])
+
 	const previewMarkdown = useMemo(
 		() =>
 			value.replace(
 				/\{\{(\w+)\}\}/g,
-				(_, key) => PREVIEW_VALUES[key] ?? `{{${key}}}`,
+				(_, key) => allPreviewValues[key] ?? `{{${key}}}`,
 			),
-		[value],
+		[value, allPreviewValues],
 	)
 
 	return (
@@ -205,7 +231,10 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
 			</div>
 
 			{/* Placeholders quick insert */}
-			<PlaceholderButtons onInsert={insertPlaceholder} />
+			<PlaceholderButtons
+				onInsert={insertPlaceholder}
+				customParameters={customParameters}
+			/>
 
 			{/* Editor and Preview */}
 			<div
@@ -262,3 +291,5 @@ export function MarkdownEditor({ value, onChange }: MarkdownEditorProps) {
 		</div>
 	)
 }
+
+export const MarkdownEditor = memo(MarkdownEditorComponent)

@@ -8,7 +8,7 @@ import { createBootstrapDefaults } from './integrations/tanstack-query/client-co
 import { routeTree } from './routeTree.gen'
 import { NotFound } from './components/NotFound.tsx'
 import { ErrorBoundary } from './components/ErrorBoundary'
-import { ThemeProvider } from './contexts/theme'
+import { ThemeProvider, useTheme } from './contexts/theme'
 import { NetworkProvider } from './contexts/network'
 import { AuthProvider, useAuth } from './contexts/auth'
 import reportWebVitals from './reportWebVitals'
@@ -36,6 +36,15 @@ declare module '@tanstack/react-router' {
 }
 
 /**
+ * Toaster that follows the app's light/dark theme.
+ * Must be rendered inside ThemeProvider.
+ */
+function ThemedToaster() {
+	const { effectiveTheme } = useTheme()
+	return <Toaster theme={effectiveTheme} />
+}
+
+/**
  * App with user-scoped providers.
  * Must be inside AuthProvider to access user ID.
  */
@@ -56,7 +65,7 @@ function AppWithProviders() {
 			<ThemeProvider>
 				<NetworkProvider>
 					<RouterProvider router={router} />
-					<Toaster />
+					<ThemedToaster />
 				</NetworkProvider>
 			</ThemeProvider>
 		</TanStackQueryProvider.Provider>

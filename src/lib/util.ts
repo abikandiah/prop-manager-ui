@@ -46,3 +46,16 @@ export function parseIntOrUndefined(
 	const t = s.trim()
 	return t === '' ? undefined : parseInt(t, radix)
 }
+
+/**
+ * Normalize a template parameter name for use in placeholders like {{ parameter_name }}.
+ * Strips surrounding {{ }}, trims, replaces spaces with underscores, and keeps only alphanumerics and underscores.
+ *
+ * @param raw - User input (e.g. "{{ my param }}", "my param", "my-param")
+ * @returns Normalized key suitable for template substitution (e.g. "my_param")
+ */
+export function normalizeParameterName(raw: string): string {
+	let s = raw.replace(/^\{\{|\}\}$/g, '').trim()
+	s = s.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_]/g, '')
+	return s
+}

@@ -48,6 +48,24 @@ export function parseIntOrUndefined(
 }
 
 /**
+ * Shallow equality for two records (same keys, same values via ===).
+ * Use when you need to avoid syncing when the parent echoes our own update.
+ *
+ * @param a - First record
+ * @param b - Second record
+ * @returns true if both have the same keys and each value is === equal
+ */
+export function recordsShallowEqual(
+	a: Record<string, string>,
+	b: Record<string, string>,
+): boolean {
+	const keysA = Object.keys(a)
+	const keysB = Object.keys(b)
+	if (keysA.length !== keysB.length) return false
+	return keysA.every((k) => b[k] === a[k])
+}
+
+/**
  * Normalize a template parameter name for use in placeholders like {{ parameter_name }}.
  * Strips surrounding {{ }}, trims, replaces spaces with underscores, and keeps only alphanumerics and underscores.
  *

@@ -4,7 +4,7 @@ import { Button } from '@abumble/design-system/components/Button'
 import { Input } from '@abumble/design-system/components/Input'
 import { Plus, Trash2 } from 'lucide-react'
 import { SYSTEM_KEYS, SYSTEM_PARAMETERS } from '../../constants'
-import { normalizeParameterName } from '@/lib/util'
+import { normalizeParameterName, recordsShallowEqual } from '@/lib/util'
 
 export interface TemplateParametersStepProps {
 	templateParameters: Record<string, string>
@@ -36,29 +36,22 @@ function recordToCustomParams(
 /**
  * Converts internal CustomParam[] back to Record<string, string> for parent.
  * Only includes custom parameters - system parameters are never persisted.
+ * Params with blank key (after trim) are filtered out so they are not sent to parent.
  */
 function customParamsToRecord(
 	customParams: Array<CustomParam>,
 ): Record<string, string> {
-	return Object.fromEntries(customParams.map((p) => [p.key, p.value]))
-}
-
-/** Shallow compare two records (key/value). Used to avoid syncing when parent echo's our own update. */
-function recordsEqual(
-	a: Record<string, string>,
-	b: Record<string, string>,
-): boolean {
-	const keysA = Object.keys(a)
-	const keysB = Object.keys(b)
-	if (keysA.length !== keysB.length) return false
-	return keysA.every((k) => b[k] === a[k])
+	return Object.fromEntries(
+		customParams
+			.filter((p) => p.key.trim() !== '')
+			.map((p) => [p.key, p.value]),
+	)
 }
 
 const TemplateParametersStepComponent = function TemplateParametersStep({
 	templateParameters,
 	onParametersChange,
 }: TemplateParametersStepProps) {
-	// Maintain stable ID array in local state
 	const [customParams, setCustomParams] = useState<Array<CustomParam>>(() =>
 		recordToCustomParams(templateParameters),
 	)
@@ -75,7 +68,7 @@ const TemplateParametersStepComponent = function TemplateParametersStep({
 	useEffect(() => {
 		setCustomParams((prev) => {
 			const currentRecord = customParamsToRecord(prev)
-			if (recordsEqual(templateParameters, currentRecord)) return prev
+			if (recordsShallowEqual(templateParameters, currentRecord)) return prev
 
 			// Preserve existing IDs when syncing from parent
 			const newParams: Array<CustomParam> = []
@@ -88,11 +81,9 @@ const TemplateParametersStepComponent = function TemplateParametersStep({
 					const existing = prev.find((p) => p.key === key)
 
 					if (existing && !usedIds.has(existing.id)) {
-						// Reuse existing ID for stability
 						newParams.push({ id: existing.id, key, value })
 						usedIds.add(existing.id)
 					} else {
-						// Generate new ID (param is new or ID was already used)
 						let newId = crypto.randomUUID()
 						// Handle duplicate IDs (extremely rare but possible)
 						while (usedIds.has(newId)) {
@@ -109,11 +100,7 @@ const TemplateParametersStepComponent = function TemplateParametersStep({
 
 	const handleAddParameter = useCallback(() => {
 		setCustomParams((prev) => {
-			const newKey = `param_${Date.now()}`
-			const updated = [
-				...prev,
-				{ id: crypto.randomUUID(), key: newKey, value: '' },
-			]
+			const updated = [...prev, { id: crypto.randomUUID(), key: '', value: '' }]
 			onParamsChangeRef.current(customParamsToRecord(updated))
 			return updated
 		})
@@ -133,22 +120,21 @@ const TemplateParametersStepComponent = function TemplateParametersStep({
 				const param = prev.find((p) => p.id === id)
 				if (!param) return prev
 
-				// Keep existing key when user clears the field (e.g. select-all + cut).
-				const effectiveKey = newKey.trim() === '' ? param.key : newKey
+				const key = newKey.trim()
 
-				// Check for duplicate keys (only if the key is actually changing)
-				if (effectiveKey !== param.key) {
+				// Check for duplicate keys only when the key is non-blank
+				if (key !== '') {
 					const duplicate = prev.some(
-						(p) => p.id !== id && p.key === effectiveKey,
+						(p) => p.id !== id && p.key.trim() === key,
 					)
 					if (duplicate) {
-						toast.error(`Parameter "${effectiveKey}" already exists`)
+						toast.error(`Parameter "${key}" already exists`)
 						return prev
 					}
 				}
 
 				const updated = prev.map((p) =>
-					p.id === id ? { ...p, key: effectiveKey, value } : p,
+					p.id === id ? { ...p, key, value } : p,
 				)
 
 				onParamsChangeRef.current(customParamsToRecord(updated))

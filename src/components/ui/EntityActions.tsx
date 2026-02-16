@@ -1,11 +1,8 @@
 import { useState } from 'react'
-import type { ReactNode } from 'react'
 import { Pencil, Trash2 } from 'lucide-react'
-import {
-	ActionsPopover,
-	type ActionItem,
-} from '@abumble/design-system/components/ActionsPopover'
+import { ActionsPopover } from '@abumble/design-system/components/ActionsPopover'
 import { ConfirmDeleteDialog } from '@abumble/design-system/components/ConfirmDeleteDialog'
+import type { ActionItem } from '@abumble/design-system/components/ActionsPopover'
 
 export interface EntityActionsProps {
 	/** Optional label for the actions button (defaults to "Actions") */
@@ -17,13 +14,13 @@ export interface EntityActionsProps {
 	/** Whether delete operation is pending */
 	isDeletePending?: boolean
 	/** Additional action items to show before edit/delete */
-	additionalItems?: ActionItem[]
+	additionalItems?: Array<ActionItem>
 	/** Stop propagation on trigger click (useful in table rows) */
 	stopTriggerPropagation?: boolean
 	/** Delete confirmation dialog title */
 	deleteTitle: string
 	/** Delete confirmation dialog description */
-	deleteDescription: ReactNode
+	deleteDescription: React.ReactNode
 }
 
 /**
@@ -75,7 +72,7 @@ export function EntityActions({
 		onDelete()
 	}
 
-	const items: ActionItem[] = [
+	const items: Array<ActionItem> = [
 		...additionalItems,
 		...(onEdit
 			? [
@@ -84,7 +81,7 @@ export function EntityActions({
 						icon: <Pencil className="size-4 shrink-0" />,
 						onClick: onEdit,
 					},
-			  ]
+				]
 			: []),
 		{
 			label: 'Delete',

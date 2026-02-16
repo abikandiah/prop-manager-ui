@@ -60,7 +60,7 @@ function Root() {
 		return (
 			<div className="layout-header-full flex min-h-screen w-full flex-col">
 				<Header />
-				<main className="flex flex-col mt-14 p-4 md:p-6 flex-1">
+				<main className="flex flex-col mt-14 p-6 flex-1">
 					{!isOnline && <OfflineWarningBanner />}
 					{altContent}
 				</main>
@@ -76,7 +76,7 @@ function Root() {
 				<div className="flex flex-1 min-w-0 mt-14">
 					<AppSidebar />
 					<SidebarInset>
-						<main className="flex flex-col p-4 md:p-6">
+						<main className="flex flex-col p-6">
 							{!isOnline && <OfflineWarningBanner />}
 							<div className="flex flex-col gap-4">
 								<Outlet />

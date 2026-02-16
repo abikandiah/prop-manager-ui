@@ -2,13 +2,13 @@ import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
+import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
+import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
+import { FormDialog } from '@abumble/design-system/components/Dialog'
 import type { Unit } from '@/domain/unit'
 import { usePropDetail } from '@/features/props'
 import { UnitForm, useDeleteUnit, useUnitDetail } from '@/features/units'
 import { formatCurrency } from '@/lib/format'
-import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
-import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
-import { FormDialog } from '@abumble/design-system/components/Dialog'
 import { EntityActions, TextLink } from '@/components/ui'
 import { config } from '@/config'
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
@@ -17,13 +17,7 @@ export const Route = createFileRoute('/units/$unitId')({
 	component: UnitDetailPage,
 })
 
-function UnitActions({
-	unit,
-	onEdit,
-}: {
-	unit: Unit
-	onEdit: () => void
-}) {
+function UnitActions({ unit, onEdit }: { unit: Unit; onEdit: () => void }) {
 	const navigate = useNavigate()
 	const deleteUnit = useDeleteUnit()
 
@@ -48,9 +42,7 @@ function UnitActions({
 			isDeletePending={deleteUnit.isPending}
 			deleteTitle="Delete unit?"
 			deleteDescription={
-				<>
-					Unit {unit.unitNumber} will be removed. This can&apos;t be undone.
-				</>
+				<>Unit {unit.unitNumber} will be removed. This can&apos;t be undone.</>
 			}
 		/>
 	)
@@ -65,9 +57,11 @@ function UnitDetailPage() {
 		isError,
 		error,
 	} = useUnitDetail(unitId)
-	
-	const { data: prop, isLoading: propLoading } = usePropDetail(unit?.propertyId ?? null)
-	
+
+	const { data: prop, isLoading: propLoading } = usePropDetail(
+		unit?.propertyId ?? null,
+	)
+
 	const [editingUnit, setEditingUnit] = useState<Unit | null>(null)
 
 	const isLoading = unitLoading || propLoading
@@ -106,14 +100,10 @@ function UnitDetailPage() {
 					title="Unit not found"
 					description={
 						isError
-							? (error?.message || 'Failed to load unit')
+							? error?.message || 'Failed to load unit'
 							: 'The unit you were looking for was not found.'
 					}
-					action={
-						<TextLink to="/units">
-							Back to units
-						</TextLink>
-					}
+					action={<TextLink to="/units">Back to units</TextLink>}
 				/>
 			) : (
 				<div className="flex flex-col gap-6">
@@ -130,10 +120,7 @@ function UnitDetailPage() {
 							</>
 						}
 						actions={
-							<UnitActions
-								unit={unit}
-								onEdit={() => setEditingUnit(unit)}
-							/>
+							<UnitActions unit={unit} onEdit={() => setEditingUnit(unit)} />
 						}
 					/>
 

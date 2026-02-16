@@ -2,12 +2,12 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Button } from '@abumble/design-system/components/Button'
-import { LeaseForm, LeasesTableView } from '@/features/leases'
 import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
 import {
 	DialogTrigger,
 	FormDialog,
 } from '@abumble/design-system/components/Dialog'
+import { LeaseForm, LeasesTableView } from '@/features/leases'
 
 export const Route = createFileRoute('/leases/agreements')({
 	component: RouteComponent,

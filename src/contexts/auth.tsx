@@ -22,7 +22,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const queryClient = useQueryClient()
-	const { data: user, isLoading, refetch } = useQuery({
+	const {
+		data: user,
+		isLoading,
+		refetch,
+	} = useQuery({
 		queryKey: ['me'],
 		queryFn: async () => {
 			const { data } = await api.get<User>('/me')

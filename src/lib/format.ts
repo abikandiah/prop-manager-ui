@@ -1,12 +1,14 @@
 /** Single-line address string (comma-separated). Returns '—' when address is null/empty. */
-export function formatAddress(address: {
-	addressLine1: string
-	addressLine2: string | null
-	city: string
-	stateProvinceRegion: string
-	postalCode: string
-	countryCode: string
-} | null): string {
+export function formatAddress(
+	address: {
+		addressLine1: string
+		addressLine2: string | null
+		city: string
+		stateProvinceRegion: string
+		postalCode: string
+		countryCode: string
+	} | null,
+): string {
 	if (!address) return '—'
 	const parts = [
 		address.addressLine1,

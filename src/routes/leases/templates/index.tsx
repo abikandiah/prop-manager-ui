@@ -12,7 +12,7 @@ import {
 	LeaseTemplatesTableView,
 } from '@/features/lease-templates'
 
-export const Route = createFileRoute('/leases/templates')({
+export const Route = createFileRoute('/leases/templates/')({
 	component: RouteComponent,
 })
 

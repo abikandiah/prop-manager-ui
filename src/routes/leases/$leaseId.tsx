@@ -16,7 +16,7 @@ import {
 	useLeaseDetail,
 } from '@/features/leases'
 import { formatAddress, formatCurrency, formatDate } from '@/lib/format'
-import { EntityActions, TextLink } from '@/components/ui'
+import { DetailField, EntityActions, TextLink } from '@/components/ui'
 import { config } from '@/config'
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
 
@@ -163,12 +163,12 @@ function LeaseDetailPage() {
 						{/* Group: Template Info */}
 						<div className="space-y-6">
 							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Template
-								</label>
-								<p className="mt-1 text-lg font-semibold text-foreground">
+								<DetailField
+									label="Template"
+									valueClassName="text-lg font-semibold text-foreground"
+								>
 									{lease.leaseTemplateName || '—'}
-								</p>
+								</DetailField>
 								{lease.leaseTemplateVersionTag && (
 									<p className="text-sm text-muted-foreground">
 										Version: {lease.leaseTemplateVersionTag}
@@ -176,147 +176,92 @@ function LeaseDetailPage() {
 								)}
 							</div>
 							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Property
-								</label>
-								<p className="mt-1 text-foreground font-medium">
+								<DetailField
+									label="Property"
+									valueClassName="text-foreground font-medium"
+								>
 									{property?.legalName ?? '—'}
-								</p>
+								</DetailField>
 								{property?.address && (
 									<p className="text-sm text-muted-foreground">
 										{formatAddress(property.address)}
 									</p>
 								)}
 							</div>
-							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Unit
-								</label>
-								<p className="mt-1 text-foreground font-medium">
-									{unit?.unitNumber ?? '—'}
-								</p>
-							</div>
+							<DetailField
+								label="Unit"
+								valueClassName="text-foreground font-medium"
+							>
+								{unit?.unitNumber ?? '—'}
+							</DetailField>
 						</div>
 
 						{/* Group: Lease Terms */}
 						<div className="space-y-6">
-							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Start Date
-								</label>
-								<p className="mt-1 text-foreground">
-									{formatDate(lease.startDate)}
-								</p>
-							</div>
-							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									End Date
-								</label>
-								<p className="mt-1 text-foreground">
-									{formatDate(lease.endDate)}
-								</p>
-							</div>
-							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Created
-								</label>
-								<p className="mt-1 text-foreground">
-									{formatDate(lease.createdAt)}
-								</p>
-							</div>
+							<DetailField label="Start Date">
+								{formatDate(lease.startDate)}
+							</DetailField>
+							<DetailField label="End Date">
+								{formatDate(lease.endDate)}
+							</DetailField>
+							<DetailField label="Created">
+								{formatDate(lease.createdAt)}
+							</DetailField>
 						</div>
 
 						{/* Group: Financials */}
 						<div className="space-y-6">
-							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Rent Amount
-								</label>
-								<p className="mt-1 text-foreground">
-									{formatCurrency(lease.rentAmount)}
-								</p>
-							</div>
-							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Rent Due Day
-								</label>
-								<p className="mt-1 text-foreground">
-									Day {lease.rentDueDay} of month
-								</p>
-							</div>
-							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Security Deposit
-								</label>
-								<p className="mt-1 text-foreground">
-									{lease.securityDepositHeld != null
-										? formatCurrency(lease.securityDepositHeld)
-										: '—'}
-								</p>
-							</div>
+							<DetailField label="Rent Amount">
+								{formatCurrency(lease.rentAmount)}
+							</DetailField>
+							<DetailField label="Rent Due Day">
+								Day {lease.rentDueDay} of month
+							</DetailField>
+							<DetailField label="Security Deposit">
+								{lease.securityDepositHeld != null
+									? formatCurrency(lease.securityDepositHeld)
+									: '—'}
+							</DetailField>
 						</div>
 
 						{/* Group: Late Fees & Notice */}
 						<div className="space-y-6">
-							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Late Fee Type
-								</label>
-								<p className="mt-1 text-foreground">
-									{lease.lateFeeType?.replace(/_/g, ' ') || '—'}
-								</p>
-							</div>
-							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Late Fee Amount
-								</label>
-								<p className="mt-1 text-foreground">
-									{lease.lateFeeAmount != null
-										? lease.lateFeeType === 'PERCENTAGE'
-											? `${lease.lateFeeAmount}%`
-											: formatCurrency(lease.lateFeeAmount)
-										: '—'}
-								</p>
-							</div>
-							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Notice Period
-								</label>
-								<p className="mt-1 text-foreground">
-									{lease.noticePeriodDays != null
-										? `${lease.noticePeriodDays} days`
-										: '—'}
-								</p>
-							</div>
+							<DetailField label="Late Fee Type">
+								{lease.lateFeeType?.replace(/_/g, ' ') || '—'}
+							</DetailField>
+							<DetailField label="Late Fee Amount">
+								{lease.lateFeeAmount != null
+									? lease.lateFeeType === 'PERCENTAGE'
+										? `${lease.lateFeeAmount}%`
+										: formatCurrency(lease.lateFeeAmount)
+									: '—'}
+							</DetailField>
+							<DetailField label="Notice Period">
+								{lease.noticePeriodDays != null
+									? `${lease.noticePeriodDays} days`
+									: '—'}
+							</DetailField>
 						</div>
 
 						{/* Group: Documents */}
 						{(lease.executedContentMarkdown || lease.signedPdfUrl) && (
 							<div className="space-y-6">
 								{lease.executedContentMarkdown && (
-									<div>
-										<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-											Executed Content
-										</label>
-										<p className="mt-1 text-foreground">Available</p>
-									</div>
+									<DetailField label="Executed Content">
+										Available
+									</DetailField>
 								)}
 								{lease.signedPdfUrl && (
-									<div>
-										<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-											Signed PDF
-										</label>
-										<p className="mt-1 text-foreground">
-											<a
-												href={lease.signedPdfUrl}
-												target="_blank"
-												rel="noopener noreferrer"
-												className="text-primary hover:underline"
-											>
-												View PDF
-											</a>
-										</p>
-									</div>
+									<DetailField label="Signed PDF">
+										<a
+											href={lease.signedPdfUrl}
+											target="_blank"
+											rel="noopener noreferrer"
+											className="text-primary hover:underline"
+										>
+											View PDF
+										</a>
+									</DetailField>
 								)}
 							</div>
 						)}

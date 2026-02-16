@@ -1,4 +1,5 @@
 # Offline Implementation Plan
+
 ## Client-Side ID Generation + Pure TanStack
 
 > **Status**: Implementation complete ✅
@@ -25,6 +26,7 @@
 ### The Problem This Solves
 
 **Old approach (Backend generates IDs):**
+
 ```typescript
 // Offline:
 1. Create property → temp ID: "opt-123"
@@ -36,6 +38,7 @@
 ```
 
 **New approach (UI generates IDs):**
+
 ```typescript
 // Offline:
 const propId = crypto.randomUUID()  // "abc-456" (real UUID!)
@@ -74,37 +77,37 @@ import type { PersistedClient } from '@tanstack/react-query-persist-client'
 const CACHE_KEY = 'react-query-cache'
 
 export class AppDatabase extends Dexie {
-  queries!: Dexie.Table<
-    { id: string; value: PersistedClient; updatedAt: number },
-    string
-  >
+	queries!: Dexie.Table<
+		{ id: string; value: PersistedClient; updatedAt: number },
+		string
+	>
 
-  constructor(userId: string) {
-    // ✅ User-scoped database name
-    super(`prop-manager-db-${userId}`)
+	constructor(userId: string) {
+		// ✅ User-scoped database name
+		super(`prop-manager-db-${userId}`)
 
-    this.version(1).stores({
-      queries: 'id, updatedAt',
-      // ❌ Remove mutations table - TanStack handles this
-    })
-  }
+		this.version(1).stores({
+			queries: 'id, updatedAt',
+			// ❌ Remove mutations table - TanStack handles this
+		})
+	}
 
-  async saveCacheBlob(client: PersistedClient) {
-    return this.queries.put({
-      id: CACHE_KEY,
-      value: client,
-      updatedAt: Date.now(),
-    })
-  }
+	async saveCacheBlob(client: PersistedClient) {
+		return this.queries.put({
+			id: CACHE_KEY,
+			value: client,
+			updatedAt: Date.now(),
+		})
+	}
 
-  async loadCacheBlob() {
-    const record = await this.queries.get(CACHE_KEY)
-    return record?.value
-  }
+	async loadCacheBlob() {
+		const record = await this.queries.get(CACHE_KEY)
+		return record?.value
+	}
 
-  async deleteCacheBlob() {
-    await this.queries.delete(CACHE_KEY)
-  }
+	async deleteCacheBlob() {
+		await this.queries.delete(CACHE_KEY)
+	}
 }
 
 // Singleton per user
@@ -112,28 +115,28 @@ let currentDb: AppDatabase | null = null
 let currentUserId: string | null = null
 
 export function getDb(userId: string): AppDatabase {
-  if (currentDb && currentUserId === userId) {
-    return currentDb
-  }
+	if (currentDb && currentUserId === userId) {
+		return currentDb
+	}
 
-  // Close old DB if switching users
-  if (currentDb) {
-    currentDb.close()
-  }
+	// Close old DB if switching users
+	if (currentDb) {
+		currentDb.close()
+	}
 
-  currentDb = new AppDatabase(userId)
-  currentUserId = userId
-  return currentDb
+	currentDb = new AppDatabase(userId)
+	currentUserId = userId
+	return currentDb
 }
 
 export async function clearUserDb(userId: string) {
-  const dbName = `prop-manager-db-${userId}`
-  await Dexie.delete(dbName)
+	const dbName = `prop-manager-db-${userId}`
+	await Dexie.delete(dbName)
 
-  if (currentUserId === userId) {
-    currentDb = null
-    currentUserId = null
-  }
+	if (currentUserId === userId) {
+		currentDb = null
+		currentUserId = null
+	}
 }
 ```
 
@@ -145,98 +148,98 @@ export async function clearUserDb(userId: string) {
 
 ```typescript
 import type {
-  PersistedClient,
-  Persister,
+	PersistedClient,
+	Persister,
 } from '@tanstack/react-query-persist-client'
 import { getDb } from './db'
 
 function throttle<T extends (client: PersistedClient) => void>(
-  fn: T,
-  delay: number,
-  opts: { leading?: boolean; trailing?: boolean } = {},
+	fn: T,
+	delay: number,
+	opts: { leading?: boolean; trailing?: boolean } = {},
 ): T {
-  const { leading = true, trailing = true } = opts
-  let lastRun = 0
-  let timeoutId: ReturnType<typeof setTimeout> | null = null
-  let lastArgs: PersistedClient | null = null
+	const { leading = true, trailing = true } = opts
+	let lastRun = 0
+	let timeoutId: ReturnType<typeof setTimeout> | null = null
+	let lastArgs: PersistedClient | null = null
 
-  const invoke = (client: PersistedClient) => {
-    lastArgs = null
-    lastRun = Date.now()
-    void fn(client)
-  }
+	const invoke = (client: PersistedClient) => {
+		lastArgs = null
+		lastRun = Date.now()
+		void fn(client)
+	}
 
-  return ((client: PersistedClient) => {
-    const now = Date.now()
-    if (leading && now - lastRun >= delay) {
-      invoke(client)
-    } else if (trailing) {
-      lastArgs = client
-      if (timeoutId === null) {
-        timeoutId = setTimeout(() => {
-          timeoutId = null
-          if (lastArgs) invoke(lastArgs)
-        }, delay)
-      }
-    }
-  }) as T
+	return ((client: PersistedClient) => {
+		const now = Date.now()
+		if (leading && now - lastRun >= delay) {
+			invoke(client)
+		} else if (trailing) {
+			lastArgs = client
+			if (timeoutId === null) {
+				timeoutId = setTimeout(() => {
+					timeoutId = null
+					if (lastArgs) invoke(lastArgs)
+				}, delay)
+			}
+		}
+	}) as T
 }
 
 export const createThrottledCachePersister = (
-  userId: string,
-  throttleMs = 1000,
+	userId: string,
+	throttleMs = 1000,
 ): Persister => {
-  const db = getDb(userId)
+	const db = getDb(userId)
 
-  const saveToDisk = async (client: PersistedClient) => {
-    try {
-      console.log('[Offline] Persisting cache for user:', userId)
-      await db.saveCacheBlob(client)
-    } catch (err) {
-      console.error('[Offline] Failed to persist cache:', err)
+	const saveToDisk = async (client: PersistedClient) => {
+		try {
+			console.log('[Offline] Persisting cache for user:', userId)
+			await db.saveCacheBlob(client)
+		} catch (err) {
+			console.error('[Offline] Failed to persist cache:', err)
 
-      // Handle quota exceeded
-      if (err instanceof Error && err.name === 'QuotaExceededError') {
-        console.error('[Offline] Storage quota exceeded!')
-        // TODO: Show user warning
-      }
-    }
-  }
+			// Handle quota exceeded
+			if (err instanceof Error && err.name === 'QuotaExceededError') {
+				console.error('[Offline] Storage quota exceeded!')
+				// TODO: Show user warning
+			}
+		}
+	}
 
-  const throttledSave = throttle(saveToDisk, throttleMs, {
-    leading: true,
-    trailing: true,
-  })
+	const throttledSave = throttle(saveToDisk, throttleMs, {
+		leading: true,
+		trailing: true,
+	})
 
-  return {
-    persistClient: (client: PersistedClient) => {
-      throttledSave(client)
-    },
-    restoreClient: async () => {
-      try {
-        const cache = await db.loadCacheBlob()
-        if (!cache) {
-          console.log('[Offline] No cached data found')
-          return undefined
-        }
+	return {
+		persistClient: (client: PersistedClient) => {
+			throttledSave(client)
+		},
+		restoreClient: async () => {
+			try {
+				const cache = await db.loadCacheBlob()
+				if (!cache) {
+					console.log('[Offline] No cached data found')
+					return undefined
+				}
 
-        // Structural validation
-        if (!cache.timestamp || !cache.clientState) {
-          console.warn('[Offline] Invalid cache structure, ignoring')
-          return undefined
-        }
+				// Structural validation
+				if (!cache.timestamp || !cache.clientState) {
+					console.warn('[Offline] Invalid cache structure, ignoring')
+					return undefined
+				}
 
-        console.log('[Offline] Cache restored for user:', userId)
-        return cache
-      } catch (error) {
-        console.error('[Offline] Failed to restore cache:', error)
-        return undefined
-      }
-    },
-    removeClient: async () => {
-      return await db.deleteCacheBlob()
-    },
-  }
+				console.log('[Offline] Cache restored for user:', userId)
+				return cache
+			} catch (error) {
+				console.error('[Offline] Failed to restore cache:', error)
+				return undefined
+			}
+		},
+		removeClient: async () => {
+			return await db.deleteCacheBlob()
+		},
+	}
 }
 ```
 
@@ -469,18 +472,18 @@ onlineManager.setEventListener(() => {
  * Used for creating entities offline - these are REAL IDs, not optimistic.
  */
 export function generateId(): string {
-  return crypto.randomUUID()
+	return crypto.randomUUID()
 }
 
 /**
  * @deprecated Use generateId() instead. This was for optimistic IDs only.
  */
 export function generateOptimisticId(): string {
-  return `opt-${crypto.randomUUID()}`
+	return `opt-${crypto.randomUUID()}`
 }
 
 export function nowIso(): string {
-  return new Date().toISOString()
+	return new Date().toISOString()
 }
 ```
 
@@ -489,15 +492,15 @@ export function nowIso(): string {
 ```typescript
 // src/domain/property.ts
 export interface CreatePropPayload {
-  id: string  // ✅ NEW: Client provides ID
-  legalName: string
-  address: CreatePropAddressPayload
-  propertyType: PropertyType
-  description?: string | null
-  parcelNumber?: string | null
-  ownerId?: string | null
-  totalArea?: number | null
-  yearBuilt?: number | null
+	id: string // ✅ NEW: Client provides ID
+	legalName: string
+	address: CreatePropAddressPayload
+	propertyType: PropertyType
+	description?: string | null
+	parcelNumber?: string | null
+	ownerId?: string | null
+	totalArea?: number | null
+	yearBuilt?: number | null
 }
 ```
 
@@ -508,63 +511,63 @@ export interface CreatePropPayload {
 import { generateId, nowIso } from '@/lib/util'
 
 function applyCreate(
-  queryClient: ReturnType<typeof useQueryClient>,
-  payload: CreatePropPayload,
+	queryClient: ReturnType<typeof useQueryClient>,
+	payload: CreatePropPayload,
 ): Prop {
-  // ✅ Use the real ID from payload (not optimistic)
-  const optimistic: Prop = {
-    id: payload.id,  // Real UUID from client!
-    legalName: payload.legalName,
-    addressId: '',
-    address: null,
-    propertyType: payload.propertyType,
-    description: payload.description ?? null,
-    parcelNumber: payload.parcelNumber ?? null,
-    ownerId: payload.ownerId ?? null,
-    totalArea: payload.totalArea ?? null,
-    yearBuilt: payload.yearBuilt ?? null,
-    createdAt: nowIso(),
-    updatedAt: nowIso(),
-    version: 0,
-  }
+	// ✅ Use the real ID from payload (not optimistic)
+	const optimistic: Prop = {
+		id: payload.id, // Real UUID from client!
+		legalName: payload.legalName,
+		addressId: '',
+		address: null,
+		propertyType: payload.propertyType,
+		description: payload.description ?? null,
+		parcelNumber: payload.parcelNumber ?? null,
+		ownerId: payload.ownerId ?? null,
+		totalArea: payload.totalArea ?? null,
+		yearBuilt: payload.yearBuilt ?? null,
+		createdAt: nowIso(),
+		updatedAt: nowIso(),
+		version: 0,
+	}
 
-  queryClient.setQueryData(propKeys.list(), (old: Array<Prop> | undefined) =>
-    old ? [...old, optimistic] : [optimistic],
-  )
+	queryClient.setQueryData(propKeys.list(), (old: Array<Prop> | undefined) =>
+		old ? [...old, optimistic] : [optimistic],
+	)
 
-  return optimistic
+	return optimistic
 }
 
 export function useCreateProp() {
-  const queryClient = useQueryClient()
+	const queryClient = useQueryClient()
 
-  return useMutation({
-    mutationKey: ['createProp'],
-    networkMode: 'online',  // ✅ Pause when offline
-    mutationFn: (payload: CreatePropPayload) => {
-      const requestId = stableRequestId(['createProp'], payload)
-      return propsApi.create(payload, { [IDEMPOTENCY_HEADER]: requestId })
-    },
-    onMutate: async (payload) => {
-      await queryClient.cancelQueries({ queryKey: propKeys.list() })
-      const previousProps = queryClient.getQueryData<Array<Prop>>(
-        propKeys.list(),
-      )
-      const optimistic = applyCreate(queryClient, payload)
-      return { previousProps, optimisticId: optimistic.id }
-    },
-    onError: (err, _, context) => {
-      if (context?.previousProps) {
-        queryClient.setQueryData(propKeys.list(), context.previousProps)
-      }
-      console.error('[Mutation] Create failed:', err)
-    },
-    onSuccess: (data, variables, context) => {
-      // ✅ No ID mapping needed! Client ID matches backend ID
-      console.log('[Mutation] Create succeeded:', data.id)
-      queryClient.invalidateQueries({ queryKey: propKeys.all })
-    },
-  })
+	return useMutation({
+		mutationKey: ['createProp'],
+		networkMode: 'online', // ✅ Pause when offline
+		mutationFn: (payload: CreatePropPayload) => {
+			const requestId = stableRequestId(['createProp'], payload)
+			return propsApi.create(payload, { [IDEMPOTENCY_HEADER]: requestId })
+		},
+		onMutate: async (payload) => {
+			await queryClient.cancelQueries({ queryKey: propKeys.list() })
+			const previousProps = queryClient.getQueryData<Array<Prop>>(
+				propKeys.list(),
+			)
+			const optimistic = applyCreate(queryClient, payload)
+			return { previousProps, optimisticId: optimistic.id }
+		},
+		onError: (err, _, context) => {
+			if (context?.previousProps) {
+				queryClient.setQueryData(propKeys.list(), context.previousProps)
+			}
+			console.error('[Mutation] Create failed:', err)
+		},
+		onSuccess: (data, variables, context) => {
+			// ✅ No ID mapping needed! Client ID matches backend ID
+			console.log('[Mutation] Create succeeded:', data.id)
+			queryClient.invalidateQueries({ queryKey: propKeys.all })
+		},
+	})
 }
 ```
 
@@ -735,6 +738,7 @@ rm src/features/offline/syncEngine.ts
 ```
 
 **Backend Schema:**
+
 ```sql
 CREATE TABLE properties (
   id UUID PRIMARY KEY,  -- Accept client UUIDs
@@ -745,6 +749,7 @@ CREATE TABLE properties (
 ```
 
 **Backend Validation:**
+
 - ✅ Accept UUID in request body
 - ✅ Validate UUID format
 - ✅ Check for duplicate ID (return 409 Conflict)
@@ -759,11 +764,11 @@ CREATE TABLE properties (
 ```typescript
 // src/lib/offline-types.ts
 export function stableRequestId(
-  mutationKey: unknown,
-  variables: unknown,
+	mutationKey: unknown,
+	variables: unknown,
 ): string {
-  const payload = JSON.stringify({ k: mutationKey, v: variables })
-  return uuidv5(payload, APP_NAMESPACE)
+	const payload = JSON.stringify({ k: mutationKey, v: variables })
+	return uuidv5(payload, APP_NAMESPACE)
 }
 
 // Usage in hooks:
@@ -772,6 +777,7 @@ return propsApi.create(payload, { [IDEMPOTENCY_HEADER]: requestId })
 ```
 
 **How it works:**
+
 1. Same payload → same request ID
 2. User clicks "Save" 5 times → 5 mutations with same request ID
 3. All 5 reach backend → backend dedupes via request ID
@@ -784,6 +790,7 @@ return propsApi.create(payload, { [IDEMPOTENCY_HEADER]: requestId })
 ## Testing Checklist
 
 ### User Scoping:
+
 - [ ] User A creates property offline
 - [ ] User A logs out
 - [ ] User B logs in
@@ -792,6 +799,7 @@ return propsApi.create(payload, { [IDEMPOTENCY_HEADER]: requestId })
 - [ ] User A's property syncs successfully
 
 ### Offline Creations:
+
 - [ ] Go offline
 - [ ] Create property
 - [ ] Create unit for that property
@@ -801,6 +809,7 @@ return propsApi.create(payload, { [IDEMPOTENCY_HEADER]: requestId })
 - [ ] Unit has correct propertyId ✅
 
 ### App Reload:
+
 - [ ] Go offline
 - [ ] Create property
 - [ ] Close browser tab
@@ -810,6 +819,7 @@ return propsApi.create(payload, { [IDEMPOTENCY_HEADER]: requestId })
 - [ ] Property syncs
 
 ### Idempotency:
+
 - [ ] Go offline
 - [ ] Click "Create Property" 5 times rapidly
 - [ ] 5 items appear in UI
@@ -818,6 +828,7 @@ return propsApi.create(payload, { [IDEMPOTENCY_HEADER]: requestId })
 - [ ] UI updates to show 1 real property
 
 ### Smart Retry:
+
 - [ ] Create property offline
 - [ ] Immediately create unit
 - [ ] Backend receives unit first (race condition)

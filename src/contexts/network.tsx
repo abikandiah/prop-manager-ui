@@ -50,16 +50,13 @@ export function NetworkProvider({ children }: { children: React.ReactNode }) {
 			abortControllerRef.current?.abort()
 			abortControllerRef.current = new AbortController()
 
-			await fetch(
-				`${config.apiBaseUrl.replace(/\/$/, '')}/actuator/health`,
-				{
-					method: 'HEAD',
-					cache: 'no-store',
-					signal: abortControllerRef.current.signal,
-					// Short timeout to quickly detect unreachable server
-					// Note: fetch doesn't have timeout, but signal works
-				},
-			)
+			await fetch(`${config.apiBaseUrl.replace(/\/$/, '')}/actuator/health`, {
+				method: 'HEAD',
+				cache: 'no-store',
+				signal: abortControllerRef.current.signal,
+				// Short timeout to quickly detect unreachable server
+				// Note: fetch doesn't have timeout, but signal works
+			})
 
 			console.log('[Network] Server is reachable')
 			return true

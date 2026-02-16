@@ -92,4 +92,5 @@ export function ExternalSite({
 
 // App-specific UI components
 // Import design-system components directly from @abumble/design-system
+export * from './DetailField'
 export * from './EntityActions'

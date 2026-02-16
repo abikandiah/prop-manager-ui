@@ -193,25 +193,22 @@ export function PropsForm({
 					},
 				)
 			} else {
-				createProp.mutate(
-					payload,
-					{
-						onSuccess: (data) => {
-							setForm(initialForm)
-							toast.success('Property created successfully')
-							if (onSuccess) {
-								onSuccess(data)
-							} else {
-								navigate({ to: '/props/$id', params: { id: data.id } })
-							}
-						},
-						onError: (error) => {
-							toast.error(
-								`Failed to create property: ${error.message || 'Unknown'}`,
-							)
-						},
+				createProp.mutate(payload, {
+					onSuccess: (data) => {
+						setForm(initialForm)
+						toast.success('Property created successfully')
+						if (onSuccess) {
+							onSuccess(data)
+						} else {
+							navigate({ to: '/props/$id', params: { id: data.id } })
+						}
 					},
-				)
+					onError: (error) => {
+						toast.error(
+							`Failed to create property: ${error.message || 'Unknown'}`,
+						)
+					},
+				})
 			}
 		},
 		[

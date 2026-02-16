@@ -26,6 +26,7 @@
 ### 1. Network Connectivity (INSTANT) ⚡
 
 **Triggers:**
+
 ```
 User disables WiFi          → INSTANT offline
 User enables airplane mode  → INSTANT offline
@@ -50,6 +51,7 @@ Mutations: Paused
 ### 2. Server Reachability (3-FAILURE THRESHOLD) 🎯
 
 **Triggers:**
+
 ```
 Server error (5xx)   → Count failure
 Network timeout      → Count failure
@@ -107,12 +109,14 @@ false           | false               | false    | You're offline
 ### Network: Instant (No Threshold)
 
 **Reasons:**
+
 - ✅ Browser events are 100% reliable
 - ✅ User knows when they disabled WiFi
 - ✅ No false positives possible
 - ✅ Users expect instant feedback
 
 **Example:**
+
 ```
 User clicks WiFi toggle OFF
   ↓
@@ -124,12 +128,14 @@ App immediately shows "You're offline"  ✅ Expected!
 ### Server: 3 Failures (Threshold Required)
 
 **Reasons:**
+
 - ⚠️ Network requests can fail transiently
 - ⚠️ One timeout doesn't mean server is down
 - ⚠️ Slow network can cause timeouts
 - ⚠️ Want to avoid false positives
 
 **Example without threshold (BAD):**
+
 ```
 User on slow 3G connection
   ↓
@@ -139,6 +145,7 @@ App switches to offline mode  ❌ False positive!
 ```
 
 **Example with threshold (GOOD):**
+
 ```
 User on slow 3G connection
   ↓
@@ -242,6 +249,7 @@ Result: Never goes offline ✅
 ### Edge Case 1: Slow Health Check
 
 **Problem:**
+
 ```
 WiFi comes back online
 Health check takes 5 seconds (slow network)
@@ -249,6 +257,7 @@ User waits...
 ```
 
 **Solution:** Not a problem!
+
 ```
 isNetworkOnline = true (instant)
 isServerReachable = ??? (checking...)
@@ -268,6 +277,7 @@ Banner disappears
 ### Edge Case 2: False Positive from Timeout
 
 **Problem:**
+
 ```
 User on very slow connection
 3 requests timeout in a row
@@ -275,11 +285,13 @@ App goes offline even though server is fine
 ```
 
 **Mitigation:**
+
 - Increase timeout (currently 10s in api/client.ts)
 - Increase threshold (3 → 5 failures)
 - Health check will detect server is actually reachable
 
 **Recovery:**
+
 ```
 consecutiveFailures = 3 → Goes offline
 Next successful request → consecutiveFailures = 0 → Back online
@@ -292,11 +304,13 @@ Health check succeeds → Back online
 ### Edge Case 3: Network Flapping
 
 **Problem:**
+
 ```
 WiFi goes on/off/on/off rapidly
 ```
 
 **Behavior:**
+
 ```
 Off → isNetworkOnline = false (instant)
 On  → isNetworkOnline = true (instant)
@@ -307,6 +321,7 @@ On  → isNetworkOnline = true (instant)
 **Result:** Banner appears/disappears rapidly, but correctly tracks state ✅
 
 **Potential improvement:** Add debouncing if this becomes annoying
+
 ```typescript
 const debouncedIsOnline = useDebouncedValue(isOnline, 500)
 ```
@@ -317,26 +332,26 @@ const debouncedIsOnline = useDebouncedValue(isOnline, 500)
 
 ### ✅ Trigger Offline Mode
 
-| Error Type | Example | Why |
-|------------|---------|-----|
-| Network error | `ERR_NETWORK` | Can't reach server |
-| Timeout | `ECONNABORTED` | Server too slow/unreachable |
-| No response | `error.response === undefined` | Connection failed |
-| 500 errors | `500 Internal Server Error` | Server broken |
-| 502 errors | `502 Bad Gateway` | Proxy/load balancer issue |
-| 503 errors | `503 Service Unavailable` | Server overloaded/maintenance |
-| 504 errors | `504 Gateway Timeout` | Server too slow |
+| Error Type    | Example                        | Why                           |
+| ------------- | ------------------------------ | ----------------------------- |
+| Network error | `ERR_NETWORK`                  | Can't reach server            |
+| Timeout       | `ECONNABORTED`                 | Server too slow/unreachable   |
+| No response   | `error.response === undefined` | Connection failed             |
+| 500 errors    | `500 Internal Server Error`    | Server broken                 |
+| 502 errors    | `502 Bad Gateway`              | Proxy/load balancer issue     |
+| 503 errors    | `503 Service Unavailable`      | Server overloaded/maintenance |
+| 504 errors    | `504 Gateway Timeout`          | Server too slow               |
 
 ### ❌ Don't Trigger Offline Mode
 
-| Error Type | Example | Why |
-|------------|---------|-----|
-| 400 errors | `400 Bad Request` | Client error, not server issue |
-| 401 errors | `401 Unauthorized` | Auth issue, not offline |
-| 403 errors | `403 Forbidden` | Permission issue, not offline |
-| 404 errors | `404 Not Found` | Resource missing, not offline |
-| 409 errors | `409 Conflict` | Data conflict, not offline |
-| 422 errors | `422 Validation Error` | Data invalid, not offline |
+| Error Type | Example                | Why                            |
+| ---------- | ---------------------- | ------------------------------ |
+| 400 errors | `400 Bad Request`      | Client error, not server issue |
+| 401 errors | `401 Unauthorized`     | Auth issue, not offline        |
+| 403 errors | `403 Forbidden`        | Permission issue, not offline  |
+| 404 errors | `404 Not Found`        | Resource missing, not offline  |
+| 409 errors | `409 Conflict`         | Data conflict, not offline     |
+| 422 errors | `422 Validation Error` | Data invalid, not offline      |
 
 ---
 
@@ -351,27 +366,27 @@ Server reachability is detected via response interceptors:
 
 // Success → Reset failure count
 api.interceptors.response.use(
-  (response) => {
-    window.__reportRequestSuccess()
-    return response
-  },
-  (error) => {
-    if (isServerError(error)) {
-      window.__reportRequestFailure()
-    }
-    return Promise.reject(error)
-  }
+	(response) => {
+		window.__reportRequestSuccess()
+		return response
+	},
+	(error) => {
+		if (isServerError(error)) {
+			window.__reportRequestFailure()
+		}
+		return Promise.reject(error)
+	},
 )
 
 function isServerError(error: unknown): boolean {
-  if (!axios.isAxiosError(error)) return false
+	if (!axios.isAxiosError(error)) return false
 
-  // Network errors
-  if (!error.response) return true
+	// Network errors
+	if (!error.response) return true
 
-  // 5xx errors
-  const status = error.response.status
-  return status >= 500 && status < 600
+	// 5xx errors
+	const status = error.response.status
+	return status >= 500 && status < 600
 }
 ```
 
@@ -382,11 +397,11 @@ function isServerError(error: unknown): boolean {
 
 // Sync online state to TanStack Query
 useEffect(() => {
-  onlineManager.setOnline(isOnline)
+	onlineManager.setOnline(isOnline)
 
-  if (isOnline) {
-    queryClient.resumePausedMutations()
-  }
+	if (isOnline) {
+		queryClient.resumePausedMutations()
+	}
 }, [isOnline])
 ```
 
@@ -402,18 +417,18 @@ useEffect(() => {
 // Network: Always instant (no config needed)
 
 // Server: Adjust these based on your needs
-const MAX_FAILURES_BEFORE_OFFLINE = 3  // Increase for slower networks
+const MAX_FAILURES_BEFORE_OFFLINE = 3 // Increase for slower networks
 const HEALTH_CHECK_INTERVAL_MS = 30000 // Decrease for faster recovery
 ```
 
 **Recommendations:**
 
-| Environment | MAX_FAILURES | HEALTH_CHECK_INTERVAL | Reasoning |
-|-------------|--------------|----------------------|-----------|
-| Local dev | 2 | 10000 (10s) | Fast feedback |
-| Staging | 3 | 30000 (30s) | Balanced |
-| Production | 3-5 | 30000 (30s) | Avoid false positives |
-| Slow networks | 5 | 60000 (60s) | Give more time |
+| Environment   | MAX_FAILURES | HEALTH_CHECK_INTERVAL | Reasoning             |
+| ------------- | ------------ | --------------------- | --------------------- |
+| Local dev     | 2            | 10000 (10s)           | Fast feedback         |
+| Staging       | 3            | 30000 (30s)           | Balanced              |
+| Production    | 3-5          | 30000 (30s)           | Avoid false positives |
+| Slow networks | 5            | 60000 (60s)           | Give more time        |
 
 ---
 
@@ -437,6 +452,7 @@ console.warn('[Network] Going offline', {
 ```
 
 If you see:
+
 - **Many false positives** → Increase MAX_FAILURES
 - **Slow offline detection** → Decrease MAX_FAILURES
 - **Slow recovery** → Decrease HEALTH_CHECK_INTERVAL
@@ -445,13 +461,13 @@ If you see:
 
 ## Summary
 
-| Aspect | Network Detection | Server Detection |
-|--------|------------------|------------------|
-| Trigger | Browser events | Failed requests |
-| Threshold | None (instant) | 3 consecutive failures |
-| Why different? | Events are reliable | Requests can fail transiently |
-| Speed | Instant (0ms) | Varies (5-30s typically) |
-| False positives | None | Possible (mitigated by threshold) |
-| Recovery | Instant on reconnect | Health check polling (30s) |
+| Aspect          | Network Detection    | Server Detection                  |
+| --------------- | -------------------- | --------------------------------- |
+| Trigger         | Browser events       | Failed requests                   |
+| Threshold       | None (instant)       | 3 consecutive failures            |
+| Why different?  | Events are reliable  | Requests can fail transiently     |
+| Speed           | Instant (0ms)        | Varies (5-30s typically)          |
+| False positives | None                 | Possible (mitigated by threshold) |
+| Recovery        | Instant on reconnect | Health check polling (30s)        |
 
 **Result:** Fast, accurate offline detection with minimal false positives! ✅

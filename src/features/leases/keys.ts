@@ -8,7 +8,10 @@ export const leaseKeys = {
 		propertyId?: string | null
 		status?: LeaseStatus | null
 	}) => {
-		if (!filters || (!filters.unitId && !filters.propertyId && !filters.status)) {
+		if (
+			!filters ||
+			(!filters.unitId && !filters.propertyId && !filters.status)
+		) {
 			return ['leases', 'list'] as const
 		}
 		const parts: Array<string | number | null | undefined> = ['leases', 'list']

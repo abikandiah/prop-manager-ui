@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { cn } from '@abumble/design-system/utils'
@@ -11,51 +12,13 @@ import {
 	TableRow,
 } from '@abumble/design-system/components/Table'
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
-import { FormDialog } from '@abumble/design-system/components/Dialog'
-import { LeaseTemplateFormWizard } from '../forms/LeaseTemplateFormWizard'
 import type { LeaseTemplate } from '@/domain/lease-template'
 import {
-	useDeleteLeaseTemplate,
 	useLeaseTemplatesActive,
 	useLeaseTemplatesList,
 } from '@/features/lease-templates/hooks'
-import { EntityActions } from '@/components/ui'
 import { config } from '@/config'
 import { formatDate } from '@/lib/format'
-
-function LeaseTemplateRowActions({
-	template,
-	onEdit,
-}: {
-	template: LeaseTemplate
-	onEdit: () => void
-}) {
-	const deleteTemplate = useDeleteLeaseTemplate()
-
-	return (
-		<EntityActions
-			label="Template actions"
-			onEdit={onEdit}
-			onDelete={() => {
-				deleteTemplate.mutate(template.id, {
-					onSuccess: () => toast.success('Template deleted'),
-					onError: (err) =>
-						toast.error(err.message || 'Failed to delete template'),
-				})
-			}}
-			isDeletePending={deleteTemplate.isPending}
-			deleteTitle="Delete template?"
-			deleteDescription={
-				<>
-					Template &quot;{template.name}&quot; will be removed. Existing leases
-					stamped from this template will keep their content but the template
-					reference will be cleared.
-				</>
-			}
-			stopTriggerPropagation
-		/>
-	)
-}
 
 export interface LeaseTemplatesTableViewProps {
 	activeOnly?: boolean
@@ -64,6 +27,7 @@ export interface LeaseTemplatesTableViewProps {
 export function LeaseTemplatesTableView({
 	activeOnly = false,
 }: LeaseTemplatesTableViewProps) {
+	const navigate = useNavigate()
 	const allTemplates = useLeaseTemplatesList()
 	const activeTemplates = useLeaseTemplatesActive()
 
@@ -74,24 +38,11 @@ export function LeaseTemplatesTableView({
 		error,
 	} = activeOnly ? activeTemplates : allTemplates
 
-	const [editingTemplate, setEditingTemplate] = useState<LeaseTemplate | null>(
-		null,
-	)
-	const [wizardStep, setWizardStep] = useState<1 | 2 | 3>(1)
-
-	const getStepTitle = (step: 1 | 2 | 3) => {
-		if (step === 1) return 'Template Details'
-		if (step === 2) return 'Template Parameters'
-		return 'Template Content'
-	}
-
-	const handleEditClose = () => {
-		setEditingTemplate(null)
-		setWizardStep(1) // Reset wizard step when closing
-	}
-
 	const handleRowClick = (template: LeaseTemplate) => {
-		setEditingTemplate(template)
+		navigate({
+			to: '/leases/templates/$templateId',
+			params: { templateId: template.id },
+		})
 	}
 
 	useEffect(() => {
@@ -111,7 +62,6 @@ export function LeaseTemplatesTableView({
 						<TableHead>Late fee</TableHead>
 						<TableHead>Notice period</TableHead>
 						<TableHead>Created</TableHead>
-						<TableHead className="w-12" />
 					</TableRow>
 				</TableHeader>
 				<TableBody>
@@ -135,7 +85,6 @@ export function LeaseTemplatesTableView({
 							<TableCell>
 								<Skeleton className="h-6 w-24" />
 							</TableCell>
-							<TableCell />
 						</TableRow>
 					))}
 				</TableBody>
@@ -149,105 +98,70 @@ export function LeaseTemplatesTableView({
 			delayMs={config.loadingFallbackDelayMs}
 			fallback={skeletonTable}
 		>
-			<>
-				<div className="rounded border bg-card overflow-hidden">
-					<Table>
-						<TableHeader>
+			<div className="rounded border bg-card overflow-hidden">
+				<Table>
+					<TableHeader>
+						<TableRow>
+							<TableHead>Name</TableHead>
+							<TableHead>Version</TableHead>
+							<TableHead>Status</TableHead>
+							<TableHead>Late fee</TableHead>
+							<TableHead>Notice period</TableHead>
+							<TableHead>Created</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
+						{!templates || templates.length === 0 ? (
 							<TableRow>
-								<TableHead>Name</TableHead>
-								<TableHead>Version</TableHead>
-								<TableHead>Status</TableHead>
-								<TableHead>Late fee</TableHead>
-								<TableHead>Notice period</TableHead>
-								<TableHead>Created</TableHead>
-								<TableHead className="w-12" />
+								<TableCell
+									colSpan={6}
+									className="h-24 text-center text-muted-foreground"
+								>
+									No templates yet. Create one above.
+								</TableCell>
 							</TableRow>
-						</TableHeader>
-						<TableBody>
-							{!templates || templates.length === 0 ? (
-								<TableRow>
-									<TableCell
-										colSpan={7}
-										className="h-24 text-center text-muted-foreground"
-									>
-										No templates yet. Create one above.
+						) : (
+							templates.map((template) => (
+								<TableRow
+									key={template.id}
+									className="cursor-pointer hover:bg-muted/50"
+									onClick={() => handleRowClick(template)}
+								>
+									<TableCell className="font-medium">{template.name}</TableCell>
+									<TableCell className="text-muted-foreground">
+										{template.versionTag || '—'}
+									</TableCell>
+									<TableCell>
+										<span
+											className={cn(
+												'inline-flex items-center rounded-full px-2 py-1 text-xs font-medium',
+												template.active
+													? 'bg-primary/10 text-primary'
+													: 'bg-muted text-muted-foreground',
+											)}
+										>
+											{template.active ? 'Active' : 'Inactive'}
+										</span>
+									</TableCell>
+									<TableCell className="text-muted-foreground">
+										{template.defaultLateFeeType
+											? `${template.defaultLateFeeType.replace(/_/g, ' ')} ${template.defaultLateFeeAmount ? `($${template.defaultLateFeeAmount})` : ''}`
+											: '—'}
+									</TableCell>
+									<TableCell className="text-muted-foreground">
+										{template.defaultNoticePeriodDays != null
+											? `${template.defaultNoticePeriodDays} days`
+											: '—'}
+									</TableCell>
+									<TableCell className="text-muted-foreground">
+										{formatDate(template.createdAt)}
 									</TableCell>
 								</TableRow>
-							) : (
-								templates.map((template) => (
-									<TableRow
-										key={template.id}
-										className="cursor-pointer hover:bg-muted/50"
-										onClick={() => handleRowClick(template)}
-									>
-										<TableCell className="font-medium">
-											{template.name}
-										</TableCell>
-										<TableCell className="text-muted-foreground">
-											{template.versionTag || '—'}
-										</TableCell>
-										<TableCell>
-											<span
-												className={cn(
-													'inline-flex items-center rounded-full px-2 py-1 text-xs font-medium',
-													template.active
-														? 'bg-primary/10 text-primary'
-														: 'bg-muted text-muted-foreground',
-												)}
-											>
-												{template.active ? 'Active' : 'Inactive'}
-											</span>
-										</TableCell>
-										<TableCell className="text-muted-foreground">
-											{template.defaultLateFeeType
-												? `${template.defaultLateFeeType.replace(/_/g, ' ')} ${template.defaultLateFeeAmount ? `($${template.defaultLateFeeAmount})` : ''}`
-												: '—'}
-										</TableCell>
-										<TableCell className="text-muted-foreground">
-											{template.defaultNoticePeriodDays != null
-												? `${template.defaultNoticePeriodDays} days`
-												: '—'}
-										</TableCell>
-										<TableCell className="text-muted-foreground">
-											{formatDate(template.createdAt)}
-										</TableCell>
-										<TableCell onClick={(e) => e.stopPropagation()}>
-											<LeaseTemplateRowActions
-												template={template}
-												onEdit={() => setEditingTemplate(template)}
-											/>
-										</TableCell>
-									</TableRow>
-								))
-							)}
-						</TableBody>
-					</Table>
-				</div>
-
-				{editingTemplate && (
-					<FormDialog
-						open={!!editingTemplate}
-						onOpenChange={handleEditClose}
-						title="Edit template"
-						description="Update template details."
-						className="max-w-[calc(100vw-2rem)] sm:max-w-5xl"
-						wizard={{
-							currentStep: wizardStep,
-							totalSteps: 3,
-							stepTitle: getStepTitle(wizardStep),
-						}}
-					>
-						<LeaseTemplateFormWizard
-							step={wizardStep}
-							onStepChange={setWizardStep}
-							initialTemplate={editingTemplate}
-							onSuccess={handleEditClose}
-							onCancel={handleEditClose}
-							submitLabel="Save"
-						/>
-					</FormDialog>
-				)}
-			</>
+							))
+						)}
+					</TableBody>
+				</Table>
+			</div>
 		</DelayedLoadingFallback>
 	)
 }

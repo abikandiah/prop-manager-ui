@@ -2,15 +2,15 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@abumble/design-system/components/Button'
 import { Input } from '@abumble/design-system/components/Input'
-import type {
-	CreateLeasePayload,
-	Lease,
-	LateFeeType,
-	UpdateLeasePayload,
-} from '@/domain/lease'
 import { DialogFooter } from '@abumble/design-system/components/Dialog'
 import { Label } from '@abumble/design-system/components/Label'
 import { Select } from '@abumble/design-system/components/Select'
+import type {
+	CreateLeasePayload,
+	LateFeeType,
+	Lease,
+	UpdateLeasePayload,
+} from '@/domain/lease'
 import { useCreateLease, useUpdateLease } from '@/features/leases/hooks'
 import { useUnitsList } from '@/features/units'
 import { usePropsList } from '@/features/props'
@@ -56,7 +56,9 @@ function leaseToFormState(lease: Lease): FormState {
 		rentAmount: String(lease.rentAmount),
 		rentDueDay: String(lease.rentDueDay),
 		securityDepositHeld:
-			lease.securityDepositHeld != null ? String(lease.securityDepositHeld) : '',
+			lease.securityDepositHeld != null
+				? String(lease.securityDepositHeld)
+				: '',
 		lateFeeType: lease.lateFeeType ?? '',
 		lateFeeAmount:
 			lease.lateFeeAmount != null ? String(lease.lateFeeAmount) : '',
@@ -84,7 +86,9 @@ export function LeaseForm({
 }: LeaseFormProps) {
 	const isEdit = initialLease != null
 	const [form, setForm] = useState<FormState>(() => {
-		const state = initialLease ? leaseToFormState(initialLease) : initialFormState
+		const state = initialLease
+			? leaseToFormState(initialLease)
+			: initialFormState
 		if (propertyId) state.propertyId = propertyId
 		if (unitId) state.unitId = unitId
 		return state
@@ -115,10 +119,7 @@ export function LeaseForm({
 		const { name, value } = e.target
 		setForm((prev) => ({
 			...prev,
-			[name]:
-				name === 'lateFeeType'
-					? (value as LateFeeType | '')
-					: value,
+			[name]: name === 'lateFeeType' ? (value as LateFeeType | '') : value,
 		}))
 	}
 
@@ -215,10 +216,7 @@ export function LeaseForm({
 			toast.error('Security deposit must be a valid number')
 			return
 		}
-		if (
-			form.lateFeeAmount.trim() &&
-			isNaN(parseFloat(form.lateFeeAmount))
-		) {
+		if (form.lateFeeAmount.trim() && isNaN(parseFloat(form.lateFeeAmount))) {
 			toast.error('Late fee amount must be a valid number')
 			return
 		}
@@ -426,9 +424,7 @@ export function LeaseForm({
 				</div>
 			</div>
 			<div className="space-y-2">
-				<Label htmlFor="securityDepositHeld">
-					Security deposit held ($)
-				</Label>
+				<Label htmlFor="securityDepositHeld">Security deposit held ($)</Label>
 				<Input
 					id="securityDepositHeld"
 					name="securityDepositHeld"

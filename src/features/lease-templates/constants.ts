@@ -37,7 +37,9 @@ export const ALL_BUILTIN_PARAMETERS = [
 /**
  * Set of system parameter keys for fast lookup.
  */
-export const SYSTEM_KEYS = new Set<string>(SYSTEM_PARAMETERS.map((sp) => sp.key))
+export const SYSTEM_KEYS = new Set<string>(
+	SYSTEM_PARAMETERS.map((sp) => sp.key),
+)
 
 /**
  * Preview values used in markdown editor to show sample data.

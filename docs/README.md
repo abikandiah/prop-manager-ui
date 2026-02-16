@@ -76,11 +76,13 @@ The Property Manager UI works seamlessly whether you're online or offline:
 #### 1. Network Detection (Two Types)
 
 **Network Connectivity** - Instant detection
+
 - Monitors `navigator.onLine`
 - Detects WiFi/cellular state changes
 - No threshold, immediate feedback
 
 **Server Reachability** - 3-failure threshold
+
 - Monitors API request failures
 - Requires 3 consecutive failures before marking offline
 - Prevents false positives from transient network issues
@@ -95,13 +97,14 @@ All create operations include a client-generated UUID in the payload:
 
 ```typescript
 const payload: CreatePropPayload = {
-  id: generateId(), // crypto.randomUUID()
-  legalName: "123 Main St",
-  // ... other fields
+	id: generateId(), // crypto.randomUUID()
+	legalName: '123 Main St',
+	// ... other fields
 }
 ```
 
 **Benefits**:
+
 - ✅ No optimistic ID mapping needed
 - ✅ Eliminates race conditions with dependent mutations
 - ✅ Enables offline creation of related entities
@@ -130,6 +133,7 @@ const db = new AppDatabase(user.id)
 ```
 
 **Privacy benefits**:
+
 - ✅ Users can't see each other's cached data
 - ✅ Clean logout (delete user's database)
 - ✅ No cross-user contamination
@@ -170,7 +174,7 @@ const requestId = stableRequestId(['createProp'], payload)
 // Same payload → same request ID → backend dedupes
 
 return propsApi.create(payload, {
-  [IDEMPOTENCY_HEADER]: requestId // X-Request-Id
+	[IDEMPOTENCY_HEADER]: requestId, // X-Request-Id
 })
 ```
 
@@ -198,34 +202,38 @@ src/
 
 ```typescript
 // src/contexts/network.tsx
-const MAX_FAILURES_BEFORE_OFFLINE = 3  // Server unreachable threshold
+const MAX_FAILURES_BEFORE_OFFLINE = 3 // Server unreachable threshold
 const HEALTH_CHECK_INTERVAL_MS = 30000 // Poll interval when offline (30s)
 
 // src/config/index.ts
-queryCacheStaleTimeMs: 5 * 60 * 1000      // 5 minutes
-queryCacheGcTimeMs: 24 * 60 * 60 * 1000   // 24 hours
-queryCacheMaxAgeHours: 168                // 7 days
+queryCacheStaleTimeMs: 5 * 60 * 1000 // 5 minutes
+queryCacheGcTimeMs: 24 * 60 * 60 * 1000 // 24 hours
+queryCacheMaxAgeHours: 168 // 7 days
 ```
 
 ### Common Tasks
 
 **Check if app is offline**:
+
 ```typescript
 const { isOnline } = useNetwork()
 ```
 
 **Generate a new UUID**:
+
 ```typescript
 import { generateId } from '@/lib/util'
 const id = generateId()
 ```
 
 **Resume paused mutations**:
+
 ```typescript
 queryClient.resumePausedMutations()
 ```
 
 **Clear user's offline data**:
+
 ```typescript
 await clearUserDb(userId)
 ```
@@ -268,19 +276,19 @@ See: [OFFLINE_IMPLEMENTATION_PLAN.md](./OFFLINE_IMPLEMENTATION_PLAN.md#testing-c
 
 Current state as of 2026-02-14:
 
-| Feature | Status | Notes |
-|---------|--------|-------|
-| Query cache persistence | ✅ Complete | IndexedDB via Dexie |
-| Network detection | ✅ Complete | Browser events + health checks |
-| Server reachability | ✅ Complete | 3-failure threshold |
-| Optimistic updates | ✅ Complete | All features implement |
-| Client-generated IDs | ✅ Complete | All create payloads |
-| Idempotency | ✅ Complete | X-Request-Id header |
-| User-scoped databases | ✅ Complete | One DB per user |
-| Mutation persistence | ✅ Complete | TanStack built-in |
-| Mutation resume | ✅ Complete | Auto-resume on reconnect |
-| UI feedback | ⚠️ Partial | Banner exists, need sync indicators |
-| Conflict resolution | ❌ Missing | Backend version enforcement needed |
+| Feature                 | Status      | Notes                               |
+| ----------------------- | ----------- | ----------------------------------- |
+| Query cache persistence | ✅ Complete | IndexedDB via Dexie                 |
+| Network detection       | ✅ Complete | Browser events + health checks      |
+| Server reachability     | ✅ Complete | 3-failure threshold                 |
+| Optimistic updates      | ✅ Complete | All features implement              |
+| Client-generated IDs    | ✅ Complete | All create payloads                 |
+| Idempotency             | ✅ Complete | X-Request-Id header                 |
+| User-scoped databases   | ✅ Complete | One DB per user                     |
+| Mutation persistence    | ✅ Complete | TanStack built-in                   |
+| Mutation resume         | ✅ Complete | Auto-resume on reconnect            |
+| UI feedback             | ⚠️ Partial  | Banner exists, need sync indicators |
+| Conflict resolution     | ❌ Missing  | Backend version enforcement needed  |
 
 See: [OFFLINE_REVIEW.md](./OFFLINE_REVIEW.md) for detailed status and missing pieces.
 
@@ -293,6 +301,7 @@ See: [OFFLINE_REVIEW.md](./OFFLINE_REVIEW.md) for detailed status and missing pi
 **Cause**: `resumePausedMutations()` not called
 
 **Solution**: Verify it's called in two places:
+
 1. After cache restore (root-provider.tsx `onSuccess`)
 2. When network reconnects (network.tsx)
 

@@ -147,10 +147,14 @@ export function useCreateProp() {
 
 	return {
 		...mutation,
-		mutate: (payload: CreatePropPayloadWithoutId, options?: Parameters<typeof mutation.mutate>[1]) =>
-			mutation.mutate({ ...payload, id: generateId() }, options),
-		mutateAsync: (payload: CreatePropPayloadWithoutId, options?: Parameters<typeof mutation.mutateAsync>[1]) =>
-			mutation.mutateAsync({ ...payload, id: generateId() }, options),
+		mutate: (
+			payload: CreatePropPayloadWithoutId,
+			options?: Parameters<typeof mutation.mutate>[1],
+		) => mutation.mutate({ ...payload, id: generateId() }, options),
+		mutateAsync: (
+			payload: CreatePropPayloadWithoutId,
+			options?: Parameters<typeof mutation.mutateAsync>[1],
+		) => mutation.mutateAsync({ ...payload, id: generateId() }, options),
 	}
 }
 

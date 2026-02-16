@@ -25,19 +25,21 @@
 ## How TanStack Query Handles Mutations
 
 ### Normal (Online) Behavior:
+
 ```typescript
 // Multiple mutations execute in PARALLEL
-mutate1({ name: 'A' })  // Starts immediately
-mutate2({ name: 'B' })  // Starts immediately (doesn't wait for mutate1)
-mutate3({ name: 'C' })  // Starts immediately (doesn't wait for mutate1 or mutate2)
+mutate1({ name: 'A' }) // Starts immediately
+mutate2({ name: 'B' }) // Starts immediately (doesn't wait for mutate1)
+mutate3({ name: 'C' }) // Starts immediately (doesn't wait for mutate1 or mutate2)
 ```
 
 ### Paused Mutations (Offline):
+
 ```typescript
 // User goes offline
-mutate1({ name: 'A' })  // Pauses, state.isPaused = true
-mutate2({ name: 'B' })  // Pauses, state.isPaused = true
-mutate3({ name: 'C' })  // Pauses, state.isPaused = true
+mutate1({ name: 'A' }) // Pauses, state.isPaused = true
+mutate2({ name: 'B' }) // Pauses, state.isPaused = true
+mutate3({ name: 'C' }) // Pauses, state.isPaused = true
 
 // User comes back online
 queryClient.resumePausedMutations()
@@ -45,6 +47,7 @@ queryClient.resumePausedMutations()
 ```
 
 ### MutationCache Storage:
+
 ```typescript
 // TanStack stores mutations in a Map
 class MutationCache {
@@ -66,6 +69,7 @@ resumePausedMutations() {
 ## The Problem: Dependent Mutations
 
 ### Scenario:
+
 ```typescript
 // While offline:
 1. Create property → propertyId: "opt-123" (optimistic)
@@ -89,16 +93,17 @@ resumePausedMutations()
 
 ```typescript
 // ✅ These execute in order:
-mutationKey: ['createProperty']  // Mutation 1
-mutationKey: ['createProperty']  // Mutation 2 (waits for 1)
-mutationKey: ['createProperty']  // Mutation 3 (waits for 2)
+mutationKey: ['createProperty'] // Mutation 1
+mutationKey: ['createProperty'] // Mutation 2 (waits for 1)
+mutationKey: ['createProperty'] // Mutation 3 (waits for 2)
 
 // ❌ These execute in parallel:
-mutationKey: ['createProperty']  // Mutation 1
-mutationKey: ['createUnit']      // Mutation 2 (doesn't wait!)
+mutationKey: ['createProperty'] // Mutation 1
+mutationKey: ['createUnit'] // Mutation 2 (doesn't wait!)
 ```
 
 **Current Code:**
+
 ```typescript
 // props/hooks.ts
 mutationKey: ['createProp']
@@ -110,10 +115,11 @@ mutationKey: ['createUnit']
 ```
 
 **Fix for ordering:**
+
 ```typescript
 // Use same key prefix for related mutations
 mutationKey: ['mutations', 'createProp']
-mutationKey: ['mutations', 'createUnit']  // Still different
+mutationKey: ['mutations', 'createUnit'] // Still different
 ```
 
 **This doesn't help!** Different keys still run in parallel.
@@ -123,36 +129,37 @@ mutationKey: ['mutations', 'createUnit']  // Still different
 ### Option 2: Global Mutation Queue (Custom)
 
 **Implementation:**
+
 ```typescript
 // src/lib/mutation-queue.ts
 class MutationQueue {
-  private queue: Array<() => Promise<void>> = []
-  private processing = false
+	private queue: Array<() => Promise<void>> = []
+	private processing = false
 
-  async add(fn: () => Promise<void>) {
-    this.queue.push(fn)
-    if (!this.processing) {
-      await this.process()
-    }
-  }
+	async add(fn: () => Promise<void>) {
+		this.queue.push(fn)
+		if (!this.processing) {
+			await this.process()
+		}
+	}
 
-  private async process() {
-    this.processing = true
-    while (this.queue.length > 0) {
-      const fn = this.queue.shift()!
-      await fn()
-    }
-    this.processing = false
-  }
+	private async process() {
+		this.processing = true
+		while (this.queue.length > 0) {
+			const fn = this.queue.shift()!
+			await fn()
+		}
+		this.processing = false
+	}
 }
 
 export const mutationQueue = new MutationQueue()
 
 // Usage in hooks:
 mutationFn: (payload) => {
-  return mutationQueue.add(async () => {
-    return propsApi.create(payload)
-  })
+	return mutationQueue.add(async () => {
+		return propsApi.create(payload)
+	})
 }
 ```
 
@@ -168,36 +175,36 @@ mutationFn: (payload) => {
 ```typescript
 // When property is created:
 onSuccess: (realProp, variables, context) => {
-  const optimisticId = context.optimisticId
-  const realId = realProp.id
+	const optimisticId = context.optimisticId
+	const realId = realProp.id
 
-  // Update cache: replace optimistic ID with real ID
-  queryClient.setQueryData(['props', 'list'], (old) =>
-    old.map(p => p.id === optimisticId ? realProp : p)
-  )
+	// Update cache: replace optimistic ID with real ID
+	queryClient.setQueryData(['props', 'list'], (old) =>
+		old.map((p) => (p.id === optimisticId ? realProp : p)),
+	)
 
-  // Update any pending mutations that reference this ID
-  updatePendingMutations(queryClient, optimisticId, realId)
+	// Update any pending mutations that reference this ID
+	updatePendingMutations(queryClient, optimisticId, realId)
 }
 
 function updatePendingMutations(
-  queryClient: QueryClient,
-  optimisticId: string,
-  realId: string
+	queryClient: QueryClient,
+	optimisticId: string,
+	realId: string,
 ) {
-  const mutations = queryClient.getMutationCache().getAll()
+	const mutations = queryClient.getMutationCache().getAll()
 
-  mutations.forEach(mutation => {
-    if (mutation.state.isPaused && mutation.state.variables) {
-      const vars = mutation.state.variables as any
+	mutations.forEach((mutation) => {
+		if (mutation.state.isPaused && mutation.state.variables) {
+			const vars = mutation.state.variables as any
 
-      // Update any fields that reference the optimistic ID
-      if (vars.propertyId === optimisticId) {
-        // ⚠️ Problem: Can't directly mutate mutation.state.variables
-        // TanStack doesn't expose an API for this
-      }
-    }
-  })
+			// Update any fields that reference the optimistic ID
+			if (vars.propertyId === optimisticId) {
+				// ⚠️ Problem: Can't directly mutate mutation.state.variables
+				// TanStack doesn't expose an API for this
+			}
+		}
+	})
 }
 ```
 
@@ -236,11 +243,13 @@ if (propertyId.startsWith('opt-')) {
 ```
 
 **Pros:**
+
 - ✅ Handles order issues
 - ✅ No frontend complexity
 - ✅ Works even with parallel mutations
 
 **Cons:**
+
 - ❌ Requires backend changes
 - ❌ Backend needs to maintain optimistic ID mapping
 
@@ -267,11 +276,13 @@ retryDelay: (attemptIndex) => {
 ```
 
 **Pros:**
+
 - ✅ Simple to implement
 - ✅ No backend changes
 - ✅ Handles race conditions gracefully
 
 **Cons:**
+
 - ⚠️ Delays (waits for retries)
 - ⚠️ Still might fail if property creation fails
 
@@ -302,60 +313,63 @@ retryDelay: (attemptIndex) => {
 
 ```typescript
 export function useCreateUnit() {
-  return useMutation({
-    mutationKey: ['createUnit'],
-    networkMode: 'online',
-    mutationFn: async (payload: CreateUnitPayload) => {
-      const requestId = stableRequestId(['createUnit'], payload)
-      return unitsApi.create(payload, { [IDEMPOTENCY_HEADER]: requestId })
-    },
-    retry: (failureCount, error) => {
-      // If property doesn't exist yet, retry
-      if (
-        error.response?.status === 404 &&
-        error.response?.data?.message?.includes('property') &&
-        failureCount < 5
-      ) {
-        console.log(`Property not found, retrying unit creation (attempt ${failureCount + 1})`)
-        return true
-      }
-      return failureCount < 2  // Normal retry for other errors
-    },
-    retryDelay: (attemptIndex) => {
-      return Math.min(1000 * 2 ** attemptIndex, 10000)
-    },
-    onMutate: async (payload) => {
-      // Optimistic update
-      await queryClient.cancelQueries({ queryKey: unitKeys.all })
-      const previousUnits = queryClient.getQueryData(unitKeys.list())
-      const optimistic = applyCreate(queryClient, payload)
-      return { previousUnits, optimisticId: optimistic.id }
-    },
-    onError: (err, _, context) => {
-      // Rollback
-      if (context?.previousUnits) {
-        queryClient.setQueryData(unitKeys.list(), context.previousUnits)
-      }
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: unitKeys.all })
-    },
-  })
+	return useMutation({
+		mutationKey: ['createUnit'],
+		networkMode: 'online',
+		mutationFn: async (payload: CreateUnitPayload) => {
+			const requestId = stableRequestId(['createUnit'], payload)
+			return unitsApi.create(payload, { [IDEMPOTENCY_HEADER]: requestId })
+		},
+		retry: (failureCount, error) => {
+			// If property doesn't exist yet, retry
+			if (
+				error.response?.status === 404 &&
+				error.response?.data?.message?.includes('property') &&
+				failureCount < 5
+			) {
+				console.log(
+					`Property not found, retrying unit creation (attempt ${failureCount + 1})`,
+				)
+				return true
+			}
+			return failureCount < 2 // Normal retry for other errors
+		},
+		retryDelay: (attemptIndex) => {
+			return Math.min(1000 * 2 ** attemptIndex, 10000)
+		},
+		onMutate: async (payload) => {
+			// Optimistic update
+			await queryClient.cancelQueries({ queryKey: unitKeys.all })
+			const previousUnits = queryClient.getQueryData(unitKeys.list())
+			const optimistic = applyCreate(queryClient, payload)
+			return { previousUnits, optimisticId: optimistic.id }
+		},
+		onError: (err, _, context) => {
+			// Rollback
+			if (context?.previousUnits) {
+				queryClient.setQueryData(unitKeys.list(), context.previousUnits)
+			}
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: unitKeys.all })
+		},
+	})
 }
 ```
 
 ## Summary
 
-| Approach | Order Guarantee | Complexity | Backend Change | Recommended |
-|----------|----------------|------------|----------------|-------------|
-| Default TanStack | ❌ No (parallel) | Low | No | ❌ Don't use |
-| Same mutationKey | ✅ Yes (same key only) | Low | No | ⚠️ Limited use |
-| Global Queue | ✅ Yes | High | No | ❌ Overkill |
-| Backend Optimistic IDs | ✅ Yes | Medium | Yes | ✅ If possible |
-| Smart Retry | ⚠️ Eventually | Low | No | ✅ **Recommended** |
-| Independent Design | ✅ N/A | Low | No | ✅ **Best** |
+| Approach               | Order Guarantee        | Complexity | Backend Change | Recommended        |
+| ---------------------- | ---------------------- | ---------- | -------------- | ------------------ |
+| Default TanStack       | ❌ No (parallel)       | Low        | No             | ❌ Don't use       |
+| Same mutationKey       | ✅ Yes (same key only) | Low        | No             | ⚠️ Limited use     |
+| Global Queue           | ✅ Yes                 | High       | No             | ❌ Overkill        |
+| Backend Optimistic IDs | ✅ Yes                 | Medium     | Yes            | ✅ If possible     |
+| Smart Retry            | ⚠️ Eventually          | Low        | No             | ✅ **Recommended** |
+| Independent Design     | ✅ N/A                 | Low        | No             | ✅ **Best**        |
 
 **Final Answer:**
+
 - TanStack does NOT guarantee mutation order when resuming
 - Use **Smart Retry** + **Independent Mutation Design** to handle this
 - For critical order, restructure mutations to be independent

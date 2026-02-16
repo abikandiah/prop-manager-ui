@@ -111,7 +111,7 @@ export function TemplateDetailsStep({
 			</div>
 
 			{isEdit && (
-				<div className="flex items-center gap-2">
+				<div className="flex items-center gap-2 pt-2">
 					<Checkbox
 						id="active"
 						checked={active}

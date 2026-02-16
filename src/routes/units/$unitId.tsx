@@ -9,7 +9,12 @@ import type { Unit } from '@/domain/unit'
 import { usePropDetail } from '@/features/props'
 import { UnitForm, useDeleteUnit, useUnitDetail } from '@/features/units'
 import { formatCurrency } from '@/lib/format'
-import { EntityActions, TextLink } from '@/components/ui'
+import {
+	DetailField,
+	DETAIL_LABEL_CLASS,
+	EntityActions,
+	TextLink,
+} from '@/components/ui'
 import { config } from '@/config'
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
 
@@ -68,7 +73,7 @@ function UnitDetailPage() {
 
 	useEffect(() => {
 		if (isError) {
-			toast.error(`Error loading unit: ${error?.message || 'Unknown'}`)
+			toast.error(`Error loading unit: ${error.message || 'Unknown'}`)
 		}
 	}, [isError, error])
 
@@ -100,7 +105,7 @@ function UnitDetailPage() {
 					title="Unit not found"
 					description={
 						isError
-							? error?.message || 'Failed to load unit'
+							? error.message || 'Failed to load unit'
 							: 'The unit you were looking for was not found.'
 					}
 					action={<TextLink to="/units">Back to units</TextLink>}
@@ -127,81 +132,50 @@ function UnitDetailPage() {
 					<div className="grid gap-x-8 gap-y-6 md:grid-cols-2 lg:grid-cols-3">
 						{/* Group: Primary Info */}
 						<div className="space-y-6">
-							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Unit Number
-								</label>
-								<p className="mt-1 text-lg font-semibold text-foreground">
-									{unit.unitNumber}
-								</p>
-							</div>
-							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Status
-								</label>
-								<p className="mt-1 text-foreground">
-									{unit.status.replace(/_/g, ' ')}
-								</p>
-							</div>
-							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Property
-								</label>
-								<p className="mt-1 text-foreground font-medium">
-									{prop?.legalName ?? '—'}
-								</p>
-							</div>
+							<DetailField
+								label="Unit Number"
+								valueClassName="text-lg font-semibold text-foreground"
+							>
+								{unit.unitNumber}
+							</DetailField>
+							<DetailField label="Status">
+								{unit.status.replace(/_/g, ' ')}
+							</DetailField>
+							<DetailField
+								label="Property"
+								valueClassName="text-foreground font-medium"
+							>
+								{prop?.legalName ?? '—'}
+							</DetailField>
 						</div>
 
 						{/* Group: Financials */}
 						<div className="space-y-6">
-							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Rent
-								</label>
-								<p className="mt-1 text-foreground">
-									{formatCurrency(unit.rentAmount)}
-								</p>
-							</div>
-							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Security Deposit
-								</label>
-								<p className="mt-1 text-foreground">
-									{unit.securityDeposit != null
-										? formatCurrency(unit.securityDeposit)
-										: '—'}
-								</p>
-							</div>
+							<DetailField label="Rent">
+								{formatCurrency(unit.rentAmount)}
+							</DetailField>
+							<DetailField label="Security Deposit">
+								{unit.securityDeposit != null
+									? formatCurrency(unit.securityDeposit)
+									: '—'}
+							</DetailField>
 						</div>
 
 						{/* Group: Specs */}
 						<div className="space-y-6">
-							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Beds / Baths
-								</label>
-								<p className="mt-1 text-foreground">
-									{unit.bedrooms ?? '—'} / {unit.bathrooms ?? '—'}
-								</p>
-							</div>
-							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Square Footage
-								</label>
-								<p className="mt-1 text-foreground">
-									{unit.squareFootage != null
-										? `${unit.squareFootage.toLocaleString()} sq ft`
-										: '—'}
-								</p>
-							</div>
+							<DetailField label="Beds / Baths">
+								{unit.bedrooms ?? '—'} / {unit.bathrooms ?? '—'}
+							</DetailField>
+							<DetailField label="Square Footage">
+								{unit.squareFootage != null
+									? `${unit.squareFootage.toLocaleString()} sq ft`
+									: '—'}
+							</DetailField>
 						</div>
 
 						{/* Group: Features (Full width on small, grid-col span on large) */}
-						<div className="md:col-span-2 lg:col-span-3 pt-4 border-t">
-							<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-								Features
-							</label>
+						<div className="md:col-span-2 lg:col-span-3 border-t pt-4">
+							<label className={DETAIL_LABEL_CLASS}>Features</label>
 							<div className="mt-2 flex flex-wrap gap-2">
 								{[
 									unit.balcony && 'Balcony',
@@ -227,13 +201,13 @@ function UnitDetailPage() {
 
 						{/* Group: Description (Full Width) */}
 						{unit.description && (
-							<div className="md:col-span-2 lg:col-span-3 pt-4 border-t">
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Description
-								</label>
-								<p className="mt-2 text-foreground whitespace-pre-wrap leading-relaxed">
+							<div className="md:col-span-2 lg:col-span-3 border-t pt-4">
+								<DetailField
+									label="Description"
+									valueClassName="text-foreground whitespace-pre-wrap leading-relaxed"
+								>
 									{unit.description}
-								</p>
+								</DetailField>
 							</div>
 						)}
 					</div>

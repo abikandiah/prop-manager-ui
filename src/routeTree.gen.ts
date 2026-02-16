@@ -20,12 +20,14 @@ import { Route as DevIndexRouteImport } from './routes/dev/index'
 import { Route as UnitsUnitIdRouteImport } from './routes/units/$unitId'
 import { Route as PublicTermsRouteImport } from './routes/public/terms'
 import { Route as PublicPrivacyRouteImport } from './routes/public/privacy'
-import { Route as LeasesTemplatesRouteImport } from './routes/leases/templates'
 import { Route as LeasesAgreementsRouteImport } from './routes/leases/agreements'
 import { Route as LeasesLeaseIdRouteImport } from './routes/leases/$leaseId'
 import { Route as DevAuthRouteImport } from './routes/dev/auth'
 import { Route as PropsIdRouteRouteImport } from './routes/props/$id/route'
+import { Route as LeasesTemplatesRouteRouteImport } from './routes/leases/templates/route'
 import { Route as PropsIdIndexRouteImport } from './routes/props/$id/index'
+import { Route as LeasesTemplatesIndexRouteImport } from './routes/leases/templates/index'
+import { Route as LeasesTemplatesTemplateIdRouteImport } from './routes/leases/templates/$templateId'
 
 const DevRouteRoute = DevRouteRouteImport.update({
   id: '/dev',
@@ -82,11 +84,6 @@ const PublicPrivacyRoute = PublicPrivacyRouteImport.update({
   path: '/public/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LeasesTemplatesRoute = LeasesTemplatesRouteImport.update({
-  id: '/leases/templates',
-  path: '/leases/templates',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LeasesAgreementsRoute = LeasesAgreementsRouteImport.update({
   id: '/leases/agreements',
   path: '/leases/agreements',
@@ -107,20 +104,36 @@ const PropsIdRouteRoute = PropsIdRouteRouteImport.update({
   path: '/props/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
+const LeasesTemplatesRouteRoute = LeasesTemplatesRouteRouteImport.update({
+  id: '/leases/templates',
+  path: '/leases/templates',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PropsIdIndexRoute = PropsIdIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => PropsIdRouteRoute,
 } as any)
+const LeasesTemplatesIndexRoute = LeasesTemplatesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => LeasesTemplatesRouteRoute,
+} as any)
+const LeasesTemplatesTemplateIdRoute =
+  LeasesTemplatesTemplateIdRouteImport.update({
+    id: '/$templateId',
+    path: '/$templateId',
+    getParentRoute: () => LeasesTemplatesRouteRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dev': typeof DevRouteRouteWithChildren
+  '/leases/templates': typeof LeasesTemplatesRouteRouteWithChildren
   '/props/$id': typeof PropsIdRouteRouteWithChildren
   '/dev/auth': typeof DevAuthRoute
   '/leases/$leaseId': typeof LeasesLeaseIdRoute
   '/leases/agreements': typeof LeasesAgreementsRoute
-  '/leases/templates': typeof LeasesTemplatesRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
   '/units/$unitId': typeof UnitsUnitIdRoute
@@ -130,6 +143,8 @@ export interface FileRoutesByFullPath {
   '/props/': typeof PropsIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/units/': typeof UnitsIndexRoute
+  '/leases/templates/$templateId': typeof LeasesTemplatesTemplateIdRoute
+  '/leases/templates/': typeof LeasesTemplatesIndexRoute
   '/props/$id/': typeof PropsIdIndexRoute
 }
 export interface FileRoutesByTo {
@@ -137,7 +152,6 @@ export interface FileRoutesByTo {
   '/dev/auth': typeof DevAuthRoute
   '/leases/$leaseId': typeof LeasesLeaseIdRoute
   '/leases/agreements': typeof LeasesAgreementsRoute
-  '/leases/templates': typeof LeasesTemplatesRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
   '/units/$unitId': typeof UnitsUnitIdRoute
@@ -147,17 +161,19 @@ export interface FileRoutesByTo {
   '/props': typeof PropsIndexRoute
   '/settings': typeof SettingsIndexRoute
   '/units': typeof UnitsIndexRoute
+  '/leases/templates/$templateId': typeof LeasesTemplatesTemplateIdRoute
+  '/leases/templates': typeof LeasesTemplatesIndexRoute
   '/props/$id': typeof PropsIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dev': typeof DevRouteRouteWithChildren
+  '/leases/templates': typeof LeasesTemplatesRouteRouteWithChildren
   '/props/$id': typeof PropsIdRouteRouteWithChildren
   '/dev/auth': typeof DevAuthRoute
   '/leases/$leaseId': typeof LeasesLeaseIdRoute
   '/leases/agreements': typeof LeasesAgreementsRoute
-  '/leases/templates': typeof LeasesTemplatesRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
   '/units/$unitId': typeof UnitsUnitIdRoute
@@ -167,6 +183,8 @@ export interface FileRoutesById {
   '/props/': typeof PropsIndexRoute
   '/settings/': typeof SettingsIndexRoute
   '/units/': typeof UnitsIndexRoute
+  '/leases/templates/$templateId': typeof LeasesTemplatesTemplateIdRoute
+  '/leases/templates/': typeof LeasesTemplatesIndexRoute
   '/props/$id/': typeof PropsIdIndexRoute
 }
 export interface FileRouteTypes {
@@ -174,11 +192,11 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/dev'
+    | '/leases/templates'
     | '/props/$id'
     | '/dev/auth'
     | '/leases/$leaseId'
     | '/leases/agreements'
-    | '/leases/templates'
     | '/public/privacy'
     | '/public/terms'
     | '/units/$unitId'
@@ -188,6 +206,8 @@ export interface FileRouteTypes {
     | '/props/'
     | '/settings/'
     | '/units/'
+    | '/leases/templates/$templateId'
+    | '/leases/templates/'
     | '/props/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -195,7 +215,6 @@ export interface FileRouteTypes {
     | '/dev/auth'
     | '/leases/$leaseId'
     | '/leases/agreements'
-    | '/leases/templates'
     | '/public/privacy'
     | '/public/terms'
     | '/units/$unitId'
@@ -205,16 +224,18 @@ export interface FileRouteTypes {
     | '/props'
     | '/settings'
     | '/units'
+    | '/leases/templates/$templateId'
+    | '/leases/templates'
     | '/props/$id'
   id:
     | '__root__'
     | '/'
     | '/dev'
+    | '/leases/templates'
     | '/props/$id'
     | '/dev/auth'
     | '/leases/$leaseId'
     | '/leases/agreements'
-    | '/leases/templates'
     | '/public/privacy'
     | '/public/terms'
     | '/units/$unitId'
@@ -224,16 +245,18 @@ export interface FileRouteTypes {
     | '/props/'
     | '/settings/'
     | '/units/'
+    | '/leases/templates/$templateId'
+    | '/leases/templates/'
     | '/props/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DevRouteRoute: typeof DevRouteRouteWithChildren
+  LeasesTemplatesRouteRoute: typeof LeasesTemplatesRouteRouteWithChildren
   PropsIdRouteRoute: typeof PropsIdRouteRouteWithChildren
   LeasesLeaseIdRoute: typeof LeasesLeaseIdRoute
   LeasesAgreementsRoute: typeof LeasesAgreementsRoute
-  LeasesTemplatesRoute: typeof LeasesTemplatesRoute
   PublicPrivacyRoute: typeof PublicPrivacyRoute
   PublicTermsRoute: typeof PublicTermsRoute
   UnitsUnitIdRoute: typeof UnitsUnitIdRoute
@@ -323,13 +346,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicPrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/leases/templates': {
-      id: '/leases/templates'
-      path: '/leases/templates'
-      fullPath: '/leases/templates'
-      preLoaderRoute: typeof LeasesTemplatesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/leases/agreements': {
       id: '/leases/agreements'
       path: '/leases/agreements'
@@ -358,12 +374,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PropsIdRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/leases/templates': {
+      id: '/leases/templates'
+      path: '/leases/templates'
+      fullPath: '/leases/templates'
+      preLoaderRoute: typeof LeasesTemplatesRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/props/$id/': {
       id: '/props/$id/'
       path: '/'
       fullPath: '/props/$id/'
       preLoaderRoute: typeof PropsIdIndexRouteImport
       parentRoute: typeof PropsIdRouteRoute
+    }
+    '/leases/templates/': {
+      id: '/leases/templates/'
+      path: '/'
+      fullPath: '/leases/templates/'
+      preLoaderRoute: typeof LeasesTemplatesIndexRouteImport
+      parentRoute: typeof LeasesTemplatesRouteRoute
+    }
+    '/leases/templates/$templateId': {
+      id: '/leases/templates/$templateId'
+      path: '/$templateId'
+      fullPath: '/leases/templates/$templateId'
+      preLoaderRoute: typeof LeasesTemplatesTemplateIdRouteImport
+      parentRoute: typeof LeasesTemplatesRouteRoute
     }
   }
 }
@@ -382,6 +419,19 @@ const DevRouteRouteWithChildren = DevRouteRoute._addFileChildren(
   DevRouteRouteChildren,
 )
 
+interface LeasesTemplatesRouteRouteChildren {
+  LeasesTemplatesTemplateIdRoute: typeof LeasesTemplatesTemplateIdRoute
+  LeasesTemplatesIndexRoute: typeof LeasesTemplatesIndexRoute
+}
+
+const LeasesTemplatesRouteRouteChildren: LeasesTemplatesRouteRouteChildren = {
+  LeasesTemplatesTemplateIdRoute: LeasesTemplatesTemplateIdRoute,
+  LeasesTemplatesIndexRoute: LeasesTemplatesIndexRoute,
+}
+
+const LeasesTemplatesRouteRouteWithChildren =
+  LeasesTemplatesRouteRoute._addFileChildren(LeasesTemplatesRouteRouteChildren)
+
 interface PropsIdRouteRouteChildren {
   PropsIdIndexRoute: typeof PropsIdIndexRoute
 }
@@ -397,10 +447,10 @@ const PropsIdRouteRouteWithChildren = PropsIdRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DevRouteRoute: DevRouteRouteWithChildren,
+  LeasesTemplatesRouteRoute: LeasesTemplatesRouteRouteWithChildren,
   PropsIdRouteRoute: PropsIdRouteRouteWithChildren,
   LeasesLeaseIdRoute: LeasesLeaseIdRoute,
   LeasesAgreementsRoute: LeasesAgreementsRoute,
-  LeasesTemplatesRoute: LeasesTemplatesRoute,
   PublicPrivacyRoute: PublicPrivacyRoute,
   PublicTermsRoute: PublicTermsRoute,
   UnitsUnitIdRoute: UnitsUnitIdRoute,

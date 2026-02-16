@@ -1,10 +1,18 @@
-import type { CreateLeasePayload, Lease, UpdateLeasePayload } from '@/domain/lease'
+import type {
+	CreateLeasePayload,
+	Lease,
+	UpdateLeasePayload,
+} from '@/domain/lease'
 import { api } from '@/api/client'
 import { BaseService } from '@/api/base-service'
 
 const ENDPOINT = 'leases'
 
-class LeasesApi extends BaseService<Lease, CreateLeasePayload, UpdateLeasePayload> {
+class LeasesApi extends BaseService<
+	Lease,
+	CreateLeasePayload,
+	UpdateLeasePayload
+> {
 	constructor() {
 		super(ENDPOINT)
 	}

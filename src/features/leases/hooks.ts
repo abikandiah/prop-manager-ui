@@ -1,7 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { leaseKeys } from './keys'
 import { leasesApi } from './api'
-import type { CreateLeasePayload, Lease, UpdateLeasePayload } from '@/domain/lease'
+import type {
+	CreateLeasePayload,
+	Lease,
+	UpdateLeasePayload,
+} from '@/domain/lease'
 import { stableRequestId } from '@/lib/offline-types'
 import { nowIso } from '@/lib/util'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
@@ -39,13 +43,15 @@ function applyCreate(
 	// Update unit list
 	queryClient.setQueryData(
 		leaseKeys.list({ unitId: payload.unitId }),
-		(old: Array<Lease> | undefined) => (old ? [...old, optimistic] : [optimistic]),
+		(old: Array<Lease> | undefined) =>
+			old ? [...old, optimistic] : [optimistic],
 	)
 
 	// Update property list
 	queryClient.setQueryData(
 		leaseKeys.list({ propertyId: payload.propertyId }),
-		(old: Array<Lease> | undefined) => (old ? [...old, optimistic] : [optimistic]),
+		(old: Array<Lease> | undefined) =>
+			old ? [...old, optimistic] : [optimistic],
 	)
 
 	return optimistic
@@ -122,15 +128,17 @@ function applyStatusChange(
 	)
 
 	// Update detail cache
-	queryClient.setQueryData(leaseKeys.detail(lease.id), (old: Lease | undefined) =>
-		old
-			? {
-					...old,
-					status: newStatus,
-					updatedAt,
-					version: old.version + 1,
-				}
-			: undefined,
+	queryClient.setQueryData(
+		leaseKeys.detail(lease.id),
+		(old: Lease | undefined) =>
+			old
+				? {
+						...old,
+						status: newStatus,
+						updatedAt,
+						version: old.version + 1,
+					}
+				: undefined,
 	)
 }
 
@@ -252,7 +260,12 @@ export function useUpdateLease() {
 			const requestId = stableRequestId(['updateLease'], variables)
 			return leasesApi.update(id, payload, { [IDEMPOTENCY_HEADER]: requestId })
 		},
-		onMutate: async ({ id, payload, unitId: varUnitId, propertyId: varPropertyId }) => {
+		onMutate: async ({
+			id,
+			payload,
+			unitId: varUnitId,
+			propertyId: varPropertyId,
+		}) => {
 			const currentLease = queryClient.getQueryData<Lease>(leaseKeys.detail(id))
 			const unitId = varUnitId ?? currentLease?.unitId ?? ''
 			const propertyId = varPropertyId ?? currentLease?.propertyId ?? ''

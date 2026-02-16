@@ -13,7 +13,12 @@ import {
 	usePropDetail,
 } from '@/features/props'
 import { formatAddress } from '@/lib/format'
-import { EntityActions, TextLink } from '@/components/ui'
+import {
+	DetailField,
+	DETAIL_LABEL_CLASS,
+	EntityActions,
+	TextLink,
+} from '@/components/ui'
 import { config } from '@/config'
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
 
@@ -147,57 +152,40 @@ function PropLayout() {
 					<div className="grid gap-x-8 gap-y-6 md:grid-cols-2">
 						{/* Group: Primary Info */}
 						<div className="space-y-6">
-							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Legal Name
-								</label>
-								<p className="mt-1 text-lg font-semibold text-foreground">
-									{prop.legalName}
-								</p>
-							</div>
-							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Property Type
-								</label>
-								<p className="mt-1 text-foreground">
-									{prop.propertyType.replace(/_/g, ' ')}
-								</p>
-							</div>
+							<DetailField
+								label="Legal Name"
+								valueClassName="text-lg font-semibold text-foreground"
+							>
+								{prop.legalName}
+							</DetailField>
+							<DetailField label="Property Type">
+								{prop.propertyType.replace(/_/g, ' ')}
+							</DetailField>
 						</div>
 
 						{/* Group: Details */}
 						<div className="grid grid-cols-2 gap-6">
-							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Total Area
-								</label>
-								<p className="mt-1 text-foreground">
-									{prop.totalArea != null
-										? `${prop.totalArea.toLocaleString()} sq ft`
-										: '—'}
-								</p>
-							</div>
-							<div>
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Year Built
-								</label>
-								<p className="mt-1 text-foreground">{prop.yearBuilt ?? '—'}</p>
-							</div>
+							<DetailField label="Total Area">
+								{prop.totalArea != null
+									? `${prop.totalArea.toLocaleString()} sq ft`
+									: '—'}
+							</DetailField>
+							<DetailField label="Year Built">
+								{prop.yearBuilt ?? '—'}
+							</DetailField>
 							<div className="col-span-2">
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Parcel Number
-								</label>
-								<p className="mt-1 text-foreground font-mono">
+								<DetailField
+									label="Parcel Number"
+									valueClassName="text-foreground font-mono"
+								>
 									{prop.parcelNumber ?? '—'}
-								</p>
+								</DetailField>
 							</div>
 						</div>
 
 						{/* Group: Location (Full Width) */}
-						<div className="md:col-span-2 pt-4 border-t">
-							<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-								Location
-							</label>
+						<div className="md:col-span-2 border-t pt-4">
+							<label className={DETAIL_LABEL_CLASS}>Location</label>
 							<div className="mt-2">
 								<AddressDisplay
 									address={prop.address}
@@ -208,13 +196,13 @@ function PropLayout() {
 
 						{/* Group: Description (Full Width) */}
 						{prop.description && (
-							<div className="md:col-span-2 pt-4 border-t">
-								<label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-									Description
-								</label>
-								<p className="mt-2 text-foreground whitespace-pre-wrap leading-relaxed">
+							<div className="md:col-span-2 border-t pt-4">
+								<DetailField
+									label="Description"
+									valueClassName="text-foreground whitespace-pre-wrap leading-relaxed"
+								>
 									{prop.description}
-								</p>
+								</DetailField>
 							</div>
 						)}
 					</div>

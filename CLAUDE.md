@@ -162,18 +162,18 @@ export function useCreateProp() {
 - Optimistic updates use `payload.id` (not generated IDs):
   ```typescript
   function applyCreate(
-    queryClient: ReturnType<typeof useQueryClient>,
-    payload: CreatePropPayload,
+  	queryClient: ReturnType<typeof useQueryClient>,
+  	payload: CreatePropPayload,
   ): Prop {
-    const optimistic: Prop = {
-      id: payload.id, // Use client-generated ID from payload
-      legalName: payload.legalName,
-      // ... rest of fields with defaults
-    }
-    queryClient.setQueryData(propKeys.list(), (old: Prop[] | undefined) =>
-      old ? [...old, optimistic] : [optimistic]
-    )
-    return optimistic
+  	const optimistic: Prop = {
+  		id: payload.id, // Use client-generated ID from payload
+  		legalName: payload.legalName,
+  		// ... rest of fields with defaults
+  	}
+  	queryClient.setQueryData(propKeys.list(), (old: Prop[] | undefined) =>
+  		old ? [...old, optimistic] : [optimistic],
+  	)
+  	return optimistic
   }
   ```
 - Optimistic updates applied in `onMutate`, rolled back in `onError`
@@ -265,6 +265,7 @@ Follow the code comment and style guidelines in `.cursor/rules/code-comments-and
 - Don't comment obvious code
 
 See also:
+
 - `.cursor/rules/design-system-and-architecture.mdc` for UI and styling conventions
 - `.cursor/rules/copy-and-descriptions.mdc` for user-facing text guidelines
 - `.cursor/rules/constants-vs-config.mdc` for configuration patterns
@@ -291,12 +292,13 @@ To add a new domain feature (e.g., "tenants"):
    - Update payload (no ID needed)
 
    Example:
+
    ```typescript
    export interface CreateTenantPayload {
-     id: string // Client-generated UUID for idempotency
-     name: string
-     email: string
-     // ... other fields
+   	id: string // Client-generated UUID for idempotency
+   	name: string
+   	email: string
+   	// ... other fields
    }
    ```
 

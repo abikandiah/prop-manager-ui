@@ -52,6 +52,7 @@
 ### 1. **Mutation Cache NOT Being Persisted**
 
 **Problem:**
+
 ```typescript
 // src/integrations/tanstack-query/root-provider.tsx
 dehydrateOptions: {
@@ -65,6 +66,7 @@ dehydrateOptions: {
 **Impact:** When the app reloads, all pending mutations are lost. Users lose their offline work.
 
 **Fix:**
+
 ```typescript
 dehydrateOptions: {
   shouldDehydrateQuery: (query: Query) => {
@@ -84,22 +86,25 @@ dehydrateOptions: {
 ### 2. **Paused Mutations Never Resume**
 
 **Problem:**
+
 ```typescript
 // syncEngine.ts line 6-8
 export async function startSync(queryClient: QueryClient) {
-  // TODO: Implement sync engine
-  return  // ❌ Returns immediately, sync never happens
+	// TODO: Implement sync engine
+	return // ❌ Returns immediately, sync never happens
 }
 ```
 
 **Impact:** Mutations pause when offline but never actually execute when back online.
 
 **Fix Required:**
+
 - Remove the early return in `syncEngine.ts`
 - Call `queryClient.resumePausedMutations()` after cache restore
 - Call it again when network reconnects
 
 **Where to add:**
+
 ```typescript
 // In root-provider.tsx onSuccess callback
 onSuccess: () => {
@@ -118,6 +123,7 @@ if (actualOnline) {
 ### 3. **Network Mode Inconsistency**
 
 **Problem:**
+
 - Props & Units: `networkMode: 'online'` → mutations **pause** when offline
 - Leases & Templates: `networkMode: 'offlineFirst'` → mutations **fail immediately** when offline
 
@@ -126,11 +132,13 @@ if (actualOnline) {
 **Recommendation:**
 
 **Option A: Full Offline Support (Recommended)**
+
 - Change ALL mutations to `networkMode: 'online'` (they'll pause and resume)
 - Complete the sync engine implementation
 - Add UI feedback for pending sync
 
 **Option B: Online-Only (Simpler)**
+
 - Keep `networkMode: 'online'` everywhere
 - Show clear "You're offline" messaging
 - Disable mutation buttons when offline
@@ -141,12 +149,14 @@ if (actualOnline) {
 ### 4. **No UI Feedback for Sync Status**
 
 **Missing:**
+
 - No indicator showing pending mutations
 - No "Syncing..." toast when reconnecting
 - No retry UI for failed mutations
 - No visual distinction for optimistically created items
 
 **Suggested Components:**
+
 ```typescript
 // src/components/SyncStatusBanner.tsx
 // Shows at top: "X changes waiting to sync" or "Syncing..."
@@ -169,6 +179,7 @@ export function usePendingMutations() {
 ### 5. **Mutation Outbox Never Consumed**
 
 **Problem:**
+
 ```typescript
 // db.ts - addMutation() is called
 // syncEngine.ts - getNextPending() exists but sync is disabled
@@ -177,6 +188,7 @@ export function usePendingMutations() {
 **Impact:** The `mutations` table grows forever but serves no purpose.
 
 **Fix:** Either:
+
 1. Complete the sync engine to actually consume the outbox
 2. OR remove the custom outbox and rely only on TanStack's mutation cache persistence
 
@@ -187,11 +199,13 @@ export function usePendingMutations() {
 **Problem:** If a mutation fails 3 times, it's marked as `failed` and forgotten.
 
 **Missing:**
+
 - UI to show failed mutations
 - Button to retry failed mutations
 - Option to discard failed mutations
 
 **Suggested:**
+
 ```typescript
 // src/components/FailedMutationsDialog.tsx
 export function FailedMutationsDialog() {
@@ -221,11 +235,13 @@ export function FailedMutationsDialog() {
 ### 7. **Version-Based Conflict Detection Not Enforced**
 
 **Problem:**
+
 - Entities have a `version` field
 - Mutations send it in payload
 - But backend likely doesn't enforce optimistic locking
 
 **Current Risk:**
+
 - User A edits property offline
 - User B edits same property online
 - User A comes back online
@@ -233,6 +249,7 @@ export function FailedMutationsDialog() {
 - User B's work is silently lost
 
 **Fix (Backend Required):**
+
 ```typescript
 // Backend should reject updates with stale version:
 PATCH /api/props/123
@@ -246,12 +263,13 @@ Response 409 Conflict:
 ```
 
 **Frontend handling:**
+
 ```typescript
 onError: (err) => {
-  if (err.response?.status === 409) {
-    // Show conflict resolution UI
-    showConflictDialog(err.response.data)
-  }
+	if (err.response?.status === 409) {
+		// Show conflict resolution UI
+		showConflictDialog(err.response.data)
+	}
 }
 ```
 
@@ -263,12 +281,13 @@ onError: (err) => {
 IndexedDB database is shared across ALL users on the same browser/device.
 
 **Current Code:**
+
 ```typescript
 // db.ts
 export class AppDatabase extends Dexie {
-  constructor() {
-    super('prop-manager-db')  // ❌ Same DB for all users!
-  }
+	constructor() {
+		super('prop-manager-db') // ❌ Same DB for all users!
+	}
 }
 ```
 
@@ -294,16 +313,17 @@ export class AppDatabase extends Dexie {
 **Recommended Solutions:**
 
 **Option A: User-Scoped Database (Recommended)**
+
 ```typescript
 // db.ts
 export class AppDatabase extends Dexie {
-  constructor(userId: string) {
-    super(`prop-manager-db-${userId}`)  // ✅ One DB per user
-    this.version(1).stores({
-      queries: 'id, updatedAt',
-      mutations: 'id, status, timestamp, [status+timestamp]',
-    })
-  }
+	constructor(userId: string) {
+		super(`prop-manager-db-${userId}`) // ✅ One DB per user
+		this.version(1).stores({
+			queries: 'id, updatedAt',
+			mutations: 'id, status, timestamp, [status+timestamp]',
+		})
+	}
 }
 
 // Create singleton per user
@@ -311,29 +331,30 @@ let currentDb: AppDatabase | null = null
 let currentUserId: string | null = null
 
 export function getDb(userId: string): AppDatabase {
-  if (currentDb && currentUserId === userId) {
-    return currentDb
-  }
+	if (currentDb && currentUserId === userId) {
+		return currentDb
+	}
 
-  // Close old DB if switching users
-  if (currentDb) {
-    currentDb.close()
-  }
+	// Close old DB if switching users
+	if (currentDb) {
+		currentDb.close()
+	}
 
-  currentDb = new AppDatabase(userId)
-  currentUserId = userId
-  return currentDb
+	currentDb = new AppDatabase(userId)
+	currentUserId = userId
+	return currentDb
 }
 
 // Call on logout to clear
 export async function clearUserDb(userId: string) {
-  const db = new AppDatabase(userId)
-  await db.delete()
-  await db.close()
+	const db = new AppDatabase(userId)
+	await db.delete()
+	await db.close()
 }
 ```
 
 **Option B: User ID in Every Record**
+
 ```typescript
 // Add userId to schema
 this.version(2).stores({
@@ -358,19 +379,21 @@ async clearUserData(userId: string) {
 ```
 
 **Option C: Clear on Logout (Simple but loses offline data)**
+
 ```typescript
 // AuthProvider
 const logout = async () => {
-  // Clear all offline data
-  await db.delete()
-  await db.open()
+	// Clear all offline data
+	await db.delete()
+	await db.open()
 
-  // Clear auth
-  setUser(null)
+	// Clear auth
+	setUser(null)
 }
 ```
 
 **Recommendation: Option A** (User-Scoped Database)
+
 - ✅ Best privacy (complete isolation)
 - ✅ Easy to implement
 - ✅ Clean logout (just delete the DB)
@@ -407,6 +430,7 @@ const logout = async () => {
 ```
 
 **Must Test:**
+
 - [ ] User A creates item offline
 - [ ] User A logs out
 - [ ] User B logs in (different account)
@@ -461,9 +485,11 @@ const logout = async () => {
 ## Recommended Architecture Decision
 
 ### Current Documentation Says:
+
 > "We use TanStack Query's built-in sync instead of a custom mutation queue"
 
 ### But the Code Has:
+
 - Custom mutation outbox in Dexie
 - Custom `syncEngine.ts` (disabled)
 - MutationCache hook that adds to outbox
@@ -471,6 +497,7 @@ const logout = async () => {
 ### Recommendation: Pick One Approach
 
 **Option A: Pure TanStack (Simpler)**
+
 ```typescript
 // Remove:
 - db.mutations table
@@ -484,6 +511,7 @@ const logout = async () => {
 ```
 
 **Option B: Custom Outbox (More Control)**
+
 ```typescript
 // Keep everything, but:
 - Complete syncEngine implementation
@@ -492,6 +520,7 @@ const logout = async () => {
 ```
 
 **My Recommendation: Option A** (Pure TanStack)
+
 - Less code to maintain
 - TanStack Query is battle-tested
 - Matches what the documentation says
@@ -528,6 +557,7 @@ For true offline support, ALL mutations should use `networkMode: 'online'` so th
 **Missing:** UI feedback, error handling, conflict resolution
 
 **Estimate to Complete:**
+
 - Phase 1 (Essential): 4-8 hours
 - Phase 2 (Feedback): 4-6 hours
 - Phase 3 (Errors): 2-4 hours

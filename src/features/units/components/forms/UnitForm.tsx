@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@abumble/design-system/components/Button'
 import { Input } from '@abumble/design-system/components/Input'
@@ -6,16 +6,17 @@ import { Checkbox } from '@abumble/design-system/components/Checkbox'
 import { DialogFooter } from '@abumble/design-system/components/Dialog'
 import { Label } from '@abumble/design-system/components/Label'
 import { Select } from '@abumble/design-system/components/Select'
+import type {CreateUnitPayload, Unit, UnitStatus, UnitType, UpdateUnitPayload} from '@/domain/unit';
 import { useCreateUnit, useUpdateUnit } from '@/features/units/hooks'
 import { usePropsList } from '@/features/props'
 import {
+	
 	UNIT_STATUSES,
-	UNIT_TYPES,
-	type CreateUnitPayload,
-	type Unit,
-	type UnitStatus,
-	type UnitType,
-	type UpdateUnitPayload,
+	UNIT_TYPES
+	
+	
+	
+	
 } from '@/domain/unit'
 import { generateId } from '@/lib/util'
 
@@ -99,7 +100,10 @@ export function UnitForm({
 		if (initialUnit) {
 			setForm(unitToFormState(initialUnit))
 		} else {
-			setForm((prev) => ({ ...initialFormState, propertyId: propId ?? prev.propertyId }))
+			setForm((prev) => ({
+				...initialFormState,
+				propertyId: propId ?? prev.propertyId,
+			}))
 		}
 	}, [initialUnit, propId])
 
@@ -202,10 +206,7 @@ export function UnitForm({
 			toast.error('Bathrooms must be a valid number')
 			return
 		}
-		if (
-			form.squareFootage.trim() &&
-			isNaN(parseInt(form.squareFootage, 10))
-		) {
+		if (form.squareFootage.trim() && isNaN(parseInt(form.squareFootage, 10))) {
 			toast.error('Square footage must be a valid number')
 			return
 		}

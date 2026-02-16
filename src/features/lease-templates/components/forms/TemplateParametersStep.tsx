@@ -2,7 +2,7 @@ import { memo, useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@abumble/design-system/components/Button'
 import { Input } from '@abumble/design-system/components/Input'
-import { Plus, Trash2 } from 'lucide-react'
+import { ChevronDown, ChevronRight, Plus, Trash2 } from 'lucide-react'
 import { SYSTEM_KEYS, SYSTEM_PARAMETERS } from '../../constants'
 import { normalizeParameterName, recordsShallowEqual } from '@/lib/util'
 
@@ -55,6 +55,7 @@ const TemplateParametersStepComponent = function TemplateParametersStep({
 	const [customParams, setCustomParams] = useState<Array<CustomParam>>(() =>
 		recordToCustomParams(templateParameters),
 	)
+	const [systemParamsCollapsed, setSystemParamsCollapsed] = useState(true)
 
 	const onParamsChangeRef = useRef(onParametersChange)
 	const templateParametersRef = useRef(templateParameters)
@@ -146,43 +147,6 @@ const TemplateParametersStepComponent = function TemplateParametersStep({
 
 	return (
 		<div className="space-y-6">
-			{/* System Parameters (Read-only) */}
-			<div>
-				<h3 className="text-lg font-semibold text-foreground mb-2">
-					System Parameters
-				</h3>
-				<p className="text-sm text-muted-foreground mb-4">
-					These parameters are automatically filled when creating a lease
-					agreement and cannot be modified.
-				</p>
-				<div className="border rounded-lg overflow-hidden">
-					<table className="w-full">
-						<thead className="bg-muted/50">
-							<tr>
-								<th className="text-left px-4 py-2 text-sm font-medium text-muted-foreground">
-									Parameter
-								</th>
-								<th className="text-left px-4 py-2 text-sm font-medium text-muted-foreground">
-									Description
-								</th>
-							</tr>
-						</thead>
-						<tbody className="divide-y">
-							{SYSTEM_PARAMETERS.map((param) => (
-								<tr key={param.key} className="hover:bg-muted/30">
-									<td className="px-4 py-3 text-sm font-mono text-foreground">
-										{`{{${param.key}}}`}
-									</td>
-									<td className="px-4 py-3 text-sm text-muted-foreground">
-										{param.description}
-									</td>
-								</tr>
-							))}
-						</tbody>
-					</table>
-				</div>
-			</div>
-
 			{/* Custom Parameters */}
 			<div>
 				<div className="flex items-center justify-between mb-2">
@@ -236,6 +200,59 @@ const TemplateParametersStepComponent = function TemplateParametersStep({
 							</tbody>
 						</table>
 					</div>
+				)}
+			</div>
+
+			{/* System Parameters (Read-only, Collapsible) */}
+			<div>
+				<button
+					type="button"
+					onClick={() => setSystemParamsCollapsed(!systemParamsCollapsed)}
+					className="flex items-center gap-2 w-full text-left mb-2 group"
+				>
+					{systemParamsCollapsed ? (
+						<ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+					) : (
+						<ChevronDown className="h-5 w-5 text-muted-foreground group-hover:text-foreground transition-colors" />
+					)}
+					<h3 className="text-lg font-semibold text-foreground group-hover:text-foreground/80 transition-colors">
+						System Parameters
+					</h3>
+				</button>
+
+				{!systemParamsCollapsed && (
+					<>
+						<p className="text-sm text-muted-foreground mb-4">
+							These parameters are automatically filled when creating a lease
+							agreement and cannot be modified.
+						</p>
+						<div className="border rounded-lg overflow-hidden">
+							<table className="w-full">
+								<thead className="bg-muted/50">
+									<tr>
+										<th className="text-left px-4 py-2 text-sm font-medium text-muted-foreground">
+											Parameter
+										</th>
+										<th className="text-left px-4 py-2 text-sm font-medium text-muted-foreground">
+											Description
+										</th>
+									</tr>
+								</thead>
+								<tbody className="divide-y">
+									{SYSTEM_PARAMETERS.map((param) => (
+										<tr key={param.key} className="hover:bg-muted/30">
+											<td className="px-4 py-3 text-sm font-mono text-foreground">
+												{`{{${param.key}}}`}
+											</td>
+											<td className="px-4 py-3 text-sm text-muted-foreground">
+												{param.description}
+											</td>
+										</tr>
+									))}
+								</tbody>
+							</table>
+						</div>
+					</>
 				)}
 			</div>
 		</div>

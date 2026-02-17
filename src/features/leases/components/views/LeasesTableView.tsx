@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
@@ -13,8 +13,9 @@ import {
 } from '@abumble/design-system/components/Table'
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
 import { FormDialog } from '@abumble/design-system/components/Dialog'
-import { LeaseForm } from '../forms/LeaseForm'
-import type { Lease, LeaseStatus } from '@/domain/lease'
+import { LeaseAgreementFormWizard } from '../forms/LeaseAgreementFormWizard'
+import type { Lease } from '@/domain/lease'
+import { LeaseStatus } from '@/domain/lease'
 import { EntityActions } from '@/components/ui'
 import {
 	useDeleteLease,
@@ -25,6 +26,22 @@ import {
 import { config } from '@/config'
 import { formatCurrency, formatDate } from '@/lib/format'
 
+function statusVariant(status: LeaseStatus) {
+	switch (status) {
+		case LeaseStatus.ACTIVE:
+			return 'success'
+		case LeaseStatus.DRAFT:
+			return 'secondary'
+		case LeaseStatus.REVIEW:
+			return 'warning'
+		case LeaseStatus.TERMINATED:
+		case LeaseStatus.EVICTED:
+			return 'destructive'
+		default:
+			return 'default'
+	}
+}
+
 function LeaseRowActions({
 	lease,
 	onEdit,
@@ -33,7 +50,7 @@ function LeaseRowActions({
 	onEdit: () => void
 }) {
 	const deleteLease = useDeleteLease()
-	const isDraft = lease.status === 'DRAFT'
+	const isDraft = lease.status === LeaseStatus.DRAFT
 
 	return (
 		<EntityActions
@@ -87,22 +104,24 @@ export function LeasesTableView({
 			? raw.data.filter((l) => l.status === status)
 			: (raw.data ?? [])
 	const isLoading = raw.isLoading
-	const isError = raw.isError
-	const error = raw.error
 	const [editingLease, setEditingLease] = useState<Lease | null>(null)
+
+	// Show error toast once per error instance, not on every re-render
+	const lastErrorRef = useRef<unknown>(null)
+	if (raw.isError && raw.error !== lastErrorRef.current) {
+		lastErrorRef.current = raw.error
+		toast.error(`Error loading leases: ${raw.error?.message || 'Unknown'}`)
+	}
+	if (!raw.isError) lastErrorRef.current = null
 
 	const handleRowClick = (lease: Lease) => {
 		navigate({
-			to: '/leases/$leaseId',
+			to: '/leases/agreements/$leaseId',
 			params: { leaseId: lease.id },
 		})
 	}
 
-	useEffect(() => {
-		if (isError) {
-			toast.error(`Error loading leases: ${error?.message || 'Unknown'}`)
-		}
-	}, [isError, error])
+	const TABLE_COLS = 7
 
 	const skeletonTable = (
 		<div className="rounded border bg-card overflow-hidden">
@@ -121,24 +140,11 @@ export function LeasesTableView({
 				<TableBody>
 					{Array.from({ length: 3 }).map((_, i) => (
 						<TableRow key={i}>
-							<TableCell>
-								<Skeleton className="h-6 w-32" />
-							</TableCell>
-							<TableCell>
-								<Skeleton className="h-6 w-24" />
-							</TableCell>
-							<TableCell>
-								<Skeleton className="h-6 w-20" />
-							</TableCell>
-							<TableCell>
-								<Skeleton className="h-6 w-12" />
-							</TableCell>
-							<TableCell>
-								<Skeleton className="h-6 w-24" />
-							</TableCell>
-							<TableCell>
-								<Skeleton className="h-6 w-24" />
-							</TableCell>
+							{Array.from({ length: TABLE_COLS - 1 }).map((__, j) => (
+								<TableCell key={j}>
+									<Skeleton className="h-6 w-24" />
+								</TableCell>
+							))}
 							<TableCell />
 						</TableRow>
 					))}
@@ -171,7 +177,7 @@ export function LeasesTableView({
 							{leases.length === 0 ? (
 								<TableRow>
 									<TableCell
-										colSpan={7}
+										colSpan={TABLE_COLS}
 										className="h-24 text-center text-muted-foreground"
 									>
 										No leases yet. Add one above.
@@ -188,17 +194,7 @@ export function LeasesTableView({
 											{lease.leaseTemplateName || '—'}
 										</TableCell>
 										<TableCell>
-											<Badge
-												variant={
-													lease.status === 'ACTIVE'
-														? 'success'
-														: lease.status === 'DRAFT'
-															? 'secondary'
-															: lease.status === 'PENDING_REVIEW'
-																? 'warning'
-																: 'default'
-												}
-											>
+											<Badge variant={statusVariant(lease.status)}>
 												{lease.status.replace(/_/g, ' ')}
 											</Badge>
 										</TableCell>
@@ -227,20 +223,17 @@ export function LeasesTableView({
 					</Table>
 				</div>
 
-				{editingLease && editingLease.status === 'DRAFT' && (
+				{editingLease && editingLease.status === LeaseStatus.DRAFT && (
 					<FormDialog
 						open={!!editingLease}
-						onOpenChange={() => setEditingLease(null)}
+						onOpenChange={(open) => { if (!open) setEditingLease(null) }}
 						title="Edit lease"
-						description="Update lease details. Only DRAFT leases can be edited."
+						description="Update lease details. Only draft leases can be edited."
 					>
-						<LeaseForm
-							propertyId={propertyId}
-							unitId={unitId}
+						<LeaseAgreementFormWizard
 							initialLease={editingLease}
 							onSuccess={() => setEditingLease(null)}
 							onCancel={() => setEditingLease(null)}
-							submitLabel="Save"
 						/>
 					</FormDialog>
 				)}

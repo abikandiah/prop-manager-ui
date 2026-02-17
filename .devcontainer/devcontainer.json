@@ -16,6 +16,7 @@
 				"dbaeumer.vscode-eslint",
 				"esbenp.prettier-vscode",
 				"redhat.vscode-yaml",
+				"redhat.java",
 				"bradlc.vscode-tailwindcss",
 				"dsznajder.es7-react-js-snippets",
 				"anthropic.claude-code"

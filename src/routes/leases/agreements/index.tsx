@@ -7,29 +7,25 @@ import {
 	DialogTrigger,
 	FormDialog,
 } from '@abumble/design-system/components/Dialog'
-import {
-	LeaseTemplateFormWizard,
-	LeaseTemplatesTableView,
-} from '@/features/lease-templates'
+import { LeaseAgreementFormWizard, LeasesTableView } from '@/features/leases'
 
-export const Route = createFileRoute('/leases/templates/')({
+export const Route = createFileRoute('/leases/agreements/')({
 	component: RouteComponent,
 })
+
+const WIZARD_STEP_TITLES: Record<1 | 2 | 3, string> = {
+	1: 'Details',
+	2: 'Terms',
+	3: 'Parameters',
+}
 
 function RouteComponent() {
 	const [addOpen, setAddOpen] = useState(false)
 	const [wizardStep, setWizardStep] = useState<1 | 2 | 3>(1)
 
-	const getStepTitle = (step: 1 | 2 | 3) => {
-		if (step === 1) return 'Template Details'
-		if (step === 2) return 'Template Parameters'
-		return 'Template Content'
-	}
-
 	const handleOpenChange = (open: boolean) => {
 		setAddOpen(open)
 		if (!open) {
-			// Reset wizard step when dialog closes
 			setWizardStep(1)
 		}
 	}
@@ -37,50 +33,42 @@ function RouteComponent() {
 	return (
 		<>
 			<BannerHeader
-				title="Lease Templates"
-				description={
-					<>
-						Create and manage lease templates that can be used as starting
-						points for new tenant agreements. Templates let you define standard
-						terms, conditions, and clauses with placeholders that get filled in
-						when you start a new lease agreement.
-					</>
-				}
+				title="Lease Agreements"
+				description="Create and manage lease agreements that connect tenants to properties and units. Track active, expired, and past leases."
 			/>
 
 			<div>
 				<FormDialog
 					open={addOpen}
 					onOpenChange={handleOpenChange}
-					title="Add lease template"
-					description="Create a new reusable lease template with standard terms."
+					title="Add lease agreement"
+					description="Create a new signed lease agreement."
 					className="max-w-[calc(100vw-2rem)] sm:max-w-5xl"
 					wizard={{
 						currentStep: wizardStep,
 						totalSteps: 3,
-						stepTitle: getStepTitle(wizardStep),
-						stepLabels: ['Details', 'Parameters', 'Content'],
+						stepTitle: WIZARD_STEP_TITLES[wizardStep],
 					}}
 					trigger={
 						<DialogTrigger asChild>
 							<Button>
 								<Plus className="size-4" />
-								Add template
+								Add lease
 							</Button>
 						</DialogTrigger>
 					}
 				>
-					<LeaseTemplateFormWizard
+					<LeaseAgreementFormWizard
 						step={wizardStep}
 						onStepChange={setWizardStep}
 						onSuccess={() => setAddOpen(false)}
 						onCancel={() => setAddOpen(false)}
-						submitLabel="Create Template"
+						submitLabel="Create Lease"
 					/>
 				</FormDialog>
 			</div>
 
-			<LeaseTemplatesTableView />
+			<LeasesTableView status="ACTIVE" />
 		</>
 	)
 }

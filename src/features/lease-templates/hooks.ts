@@ -113,11 +113,14 @@ export function useLeaseTemplatesSearch(query: string | null) {
 	})
 }
 
-export function useLeaseTemplateDetail(id: string | null) {
+export function useLeaseTemplateDetail(
+	id: string | null,
+	options?: { enabled?: boolean },
+) {
 	return useQuery({
 		queryKey: leaseTemplateKeys.detail(id!),
 		queryFn: () => leaseTemplatesApi.getById(id!),
-		enabled: id != null,
+		enabled: options?.enabled ?? id != null,
 	})
 }
 

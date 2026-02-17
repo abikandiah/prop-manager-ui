@@ -1,17 +1,29 @@
 // --- Enums ---
 
-export const LEASE_STATUSES = [
-	'DRAFT',
-	'PENDING_REVIEW',
-	'ACTIVE',
-	'TERMINATED',
-	'EXPIRED',
-	'EVICTED',
-] as const
-export type LeaseStatus = (typeof LEASE_STATUSES)[number]
+export const LeaseStatus = {
+	DRAFT: 'DRAFT',
+	REVIEW: 'REVIEW',
+	SIGNED: 'SIGNED',
+	ACTIVE: 'ACTIVE',
+	EXPIRED: 'EXPIRED',
+	TERMINATED: 'TERMINATED',
+	EVICTED: 'EVICTED',
+} as const
 
-export const LATE_FEE_TYPES = ['FLAT_FEE', 'PERCENTAGE'] as const
-export type LateFeeType = (typeof LATE_FEE_TYPES)[number]
+export type LeaseStatus = (typeof LeaseStatus)[keyof typeof LeaseStatus]
+
+export const LEASE_STATUSES: ReadonlyArray<LeaseStatus> =
+	Object.values(LeaseStatus)
+
+export const LateFeeType = {
+	FLAT_FEE: 'FLAT_FEE',
+	PERCENTAGE: 'PERCENTAGE',
+} as const
+
+export type LateFeeType = (typeof LateFeeType)[keyof typeof LateFeeType]
+
+export const LATE_FEE_TYPES: ReadonlyArray<LateFeeType> =
+	Object.values(LateFeeType)
 
 // --- Lease Entity ---
 
@@ -35,6 +47,7 @@ export interface Lease {
 	lateFeeAmount: number | null
 	noticePeriodDays: number | null
 	additionalMetadata: Record<string, unknown> | null
+	templateParameters: Record<string, string> | null
 	createdAt: string
 	updatedAt: string
 }
@@ -47,6 +60,7 @@ export interface CreateLeasePayload {
 	leaseTemplateId: string
 	unitId: string
 	propertyId: string
+	tenantEmails: Array<string>
 	startDate: string
 	endDate: string
 	rentAmount: number
@@ -56,6 +70,7 @@ export interface CreateLeasePayload {
 	lateFeeType?: LateFeeType | null
 	lateFeeAmount?: number | null
 	noticePeriodDays?: number | null
+	templateParameters?: Record<string, string>
 	additionalMetadata?: Record<string, unknown> | null
 }
 
@@ -71,6 +86,8 @@ export interface UpdateLeasePayload {
 	noticePeriodDays?: number | null
 	/** Allow the owner to tweak the stamped content before sending for review */
 	executedContentMarkdown?: string | null
+	/** Extra placeholders for template: {{key}} → value */
+	templateParameters?: Record<string, string> | null
 	additionalMetadata?: Record<string, unknown> | null
 	/** Required for optimistic-lock verification */
 	version: number

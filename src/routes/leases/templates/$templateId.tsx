@@ -8,6 +8,7 @@ import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
 import { FormDialog } from '@abumble/design-system/components/Dialog'
 import type { LeaseTemplate } from '@/domain/lease-template'
+import { LateFeeType } from '@/domain/lease'
 import {
 	LeaseTemplateFormWizard,
 	useDeleteLeaseTemplate,
@@ -178,7 +179,7 @@ function LeaseTemplateDetailPage() {
 							</DetailField>
 							<DetailField label="Default Late Fee Amount">
 								{template.defaultLateFeeAmount != null
-									? template.defaultLateFeeType === 'PERCENTAGE'
+									? template.defaultLateFeeType === LateFeeType.PERCENTAGE
 										? `${template.defaultLateFeeAmount}%`
 										: formatCurrency(template.defaultLateFeeAmount)
 									: '—'}
@@ -204,7 +205,9 @@ function LeaseTemplateDetailPage() {
 						{/* Group: Template Parameters (Full width) */}
 						{Object.keys(template.templateParameters).length > 0 && (
 							<div className="md:col-span-2 lg:col-span-3 border-t pt-4">
-								<label className={DETAIL_LABEL_CLASS}>Template Parameters</label>
+								<label className={DETAIL_LABEL_CLASS}>
+									Template Parameters
+								</label>
 								<div className="mt-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 									{Object.entries(template.templateParameters).map(
 										([key, value]) => (

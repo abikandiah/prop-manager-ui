@@ -6,6 +6,7 @@ import type {
 	Lease,
 	UpdateLeasePayload,
 } from '@/domain/lease'
+import { LeaseStatus } from '@/domain/lease'
 import { stableRequestId } from '@/lib/offline-types'
 import { nowIso } from '@/lib/util'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
@@ -23,7 +24,7 @@ function applyCreate(
 		leaseTemplateVersionTag: null,
 		unitId: payload.unitId,
 		propertyId: payload.propertyId,
-		status: 'DRAFT',
+		status: LeaseStatus.DRAFT,
 		version: 0,
 		startDate: payload.startDate,
 		endDate: payload.endDate,
@@ -36,6 +37,7 @@ function applyCreate(
 		lateFeeAmount: payload.lateFeeAmount ?? null,
 		noticePeriodDays: payload.noticePeriodDays ?? null,
 		additionalMetadata: payload.additionalMetadata ?? null,
+		templateParameters: payload.templateParameters ?? null,
 		createdAt: nowIso(),
 		updatedAt: nowIso(),
 	}
@@ -406,7 +408,7 @@ export function useSubmitLeaseForReview() {
 			)
 			const previousLease = currentLease
 
-			applyStatusChange(queryClient, currentLease, 'PENDING_REVIEW')
+			applyStatusChange(queryClient, currentLease, LeaseStatus.REVIEW)
 
 			return { previousUnitLeases, previousPropertyLeases, previousLease }
 		},
@@ -450,7 +452,7 @@ export function useActivateLease() {
 			)
 			const previousLease = currentLease
 
-			applyStatusChange(queryClient, currentLease, 'ACTIVE')
+			applyStatusChange(queryClient, currentLease, LeaseStatus.ACTIVE)
 
 			return { previousUnitLeases, previousPropertyLeases, previousLease }
 		},
@@ -494,7 +496,7 @@ export function useRevertLeaseToDraft() {
 			)
 			const previousLease = currentLease
 
-			applyStatusChange(queryClient, currentLease, 'DRAFT')
+			applyStatusChange(queryClient, currentLease, LeaseStatus.DRAFT)
 
 			return { previousUnitLeases, previousPropertyLeases, previousLease }
 		},
@@ -538,7 +540,7 @@ export function useTerminateLease() {
 			)
 			const previousLease = currentLease
 
-			applyStatusChange(queryClient, currentLease, 'TERMINATED')
+			applyStatusChange(queryClient, currentLease, LeaseStatus.TERMINATED)
 
 			return { previousUnitLeases, previousPropertyLeases, previousLease }
 		},

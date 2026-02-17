@@ -33,19 +33,19 @@ class LeasesApi extends BaseService<
 
 	// --- Status Transition Endpoints ---
 
-	/** Submit draft for tenant review (DRAFT → PENDING_REVIEW) */
+	/** Submit draft for tenant review (DRAFT → REVIEW) */
 	async submitForReview(id: string): Promise<Lease> {
 		const res = await api.post<Lease>(`${this.endpoint}/${id}/submit`)
 		return res.data
 	}
 
-	/** Activate a reviewed lease (PENDING_REVIEW → ACTIVE) */
+	/** Activate a reviewed lease (REVIEW → ACTIVE) */
 	async activate(id: string): Promise<Lease> {
 		const res = await api.post<Lease>(`${this.endpoint}/${id}/activate`)
 		return res.data
 	}
 
-	/** Revert to draft for further edits (PENDING_REVIEW → DRAFT) */
+	/** Revert to draft for further edits (REVIEW → DRAFT) */
 	async revertToDraft(id: string): Promise<Lease> {
 		const res = await api.post<Lease>(`${this.endpoint}/${id}/revert`)
 		return res.data

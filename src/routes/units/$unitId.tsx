@@ -8,7 +8,7 @@ import { FormDialog } from '@abumble/design-system/components/Dialog'
 import type { Unit } from '@/domain/unit'
 import { usePropDetail } from '@/features/props'
 import { UnitForm, useDeleteUnit, useUnitDetail } from '@/features/units'
-import { formatCurrency } from '@/lib/format'
+import { formatCurrency, formatEnumLabel } from '@/lib/format'
 import {
 	DetailField,
 	DETAIL_LABEL_CLASS,
@@ -118,7 +118,7 @@ function UnitDetailPage() {
 						title={`Unit ${unit.unitNumber}`}
 						description={
 							<>
-								{unit.status.replace(/_/g, ' ')}
+								{formatEnumLabel(unit.status)}
 								{unit.rentAmount != null &&
 									` · ${formatCurrency(unit.rentAmount)}`}
 								{prop && ` · ${prop.legalName}`}
@@ -139,7 +139,7 @@ function UnitDetailPage() {
 								{unit.unitNumber}
 							</DetailField>
 							<DetailField label="Status">
-								{unit.status.replace(/_/g, ' ')}
+								{formatEnumLabel(unit.status)}
 							</DetailField>
 							<DetailField
 								label="Property"

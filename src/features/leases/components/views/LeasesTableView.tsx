@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
-import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { Badge } from '@abumble/design-system/components/Badge'
 import {
 	Table,
@@ -16,7 +15,7 @@ import { FormDialog } from '@abumble/design-system/components/Dialog'
 import { LeaseAgreementFormWizard } from '../forms/LeaseAgreementFormWizard'
 import type { Lease } from '@/domain/lease'
 import { LeaseStatus } from '@/domain/lease'
-import { EntityActions } from '@/components/ui'
+import { EntityActions, TableSkeleton } from '@/components/ui'
 import {
 	useDeleteLease,
 	useLeasesByPropertyId,
@@ -24,7 +23,7 @@ import {
 	useLeasesList,
 } from '@/features/leases'
 import { config } from '@/config'
-import { formatCurrency, formatDate } from '@/lib/format'
+import { formatCurrency, formatDate, formatEnumLabel } from '@/lib/format'
 
 function statusVariant(status: LeaseStatus) {
 	switch (status) {
@@ -124,33 +123,10 @@ export function LeasesTableView({
 	const TABLE_COLS = 7
 
 	const skeletonTable = (
-		<div className="rounded border bg-card overflow-hidden">
-			<Table>
-				<TableHeader>
-					<TableRow>
-						<TableHead>Template</TableHead>
-						<TableHead>Status</TableHead>
-						<TableHead>Rent</TableHead>
-						<TableHead>Due day</TableHead>
-						<TableHead>Start date</TableHead>
-						<TableHead>End date</TableHead>
-						<TableHead className="w-12" />
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					{Array.from({ length: 3 }).map((_, i) => (
-						<TableRow key={i}>
-							{Array.from({ length: TABLE_COLS - 1 }).map((__, j) => (
-								<TableCell key={j}>
-									<Skeleton className="h-6 w-24" />
-								</TableCell>
-							))}
-							<TableCell />
-						</TableRow>
-					))}
-				</TableBody>
-			</Table>
-		</div>
+		<TableSkeleton
+			headers={['Template', 'Status', 'Rent', 'Due day', 'Start date', 'End date', '']}
+			columnWidths={['w-24', 'w-24', 'w-24', 'w-24', 'w-24', 'w-24', '']}
+		/>
 	)
 
 	return (
@@ -195,7 +171,7 @@ export function LeasesTableView({
 										</TableCell>
 										<TableCell>
 											<Badge variant={statusVariant(lease.status)}>
-												{lease.status.replace(/_/g, ' ')}
+												{formatEnumLabel(lease.status)}
 											</Badge>
 										</TableCell>
 										<TableCell className="text-muted-foreground">

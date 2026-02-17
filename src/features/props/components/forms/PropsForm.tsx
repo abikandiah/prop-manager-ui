@@ -9,9 +9,10 @@ import { Select } from '@abumble/design-system/components/Select'
 import { Textarea } from '@abumble/design-system/components/Textarea'
 import { ADDRESS_FORM_INITIAL, AddressFormFields } from './AddressFormFields'
 import type { AddressFormValue } from './AddressFormFields'
-import type { CreatePropPayload, Prop, PropertyType } from '@/domain/property'
+import type { CreatePropPayload, Prop } from '@/domain/property'
+import { PropertyType, PROPERTY_TYPES } from '@/domain/property'
 import { useCreateProp, useUpdateProp } from '@/features/props/hooks'
-import { PROPERTY_TYPES } from '@/domain/property'
+import { formatEnumLabel } from '@/lib/format'
 
 type FormState = {
 	legalName: string
@@ -25,7 +26,7 @@ type FormState = {
 
 const initialForm: FormState = {
 	legalName: '',
-	propertyType: 'CONDOMINIUM',
+	propertyType: PropertyType.CONDOMINIUM,
 	description: '',
 	address: ADDRESS_FORM_INITIAL,
 	parcelNumber: '',
@@ -257,7 +258,7 @@ export function PropsForm({
 				>
 					{PROPERTY_TYPES.map((t) => (
 						<option key={t} value={t}>
-							{t.replace(/_/g, ' ')}
+							{formatEnumLabel(t)}
 						</option>
 					))}
 				</Select>

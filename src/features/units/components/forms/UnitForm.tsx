@@ -6,18 +6,12 @@ import { Checkbox } from '@abumble/design-system/components/Checkbox'
 import { DialogFooter } from '@abumble/design-system/components/Dialog'
 import { Label } from '@abumble/design-system/components/Label'
 import { Select } from '@abumble/design-system/components/Select'
-import type {CreateUnitPayload, Unit, UnitStatus, UnitType, UpdateUnitPayload} from '@/domain/unit';
+import type { CreateUnitPayload, Unit, UpdateUnitPayload } from '@/domain/unit'
+import { UnitStatus, UnitType } from '@/domain/unit'
 import { useCreateUnit, useUpdateUnit } from '@/features/units/hooks'
 import { usePropsList } from '@/features/props'
-import {
-	
-	UNIT_STATUSES,
-	UNIT_TYPES
-	
-	
-	
-	
-} from '@/domain/unit'
+import { UNIT_STATUSES, UNIT_TYPES } from '@/domain/unit'
+import { formatEnumLabel } from '@/lib/format'
 import { generateId } from '@/lib/util'
 
 type FormState = {
@@ -40,7 +34,7 @@ const initialFormState: FormState = {
 	propertyId: '',
 	unitNumber: '',
 	unitType: '',
-	status: 'VACANT',
+	status: UnitStatus.VACANT,
 	description: '',
 	rentAmount: '',
 	securityDeposit: '',
@@ -296,7 +290,7 @@ export function UnitForm({
 				>
 					{UNIT_STATUSES.map((s) => (
 						<option key={s} value={s}>
-							{s.replace(/_/g, ' ')}
+							{formatEnumLabel(s)}
 						</option>
 					))}
 				</Select>
@@ -312,7 +306,7 @@ export function UnitForm({
 					<option value="">Not specified</option>
 					{UNIT_TYPES.map((t) => (
 						<option key={t} value={t}>
-							{t.replace(/_/g, ' ')}
+							{formatEnumLabel(t)}
 						</option>
 					))}
 				</Select>

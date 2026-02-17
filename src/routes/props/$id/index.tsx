@@ -12,7 +12,7 @@ import {
 	useDeleteProp,
 	usePropDetail,
 } from '@/features/props'
-import { formatAddress } from '@/lib/format'
+import { formatAddress, formatEnumLabel } from '@/lib/format'
 import {
 	DetailField,
 	DETAIL_LABEL_CLASS,
@@ -124,7 +124,7 @@ function PropLayout() {
 						title={prop.legalName}
 						description={
 							<>
-								{prop.propertyType.replace(/_/g, ' ')}
+								{formatEnumLabel(prop.propertyType)}
 								{prop.address && ` · ${formatAddress(prop.address)}`}
 							</>
 						}
@@ -159,7 +159,7 @@ function PropLayout() {
 								{prop.legalName}
 							</DetailField>
 							<DetailField label="Property Type">
-								{prop.propertyType.replace(/_/g, ' ')}
+								{formatEnumLabel(prop.propertyType)}
 							</DetailField>
 						</div>
 

@@ -30,6 +30,13 @@ export function formatCurrency(n: number | null): string {
 	}).format(n)
 }
 
+/** Converts SCREAMING_SNAKE_CASE enum values to Title Case for display. e.g. "SINGLE_FAMILY_HOME" → "Single Family Home" */
+export function formatEnumLabel(value: string): string {
+	return value
+		.replace(/_/g, ' ')
+		.replace(/\b\w/g, (c) => c.toUpperCase())
+}
+
 export function formatDate(dateString: string | null): string {
 	if (!dateString) return '—'
 	try {

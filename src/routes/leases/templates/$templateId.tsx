@@ -10,11 +10,12 @@ import { FormDialog } from '@abumble/design-system/components/Dialog'
 import type { LeaseTemplate } from '@/domain/lease-template'
 import { LateFeeType } from '@/domain/lease'
 import {
+	LEASE_TEMPLATE_WIZARD_STEPS,
 	LeaseTemplateFormWizard,
 	useDeleteLeaseTemplate,
 	useLeaseTemplateDetail,
 } from '@/features/lease-templates'
-import { formatCurrency, formatDate } from '@/lib/format'
+import { formatCurrency, formatDate, formatEnumLabel } from '@/lib/format'
 import {
 	DETAIL_LABEL_CLASS,
 	DetailField,
@@ -64,12 +65,6 @@ function LeaseTemplateActions({
 			}
 		/>
 	)
-}
-
-const WIZARD_STEP_TITLES: Record<1 | 2 | 3, string> = {
-	1: 'Template Details',
-	2: 'Template Parameters',
-	3: 'Template Content',
 }
 
 function LeaseTemplateDetailPage() {
@@ -175,7 +170,7 @@ function LeaseTemplateDetailPage() {
 						{/* Group: Default Terms */}
 						<div className="space-y-6">
 							<DetailField label="Default Late Fee Type">
-								{template.defaultLateFeeType?.replace(/_/g, ' ') || '—'}
+								{template.defaultLateFeeType ? formatEnumLabel(template.defaultLateFeeType) : '—'}
 							</DetailField>
 							<DetailField label="Default Late Fee Amount">
 								{template.defaultLateFeeAmount != null
@@ -251,7 +246,7 @@ function LeaseTemplateDetailPage() {
 							wizard={{
 								currentStep: wizardStep,
 								totalSteps: 3,
-								stepTitle: WIZARD_STEP_TITLES[wizardStep],
+								stepTitle: LEASE_TEMPLATE_WIZARD_STEPS[wizardStep],
 							}}
 						>
 							<LeaseTemplateFormWizard

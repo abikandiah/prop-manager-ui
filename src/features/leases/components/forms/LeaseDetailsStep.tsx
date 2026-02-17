@@ -3,7 +3,15 @@ import { Input } from '@abumble/design-system/components/Input'
 import { Label } from '@abumble/design-system/components/Label'
 import { Select } from '@abumble/design-system/components/Select'
 import { Button } from '@abumble/design-system/components/Button'
-import { X } from 'lucide-react'
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from '@abumble/design-system/components/Table'
+import { Trash2 } from 'lucide-react'
 import { usePropsList } from '@/features/props'
 import { useUnitsList } from '@/features/units'
 import { useLeaseTemplatesActive } from '@/features/lease-templates'
@@ -147,7 +155,7 @@ export function LeaseDetailsStep({
 
 			<div className="space-y-2">
 				<Label htmlFor="tenantEmails">
-					Tenant Emails{' '}
+					Tenant emails{' '}
 					<span className="text-destructive" aria-hidden>
 						*
 					</span>
@@ -159,29 +167,39 @@ export function LeaseDetailsStep({
 						value={emailInput}
 						onChange={(e) => setEmailInput(e.target.value)}
 						onKeyDown={handleEmailInputKeyDown}
-						placeholder="Enter tenant email"
+						placeholder="tenant@example.com"
 					/>
 					<Button type="button" onClick={handleAddEmail} variant="outline">
 						Add
 					</Button>
 				</div>
 				{tenantEmails.length > 0 && (
-					<div className="flex flex-wrap gap-2 mt-2">
-						{tenantEmails.map((email) => (
-							<div
-								key={email}
-								className="flex items-center gap-1 bg-muted/30 border border-border/50 rounded-md px-2 py-1 text-sm"
-							>
-								<span>{email}</span>
-								<button
-									type="button"
-									onClick={() => handleRemoveEmail(email)}
-									className="text-muted-foreground hover:text-foreground"
-								>
-									<X className="h-3 w-3" />
-								</button>
-							</div>
-						))}
+					<div className="rounded border overflow-hidden mt-1">
+						<Table>
+							<TableHeader>
+								<TableRow>
+									<TableHead>Email</TableHead>
+									<TableHead className="w-10" />
+								</TableRow>
+							</TableHeader>
+							<TableBody>
+								{tenantEmails.map((email) => (
+									<TableRow key={email}>
+										<TableCell className="text-sm">{email}</TableCell>
+										<TableCell className="text-right">
+											<button
+												type="button"
+												onClick={() => handleRemoveEmail(email)}
+												className="text-muted-foreground hover:text-destructive transition-colors"
+												aria-label={`Remove ${email}`}
+											>
+												<Trash2 className="h-4 w-4" />
+											</button>
+										</TableCell>
+									</TableRow>
+								))}
+							</TableBody>
+						</Table>
 					</div>
 				)}
 			</div>

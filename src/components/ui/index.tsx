@@ -94,3 +94,4 @@ export function ExternalSite({
 // Import design-system components directly from @abumble/design-system
 export * from './DetailField'
 export * from './EntityActions'
+export * from './TableSkeleton'

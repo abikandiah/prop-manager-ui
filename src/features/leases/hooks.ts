@@ -388,178 +388,83 @@ export function useDeleteLease() {
 
 // --- Status Transition Mutations ---
 
-export function useSubmitLeaseForReview() {
-	const queryClient = useQueryClient()
+function makeLeaseStatusTransitionHook(
+	mutationKey: string,
+	mutationFn: (id: string) => Promise<Lease>,
+	newStatus: LeaseStatus,
+	errorLabel: string,
+) {
+	return function useLeaseStatusTransition() {
+		const queryClient = useQueryClient()
 
-	return useMutation({
-		mutationKey: ['submitLeaseForReview'],
-		networkMode: 'online',
-		mutationFn: (id: string) => leasesApi.submitForReview(id),
-		onMutate: async (id) => {
-			const currentLease = queryClient.getQueryData<Lease>(leaseKeys.detail(id))
-			if (!currentLease) return
-
-			await queryClient.cancelQueries({ queryKey: leaseKeys.all })
-			const previousUnitLeases = queryClient.getQueryData<Array<Lease>>(
-				leaseKeys.list({ unitId: currentLease.unitId }),
-			)
-			const previousPropertyLeases = queryClient.getQueryData<Array<Lease>>(
-				leaseKeys.list({ propertyId: currentLease.propertyId }),
-			)
-			const previousLease = currentLease
-
-			applyStatusChange(queryClient, currentLease, LeaseStatus.REVIEW)
-
-			return { previousUnitLeases, previousPropertyLeases, previousLease }
-		},
-		onError: (err, id, context) => {
-			if (context?.previousLease) {
-				queryClient.setQueryData(
-					leaseKeys.list({ unitId: context.previousLease.unitId }),
-					context.previousUnitLeases,
+		return useMutation({
+			mutationKey: [mutationKey],
+			networkMode: 'online',
+			mutationFn,
+			onMutate: async (id: string) => {
+				const currentLease = queryClient.getQueryData<Lease>(
+					leaseKeys.detail(id),
 				)
-				queryClient.setQueryData(
-					leaseKeys.list({ propertyId: context.previousLease.propertyId }),
-					context.previousPropertyLeases,
+				if (!currentLease) return
+
+				await queryClient.cancelQueries({ queryKey: leaseKeys.all })
+				const previousUnitLeases = queryClient.getQueryData<Array<Lease>>(
+					leaseKeys.list({ unitId: currentLease.unitId }),
 				)
-				queryClient.setQueryData(leaseKeys.detail(id), context.previousLease)
-			}
-			console.error('[Mutation] Submit lease for review failed:', err)
-		},
-		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: leaseKeys.all })
-		},
-	})
+				const previousPropertyLeases = queryClient.getQueryData<Array<Lease>>(
+					leaseKeys.list({ propertyId: currentLease.propertyId }),
+				)
+				const previousLease = currentLease
+
+				applyStatusChange(queryClient, currentLease, newStatus)
+
+				return { previousUnitLeases, previousPropertyLeases, previousLease }
+			},
+			onError: (err, id, context) => {
+				if (context?.previousLease) {
+					queryClient.setQueryData(
+						leaseKeys.list({ unitId: context.previousLease.unitId }),
+						context.previousUnitLeases,
+					)
+					queryClient.setQueryData(
+						leaseKeys.list({ propertyId: context.previousLease.propertyId }),
+						context.previousPropertyLeases,
+					)
+					queryClient.setQueryData(leaseKeys.detail(id), context.previousLease)
+				}
+				console.error(`[Mutation] ${errorLabel} failed:`, err)
+			},
+			onSettled: () => {
+				queryClient.invalidateQueries({ queryKey: leaseKeys.all })
+			},
+		})
+	}
 }
 
-export function useActivateLease() {
-	const queryClient = useQueryClient()
+export const useSubmitLeaseForReview = makeLeaseStatusTransitionHook(
+	'submitLeaseForReview',
+	(id) => leasesApi.submitForReview(id),
+	LeaseStatus.REVIEW,
+	'Submit lease for review',
+)
 
-	return useMutation({
-		mutationKey: ['activateLease'],
-		networkMode: 'online',
-		mutationFn: (id: string) => leasesApi.activate(id),
-		onMutate: async (id) => {
-			const currentLease = queryClient.getQueryData<Lease>(leaseKeys.detail(id))
-			if (!currentLease) return
+export const useActivateLease = makeLeaseStatusTransitionHook(
+	'activateLease',
+	(id) => leasesApi.activate(id),
+	LeaseStatus.ACTIVE,
+	'Activate lease',
+)
 
-			await queryClient.cancelQueries({ queryKey: leaseKeys.all })
-			const previousUnitLeases = queryClient.getQueryData<Array<Lease>>(
-				leaseKeys.list({ unitId: currentLease.unitId }),
-			)
-			const previousPropertyLeases = queryClient.getQueryData<Array<Lease>>(
-				leaseKeys.list({ propertyId: currentLease.propertyId }),
-			)
-			const previousLease = currentLease
+export const useRevertLeaseToDraft = makeLeaseStatusTransitionHook(
+	'revertLeaseToDraft',
+	(id) => leasesApi.revertToDraft(id),
+	LeaseStatus.DRAFT,
+	'Revert lease to draft',
+)
 
-			applyStatusChange(queryClient, currentLease, LeaseStatus.ACTIVE)
-
-			return { previousUnitLeases, previousPropertyLeases, previousLease }
-		},
-		onError: (err, id, context) => {
-			if (context?.previousLease) {
-				queryClient.setQueryData(
-					leaseKeys.list({ unitId: context.previousLease.unitId }),
-					context.previousUnitLeases,
-				)
-				queryClient.setQueryData(
-					leaseKeys.list({ propertyId: context.previousLease.propertyId }),
-					context.previousPropertyLeases,
-				)
-				queryClient.setQueryData(leaseKeys.detail(id), context.previousLease)
-			}
-			console.error('[Mutation] Activate lease failed:', err)
-		},
-		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: leaseKeys.all })
-		},
-	})
-}
-
-export function useRevertLeaseToDraft() {
-	const queryClient = useQueryClient()
-
-	return useMutation({
-		mutationKey: ['revertLeaseToDraft'],
-		networkMode: 'online',
-		mutationFn: (id: string) => leasesApi.revertToDraft(id),
-		onMutate: async (id) => {
-			const currentLease = queryClient.getQueryData<Lease>(leaseKeys.detail(id))
-			if (!currentLease) return
-
-			await queryClient.cancelQueries({ queryKey: leaseKeys.all })
-			const previousUnitLeases = queryClient.getQueryData<Array<Lease>>(
-				leaseKeys.list({ unitId: currentLease.unitId }),
-			)
-			const previousPropertyLeases = queryClient.getQueryData<Array<Lease>>(
-				leaseKeys.list({ propertyId: currentLease.propertyId }),
-			)
-			const previousLease = currentLease
-
-			applyStatusChange(queryClient, currentLease, LeaseStatus.DRAFT)
-
-			return { previousUnitLeases, previousPropertyLeases, previousLease }
-		},
-		onError: (err, id, context) => {
-			if (context?.previousLease) {
-				queryClient.setQueryData(
-					leaseKeys.list({ unitId: context.previousLease.unitId }),
-					context.previousUnitLeases,
-				)
-				queryClient.setQueryData(
-					leaseKeys.list({ propertyId: context.previousLease.propertyId }),
-					context.previousPropertyLeases,
-				)
-				queryClient.setQueryData(leaseKeys.detail(id), context.previousLease)
-			}
-			console.error('[Mutation] Revert lease to draft failed:', err)
-		},
-		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: leaseKeys.all })
-		},
-	})
-}
-
-export function useTerminateLease() {
-	const queryClient = useQueryClient()
-
-	return useMutation({
-		mutationKey: ['terminateLease'],
-		networkMode: 'online',
-		mutationFn: (id: string) => leasesApi.terminate(id),
-		onMutate: async (id) => {
-			const currentLease = queryClient.getQueryData<Lease>(leaseKeys.detail(id))
-			if (!currentLease) return
-
-			await queryClient.cancelQueries({ queryKey: leaseKeys.all })
-			const previousUnitLeases = queryClient.getQueryData<Array<Lease>>(
-				leaseKeys.list({ unitId: currentLease.unitId }),
-			)
-			const previousPropertyLeases = queryClient.getQueryData<Array<Lease>>(
-				leaseKeys.list({ propertyId: currentLease.propertyId }),
-			)
-			const previousLease = currentLease
-
-			applyStatusChange(queryClient, currentLease, LeaseStatus.TERMINATED)
-
-			return { previousUnitLeases, previousPropertyLeases, previousLease }
-		},
-		onError: (err, id, context) => {
-			if (context?.previousLease) {
-				queryClient.setQueryData(
-					leaseKeys.list({ unitId: context.previousLease.unitId }),
-					context.previousUnitLeases,
-				)
-				queryClient.setQueryData(
-					leaseKeys.list({ propertyId: context.previousLease.propertyId }),
-					context.previousPropertyLeases,
-				)
-				queryClient.setQueryData(leaseKeys.detail(id), context.previousLease)
-			}
-			console.error('[Mutation] Terminate lease failed:', err)
-		},
-		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: leaseKeys.all })
-		},
-	})
-}
+export const useTerminateLease = makeLeaseStatusTransitionHook(
+	'terminateLease',
+	(id) => leasesApi.terminate(id),
+	LeaseStatus.TERMINATED,
+	'Terminate lease',
+)

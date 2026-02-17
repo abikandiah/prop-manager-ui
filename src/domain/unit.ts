@@ -1,22 +1,28 @@
-export const UNIT_STATUSES = [
-	'VACANT',
-	'OCCUPIED',
-	'UNDER_MAINTENANCE',
-	'NOTICE_GIVEN',
-] as const
-export type UnitStatus = (typeof UNIT_STATUSES)[number]
+export const UnitStatus = {
+	VACANT: 'VACANT',
+	OCCUPIED: 'OCCUPIED',
+	UNDER_MAINTENANCE: 'UNDER_MAINTENANCE',
+	NOTICE_GIVEN: 'NOTICE_GIVEN',
+} as const
 
-export const UNIT_TYPES = [
-	'APARTMENT',
-	'CONDO',
-	'STUDIO',
-	'LOFT',
-	'SUITE',
-	'RETAIL',
-	'WAREHOUSE',
-	'OTHER',
-] as const
-export type UnitType = (typeof UNIT_TYPES)[number]
+export type UnitStatus = (typeof UnitStatus)[keyof typeof UnitStatus]
+
+export const UNIT_STATUSES: ReadonlyArray<UnitStatus> = Object.values(UnitStatus)
+
+export const UnitType = {
+	APARTMENT: 'APARTMENT',
+	CONDO: 'CONDO',
+	STUDIO: 'STUDIO',
+	LOFT: 'LOFT',
+	SUITE: 'SUITE',
+	RETAIL: 'RETAIL',
+	WAREHOUSE: 'WAREHOUSE',
+	OTHER: 'OTHER',
+} as const
+
+export type UnitType = (typeof UnitType)[keyof typeof UnitType]
+
+export const UNIT_TYPES: ReadonlyArray<UnitType> = Object.values(UnitType)
 
 export interface Unit {
 	id: string

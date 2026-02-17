@@ -1,7 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useRef, useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
-import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import {
 	Table,
 	TableBody,
@@ -14,10 +13,10 @@ import { DelayedLoadingFallback } from '@abumble/design-system/components/Delaye
 import { FormDialog } from '@abumble/design-system/components/Dialog'
 import { UnitForm } from '../forms/UnitForm'
 import type { Unit } from '@/domain/unit'
-import { EntityActions } from '@/components/ui'
+import { EntityActions, TableSkeleton } from '@/components/ui'
 import { useDeleteUnit, useUnitsByPropId, useUnitsList } from '@/features/units'
 import { config } from '@/config'
-import { formatCurrency } from '@/lib/format'
+import { formatCurrency, formatEnumLabel } from '@/lib/format'
 
 function UnitRowActions({ unit, onEdit }: { unit: Unit; onEdit: () => void }) {
 	const deleteUnit = useDeleteUnit()
@@ -70,53 +69,19 @@ export function UnitsTableView({ propId }: UnitsTableViewProps) {
 		})
 	}
 
-	useEffect(() => {
-		if (isError) {
-			toast.error(`Error loading units: ${error?.message || 'Unknown'}`)
-		}
-	}, [isError, error])
+	// Show error toast once per error instance, not on every re-render
+	const lastErrorRef = useRef<unknown>(null)
+	if (isError && error !== lastErrorRef.current) {
+		lastErrorRef.current = error
+		toast.error(`Error loading units: ${error?.message || 'Unknown'}`)
+	}
+	if (!isError) lastErrorRef.current = null
 
 	const skeletonTable = (
-		<div className="rounded border bg-card overflow-hidden">
-			<Table>
-				<TableHeader>
-					<TableRow>
-						<TableHead>Unit #</TableHead>
-						<TableHead>Status</TableHead>
-						<TableHead>Rent</TableHead>
-						<TableHead>Beds</TableHead>
-						<TableHead>Baths</TableHead>
-						<TableHead>Sq ft</TableHead>
-						<TableHead className="w-12" />
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					{Array.from({ length: 3 }).map((_, i) => (
-						<TableRow key={i}>
-							<TableCell>
-								<Skeleton className="h-6 w-16" />
-							</TableCell>
-							<TableCell>
-								<Skeleton className="h-6 w-24" />
-							</TableCell>
-							<TableCell>
-								<Skeleton className="h-6 w-20" />
-							</TableCell>
-							<TableCell>
-								<Skeleton className="h-6 w-8" />
-							</TableCell>
-							<TableCell>
-								<Skeleton className="h-6 w-8" />
-							</TableCell>
-							<TableCell>
-								<Skeleton className="h-6 w-14" />
-							</TableCell>
-							<TableCell />
-						</TableRow>
-					))}
-				</TableBody>
-			</Table>
-		</div>
+		<TableSkeleton
+			headers={['Unit #', 'Status', 'Rent', 'Beds', 'Baths', 'Sq ft', '']}
+			columnWidths={['w-16', 'w-24', 'w-20', 'w-8', 'w-8', 'w-14', '']}
+		/>
 	)
 
 	return (
@@ -160,7 +125,7 @@ export function UnitsTableView({ propId }: UnitsTableViewProps) {
 											{unit.unitNumber}
 										</TableCell>
 										<TableCell className="text-muted-foreground">
-											{unit.status.replace(/_/g, ' ')}
+											{formatEnumLabel(unit.status)}
 										</TableCell>
 										<TableCell className="text-muted-foreground">
 											{formatCurrency(unit.rentAmount)}

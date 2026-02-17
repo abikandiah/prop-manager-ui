@@ -78,6 +78,12 @@ function formToPayloadFields(form: FormState) {
 	}
 }
 
+export const LEASE_TEMPLATE_WIZARD_STEPS: Record<1 | 2 | 3, string> = {
+	1: 'Template Details',
+	2: 'Template Parameters',
+	3: 'Template Content',
+}
+
 export interface LeaseTemplateFormWizardProps {
 	initialTemplate?: LeaseTemplate | null
 	onSuccess?: (data?: LeaseTemplate) => void

@@ -3,6 +3,7 @@ import { Label } from '@abumble/design-system/components/Label'
 import { Select } from '@abumble/design-system/components/Select'
 import type { LateFeeType } from '@/domain/lease'
 import { LATE_FEE_TYPES } from '@/domain/lease'
+import { formatEnumLabel } from '@/lib/format'
 
 interface LeaseTermsStepProps {
 	rentAmount: string
@@ -94,7 +95,7 @@ export function LeaseTermsStep({
 						<option value="">None</option>
 						{LATE_FEE_TYPES.map((t) => (
 							<option key={t} value={t}>
-								{t.replace(/_/g, ' ')}
+								{formatEnumLabel(t)}
 							</option>
 						))}
 					</Select>

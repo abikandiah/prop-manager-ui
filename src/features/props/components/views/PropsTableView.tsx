@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useRef } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { cn } from '@abumble/design-system/utils'
 import { toast } from 'sonner'
@@ -14,18 +14,20 @@ import {
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
 import { useCreateProp, usePropsList } from '@/features/props'
 import { config } from '@/config'
-import { formatAddress } from '@/lib/format'
+import { formatAddress, formatEnumLabel } from '@/lib/format'
 
 export function PropsTableView() {
 	const navigate = useNavigate()
 	const { data: props, isLoading, isError, error } = usePropsList()
 	const createProp = useCreateProp()
 
-	useEffect(() => {
-		if (isError) {
-			toast.error(`Error loading properties: ${error.message || 'Unknown'}`)
-		}
-	}, [isError, error])
+	// Show error toast once per error instance, not on every re-render
+	const lastErrorRef = useRef<unknown>(null)
+	if (isError && error !== lastErrorRef.current) {
+		lastErrorRef.current = error
+		toast.error(`Error loading properties: ${error.message || 'Unknown'}`)
+	}
+	if (!isError) lastErrorRef.current = null
 
 	return (
 		<div className="rounded border bg-card overflow-hidden">
@@ -87,7 +89,7 @@ export function PropsTableView() {
 										role="button"
 									>
 										<TableCell className="text-muted-foreground">
-											{p.propertyType.replace(/_/g, ' ')}
+											{formatEnumLabel(p.propertyType)}
 										</TableCell>
 										<TableCell className="font-medium">
 											<div className="flex flex-col">

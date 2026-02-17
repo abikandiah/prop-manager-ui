@@ -4,6 +4,7 @@ import { Label } from '@abumble/design-system/components/Label'
 import { Select } from '@abumble/design-system/components/Select'
 import type { LateFeeType } from '@/domain/lease'
 import { LATE_FEE_TYPES } from '@/domain/lease'
+import { formatEnumLabel } from '@/lib/format'
 
 export interface TemplateDetailsStepProps {
 	name: string
@@ -74,7 +75,7 @@ export function TemplateDetailsStep({
 						<option value="">None</option>
 						{LATE_FEE_TYPES.map((type) => (
 							<option key={type} value={type}>
-								{type.replace(/_/g, ' ')}
+								{formatEnumLabel(type)}
 							</option>
 						))}
 					</Select>

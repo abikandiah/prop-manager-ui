@@ -8,6 +8,7 @@ import {
 	FormDialog,
 } from '@abumble/design-system/components/Dialog'
 import { LeaseAgreementFormWizard, LeasesTableView } from '@/features/leases'
+import { LeaseStatus } from '@/domain/lease'
 
 export const Route = createFileRoute('/leases/agreements/')({
 	component: RouteComponent,
@@ -48,6 +49,7 @@ function RouteComponent() {
 						currentStep: wizardStep,
 						totalSteps: 3,
 						stepTitle: WIZARD_STEP_TITLES[wizardStep],
+						stepLabels: ['Details', 'Terms', 'Parameters'],
 					}}
 					trigger={
 						<DialogTrigger asChild>
@@ -68,7 +70,7 @@ function RouteComponent() {
 				</FormDialog>
 			</div>
 
-			<LeasesTableView status="ACTIVE" />
+			<LeasesTableView status={LeaseStatus.ACTIVE} />
 		</>
 	)
 }

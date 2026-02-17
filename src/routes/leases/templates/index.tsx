@@ -8,6 +8,7 @@ import {
 	FormDialog,
 } from '@abumble/design-system/components/Dialog'
 import {
+	LEASE_TEMPLATE_WIZARD_STEPS,
 	LeaseTemplateFormWizard,
 	LeaseTemplatesTableView,
 } from '@/features/lease-templates'
@@ -20,16 +21,9 @@ function RouteComponent() {
 	const [addOpen, setAddOpen] = useState(false)
 	const [wizardStep, setWizardStep] = useState<1 | 2 | 3>(1)
 
-	const getStepTitle = (step: 1 | 2 | 3) => {
-		if (step === 1) return 'Template Details'
-		if (step === 2) return 'Template Parameters'
-		return 'Template Content'
-	}
-
 	const handleOpenChange = (open: boolean) => {
 		setAddOpen(open)
 		if (!open) {
-			// Reset wizard step when dialog closes
 			setWizardStep(1)
 		}
 	}
@@ -58,7 +52,7 @@ function RouteComponent() {
 					wizard={{
 						currentStep: wizardStep,
 						totalSteps: 3,
-						stepTitle: getStepTitle(wizardStep),
+						stepTitle: LEASE_TEMPLATE_WIZARD_STEPS[wizardStep],
 						stepLabels: ['Details', 'Parameters', 'Content'],
 					}}
 					trigger={

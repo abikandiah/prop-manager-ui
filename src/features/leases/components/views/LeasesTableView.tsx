@@ -73,6 +73,12 @@ function LeaseRowActions({
 	)
 }
 
+const WIZARD_STEP_TITLES: Record<1 | 2 | 3, string> = {
+	1: 'Details',
+	2: 'Terms',
+	3: 'Parameters',
+}
+
 export interface LeasesTableViewProps {
 	propertyId?: string
 	unitId?: string
@@ -94,9 +100,7 @@ export function LeasesTableView({
 		? leasesByUnit
 		: propertyId
 			? leasesByProperty
-			: status != null
-				? allLeases
-				: { data: [], isLoading: false, isError: false, error: null }
+			: allLeases
 
 	const leases =
 		status != null && raw.data != null
@@ -104,6 +108,12 @@ export function LeasesTableView({
 			: (raw.data ?? [])
 	const isLoading = raw.isLoading
 	const [editingLease, setEditingLease] = useState<Lease | null>(null)
+	const [wizardStep, setWizardStep] = useState<1 | 2 | 3>(2)
+
+	const handleEditClose = () => {
+		setEditingLease(null)
+		setWizardStep(2)
+	}
 
 	// Show error toast once per error instance, not on every re-render
 	const lastErrorRef = useRef<unknown>(null)
@@ -211,15 +221,24 @@ export function LeasesTableView({
 					<FormDialog
 						open={!!editingLease}
 						onOpenChange={(open) => {
-							if (!open) setEditingLease(null)
+							if (!open) handleEditClose()
 						}}
 						title="Edit lease"
 						description="Update lease details. Only draft leases can be edited."
+						className="max-w-[calc(100vw-2rem)] sm:max-w-5xl"
+						wizard={{
+							currentStep: wizardStep,
+							totalSteps: 3,
+							stepTitle: WIZARD_STEP_TITLES[wizardStep],
+							stepLabels: ['Details', 'Terms', 'Parameters'],
+						}}
 					>
 						<LeaseAgreementFormWizard
 							initialLease={editingLease}
-							onSuccess={() => setEditingLease(null)}
-							onCancel={() => setEditingLease(null)}
+							step={wizardStep}
+							onStepChange={setWizardStep}
+							onSuccess={handleEditClose}
+							onCancel={handleEditClose}
 						/>
 					</FormDialog>
 				)}

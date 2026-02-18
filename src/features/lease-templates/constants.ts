@@ -42,6 +42,31 @@ export const SYSTEM_KEYS = new Set<string>(
 )
 
 /**
+ * Resolves system parameter values from real lease form context.
+ * Used in the lease agreement wizard to substitute actual values in the markdown preview,
+ * as opposed to the sample data (PREVIEW_VALUES) used in the template editor.
+ */
+export function buildLeaseSystemParameters(context: {
+	propertyName?: string
+	unitNumber?: string
+	startDate?: string
+	endDate?: string
+	rentAmount?: string
+	rentDueDay?: string
+	securityDeposit?: string
+}): Record<string, string> {
+	const vals: Record<string, string> = {}
+	if (context.propertyName) vals.property_name = context.propertyName
+	if (context.unitNumber) vals.unit_number = context.unitNumber
+	if (context.startDate) vals.start_date = context.startDate
+	if (context.endDate) vals.end_date = context.endDate
+	if (context.rentAmount) vals.rent_amount = `$${context.rentAmount}`
+	if (context.rentDueDay) vals.rent_due_day = context.rentDueDay
+	if (context.securityDeposit) vals.security_deposit = `$${context.securityDeposit}`
+	return vals
+}
+
+/**
  * Preview values used in markdown editor to show sample data.
  * Bold markdown formatting is applied for visual distinction.
  */

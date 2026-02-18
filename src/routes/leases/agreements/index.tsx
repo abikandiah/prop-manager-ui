@@ -8,7 +8,6 @@ import {
 	FormDialog,
 } from '@abumble/design-system/components/Dialog'
 import { LeaseAgreementFormWizard, LeasesTableView } from '@/features/leases'
-import { LeaseStatus } from '@/domain/lease'
 
 export const Route = createFileRoute('/leases/agreements/')({
 	component: RouteComponent,
@@ -70,7 +69,7 @@ function RouteComponent() {
 				</FormDialog>
 			</div>
 
-			<LeasesTableView status={LeaseStatus.ACTIVE} />
+			<LeasesTableView />
 		</>
 	)
 }

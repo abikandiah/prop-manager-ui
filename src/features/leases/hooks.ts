@@ -42,6 +42,13 @@ function applyCreate(
 		updatedAt: nowIso(),
 	}
 
+	// Update unfiltered list
+	queryClient.setQueryData(
+		leaseKeys.list(),
+		(old: Array<Lease> | undefined) =>
+			old ? [...old, optimistic] : [optimistic],
+	)
+
 	// Update unit list
 	queryClient.setQueryData(
 		leaseKeys.list({ unitId: payload.unitId }),
@@ -208,6 +215,9 @@ export function useCreateLease() {
 		},
 		onMutate: async (payload) => {
 			await queryClient.cancelQueries({ queryKey: leaseKeys.lists() })
+			const previousAllLeases = queryClient.getQueryData<Array<Lease>>(
+				leaseKeys.list(),
+			)
 			const previousUnitLeases = queryClient.getQueryData<Array<Lease>>(
 				leaseKeys.list({ unitId: payload.unitId }),
 			)
@@ -216,12 +226,16 @@ export function useCreateLease() {
 			)
 			const optimistic = applyCreate(queryClient, payload)
 			return {
+				previousAllLeases,
 				previousUnitLeases,
 				previousPropertyLeases,
 				optimisticId: optimistic.id,
 			}
 		},
 		onError: (err, payload, context) => {
+			if (context?.previousAllLeases) {
+				queryClient.setQueryData(leaseKeys.list(), context.previousAllLeases)
+			}
 			if (context?.previousUnitLeases) {
 				queryClient.setQueryData(
 					leaseKeys.list({ unitId: payload.unitId }),

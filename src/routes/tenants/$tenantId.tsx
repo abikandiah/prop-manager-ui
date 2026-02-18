@@ -1,15 +1,14 @@
+import { CenteredEmptyState } from '@/components/CenteredEmptyState'
+import { DetailField, TextLink } from '@/components/ui'
+import { config } from '@/config'
+import { useTenantDetail } from '@/features/tenants'
+import { formatDate } from '@/lib/format'
+import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
+import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
+import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { Link, createFileRoute } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
-import { Skeleton } from '@abumble/design-system/components/Skeleton'
-import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
-import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
-import { useTenantDetail } from '@/features/tenants'
-import { DetailField } from '@/components/ui'
-import { config } from '@/config'
-import { CenteredEmptyState } from '@/components/CenteredEmptyState'
-import { TextLink } from '@/components/ui'
-import { formatDate } from '@/lib/format'
 
 export const Route = createFileRoute('/tenants/$tenantId')({
 	component: TenantDetailPage,
@@ -90,10 +89,14 @@ function TenantDetailPage() {
 						)}
 
 						{/* Vehicle */}
-						<DetailField label="Vehicle">{tenant.vehicleInfo ?? '—'}</DetailField>
+						<DetailField label="Vehicle">
+							{tenant.vehicleInfo ?? '—'}
+						</DetailField>
 
 						{/* Joined */}
-						<DetailField label="Joined">{formatDate(tenant.createdAt)}</DetailField>
+						<DetailField label="Joined">
+							{formatDate(tenant.createdAt)}
+						</DetailField>
 
 						{/* Notes */}
 						{tenant.notes && (

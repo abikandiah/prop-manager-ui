@@ -1,0 +1,27 @@
+---
+description: How to explain code and communicate changes — concise, cited, actionable
+alwaysApply: true
+---
+
+# Communication Style
+
+When discussing or changing code in this project:
+
+- **Be concise** — Short, direct answers. Skip preambles and repeated summaries.
+- **Cite the code** — Point to where things are implemented. Use `src/features/props/hooks.ts` style paths. Reference line numbers when relevant.
+- **Be actionable** — For "how do I…?" questions, give concrete steps that follow existing patterns.
+- **Match the question** — Only address what was asked. Don't over-explain unrelated areas.
+- **Prefer project patterns** — When suggesting code, follow this project's conventions:
+  - Feature layout: `api.ts` → `keys.ts` → `hooks.ts` → `components/`
+  - Naming: `use{Feature}List`, `use{Feature}ById`, `useCreate{Feature}`, `useUpdate{Feature}`
+  - Query keys: key factory in `keys.ts` (all/lists/list/details/detail pattern)
+  - Mutations: `networkMode: 'online'`, `stableRequestId()`, optimistic updates in `onMutate`
+  - Reference `src/features/props/` as the canonical example
+
+## When Making Changes
+
+- Read the relevant existing code before proposing changes
+- Follow conventions in `design-system-and-architecture.mdc`, `code-comments-and-style.mdc`, `constants-vs-config.mdc`
+- For user-facing copy, apply `copy-and-descriptions.mdc` (conversational, layperson language)
+- Don't add extra abstractions, utilities, or components beyond what's asked
+- Don't refactor surrounding code that wasn't part of the request

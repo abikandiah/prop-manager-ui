@@ -1,332 +1,439 @@
-# CLAUDE.md
+# prop-manager-ui — React Frontend
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Property management frontend. React 19, TypeScript (strict), Vite 7, TanStack Router + Query, Tailwind v4, offline-first architecture.
 
-## Package Manager
+> Cross-cutting architecture decisions (IDs, optimistic locking, error contract, auth) are in the root [`../CLAUDE.md`](../CLAUDE.md).
 
-This project uses **pnpm** exclusively. Always use `pnpm` commands, never `npm` or `yarn`.
+---
 
-## Development Commands
+## Commands
 
 ```bash
-# Install dependencies
-pnpm install
-
-# Start dev server (runs on port 3000)
-pnpm dev
-
-# Build for production
-pnpm build
-
-# Run all tests
-pnpm test
-
-# Lint code
-pnpm lint
-
-# Format code
-pnpm format
-
-# Format and fix (runs prettier --write and eslint --fix)
-pnpm check
+pnpm dev      # Dev server (port 3000, proxies /api → localhost:4080)
+pnpm test     # Run tests (Vitest + jsdom)
+pnpm lint     # ESLint check
+pnpm check    # Prettier --write + ESLint --fix (run before committing)
+pnpm build    # Production build
 ```
+
+**Package manager: `pnpm` only. Never `npm` or `yarn`.**
+
+## Dev Auth
+
+In dev, store a JWT in localStorage:
+
+```typescript
+// Browser console — after running the backend dev server
+setDevToken('paste-jwt-here')  // from POST /api/dev/login
+```
+
+The axios client (`src/api/client.ts`) reads `DEV_AUTH_TOKEN` from localStorage automatically.
+
+---
 
 ## Tech Stack
 
-- **Build**: Vite 7 with React 19 and TypeScript (strict mode)
-- **Routing**: TanStack Router (file-based routing in `src/routes/`)
-- **Data Fetching**: TanStack Query with offline-first persistence (Dexie/IndexedDB)
-- **Styling**: Tailwind CSS v4, @abumble/design-system
-- **UI Components**: @abumble/design-system + Shadcn UI (new-york style, zinc, CSS variables)
-- **Testing**: Vitest with jsdom
+| Concern | Library |
+|---|---|
+| Build | Vite 7 |
+| UI | React 19 |
+| Language | TypeScript (strict) |
+| Routing | TanStack Router (file-based) |
+| Data fetching / cache | TanStack Query + IndexedDB persistence |
+| Styling | Tailwind CSS v4, @abumble/design-system |
+| UI components | @abumble/design-system + Shadcn UI (new-york, zinc, CSS vars) |
+| HTTP client | Axios (with interceptors) |
+| Offline DB | Dexie (IndexedDB) |
+| Testing | Vitest + jsdom + Testing Library |
 
-## Project Architecture
+---
 
-### Feature-Based Organization
+## Architecture
 
-The codebase follows a feature-based architecture. Each domain feature lives in `src/features/{feature-name}/` with a consistent structure:
+### Directory Structure
 
 ```
-src/features/{feature-name}/
-  ├── api.ts           # BaseService-based API client
-  ├── hooks.ts         # React Query hooks (queries + mutations)
-  ├── keys.ts          # Query key factory
-  ├── components/      # Feature-specific components
-  │   ├── forms/       # Form components (create/edit dialogs)
-  │   └── views/       # View components (tables, lists, details)
-  └── index.ts         # Public exports
+src/
+  api/            # Shared API infrastructure
+    client.ts       # Axios instance with auth + idempotency interceptors
+    base-service.ts # Generic CRUD service (list, getById, create, update, delete)
+  config/         # Runtime config from env vars (apiBaseUrl, cache TTLs, feature flags)
+  contexts/       # React contexts: theme, network, auth
+  components/     # Shared/global components (ErrorBoundary, NotFound, etc.)
+  domain/         # TypeScript interfaces for domain entities
+  features/       # Feature modules (see Feature Structure below)
+  integrations/
+    tanstack-query/ # React Query setup, persistence, user-scoped client
+  lib/            # Pure utilities (formatting, offline helpers, generateId())
+  routes/         # TanStack Router file-based routes
+    __root.tsx      # Root layout with sidebar, header, providers
+    routeTree.gen.ts # Auto-generated — never edit manually
 ```
 
-**Examples**: `src/features/props/`, `src/features/units/`, `src/features/leases/`
+### Feature Structure
 
-### Core Directories
+Every feature follows this structure:
 
-- **`src/domain/`**: TypeScript types for domain entities (Prop, Unit, Lease, Address, etc.). These define the shape of data throughout the app.
-- **`src/api/`**: Shared API infrastructure (`client.ts` = axios instance with interceptors; `base-service.ts` = generic CRUD service class)
-- **`src/config/`**: Runtime configuration from env vars (`config.apiBaseUrl`, `config.queryCacheStaleTimeMs`, etc.). See Constants vs Config rule below.
-- **`src/lib/`**: Pure utility functions (formatting, offline helpers, constants, `generateId()` for UUIDs)
-- **`src/contexts/`**: React context providers (theme, network, auth)
-- **`src/components/`**: Shared/global components (ErrorBoundary, NotFound, etc.)
-- **`src/routes/`**: TanStack Router file-based routes (each `.tsx` file = route)
-- **`src/integrations/tanstack-query/`**: React Query setup with user-scoped persistence
-- **`src/features/offline/`**: Offline infrastructure (Dexie DB schema for mutation outbox, cache persistor)
+```
+src/features/{name}/
+  api.ts          # BaseService subclass for the feature endpoint
+  keys.ts         # Query key factory
+  hooks.ts        # TanStack Query hooks (queries + mutations)
+  components/
+    forms/        # Create/edit form dialogs
+    views/        # List tables, detail panels
+  index.ts        # Re-exports public API
+```
 
-### API Client Pattern
+Reference implementation: `src/features/props/`
 
-All feature API clients extend `BaseService`:
+---
+
+## Patterns
+
+### Domain Types (`src/domain/`)
 
 ```typescript
-// src/features/props/api.ts
+// src/domain/property.ts
+export interface Prop {
+    id: string
+    legalName: string
+    address: Address
+    propertyType: PropertyType
+    version: number       // Required — sent back on updates
+    createdAt: string
+    updatedAt: string
+}
+
+export interface CreatePropPayload {
+    id: string            // Client-generated UUID — ALWAYS include
+    legalName: string
+    address: AddressInput
+    propertyType: PropertyType
+}
+
+export interface UpdatePropPayload {
+    legalName?: string
+    address?: AddressInput
+    propertyType?: PropertyType
+    version: number       // Required — from last-read entity
+}
+```
+
+### API Client (`api.ts`)
+
+```typescript
 import { BaseService } from '@/api/base-service'
-import type {
-	Prop,
-	CreatePropPayload,
-	UpdatePropPayload,
-} from '@/domain/property'
+import type { Prop, CreatePropPayload, UpdatePropPayload } from '@/domain/property'
 
 class PropsApi extends BaseService<Prop, CreatePropPayload, UpdatePropPayload> {
-	constructor() {
-		super('props') // endpoint = /api/props
-	}
+    constructor() {
+        super('props') // maps to /api/props
+    }
 }
+
 export const propsApi = new PropsApi()
 ```
 
 `BaseService` provides: `list()`, `getById(id)`, `create(payload)`, `update(id, payload)`, `delete(id)`.
 
-### React Query Integration
-
-Feature hooks follow this pattern:
-
-1. **Query keys** (in `keys.ts`):
+### Query Keys (`keys.ts`)
 
 ```typescript
 export const propKeys = {
-	all: ['props'] as const,
-	lists: () => [...propKeys.all, 'list'] as const,
-	list: () => propKeys.lists(),
-	details: () => [...propKeys.all, 'detail'] as const,
-	detail: (id: string) => [...propKeys.details(), id] as const,
+    all: ['props'] as const,
+    lists: () => [...propKeys.all, 'list'] as const,
+    list: () => propKeys.lists(),
+    details: () => [...propKeys.all, 'detail'] as const,
+    detail: (id: string) => [...propKeys.details(), id] as const,
 }
 ```
 
-2. **Queries** (in `hooks.ts`):
+### Query Hooks (`hooks.ts`)
 
 ```typescript
 export function usePropsList() {
-	return useQuery({
-		queryKey: propKeys.list(),
-		queryFn: () => propsApi.list(),
-	})
+    return useQuery({
+        queryKey: propKeys.list(),
+        queryFn: () => propsApi.list(),
+    })
+}
+
+export function usePropById(id: string) {
+    return useQuery({
+        queryKey: propKeys.detail(id),
+        queryFn: () => propsApi.getById(id),
+        enabled: !!id,
+    })
 }
 ```
 
-3. **Mutations with optimistic updates** (in `hooks.ts`):
+### Mutation Hooks with Optimistic Updates (`hooks.ts`)
 
 ```typescript
 export function useCreateProp() {
-	const queryClient = useQueryClient()
-	return useMutation({
-		mutationKey: ['createProp'],
-		networkMode: 'online',
-		mutationFn: (payload: CreatePropPayload) => {
-			const requestId = stableRequestId(['createProp'], payload)
-			return propsApi.create(payload, { [IDEMPOTENCY_HEADER]: requestId })
-		},
-		onMutate: async (payload) => {
-			// Apply optimistic update to cache
-			await queryClient.cancelQueries({ queryKey: propKeys.list() })
-			const previousProps = queryClient.getQueryData<Array<Prop>>(
-				propKeys.list(),
-			)
-			const optimistic = applyCreate(queryClient, payload) // helper function
-			return { previousProps, optimisticId: optimistic.id }
-		},
-		onError: (err, _, context) => {
-			// Rollback on error
-			if (context?.previousProps) {
-				queryClient.setQueryData(propKeys.list(), context.previousProps)
-			}
-		},
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: propKeys.all })
-		},
-	})
+    const queryClient = useQueryClient()
+    return useMutation({
+        mutationKey: ['createProp'],
+        networkMode: 'online',     // Pause offline, auto-resume on reconnect
+        mutationFn: (payload: CreatePropPayload) => {
+            const requestId = stableRequestId(['createProp'], payload)
+            return propsApi.create(payload, { [IDEMPOTENCY_HEADER]: requestId })
+        },
+        onMutate: async (payload) => {
+            await queryClient.cancelQueries({ queryKey: propKeys.list() })
+            const previous = queryClient.getQueryData<Prop[]>(propKeys.list())
+            // Use payload.id — client pre-generated the ID
+            const optimistic: Prop = { ...payload, version: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
+            queryClient.setQueryData(propKeys.list(), (old: Prop[] | undefined) =>
+                old ? [...old, optimistic] : [optimistic])
+            return { previous }
+        },
+        onError: (_err, _payload, context) => {
+            if (context?.previous) queryClient.setQueryData(propKeys.list(), context.previous)
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: propKeys.all })
+        },
+    })
 }
 ```
 
-**Key patterns**:
+**Key rules:**
+- `networkMode: 'online'` on **all** mutations
+- `stableRequestId()` + `IDEMPOTENCY_HEADER` on every mutation call
+- Call `generateId()` **before** building the payload (in the form component's submit handler)
+- Use `payload.id` in `onMutate` (not `generateId()`) — the ID is already in the payload
+- Rollback in `onError`, invalidate in `onSuccess` (or `onSettled` for always-invalidate)
 
-- All mutations use `stableRequestId()` + `IDEMPOTENCY_HEADER` for idempotent requests
-- Create payloads must include client-generated `id` field (via `generateId()`)
-- Optimistic updates use `payload.id` (not generated IDs):
-  ```typescript
-  function applyCreate(
-  	queryClient: ReturnType<typeof useQueryClient>,
-  	payload: CreatePropPayload,
-  ): Prop {
-  	const optimistic: Prop = {
-  		id: payload.id, // Use client-generated ID from payload
-  		legalName: payload.legalName,
-  		// ... rest of fields with defaults
-  	}
-  	queryClient.setQueryData(propKeys.list(), (old: Prop[] | undefined) =>
-  		old ? [...old, optimistic] : [optimistic],
-  	)
-  	return optimistic
-  }
-  ```
-- Optimistic updates applied in `onMutate`, rolled back in `onError`
-- Query cache invalidated in `onSuccess` or `onSettled`
-- Mutations use `networkMode: 'online'` (not `'offlineFirst'`)
+### ID Generation
 
-### Offline-First Architecture
+```typescript
+import { generateId } from '@/lib'
 
-The app uses TanStack Query's persistence with Dexie (IndexedDB) and a **Pure TanStack** approach (no custom mutation queue or sync engine):
+// In form submit handler or buildCreatePayload()
+function handleSubmit(values: FormValues) {
+    const payload: CreatePropPayload = {
+        id: generateId(),    // Real UUID sent to backend — NOT a temporary ID
+        legalName: values.legalName,
+        // ...
+    }
+    createProp(payload)
+}
+```
 
-- **User-scoped databases**: Each user gets their own IndexedDB database (`prop-manager-{userId}`) for data privacy. Query clients are created per user and cleared on logout.
-- **Cache persistence**: Query results saved to IndexedDB (`src/integrations/tanstack-query/root-provider.tsx`)
-- **Mutation persistence**: Pending mutations automatically saved to IndexedDB with `shouldDehydrateMutation`
-- **Client-generated IDs**: All create payloads require a `id: string` field generated via `generateId()` (uses `crypto.randomUUID()`) for idempotency. This prevents race conditions and enables optimistic updates with stable IDs.
-- **Network mode**: Mutations use `networkMode: 'online'` (pause when offline, auto-resume when back online). Queries use default network mode.
-- **Idempotency headers**: All mutations include `X-Request-Id` header via `stableRequestId()` to prevent duplicate operations
-- **Router context**: The user-scoped query client is passed to TanStack Router via context: `<RouterProvider router={router} context={{ queryClient }} />`
-- **Dev mode**: Persistence disabled by default in dev (enable with `VITE_PERSIST_OFFLINE=true`)
+---
 
-See `src/integrations/tanstack-query/root-provider.tsx` for the React Query setup and user-scoped database management.
+## Error Handling in UI
 
-### Routing
+API errors come as RFC 7807 `ProblemDetail`. The axios client throws on non-2xx responses.
 
-TanStack Router with file-based routing:
+```typescript
+// In a mutation's onError or component error boundary
+function handleApiError(error: unknown) {
+    if (axios.isAxiosError(error)) {
+        const problem = error.response?.data
+        // problem.status, problem.title, problem.detail
+        // problem.errors: [{ field, message }] for validation failures
+    }
+}
 
-- Routes live in `src/routes/` (e.g., `src/routes/props/index.tsx` → `/props`)
-- Route tree auto-generated in `src/routeTree.gen.ts` (never edit manually)
-- Root layout in `src/routes/__root.tsx`
-- Route loaders can prefetch data before render (but most data fetching uses TanStack Query in components)
+// Show validation errors from a 400 response
+const errors: Array<{ field: string; message: string }> = problem?.errors ?? []
+```
+
+For form mutations, pass `onError` to the mutation to surface validation errors back to form fields.
+
+---
 
 ## Design System & Styling
 
-This project uses **@abumble/design-system** for shared components, styles, and theme.
+### Component Priority
 
-### Using @abumble/design-system
+1. **@abumble/design-system** components first (`Card`, `Button`, `Sidebar*`, `Banner`, `NotFound`, etc.)
+2. **Shadcn UI** for primitives not in the design-system — add with `pnpx shadcn@latest add <component>` (new-york style, zinc, CSS variables)
+3. Custom components as a last resort
 
-- **Components**: Import from `@abumble/design-system/components/{Component}` (e.g., `Card`, `Button`, `Sidebar*`, `Banner`, `NotFound`)
-- **Utils**: Use `cn()` from `@abumble/design-system/utils` for className merging
-- **Styles**: Base theme in `@abumble/design-system/styles.css` (imported first in `src/styles.css`)
-- **Tailwind integration**: Use `@source "../node_modules/@abumble/design-system"` in CSS so Tailwind scans the package
+```typescript
+import { Card } from '@abumble/design-system/components/Card'
+import { cn } from '@abumble/design-system/utils'
+```
 
-### Styling Guidelines
+### Styling Rules
 
-- **DO NOT** add shadow modifications (e.g., `shadow-*`) to design-system components
-- **Theme**: oklch color space, CSS variables in `:root` and `.dark`
-- **Dark mode**: Class-based (toggle `.dark` on `document.documentElement`)
-- **Semantic text colors**: Use `text-foreground` for headings, `text-muted-foreground` for secondary text (avoid hardcoded grays)
-- **Form dialogs**: Standard width `max-w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto` for all create/edit forms
+- **Text colors**: `text-foreground` for headings, `text-muted-foreground` for secondary text — no hardcoded grays
+- **Dark mode**: Class-based (`.dark` on `document.documentElement`)
+- **Form dialogs**: Always `className="max-w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto"` on `DialogContent`
+- **No shadow overrides** on design-system components
+- **`cn()`** for all conditional className merges
 
 ### Copy & Tone
 
-- **User-facing text**: Use conversational, layperson language (see `.cursor/rules/copy-and-descriptions.mdc`)
-- **Examples**: "This is where you keep a list of every property you own or manage—your house, a rental building, a commercial space, or a piece of land."
-- **Avoid**: Jargon like "parcel," "legal name," "tracking and monitoring" unless audience is technical
+User-facing text must be **conversational and layperson**:
+
+- Say "Add a property" not "Create a property entity"
+- Say "your house, a rental building, a commercial space" not "a real estate parcel"
+- Use "you" and "your"
+- 1–3 sentences for page descriptions — don't over-explain
+- See `.cursor/rules/copy-and-descriptions.mdc` for full guidance
+
+---
 
 ## Configuration vs Constants
 
-Follow the rule in `.cursor/rules/constants-vs-config.mdc`:
+```typescript
+// src/config/index.ts — for values that vary by environment/deployment
+export const config = {
+    apiBaseUrl: import.meta.env.VITE_API_BASE_URL ?? '',
+    queryCacheStaleTimeMs: 5 * 60 * 1000,
+}
 
-- **Use `src/config/index.ts`** for values that may change per environment or deployment (API URLs, timeouts, feature flags, cache TTLs)
-- **Use code constants** for fixed domain/protocol values (sentinel IDs like `OPTIMISTIC_PROP_ID`, storage keys, magic numbers)
+// In-module constants — for fixed domain/protocol values
+const IDEMPOTENCY_HEADER = 'X-Request-Id'
+const OFFLINE_DB_VERSION = 1
+```
 
-Ask: "Would we ever want to change this without changing code?"
+**Rule of thumb**: "Would we ever change this without changing code?" → Yes = config, No = constant.
 
-- **Yes** → config (consider env override)
-- **No** → constant in code
+---
+
+## Routing
+
+- File-based routes in `src/routes/` (e.g., `src/routes/props/index.tsx` → `/props`)
+- `src/routeTree.gen.ts` is **auto-generated** — never edit it manually
+- Root layout: `src/routes/__root.tsx`
+- Pass user-scoped `queryClient` via router context:
+  ```typescript
+  <RouterProvider router={router} context={{ queryClient }} />
+  ```
+
+---
+
+## Navigation Structure
+
+- **Sidebar**: Main app nav only — Home, Props, Units, Leases, Messages
+- **DO NOT** add Settings to the sidebar
+- **User dropdown** (header): Profile (`/profile`), Settings (`/settings`)
+- **Theme toggle**: Header, left of notifications (sun/moon icon)
+
+---
+
+## Offline-First Architecture
+
+- Query cache persisted to **IndexedDB** (Dexie) per user (`prop-manager-{userId}`)
+- Pending mutations persisted to IndexedDB via `shouldDehydrateMutation`
+- User-scoped query client created on login, cleared on logout
+- Disable persistence in dev by default; enable with `VITE_PERSIST_OFFLINE=true`
+- See `src/integrations/tanstack-query/root-provider.tsx` for setup
+
+---
 
 ## Path Aliases
-
-Import from `@/` to reference `src/`:
 
 ```typescript
 import { config } from '@/config'
 import { propsApi } from '@/features/props/api'
 import type { Prop } from '@/domain/property'
+import { generateId } from '@/lib'
+import { cn } from '@abumble/design-system/utils'
 ```
 
-## Development Notes
+---
 
-### Code Style & Comments
+## Code Style
 
-Follow the code comment and style guidelines in `.cursor/rules/code-comments-and-style.mdc`:
+- No emojis in code (comments, console logs, variable names) — only in user-facing UI and markdown docs
+- Console log prefix format: `console.log('[FeatureName] Message', data)`
+- JSDoc for exported functions and hooks
+- No semicolons, single quotes, trailing commas, tabs — enforced by Prettier (`pnpm check`)
+- See `.cursor/rules/code-comments-and-style.mdc` for full guidance
 
-- **No emojis in code** (comments, console logs, variable names)
-- Emojis are fine for user-facing UI text and markdown documentation
-- Use clear, concise comments for complex logic
-- Use JSDoc for public APIs
-- Use log prefixes in square brackets: `console.log('[Network] Going offline')`
-- Don't comment obvious code
-
-See also:
-
-- `.cursor/rules/design-system-and-architecture.mdc` for UI and styling conventions
-- `.cursor/rules/copy-and-descriptions.mdc` for user-facing text guidelines
-- `.cursor/rules/constants-vs-config.mdc` for configuration patterns
-
-### API Proxy
-
-The dev server proxies `/api` to `http://localhost:4080` (see `vite.config.ts`). The backend is expected to run on port 4080 during development.
-
-### Dev Auth Token
-
-In development, a bearer token can be stored in localStorage (`DEV_AUTH_TOKEN`) and automatically added to all requests. See `src/api/client.ts` (`getDevToken()`, `setDevToken()`).
-
-### Devtools
-
-TanStack Router and Query devtools are available in dev mode (bottom-right of screen).
-
-## Adding a New Feature
-
-To add a new domain feature (e.g., "tenants"):
-
-1. **Define domain types** in `src/domain/tenant.ts`:
-   - Entity type (e.g., `Tenant`)
-   - Create payload **must include `id: string`** for client-generated UUID
-   - Update payload (no ID needed)
-
-   Example:
-
-   ```typescript
-   export interface CreateTenantPayload {
-   	id: string // Client-generated UUID for idempotency
-   	name: string
-   	email: string
-   	// ... other fields
-   }
-   ```
-
-2. **Create feature directory** `src/features/tenants/` with:
-   - `api.ts`: Extend `BaseService<Tenant, CreateTenantPayload, UpdateTenantPayload>`
-   - `keys.ts`: Query key factory following existing pattern
-   - `hooks.ts`: Query and mutation hooks with optimistic updates
-     - In `applyCreate()`, use `payload.id` (not `generateId()`)
-     - Use `networkMode: 'online'` for all mutations
-   - `components/forms/`: Create/edit forms
-     - Call `generateId()` in `buildCreatePayload()` or before mutation
-   - `components/views/`: List/detail views
-   - `index.ts`: Re-export public API
-
-3. **Add route** in `src/routes/tenants/index.tsx`
-4. **Update navigation** in `src/routes/__root.tsx` or sidebar
-
-Follow the pattern established in `src/features/props/` as a reference.
+---
 
 ## Testing
 
-- Test files: `src/**/*.{test,spec}.{ts,tsx}`
-- Run with: `pnpm test`
-- Framework: Vitest with jsdom environment
+Test files: `src/**/*.{test,spec}.{ts,tsx}` — Vitest + jsdom + Testing Library.
 
-## Navigation Structure
+### Unit Test (utility function)
 
-- **Sidebar**: Main app navigation only (Home, Props, Units, Leases, Messages)
-- **User dropdown** (header): Profile and Settings
-- **DO NOT** put Settings in the sidebar
-- **Theme toggle**: Header (left of notifications), sun/moon icon
+```typescript
+import { describe, it, expect } from 'vitest'
+import { formatCurrency } from '@/lib/format'
+
+describe('formatCurrency', () => {
+    it('formats positive amounts', () => {
+        expect(formatCurrency(1234.56)).toBe('$1,234.56')
+    })
+
+    it('handles zero', () => {
+        expect(formatCurrency(0)).toBe('$0.00')
+    })
+})
+```
+
+### Component Test
+
+```typescript
+import { render, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { PropCard } from '../PropCard'
+
+describe('PropCard', () => {
+    it('renders property name', () => {
+        render(<PropCard prop={mockProp} />)
+        expect(screen.getByText('Acme House')).toBeInTheDocument()
+    })
+
+    it('calls onDelete when delete is confirmed', async () => {
+        const onDelete = vi.fn()
+        render(<PropCard prop={mockProp} onDelete={onDelete} />)
+        await userEvent.click(screen.getByRole('button', { name: /delete/i }))
+        expect(onDelete).toHaveBeenCalledWith(mockProp.id)
+    })
+})
+```
+
+### Hook Test (with QueryClient)
+
+```typescript
+import { renderHook, waitFor } from '@testing-library/react'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { usePropsList } from '../hooks'
+
+function wrapper({ children }: { children: React.ReactNode }) {
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    return <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+}
+
+describe('usePropsList', () => {
+    it('returns props from API', async () => {
+        vi.spyOn(propsApi, 'list').mockResolvedValue([mockProp])
+        const { result } = renderHook(() => usePropsList(), { wrapper })
+        await waitFor(() => expect(result.current.isSuccess).toBe(true))
+        expect(result.current.data).toContainEqual(mockProp)
+    })
+})
+```
+
+---
+
+## Adding a New Feature — Checklist
+
+1. **Domain types** in `src/domain/{name}.ts`:
+   - Entity interface (include `version: number`)
+   - `Create{Name}Payload` — **must include `id: string`**
+   - `Update{Name}Payload` — all optional except `version: number`
+
+2. **Feature directory** `src/features/{name}/`:
+   - `api.ts` — extend `BaseService<Entity, CreatePayload, UpdatePayload>`
+   - `keys.ts` — query key factory following existing pattern
+   - `hooks.ts` — queries + mutations (optimistic updates, `networkMode: 'online'`)
+   - `components/forms/` — create/edit dialog forms (call `generateId()` on submit)
+   - `components/views/` — list table, detail view
+   - `index.ts` — re-export public surface
+
+3. **Route** in `src/routes/{name}/index.tsx`
+
+4. **Navigation** — add to sidebar in `src/routes/__root.tsx` (only if it's a main nav item)
+
+Follow `src/features/props/` as the reference implementation.

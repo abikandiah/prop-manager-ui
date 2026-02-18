@@ -124,7 +124,15 @@ export function LeasesTableView({
 
 	const skeletonTable = (
 		<TableSkeleton
-			headers={['Template', 'Status', 'Rent', 'Due day', 'Start date', 'End date', '']}
+			headers={[
+				'Template',
+				'Status',
+				'Rent',
+				'Due day',
+				'Start date',
+				'End date',
+				'',
+			]}
 			columnWidths={['w-24', 'w-24', 'w-24', 'w-24', 'w-24', 'w-24', '']}
 		/>
 	)
@@ -202,7 +210,9 @@ export function LeasesTableView({
 				{editingLease && editingLease.status === LeaseStatus.DRAFT && (
 					<FormDialog
 						open={!!editingLease}
-						onOpenChange={(open) => { if (!open) setEditingLease(null) }}
+						onOpenChange={(open) => {
+							if (!open) setEditingLease(null)
+						}}
 						title="Edit lease"
 						description="Update lease details. Only draft leases can be edited."
 					>

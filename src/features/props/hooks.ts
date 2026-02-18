@@ -21,9 +21,9 @@ function applyCreate(
 	payload: CreatePropPayload,
 ): Prop {
 	const optimistic: Prop = {
-		id: payload.id, // ✅ Use client-generated ID from payload
+		id: payload.id, // Use client-generated ID from payload
 		legalName: payload.legalName,
-		addressId: '', // unknown until server responds
+		addressId: '',
 		address: null,
 		propertyType: payload.propertyType,
 		description: payload.description ?? null,

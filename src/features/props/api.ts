@@ -13,7 +13,9 @@ class PropsApi extends BaseService<Prop, CreatePropRequest, UpdatePropPayload> {
 	}
 
 	async listUnits(propId: string): Promise<Array<Unit>> {
-		const response = await api.get<Array<Unit>>(`${this.endpoint}/${propId}/units`)
+		const response = await api.get<Array<Unit>>(
+			`${this.endpoint}/${propId}/units`,
+		)
 		return response.data
 	}
 }

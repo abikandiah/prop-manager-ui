@@ -73,7 +73,7 @@ export function UnitsTableView({ propId }: UnitsTableViewProps) {
 	const lastErrorRef = useRef<unknown>(null)
 	if (isError && error !== lastErrorRef.current) {
 		lastErrorRef.current = error
-		toast.error(`Error loading units: ${error?.message || 'Unknown'}`)
+		toast.error(`Error loading units: ${error.message || 'Unknown'}`)
 	}
 	if (!isError) lastErrorRef.current = null
 

@@ -101,7 +101,16 @@ export function LeaseStatusActions({ lease }: LeaseStatusActionsProps) {
 	const revertToDraft = useRevertLeaseToDraft()
 	const terminate = useTerminateLease()
 
-	const mutations: Record<ActionKey, { mutate: (id: string, callbacks: { onSuccess: () => void; onError: (err: Error) => void }) => void; isPending: boolean }> = {
+	const mutations: Record<
+		ActionKey,
+		{
+			mutate: (
+				id: string,
+				callbacks: { onSuccess: () => void; onError: (err: Error) => void },
+			) => void
+			isPending: boolean
+		}
+	> = {
 		submit: submitForReview,
 		activate,
 		revert: revertToDraft,
@@ -109,9 +118,9 @@ export function LeaseStatusActions({ lease }: LeaseStatusActionsProps) {
 	}
 
 	const isPending = Object.values(mutations).some((m) => m.isPending)
-	const visibleActions = (Object.keys(ACTION_CONFIGS) as Array<ActionKey>).filter(
-		(key) => ACTION_CONFIGS[key].visibleWhen === lease.status,
-	)
+	const visibleActions = (
+		Object.keys(ACTION_CONFIGS) as Array<ActionKey>
+	).filter((key) => ACTION_CONFIGS[key].visibleWhen === lease.status)
 
 	const activeConfig = confirmAction ? ACTION_CONFIGS[confirmAction] : null
 	const activeMutation = confirmAction ? mutations[confirmAction] : null

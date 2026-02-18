@@ -10,13 +10,13 @@ import {
 
 export interface TableSkeletonProps {
 	/** Header labels for each column. Empty string renders a blank header (e.g. for action columns). */
-	headers: string[]
+	headers: Array<string>
 	/**
 	 * Tailwind width class for each column's skeleton (e.g. "w-24").
 	 * Use empty string to render a blank cell (e.g. for action columns).
 	 * Must match length of `headers`.
 	 */
-	columnWidths: string[]
+	columnWidths: Array<string>
 	rows?: number
 }
 

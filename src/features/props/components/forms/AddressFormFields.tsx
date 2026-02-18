@@ -1,34 +1,28 @@
+import { useFormContext } from 'react-hook-form'
 import { Input } from '@abumble/design-system/components/Input'
 import { Label } from '@abumble/design-system/components/Label'
+import { FieldError } from '@/components/ui/FieldError'
 
-export const ADDRESS_FORM_INITIAL = {
-	addressLine1: '',
-	addressLine2: '',
-	city: '',
-	stateProvinceRegion: '',
-	postalCode: '',
-	countryCode: '',
-} as const
-
-export type AddressFormValue = {
-	[K in keyof typeof ADDRESS_FORM_INITIAL]: string
+// Shape shared between the form schema and this component
+export interface AddressFields {
+	addressLine1: string
+	addressLine2: string
+	city: string
+	stateProvinceRegion: string
+	postalCode: string
+	countryCode: string
 }
 
-type Props = {
-	value: AddressFormValue
-	onChange: (field: keyof AddressFormValue, value: string) => void
-}
+// The parent form must have an `address` key matching AddressFields
+type ParentFormWithAddress = { address: AddressFields }
 
-export function AddressFormFields({ value: address, onChange }: Props) {
-	const onFormChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const { name, value } = e.target
-		const field = name as keyof AddressFormValue
-		if (field in ADDRESS_FORM_INITIAL) {
-			const next =
-				field === 'countryCode' ? value.toUpperCase().slice(0, 2) : value
-			onChange(field, next)
-		}
-	}
+export function AddressFormFields() {
+	const {
+		register,
+		formState: { errors },
+	} = useFormContext<ParentFormWithAddress>()
+
+	const addressErrors = errors.address
 
 	return (
 		<fieldset className="rounded border bg-muted/20 p-5">
@@ -45,13 +39,11 @@ export function AddressFormFields({ value: address, onChange }: Props) {
 					</Label>
 					<Input
 						id="addressLine1"
-						name="addressLine1"
-						value={address.addressLine1}
-						onChange={onFormChange}
+						{...register('address.addressLine1')}
 						placeholder="Street Address"
-						required
 						className="w-full"
 					/>
+					<FieldError message={addressErrors?.addressLine1?.message} />
 				</div>
 				<div className="space-y-1.5">
 					<Label htmlFor="addressLine2" className="text-foreground">
@@ -59,9 +51,7 @@ export function AddressFormFields({ value: address, onChange }: Props) {
 					</Label>
 					<Input
 						id="addressLine2"
-						name="addressLine2"
-						value={address.addressLine2}
-						onChange={onFormChange}
+						{...register('address.addressLine2')}
 						placeholder="Apt, Suite, Unit, etc."
 						className="w-full"
 					/>
@@ -76,13 +66,11 @@ export function AddressFormFields({ value: address, onChange }: Props) {
 						</Label>
 						<Input
 							id="countryCode"
-							name="countryCode"
-							value={address.countryCode}
-							onChange={onFormChange}
+							{...register('address.countryCode')}
 							placeholder="Country"
 							maxLength={2}
-							required
 						/>
+						<FieldError message={addressErrors?.countryCode?.message} />
 					</div>
 					<div className="space-y-1.5">
 						<Label htmlFor="stateProvinceRegion" className="text-foreground">
@@ -93,12 +81,10 @@ export function AddressFormFields({ value: address, onChange }: Props) {
 						</Label>
 						<Input
 							id="stateProvinceRegion"
-							name="stateProvinceRegion"
-							value={address.stateProvinceRegion}
-							onChange={onFormChange}
+							{...register('address.stateProvinceRegion')}
 							placeholder="Province/State"
-							required
 						/>
+						<FieldError message={addressErrors?.stateProvinceRegion?.message} />
 					</div>
 				</div>
 				<div className="grid grid-cols-2 gap-4">
@@ -109,14 +95,8 @@ export function AddressFormFields({ value: address, onChange }: Props) {
 								*
 							</span>
 						</Label>
-						<Input
-							id="city"
-							name="city"
-							value={address.city}
-							onChange={onFormChange}
-							placeholder="City"
-							required
-						/>
+						<Input id="city" {...register('address.city')} placeholder="City" />
+						<FieldError message={addressErrors?.city?.message} />
 					</div>
 					<div className="space-y-1.5">
 						<Label htmlFor="postalCode" className="text-foreground">
@@ -127,12 +107,10 @@ export function AddressFormFields({ value: address, onChange }: Props) {
 						</Label>
 						<Input
 							id="postalCode"
-							name="postalCode"
-							value={address.postalCode}
-							onChange={onFormChange}
+							{...register('address.postalCode')}
 							placeholder="Zip/Postal Code"
-							required
 						/>
+						<FieldError message={addressErrors?.postalCode?.message} />
 					</div>
 				</div>
 			</div>

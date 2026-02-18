@@ -1,4 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { z } from 'zod'
 import { toast } from 'sonner'
 import { Button } from '@abumble/design-system/components/Button'
 import { Input } from '@abumble/design-system/components/Input'
@@ -7,46 +10,72 @@ import { DialogFooter } from '@abumble/design-system/components/Dialog'
 import { Label } from '@abumble/design-system/components/Label'
 import { Select } from '@abumble/design-system/components/Select'
 import type { CreateUnitPayload, Unit, UpdateUnitPayload } from '@/domain/unit'
-import { UnitStatus, UnitType } from '@/domain/unit'
+import { FieldError } from '@/components/ui/FieldError'
+import { UNIT_STATUSES, UNIT_TYPES, UnitStatus, UnitType } from '@/domain/unit'
 import { useCreateUnit, useUpdateUnit } from '@/features/units/hooks'
 import { usePropsList } from '@/features/props'
-import { UNIT_STATUSES, UNIT_TYPES } from '@/domain/unit'
 import { formatEnumLabel } from '@/lib/format'
 import { generateId } from '@/lib/util'
 
-type FormState = {
-	propertyId: string
-	unitNumber: string
-	unitType: UnitType | ''
-	status: UnitStatus
-	description: string
-	rentAmount: string
-	securityDeposit: string
-	bedrooms: string
-	bathrooms: string
-	squareFootage: string
-	balcony: boolean
-	laundryInUnit: boolean
-	hardwoodFloors: boolean
+const optionalFloat = z
+	.string()
+	.refine(
+		(s) => s.trim() === '' || (!isNaN(parseFloat(s)) && parseFloat(s) >= 0),
+		'Must be a valid number',
+	)
+
+const optionalInt = z
+	.string()
+	.refine(
+		(s) => s.trim() === '' || (!isNaN(parseInt(s, 10)) && parseInt(s, 10) >= 0),
+		'Must be a whole number',
+	)
+
+const unitFormSchema = z.object({
+	propertyId: z.string().min(1, 'Property is required'),
+	unitNumber: z
+		.string()
+		.min(1, 'Unit number is required')
+		.max(64, 'Unit number is too long'),
+	unitType: z.nativeEnum(UnitType).or(z.literal('')),
+	status: z.nativeEnum(UnitStatus),
+	description: z.string().max(2000).optional(),
+	rentAmount: optionalFloat,
+	securityDeposit: optionalFloat,
+	bedrooms: optionalInt,
+	bathrooms: z
+		.string()
+		.refine(
+			(s) => s.trim() === '' || (!isNaN(parseFloat(s)) && parseFloat(s) >= 0),
+			'Must be a valid number',
+		),
+	squareFootage: optionalInt,
+	balcony: z.boolean(),
+	laundryInUnit: z.boolean(),
+	hardwoodFloors: z.boolean(),
+})
+
+type UnitFormValues = z.infer<typeof unitFormSchema>
+
+function makeDefaults(propId?: string): UnitFormValues {
+	return {
+		propertyId: propId ?? '',
+		unitNumber: '',
+		unitType: '',
+		status: UnitStatus.VACANT,
+		description: '',
+		rentAmount: '',
+		securityDeposit: '',
+		bedrooms: '',
+		bathrooms: '',
+		squareFootage: '',
+		balcony: false,
+		laundryInUnit: false,
+		hardwoodFloors: false,
+	}
 }
 
-const initialFormState: FormState = {
-	propertyId: '',
-	unitNumber: '',
-	unitType: '',
-	status: UnitStatus.VACANT,
-	description: '',
-	rentAmount: '',
-	securityDeposit: '',
-	bedrooms: '',
-	bathrooms: '',
-	squareFootage: '',
-	balcony: false,
-	laundryInUnit: false,
-	hardwoodFloors: false,
-}
-
-function unitToFormState(unit: Unit): FormState {
+function unitToFormValues(unit: Unit): UnitFormValues {
 	return {
 		propertyId: unit.propertyId,
 		unitNumber: unit.unitNumber,
@@ -81,136 +110,81 @@ export function UnitForm({
 	submitLabel = 'Create Unit',
 }: UnitFormProps) {
 	const isEdit = initialUnit != null
-	const [form, setForm] = useState<FormState>(() => {
-		const state = initialUnit ? unitToFormState(initialUnit) : initialFormState
-		if (propId) state.propertyId = propId
-		return state
-	})
 	const createUnit = useCreateUnit()
 	const updateUnit = useUpdateUnit()
 	const { data: propsList } = usePropsList()
 
+	const {
+		register,
+		handleSubmit,
+		reset,
+		control,
+		formState: { errors },
+	} = useForm<UnitFormValues>({
+		resolver: standardSchemaResolver(unitFormSchema),
+		defaultValues: initialUnit
+			? unitToFormValues(initialUnit)
+			: makeDefaults(propId),
+	})
+
 	useEffect(() => {
-		if (initialUnit) {
-			setForm(unitToFormState(initialUnit))
-		} else {
-			setForm((prev) => ({
-				...initialFormState,
-				propertyId: propId ?? prev.propertyId,
-			}))
-		}
-	}, [initialUnit, propId])
+		reset(initialUnit ? unitToFormValues(initialUnit) : makeDefaults(propId))
+	}, [initialUnit?.id, propId, reset])
 
 	const pending = createUnit.isPending || updateUnit.isPending
 
-	const handleChange = (
-		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-	) => {
-		const { name, value, type } = e.target
-		const checked = (e.target as HTMLInputElement).checked
-		setForm((prev) => ({
-			...prev,
-			[name]:
-				type === 'checkbox'
-					? checked
-					: name === 'status'
-						? (value as UnitStatus)
-						: name === 'unitType'
-							? (value as UnitType | '')
-							: value,
-		}))
-	}
-
-	const handleTextareaChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-		setForm((prev) => ({ ...prev, description: e.target.value }))
-	}
-
-	const buildCreatePayload = (): CreateUnitPayload => ({
-		id: generateId(), // ✅ Generate client-side ID for idempotency
-		propertyId: form.propertyId || propId || '',
-		unitNumber: form.unitNumber.trim(),
-		unitType: form.unitType || undefined,
-		status: form.status,
-		description: form.description.trim() || undefined,
-		rentAmount: form.rentAmount.trim()
-			? parseFloat(form.rentAmount)
+	const buildCreatePayload = (values: UnitFormValues): CreateUnitPayload => ({
+		id: generateId(),
+		propertyId: values.propertyId,
+		unitNumber: values.unitNumber.trim(),
+		unitType: values.unitType || undefined,
+		status: values.status,
+		description: values.description?.trim() || undefined,
+		rentAmount: values.rentAmount.trim()
+			? parseFloat(values.rentAmount)
 			: undefined,
-		securityDeposit: form.securityDeposit.trim()
-			? parseFloat(form.securityDeposit)
+		securityDeposit: values.securityDeposit.trim()
+			? parseFloat(values.securityDeposit)
 			: undefined,
-		bedrooms: form.bedrooms.trim() ? parseInt(form.bedrooms, 10) : undefined,
-		bathrooms: form.bathrooms.trim() ? parseInt(form.bathrooms, 10) : undefined,
-		squareFootage: form.squareFootage.trim()
-			? parseInt(form.squareFootage, 10)
+		bedrooms: values.bedrooms.trim()
+			? parseInt(values.bedrooms, 10)
 			: undefined,
-		balcony: form.balcony ? true : undefined,
-		laundryInUnit: form.laundryInUnit ? true : undefined,
-		hardwoodFloors: form.hardwoodFloors ? true : undefined,
+		bathrooms: values.bathrooms.trim()
+			? parseFloat(values.bathrooms)
+			: undefined,
+		squareFootage: values.squareFootage.trim()
+			? parseInt(values.squareFootage, 10)
+			: undefined,
+		balcony: values.balcony ? true : undefined,
+		laundryInUnit: values.laundryInUnit ? true : undefined,
+		hardwoodFloors: values.hardwoodFloors ? true : undefined,
 	})
 
-	const buildUpdatePayload = (): UpdateUnitPayload => ({
-		propertyId: form.propertyId,
-		unitNumber: form.unitNumber.trim(),
-		unitType: form.unitType || null,
-		status: form.status,
-		description: form.description.trim() || null,
-		rentAmount: form.rentAmount.trim() ? parseFloat(form.rentAmount) : null,
-		securityDeposit: form.securityDeposit.trim()
-			? parseFloat(form.securityDeposit)
+	const buildUpdatePayload = (values: UnitFormValues): UpdateUnitPayload => ({
+		propertyId: values.propertyId,
+		unitNumber: values.unitNumber.trim(),
+		unitType: values.unitType || null,
+		status: values.status,
+		description: values.description?.trim() || null,
+		rentAmount: values.rentAmount.trim() ? parseFloat(values.rentAmount) : null,
+		securityDeposit: values.securityDeposit.trim()
+			? parseFloat(values.securityDeposit)
 			: null,
-		bedrooms: form.bedrooms.trim() ? parseInt(form.bedrooms, 10) : null,
-		bathrooms: form.bathrooms.trim() ? parseInt(form.bathrooms, 10) : null,
-		squareFootage: form.squareFootage.trim()
-			? parseInt(form.squareFootage, 10)
+		bedrooms: values.bedrooms.trim() ? parseInt(values.bedrooms, 10) : null,
+		bathrooms: values.bathrooms.trim() ? parseFloat(values.bathrooms) : null,
+		squareFootage: values.squareFootage.trim()
+			? parseInt(values.squareFootage, 10)
 			: null,
-		balcony: form.balcony,
-		laundryInUnit: form.laundryInUnit,
-		hardwoodFloors: form.hardwoodFloors,
+		balcony: values.balcony,
+		laundryInUnit: values.laundryInUnit,
+		hardwoodFloors: values.hardwoodFloors,
 		version: initialUnit?.version ?? 0,
 	})
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault()
-		if (!form.propertyId && !propId) {
-			toast.error('Property is required')
-			return
-		}
-		if (!form.unitNumber.trim()) {
-			toast.error('Unit number is required')
-			return
-		}
-
-		// Validate numeric fields
-		if (form.rentAmount.trim() && isNaN(parseFloat(form.rentAmount))) {
-			toast.error('Rent amount must be a valid number')
-			return
-		}
-		if (
-			form.securityDeposit.trim() &&
-			isNaN(parseFloat(form.securityDeposit))
-		) {
-			toast.error('Security deposit must be a valid number')
-			return
-		}
-		if (form.bedrooms.trim() && isNaN(parseInt(form.bedrooms, 10))) {
-			toast.error('Bedrooms must be a valid number')
-			return
-		}
-		if (form.bathrooms.trim() && isNaN(parseInt(form.bathrooms, 10))) {
-			toast.error('Bathrooms must be a valid number')
-			return
-		}
-		if (form.squareFootage.trim() && isNaN(parseInt(form.squareFootage, 10))) {
-			toast.error('Square footage must be a valid number')
-			return
-		}
-
-		if (isEdit && initialUnit) {
+	const onSubmit = (values: UnitFormValues) => {
+		if (isEdit) {
 			updateUnit.mutate(
-				{
-					id: initialUnit.id,
-					payload: buildUpdatePayload(),
-				},
+				{ id: initialUnit.id, payload: buildUpdatePayload(values) },
 				{
 					onSuccess: () => {
 						toast.success('Unit updated')
@@ -222,10 +196,10 @@ export function UnitForm({
 				},
 			)
 		} else {
-			createUnit.mutate(buildCreatePayload(), {
+			createUnit.mutate(buildCreatePayload(values), {
 				onSuccess: () => {
 					toast.success('Unit created')
-					setForm(initialFormState)
+					reset(makeDefaults(propId))
 					onSuccess?.()
 				},
 				onError: (err) => {
@@ -236,7 +210,7 @@ export function UnitForm({
 	}
 
 	return (
-		<form onSubmit={handleSubmit} className="space-y-4 pt-4">
+		<form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-4">
 			{!propId && (
 				<div className="space-y-2">
 					<Label htmlFor="propertyId">
@@ -245,13 +219,7 @@ export function UnitForm({
 							*
 						</span>
 					</Label>
-					<Select
-						id="propertyId"
-						name="propertyId"
-						value={form.propertyId}
-						onChange={handleChange}
-						required
-					>
+					<Select id="propertyId" {...register('propertyId')}>
 						<option value="" disabled>
 							Select a property
 						</option>
@@ -261,6 +229,7 @@ export function UnitForm({
 							</option>
 						))}
 					</Select>
+					<FieldError message={errors.propertyId?.message} />
 				</div>
 			)}
 			<div className="space-y-2">
@@ -272,22 +241,15 @@ export function UnitForm({
 				</Label>
 				<Input
 					id="unitNumber"
-					name="unitNumber"
-					value={form.unitNumber}
-					onChange={handleChange}
+					{...register('unitNumber')}
 					placeholder="e.g. 101"
-					required
 					maxLength={64}
 				/>
+				<FieldError message={errors.unitNumber?.message} />
 			</div>
 			<div className="space-y-2">
 				<Label htmlFor="status">Status</Label>
-				<Select
-					id="status"
-					name="status"
-					value={form.status}
-					onChange={handleChange}
-				>
+				<Select id="status" {...register('status')}>
 					{UNIT_STATUSES.map((s) => (
 						<option key={s} value={s}>
 							{formatEnumLabel(s)}
@@ -297,12 +259,7 @@ export function UnitForm({
 			</div>
 			<div className="space-y-2">
 				<Label htmlFor="unitType">Unit type (optional)</Label>
-				<Select
-					id="unitType"
-					name="unitType"
-					value={form.unitType}
-					onChange={handleChange}
-				>
+				<Select id="unitType" {...register('unitType')}>
 					<option value="">Not specified</option>
 					{UNIT_TYPES.map((t) => (
 						<option key={t} value={t}>
@@ -315,8 +272,7 @@ export function UnitForm({
 				<Label htmlFor="description">Description (optional)</Label>
 				<textarea
 					id="description"
-					value={form.description}
-					onChange={handleTextareaChange}
+					{...register('description')}
 					placeholder="Notes about this unit"
 					maxLength={2000}
 					rows={3}
@@ -324,89 +280,98 @@ export function UnitForm({
 				/>
 			</div>
 			<div className="flex flex-col gap-2">
-				<div className="flex items-center gap-2">
-					<Checkbox
-						id="balcony"
-						checked={form.balcony}
-						onCheckedChange={(checked) =>
-							setForm((prev) => ({ ...prev, balcony: !!checked }))
-						}
-					/>
-					<Label
-						htmlFor="balcony"
-						className="text-sm font-normal cursor-pointer"
-					>
-						Balcony
-					</Label>
-				</div>
-				<div className="flex items-center gap-2">
-					<Checkbox
-						id="laundryInUnit"
-						checked={form.laundryInUnit}
-						onCheckedChange={(checked) =>
-							setForm((prev) => ({ ...prev, laundryInUnit: !!checked }))
-						}
-					/>
-					<Label
-						htmlFor="laundryInUnit"
-						className="text-sm font-normal cursor-pointer"
-					>
-						Laundry in unit
-					</Label>
-				</div>
-				<div className="flex items-center gap-2">
-					<Checkbox
-						id="hardwoodFloors"
-						checked={form.hardwoodFloors}
-						onCheckedChange={(checked) =>
-							setForm((prev) => ({ ...prev, hardwoodFloors: !!checked }))
-						}
-					/>
-					<Label
-						htmlFor="hardwoodFloors"
-						className="text-sm font-normal cursor-pointer"
-					>
-						Hardwood floors
-					</Label>
-				</div>
+				<Controller
+					name="balcony"
+					control={control}
+					render={({ field }) => (
+						<div className="flex items-center gap-2">
+							<Checkbox
+								id="balcony"
+								checked={field.value}
+								onCheckedChange={(checked) => field.onChange(!!checked)}
+							/>
+							<Label
+								htmlFor="balcony"
+								className="text-sm font-normal cursor-pointer"
+							>
+								Balcony
+							</Label>
+						</div>
+					)}
+				/>
+				<Controller
+					name="laundryInUnit"
+					control={control}
+					render={({ field }) => (
+						<div className="flex items-center gap-2">
+							<Checkbox
+								id="laundryInUnit"
+								checked={field.value}
+								onCheckedChange={(checked) => field.onChange(!!checked)}
+							/>
+							<Label
+								htmlFor="laundryInUnit"
+								className="text-sm font-normal cursor-pointer"
+							>
+								Laundry in unit
+							</Label>
+						</div>
+					)}
+				/>
+				<Controller
+					name="hardwoodFloors"
+					control={control}
+					render={({ field }) => (
+						<div className="flex items-center gap-2">
+							<Checkbox
+								id="hardwoodFloors"
+								checked={field.value}
+								onCheckedChange={(checked) => field.onChange(!!checked)}
+							/>
+							<Label
+								htmlFor="hardwoodFloors"
+								className="text-sm font-normal cursor-pointer"
+							>
+								Hardwood floors
+							</Label>
+						</div>
+					)}
+				/>
 			</div>
 			<div className="grid grid-cols-3 gap-4">
 				<div className="space-y-2">
 					<Label htmlFor="bedrooms">Bedrooms</Label>
 					<Input
 						id="bedrooms"
-						name="bedrooms"
+						{...register('bedrooms')}
 						type="number"
 						min={0}
-						value={form.bedrooms}
-						onChange={handleChange}
 						placeholder="—"
 					/>
+					<FieldError message={errors.bedrooms?.message} />
 				</div>
 				<div className="space-y-2">
 					<Label htmlFor="bathrooms">Bathrooms</Label>
 					<Input
 						id="bathrooms"
-						name="bathrooms"
+						{...register('bathrooms')}
 						type="number"
 						min={0}
 						step={0.5}
-						value={form.bathrooms}
-						onChange={handleChange}
 						placeholder="—"
 					/>
+					<FieldError message={errors.bathrooms?.message} />
 				</div>
 				<div className="space-y-2">
 					<Label htmlFor="squareFootage">Sq ft</Label>
 					<Input
 						id="squareFootage"
-						name="squareFootage"
+						{...register('squareFootage')}
 						type="number"
 						min={0}
-						value={form.squareFootage}
-						onChange={handleChange}
 						placeholder="—"
 					/>
+					<FieldError message={errors.squareFootage?.message} />
 				</div>
 			</div>
 			<div className="grid grid-cols-2 gap-4">
@@ -414,27 +379,25 @@ export function UnitForm({
 					<Label htmlFor="rentAmount">Rent ($)</Label>
 					<Input
 						id="rentAmount"
-						name="rentAmount"
+						{...register('rentAmount')}
 						type="number"
 						min={0}
 						step={0.01}
-						value={form.rentAmount}
-						onChange={handleChange}
 						placeholder="Optional"
 					/>
+					<FieldError message={errors.rentAmount?.message} />
 				</div>
 				<div className="space-y-2">
 					<Label htmlFor="securityDeposit">Security deposit ($)</Label>
 					<Input
 						id="securityDeposit"
-						name="securityDeposit"
+						{...register('securityDeposit')}
 						type="number"
 						min={0}
 						step={0.01}
-						value={form.securityDeposit}
-						onChange={handleChange}
 						placeholder="Optional"
 					/>
+					<FieldError message={errors.securityDeposit?.message} />
 				</div>
 			</div>
 

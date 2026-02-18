@@ -1,23 +1,21 @@
+import { useFormContext } from 'react-hook-form'
 import { Input } from '@abumble/design-system/components/Input'
 import { Label } from '@abumble/design-system/components/Label'
 import ReactMarkdown from 'react-markdown'
+import type { LeaseFormValues } from './LeaseAgreementFormWizard'
 
 interface LeaseParametersStepProps {
-	templateParameters: Record<string, string>
 	templateMarkdown: string
-	onParametersChange: (parameters: Record<string, string>) => void
 }
 
 export function LeaseParametersStep({
-	templateParameters,
 	templateMarkdown,
-	onParametersChange,
 }: LeaseParametersStepProps) {
+	const { watch, setValue } = useFormContext<LeaseFormValues>()
+	const templateParameters = watch('templateParameters')
+
 	const handleParameterChange = (key: string, value: string) => {
-		onParametersChange({
-			...templateParameters,
-			[key]: value,
-		})
+		setValue('templateParameters', { ...templateParameters, [key]: value })
 	}
 
 	// Replace template parameters in markdown for preview
@@ -42,7 +40,6 @@ export function LeaseParametersStep({
 
 	return (
 		<div className="space-y-6">
-			{/* Parameter inputs */}
 			<div className="space-y-4">
 				<div className="text-sm font-medium text-foreground">
 					Fill in template parameters
@@ -66,7 +63,6 @@ export function LeaseParametersStep({
 				</div>
 			</div>
 
-			{/* Live preview */}
 			<div className="border-t pt-6">
 				<div className="text-sm font-medium text-foreground mb-2">
 					Lease Preview

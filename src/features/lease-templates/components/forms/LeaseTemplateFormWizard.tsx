@@ -1,4 +1,7 @@
 import { useCallback, useRef, useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { z } from 'zod'
 import { toast } from 'sonner'
 import { Button } from '@abumble/design-system/components/Button'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
@@ -19,18 +22,41 @@ import {
 	trimOrUndefined,
 } from '@/lib/util'
 
-type FormState = {
-	name: string
-	versionTag: string
-	templateMarkdown: string
-	templateParameters: Record<string, string>
-	defaultLateFeeType: LateFeeType | ''
-	defaultLateFeeAmount: string
-	defaultNoticePeriodDays: string
-	active: boolean
-}
+// ---------- Schema ----------
 
-const initialFormState: FormState = {
+const templateFormSchema = z.object({
+	name: z.string().min(1, 'Template name is required').max(255),
+	versionTag: z.string().max(50).optional(),
+	templateMarkdown: z.string().min(1, 'Template content is required'),
+	templateParameters: z.record(z.string(), z.string()),
+	defaultLateFeeType: z.string().optional(),
+	defaultLateFeeAmount: z
+		.string()
+		.refine(
+			(s) => s.trim() === '' || (!isNaN(parseFloat(s)) && parseFloat(s) >= 0),
+			'Must be a valid number',
+		),
+	defaultNoticePeriodDays: z
+		.string()
+		.refine(
+			(s) =>
+				s.trim() === '' || (!isNaN(parseInt(s, 10)) && parseInt(s, 10) >= 1),
+			'Must be at least 1 day',
+		),
+	active: z.boolean(),
+})
+
+export type TemplateFormValues = z.infer<typeof templateFormSchema>
+
+const STEP_1_FIELDS: Array<keyof TemplateFormValues> = [
+	'name',
+	'defaultLateFeeAmount',
+	'defaultNoticePeriodDays',
+]
+
+// ---------- Default values ----------
+
+const defaultValues: TemplateFormValues = {
 	name: '',
 	versionTag: '',
 	templateMarkdown: '',
@@ -41,7 +67,7 @@ const initialFormState: FormState = {
 	active: true,
 }
 
-function templateToFormState(template: LeaseTemplate): FormState {
+function templateToFormValues(template: LeaseTemplate): TemplateFormValues {
 	return {
 		name: template.name,
 		versionTag: template.versionTag ?? '',
@@ -60,29 +86,13 @@ function templateToFormState(template: LeaseTemplate): FormState {
 	}
 }
 
-function formToPayloadFields(form: FormState) {
-	return {
-		name: form.name.trim(),
-		versionTag: trimOrUndefined(form.versionTag),
-		templateMarkdown: form.templateMarkdown.trim(),
-		templateParameters:
-			Object.keys(form.templateParameters).length > 0
-				? form.templateParameters
-				: undefined,
-		defaultLateFeeType: form.defaultLateFeeType || undefined,
-		defaultLateFeeAmount: parseFloatOrUndefined(form.defaultLateFeeAmount),
-		defaultNoticePeriodDays: parseIntOrUndefined(
-			form.defaultNoticePeriodDays,
-			10,
-		),
-	}
-}
-
 export const LEASE_TEMPLATE_WIZARD_STEPS: Record<1 | 2 | 3, string> = {
 	1: 'Template Details',
 	2: 'Template Parameters',
 	3: 'Template Content',
 }
+
+// ---------- Props ----------
 
 export interface LeaseTemplateFormWizardProps {
 	initialTemplate?: LeaseTemplate | null
@@ -95,6 +105,8 @@ export interface LeaseTemplateFormWizardProps {
 	onStepChange?: (step: 1 | 2 | 3) => void
 }
 
+// ---------- Wizard component ----------
+
 export function LeaseTemplateFormWizard({
 	initialTemplate = null,
 	onSuccess,
@@ -105,113 +117,72 @@ export function LeaseTemplateFormWizard({
 }: LeaseTemplateFormWizardProps) {
 	const isEdit = initialTemplate != null
 	const [internalStep, setInternalStep] = useState<1 | 2 | 3>(1)
-
-	// Use controlled step if provided, otherwise use internal state
 	const step = controlledStep ?? internalStep
 	const setStep = onStepChange ?? setInternalStep
-	const [form, setForm] = useState<FormState>(() =>
-		initialTemplate ? templateToFormState(initialTemplate) : initialFormState,
-	)
+
 	const createTemplate = useCreateLeaseTemplate()
 	const updateTemplate = useUpdateLeaseTemplate()
-
 	const pending = createTemplate.isPending || updateTemplate.isPending
 
-	// Refs for stable callbacks
-	const formRef = useRef(form)
+	const form = useForm<TemplateFormValues>({
+		resolver: standardSchemaResolver(templateFormSchema),
+		defaultValues: initialTemplate
+			? templateToFormValues(initialTemplate)
+			: defaultValues,
+		mode: 'onTouched',
+	})
+
+	const { handleSubmit, trigger, reset } = form
+
+	// Stable refs so callbacks don't get stale during step navigation
 	const createTemplateRef = useRef(createTemplate)
 	const updateTemplateRef = useRef(updateTemplate)
-	formRef.current = form
 	createTemplateRef.current = createTemplate
 	updateTemplateRef.current = updateTemplate
 
-	const handleChange = useCallback(
-		(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-			const { name, value } = e.target
-			setForm((prev) => ({
-				...prev,
-				[name]:
-					name === 'defaultLateFeeType' ? (value as LateFeeType | '') : value,
-			}))
-		},
-		[],
-	)
-
-	const handleMarkdownChange = useCallback((value: string) => {
-		setForm((prev) => ({ ...prev, templateMarkdown: value }))
-	}, [])
-
-	const handleParametersChange = useCallback(
-		(parameters: Record<string, string>) => {
-			setForm((prev) => ({ ...prev, templateParameters: parameters }))
-		},
-		[],
-	)
-
-	const validateStep1 = useCallback((): boolean => {
-		const currentForm = formRef.current
-		if (!currentForm.name.trim()) {
-			toast.error('Template name is required')
-			return false
-		}
-
-		if (
-			currentForm.defaultLateFeeAmount.trim() &&
-			isNaN(parseFloat(currentForm.defaultLateFeeAmount))
-		) {
-			toast.error('Default late fee amount must be a valid number')
-			return false
-		}
-
-		if (
-			currentForm.defaultNoticePeriodDays.trim() &&
-			(isNaN(parseInt(currentForm.defaultNoticePeriodDays, 10)) ||
-				parseInt(currentForm.defaultNoticePeriodDays, 10) < 1)
-		) {
-			toast.error('Notice period must be at least 1 day')
-			return false
-		}
-
-		return true
-	}, [])
-
-	const handleNext = useCallback(() => {
-		if (step === 1 && validateStep1()) {
-			setStep(2)
+	const handleNext = useCallback(async () => {
+		if (step === 1) {
+			const valid = await trigger(STEP_1_FIELDS)
+			if (valid) setStep(2)
 		} else if (step === 2) {
 			setStep(3)
 		}
-	}, [step, setStep, validateStep1])
+	}, [step, setStep, trigger])
 
 	const handleBack = useCallback(() => {
-		if (step === 2) {
-			setStep(1)
-		} else if (step === 3) {
-			setStep(2)
-		}
+		if (step === 2) setStep(1)
+		else if (step === 3) setStep(2)
 	}, [step, setStep])
 
-	const handleActiveChange = useCallback((checked: boolean) => {
-		setForm((prev) => ({ ...prev, active: checked }))
-	}, [])
-
-	const handleSubmit = useCallback(
-		(e: React.FormEvent) => {
-			e.preventDefault()
-
-			const currentForm = formRef.current
-			if (!currentForm.templateMarkdown.trim()) {
-				toast.error('Template markdown is required')
-				return
+	const submitForm = useCallback(
+		(values: TemplateFormValues) => {
+			const payloadFields = {
+				name: values.name.trim(),
+				versionTag: trimOrUndefined(values.versionTag ?? ''),
+				templateMarkdown: values.templateMarkdown.trim(),
+				templateParameters:
+					Object.keys(values.templateParameters).length > 0
+						? values.templateParameters
+						: undefined,
+				defaultLateFeeType: (values.defaultLateFeeType || undefined) as
+					| LateFeeType
+					| undefined,
+				defaultLateFeeAmount: parseFloatOrUndefined(
+					values.defaultLateFeeAmount,
+				),
+				defaultNoticePeriodDays: parseIntOrUndefined(
+					values.defaultNoticePeriodDays,
+					10,
+				),
 			}
 
-			if (initialTemplate != null) {
+			if (isEdit) {
 				updateTemplateRef.current.mutate(
 					{
 						id: initialTemplate.id,
 						payload: {
-							...formToPayloadFields(currentForm),
-							active: currentForm.active,
+							...payloadFields,
+							active: values.active,
 							version: initialTemplate.version,
 						},
 					},
@@ -227,14 +198,11 @@ export function LeaseTemplateFormWizard({
 				)
 			} else {
 				createTemplateRef.current.mutate(
-					{
-						id: generateId(),
-						...formToPayloadFields(currentForm),
-					},
+					{ id: generateId(), ...payloadFields },
 					{
 						onSuccess: () => {
 							toast.success('Template created')
-							setForm(initialFormState)
+							reset(defaultValues)
 							setStep(1)
 							onSuccess?.()
 						},
@@ -245,85 +213,58 @@ export function LeaseTemplateFormWizard({
 				)
 			}
 		},
-		[initialTemplate, onSuccess, setStep],
+		[isEdit, initialTemplate, onSuccess, reset, setStep],
 	)
 
 	return (
-		<form onSubmit={handleSubmit} className="space-y-4 pt-4">
-			{/* Step 1: Template Details */}
-			{step === 1 && (
-				<TemplateDetailsStep
-					name={form.name}
-					versionTag={form.versionTag}
-					defaultLateFeeType={form.defaultLateFeeType}
-					defaultLateFeeAmount={form.defaultLateFeeAmount}
-					defaultNoticePeriodDays={form.defaultNoticePeriodDays}
-					active={form.active}
-					onFieldChange={handleChange}
-					onActiveChange={handleActiveChange}
-					isEdit={isEdit}
-				/>
-			)}
+		<FormProvider {...form}>
+			<form onSubmit={handleSubmit(submitForm)} className="space-y-4 pt-4">
+				{step === 1 && <TemplateDetailsStep isEdit={isEdit} />}
+				{step === 2 && <TemplateParametersStep />}
+				{step === 3 && <TemplateMarkdownStep />}
 
-			{/* Step 2: Template Parameters */}
-			{step === 2 && (
-				<TemplateParametersStep
-					templateParameters={form.templateParameters}
-					onParametersChange={handleParametersChange}
-				/>
-			)}
-
-			{/* Step 3: Markdown Editor */}
-			{step === 3 && (
-				<TemplateMarkdownStep
-					value={form.templateMarkdown}
-					onChange={handleMarkdownChange}
-					templateParameters={form.templateParameters}
-				/>
-			)}
-
-			{/* Footer with Navigation */}
-			<DialogFooter className="gap-2">
-				{onCancel && (
-					<Button type="button" variant="outline" onClick={onCancel}>
-						Cancel
-					</Button>
-				)}
-
-				<div className="flex gap-2">
-					{(step === 2 || step === 3) && (
-						<Button
-							type="button"
-							variant="outline"
-							onClick={handleBack}
-							disabled={pending}
-						>
-							<ArrowLeft className="h-4 w-4" />
-							Back
+				<DialogFooter className="gap-2">
+					{onCancel && (
+						<Button type="button" variant="outline" onClick={onCancel}>
+							Cancel
 						</Button>
 					)}
 
-					{(step === 1 || step === 2) && (
-						<Button type="button" onClick={handleNext}>
-							Next
-							<ArrowRight className="h-4 w-4" />
-						</Button>
-					)}
+					<div className="flex gap-2">
+						{(step === 2 || step === 3) && (
+							<Button
+								type="button"
+								variant="outline"
+								onClick={handleBack}
+								disabled={pending}
+							>
+								<ArrowLeft className="h-4 w-4" />
+								Back
+							</Button>
+						)}
 
-					{step === 3 && (
-						<Button type="submit" disabled={pending}>
-							{pending ? (
-								'Saving…'
-							) : (
-								<>
-									<Check className="h-4 w-4" />
-									{submitLabel}
-								</>
-							)}
-						</Button>
-					)}
-				</div>
-			</DialogFooter>
-		</form>
+						{(step === 1 || step === 2) && (
+							<Button type="button" onClick={handleNext}>
+								Next
+								<ArrowRight className="h-4 w-4" />
+							</Button>
+						)}
+
+						{step === 3 && (
+							<Button type="submit" disabled={pending}>
+								{pending ? (
+									'Saving…'
+								) : (
+									<>
+										<Check className="h-4 w-4" />
+										{submitLabel}
+									</>
+								)}
+							</Button>
+						)}
+					</div>
+				</DialogFooter>
+			</form>
+		</FormProvider>
 	)
 }

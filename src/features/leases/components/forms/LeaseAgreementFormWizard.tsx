@@ -1,4 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { z } from 'zod'
 import { toast } from 'sonner'
 import { Button } from '@abumble/design-system/components/Button'
 import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
@@ -15,23 +18,84 @@ import {
 	parseIntOrUndefined,
 } from '@/lib/util'
 
-type FormState = {
-	leaseTemplateId: string
-	propertyId: string
-	unitId: string
-	tenantEmails: Array<string>
-	startDate: string
-	endDate: string
-	rentAmount: string
-	rentDueDay: string
-	securityDepositHeld: string
-	lateFeeType: LateFeeType | ''
-	lateFeeAmount: string
-	noticePeriodDays: string
-	templateParameters: Record<string, string>
-}
+// ---------- Schema ----------
 
-const initialFormState: FormState = {
+const optionalFloat = z
+	.string()
+	.refine(
+		(s) => s.trim() === '' || (!isNaN(parseFloat(s)) && parseFloat(s) >= 0),
+		'Must be a valid number',
+	)
+
+const leaseFormSchema = z
+	.object({
+		// Step 1 fields
+		leaseTemplateId: z.string().min(1, 'Template is required'),
+		propertyId: z.string().min(1, 'Property is required'),
+		unitId: z.string().min(1, 'Unit is required'),
+		tenantEmails: z
+			.array(z.string().email())
+			.min(1, 'At least one tenant email is required'),
+		startDate: z.string().min(1, 'Start date is required'),
+		endDate: z.string().min(1, 'End date is required'),
+		// Step 2 fields
+		rentAmount: z
+			.string()
+			.min(1, 'Rent amount is required')
+			.refine(
+				(s) => !isNaN(parseFloat(s)) && parseFloat(s) > 0,
+				'Rent amount must be greater than 0',
+			),
+		rentDueDay: z
+			.string()
+			.min(1, 'Rent due day is required')
+			.refine((s) => {
+				const n = parseInt(s, 10)
+				return !isNaN(n) && n >= 1 && n <= 31
+			}, 'Must be between 1 and 31'),
+		securityDepositHeld: optionalFloat,
+		lateFeeType: z.string().optional(),
+		lateFeeAmount: optionalFloat,
+		noticePeriodDays: z
+			.string()
+			.refine(
+				(s) =>
+					s.trim() === '' || (!isNaN(parseInt(s, 10)) && parseInt(s, 10) >= 0),
+				'Must be a whole number',
+			),
+		// Step 3 fields
+		templateParameters: z.record(z.string(), z.string()),
+	})
+	.refine(
+		(data) =>
+			!data.startDate ||
+			!data.endDate ||
+			new Date(data.endDate) > new Date(data.startDate),
+		{ message: 'End date must be after start date', path: ['endDate'] },
+	)
+
+export type LeaseFormValues = z.infer<typeof leaseFormSchema>
+
+// Fields validated at each step
+const STEP_1_FIELDS: Array<keyof LeaseFormValues> = [
+	'leaseTemplateId',
+	'propertyId',
+	'unitId',
+	'tenantEmails',
+	'startDate',
+	'endDate',
+]
+const STEP_2_FIELDS: Array<keyof LeaseFormValues> = [
+	'rentAmount',
+	'rentDueDay',
+	'securityDepositHeld',
+	'lateFeeAmount',
+	'noticePeriodDays',
+]
+
+// ---------- Default values ----------
+
+const defaultValues: LeaseFormValues = {
 	leaseTemplateId: '',
 	propertyId: '',
 	unitId: '',
@@ -47,7 +111,7 @@ const initialFormState: FormState = {
 	templateParameters: {},
 }
 
-function leaseToFormState(lease: Lease): FormState {
+function leaseToFormValues(lease: Lease): LeaseFormValues {
 	return {
 		leaseTemplateId: lease.leaseTemplateId ?? '',
 		propertyId: lease.propertyId,
@@ -70,6 +134,8 @@ function leaseToFormState(lease: Lease): FormState {
 	}
 }
 
+// ---------- Props ----------
+
 export interface LeaseAgreementFormWizardProps {
 	/** When set, the wizard operates in edit mode using useUpdateLease */
 	initialLease?: Lease | null
@@ -81,6 +147,8 @@ export interface LeaseAgreementFormWizardProps {
 	/** Step change handler (controlled by parent for FormDialog integration) */
 	onStepChange?: (step: 1 | 2 | 3) => void
 }
+
+// ---------- Wizard component ----------
 
 export function LeaseAgreementFormWizard({
 	initialLease = null,
@@ -97,238 +165,81 @@ export function LeaseAgreementFormWizard({
 	const step = controlledStep ?? internalStep
 	const setStep = onStepChange ?? setInternalStep
 
-	const [form, setForm] = useState<FormState>(() =>
-		isEdit ? leaseToFormState(initialLease) : initialFormState,
-	)
-	// Template defaults are already reflected in the lease on edit
 	const [templateDefaultsApplied, setTemplateDefaultsApplied] = useState(isEdit)
 
 	const createLease = useCreateLease()
 	const updateLease = useUpdateLease()
-
-	const { data: selectedTemplate } = useLeaseTemplateDetail(
-		form.leaseTemplateId || '',
-		{ enabled: !!form.leaseTemplateId },
-	)
-
 	const pending = createLease.isPending || updateLease.isPending
 
-	const formRef = useRef(form)
-	formRef.current = form
+	const form = useForm<LeaseFormValues>({
+		resolver: standardSchemaResolver(leaseFormSchema),
+		defaultValues: isEdit ? leaseToFormValues(initialLease) : defaultValues,
+		mode: 'onTouched',
+	})
+
+	const { handleSubmit, trigger, watch, setValue, reset } = form
+
+	const leaseTemplateId = watch('leaseTemplateId')
+
+	const { data: selectedTemplate } = useLeaseTemplateDetail(
+		leaseTemplateId || '',
+		{ enabled: !!leaseTemplateId },
+	)
 
 	// Reset template defaults when template changes (create mode only)
+	const prevTemplateIdRef = useRef(leaseTemplateId)
 	useEffect(() => {
-		if (!isEdit) setTemplateDefaultsApplied(false)
-	}, [form.leaseTemplateId, isEdit])
+		if (!isEdit && leaseTemplateId !== prevTemplateIdRef.current) {
+			prevTemplateIdRef.current = leaseTemplateId
+			setTemplateDefaultsApplied(false)
+		}
+	}, [leaseTemplateId, isEdit])
 
-	const handleChange = useCallback(
-		(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-			const { name, value } = e.target
-			setForm((prev) => ({
-				...prev,
-				[name]: name === 'lateFeeType' ? (value as LateFeeType | '') : value,
-				// Clear dependent unit when property changes
-				...(name === 'propertyId' && value !== prev.propertyId
-					? { unitId: '' }
-					: {}),
-			}))
-		},
-		[],
-	)
-
-	const handleTenantEmailsChange = useCallback((emails: Array<string>) => {
-		setForm((prev) => ({ ...prev, tenantEmails: emails }))
-	}, [])
-
-	const handleParametersChange = useCallback(
-		(parameters: Record<string, string>) => {
-			setForm((prev) => ({ ...prev, templateParameters: parameters }))
-		},
-		[],
-	)
-
-	const validateStep1 = useCallback((): boolean => {
-		const f = formRef.current
-		if (!f.leaseTemplateId) {
-			toast.error('Template is required')
-			return false
-		}
-		if (!f.propertyId) {
-			toast.error('Property is required')
-			return false
-		}
-		if (!f.unitId) {
-			toast.error('Unit is required')
-			return false
-		}
-		if (f.tenantEmails.length === 0) {
-			toast.error('At least one tenant email is required')
-			return false
-		}
-		if (!f.startDate) {
-			toast.error('Start date is required')
-			return false
-		}
-		if (!f.endDate) {
-			toast.error('End date is required')
-			return false
-		}
-		if (new Date(f.endDate) <= new Date(f.startDate)) {
-			toast.error('End date must be after start date')
-			return false
-		}
-		return true
-	}, [])
-
-	const validateStep2 = useCallback((): boolean => {
-		const f = formRef.current
-		if (!f.rentAmount.trim() || isNaN(parseFloat(f.rentAmount))) {
-			toast.error('Rent amount must be a valid number')
-			return false
-		}
-		if (parseFloat(f.rentAmount) <= 0) {
-			toast.error('Rent amount must be greater than 0')
-			return false
-		}
-		if (!f.rentDueDay.trim() || isNaN(parseInt(f.rentDueDay, 10))) {
-			toast.error('Rent due day must be a valid number')
-			return false
-		}
-		const dueDay = parseInt(f.rentDueDay, 10)
-		if (dueDay < 1 || dueDay > 31) {
-			toast.error('Rent due day must be between 1 and 31')
-			return false
-		}
-		if (
-			f.securityDepositHeld.trim() &&
-			isNaN(parseFloat(f.securityDepositHeld))
-		) {
-			toast.error('Security deposit must be a valid number')
-			return false
-		}
-		if (f.lateFeeAmount.trim() && isNaN(parseFloat(f.lateFeeAmount))) {
-			toast.error('Late fee amount must be a valid number')
-			return false
-		}
-		if (f.noticePeriodDays.trim() && isNaN(parseInt(f.noticePeriodDays, 10))) {
-			toast.error('Notice period must be a valid number')
-			return false
-		}
-		return true
-	}, [])
-
-	const submitForm = useCallback(() => {
-		const f = formRef.current
-
-		if (isEdit) {
-			updateLease.mutate(
-				{
-					id: initialLease.id,
-					payload: {
-						startDate: f.startDate,
-						endDate: f.endDate,
-						rentAmount: parseFloat(f.rentAmount),
-						rentDueDay: parseInt(f.rentDueDay, 10),
-						securityDepositHeld:
-							parseFloatOrUndefined(f.securityDepositHeld) ?? null,
-						lateFeeType: f.lateFeeType || null,
-						lateFeeAmount: parseFloatOrUndefined(f.lateFeeAmount) ?? null,
-						noticePeriodDays:
-							parseIntOrUndefined(f.noticePeriodDays, 10) ?? null,
-						templateParameters:
-							Object.keys(f.templateParameters).length > 0
-								? f.templateParameters
-								: null,
-						version: initialLease.version,
-					},
-					unitId: initialLease.unitId,
-					propertyId: initialLease.propertyId,
-				},
-				{
-					onSuccess: () => {
-						toast.success('Lease updated')
-						onSuccess?.()
-					},
-					onError: (err) => {
-						toast.error(err.message || 'Failed to update lease')
-					},
-				},
-			)
-		} else {
-			createLease.mutate(
-				{
-					id: generateId(),
-					leaseTemplateId: f.leaseTemplateId,
-					propertyId: f.propertyId,
-					unitId: f.unitId,
-					tenantEmails: f.tenantEmails,
-					startDate: f.startDate,
-					endDate: f.endDate,
-					rentAmount: parseFloat(f.rentAmount),
-					rentDueDay: parseInt(f.rentDueDay, 10),
-					securityDepositHeld: parseFloatOrUndefined(f.securityDepositHeld),
-					lateFeeType: f.lateFeeType || undefined,
-					lateFeeAmount: parseFloatOrUndefined(f.lateFeeAmount),
-					noticePeriodDays: parseIntOrUndefined(f.noticePeriodDays, 10),
-					templateParameters:
-						Object.keys(f.templateParameters).length > 0
-							? f.templateParameters
-							: undefined,
-				},
-				{
-					onSuccess: () => {
-						toast.success('Lease created')
-						setForm(initialFormState)
-						setStep(1)
-						setTemplateDefaultsApplied(false)
-						onSuccess?.()
-					},
-					onError: (err) => {
-						toast.error(err.message || 'Failed to create lease')
-					},
-				},
-			)
-		}
-	}, [isEdit, initialLease, createLease, updateLease, onSuccess, setStep])
-
-	const handleNext = useCallback(() => {
-		if (step === 1 && validateStep1()) {
+	const handleNext = useCallback(async () => {
+		if (step === 1) {
+			const valid = await trigger(STEP_1_FIELDS)
+			if (!valid) return
 			// Apply template defaults once when moving from step 1 to step 2
 			if (selectedTemplate && !templateDefaultsApplied) {
-				setForm((prev) => ({
-					...prev,
-					lateFeeType: selectedTemplate.defaultLateFeeType ?? '',
-					lateFeeAmount:
-						selectedTemplate.defaultLateFeeAmount != null
-							? String(selectedTemplate.defaultLateFeeAmount)
-							: '',
-					noticePeriodDays:
-						selectedTemplate.defaultNoticePeriodDays != null
-							? String(selectedTemplate.defaultNoticePeriodDays)
-							: '',
-					templateParameters: { ...selectedTemplate.templateParameters },
-				}))
+				setValue('lateFeeType', selectedTemplate.defaultLateFeeType ?? '')
+				setValue(
+					'lateFeeAmount',
+					selectedTemplate.defaultLateFeeAmount != null
+						? String(selectedTemplate.defaultLateFeeAmount)
+						: '',
+				)
+				setValue(
+					'noticePeriodDays',
+					selectedTemplate.defaultNoticePeriodDays != null
+						? String(selectedTemplate.defaultNoticePeriodDays)
+						: '',
+				)
+				setValue('templateParameters', {
+					...selectedTemplate.templateParameters,
+				})
 				setTemplateDefaultsApplied(true)
 			}
 			setStep(2)
-		} else if (step === 2 && validateStep2()) {
+		} else if (step === 2) {
+			const valid = await trigger(STEP_2_FIELDS)
+			if (!valid) return
 			const hasParameters =
 				selectedTemplate &&
 				Object.keys(selectedTemplate.templateParameters).length > 0
 			if (hasParameters) {
 				setStep(3)
 			} else {
-				submitForm()
+				handleSubmit(submitForm)()
 			}
 		}
 	}, [
 		step,
 		setStep,
-		validateStep1,
-		validateStep2,
+		trigger,
 		selectedTemplate,
 		templateDefaultsApplied,
-		submitForm,
+		setValue,
+		handleSubmit,
 	])
 
 	const handleBack = useCallback(() => {
@@ -336,12 +247,84 @@ export function LeaseAgreementFormWizard({
 		else if (step === 2 && !isEdit) setStep(1)
 	}, [step, setStep, isEdit])
 
-	const handleSubmit = useCallback(
-		(e: React.FormEvent) => {
-			e.preventDefault()
-			submitForm()
+	const submitForm = useCallback(
+		(values: LeaseFormValues) => {
+			if (isEdit) {
+				updateLease.mutate(
+					{
+						id: initialLease.id,
+						payload: {
+							startDate: values.startDate,
+							endDate: values.endDate,
+							rentAmount: parseFloat(values.rentAmount),
+							rentDueDay: parseInt(values.rentDueDay, 10),
+							securityDepositHeld:
+								parseFloatOrUndefined(values.securityDepositHeld) ?? null,
+							lateFeeType: (values.lateFeeType || null) as LateFeeType | null,
+							lateFeeAmount:
+								parseFloatOrUndefined(values.lateFeeAmount) ?? null,
+							noticePeriodDays:
+								parseIntOrUndefined(values.noticePeriodDays, 10) ?? null,
+							templateParameters:
+								Object.keys(values.templateParameters).length > 0
+									? values.templateParameters
+									: null,
+							version: initialLease.version,
+						},
+						unitId: initialLease.unitId,
+						propertyId: initialLease.propertyId,
+					},
+					{
+						onSuccess: () => {
+							toast.success('Lease updated')
+							onSuccess?.()
+						},
+						onError: (err) => {
+							toast.error(err.message || 'Failed to update lease')
+						},
+					},
+				)
+			} else {
+				createLease.mutate(
+					{
+						id: generateId(),
+						leaseTemplateId: values.leaseTemplateId,
+						propertyId: values.propertyId,
+						unitId: values.unitId,
+						tenantEmails: values.tenantEmails,
+						startDate: values.startDate,
+						endDate: values.endDate,
+						rentAmount: parseFloat(values.rentAmount),
+						rentDueDay: parseInt(values.rentDueDay, 10),
+						securityDepositHeld: parseFloatOrUndefined(
+							values.securityDepositHeld,
+						),
+						lateFeeType: (values.lateFeeType || undefined) as
+							| LateFeeType
+							| undefined,
+						lateFeeAmount: parseFloatOrUndefined(values.lateFeeAmount),
+						noticePeriodDays: parseIntOrUndefined(values.noticePeriodDays, 10),
+						templateParameters:
+							Object.keys(values.templateParameters).length > 0
+								? values.templateParameters
+								: undefined,
+					},
+					{
+						onSuccess: () => {
+							toast.success('Lease created')
+							reset(defaultValues)
+							setStep(1)
+							setTemplateDefaultsApplied(false)
+							onSuccess?.()
+						},
+						onError: (err) => {
+							toast.error(err.message || 'Failed to create lease')
+						},
+					},
+				)
+			}
 		},
-		[submitForm],
+		[isEdit, initialLease, createLease, updateLease, onSuccess, reset, setStep],
 	)
 
 	const hasParameters =
@@ -355,81 +338,58 @@ export function LeaseAgreementFormWizard({
 	const showSubmit = (step === 2 && !hasParameters) || step === 3
 
 	return (
-		<form onSubmit={handleSubmit} className="space-y-4 pt-4">
-			{step === 1 && !isEdit && (
-				<LeaseDetailsStep
-					leaseTemplateId={form.leaseTemplateId}
-					propertyId={form.propertyId}
-					unitId={form.unitId}
-					tenantEmails={form.tenantEmails}
-					startDate={form.startDate}
-					endDate={form.endDate}
-					onFieldChange={handleChange}
-					onTenantEmailsChange={handleTenantEmailsChange}
-				/>
-			)}
-
-			{step === 2 && (
-				<LeaseTermsStep
-					rentAmount={form.rentAmount}
-					rentDueDay={form.rentDueDay}
-					securityDepositHeld={form.securityDepositHeld}
-					lateFeeType={form.lateFeeType}
-					lateFeeAmount={form.lateFeeAmount}
-					noticePeriodDays={form.noticePeriodDays}
-					onFieldChange={handleChange}
-				/>
-			)}
-
-			{step === 3 && selectedTemplate && (
-				<LeaseParametersStep
-					templateParameters={form.templateParameters}
-					templateMarkdown={selectedTemplate.templateMarkdown}
-					onParametersChange={handleParametersChange}
-				/>
-			)}
-
-			<DialogFooter className="gap-2">
-				{onCancel && (
-					<Button type="button" variant="outline" onClick={onCancel}>
-						Cancel
-					</Button>
+		<FormProvider {...form}>
+			<form onSubmit={handleSubmit(submitForm)} className="space-y-4 pt-4">
+				{step === 1 && !isEdit && <LeaseDetailsStep />}
+				{step === 2 && <LeaseTermsStep />}
+				{step === 3 && selectedTemplate && (
+					<LeaseParametersStep
+						templateMarkdown={selectedTemplate.templateMarkdown}
+					/>
 				)}
 
-				<div className="flex gap-2">
-					{showBack && (
-						<Button
-							type="button"
-							variant="outline"
-							onClick={handleBack}
-							disabled={pending}
-						>
-							<ArrowLeft className="h-4 w-4" />
-							Back
+				<DialogFooter className="gap-2">
+					{onCancel && (
+						<Button type="button" variant="outline" onClick={onCancel}>
+							Cancel
 						</Button>
 					)}
 
-					{showNext && (
-						<Button type="button" onClick={handleNext} disabled={pending}>
-							Next
-							<ArrowRight className="h-4 w-4" />
-						</Button>
-					)}
+					<div className="flex gap-2">
+						{showBack && (
+							<Button
+								type="button"
+								variant="outline"
+								onClick={handleBack}
+								disabled={pending}
+							>
+								<ArrowLeft className="h-4 w-4" />
+								Back
+							</Button>
+						)}
 
-					{showSubmit && (
-						<Button type="submit" disabled={pending}>
-							{pending ? (
-								pendingLabel
-							) : (
-								<>
-									<Check className="h-4 w-4" />
-									{resolvedSubmitLabel}
-								</>
-							)}
-						</Button>
-					)}
-				</div>
-			</DialogFooter>
-		</form>
+						{showNext && (
+							<Button type="button" onClick={handleNext} disabled={pending}>
+								Next
+								<ArrowRight className="h-4 w-4" />
+							</Button>
+						)}
+
+						{showSubmit && (
+							<Button type="submit" disabled={pending}>
+								{pending ? (
+									pendingLabel
+								) : (
+									<>
+										<Check className="h-4 w-4" />
+										{resolvedSubmitLabel}
+									</>
+								)}
+							</Button>
+						)}
+					</div>
+				</DialogFooter>
+			</form>
+		</FormProvider>
 	)
 }

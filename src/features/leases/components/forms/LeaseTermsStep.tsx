@@ -1,31 +1,21 @@
+import { useFormContext } from 'react-hook-form'
 import { Input } from '@abumble/design-system/components/Input'
 import { Label } from '@abumble/design-system/components/Label'
 import { Select } from '@abumble/design-system/components/Select'
-import type { LateFeeType } from '@/domain/lease'
+import type { LeaseFormValues } from './LeaseAgreementFormWizard'
+import { FieldError } from '@/components/ui/FieldError'
 import { LATE_FEE_TYPES } from '@/domain/lease'
 import { formatEnumLabel } from '@/lib/format'
 
-interface LeaseTermsStepProps {
-	rentAmount: string
-	rentDueDay: string
-	securityDepositHeld: string
-	lateFeeType: LateFeeType | ''
-	lateFeeAmount: string
-	noticePeriodDays: string
-	onFieldChange: (
-		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-	) => void
-}
+export function LeaseTermsStep() {
+	const {
+		register,
+		watch,
+		formState: { errors },
+	} = useFormContext<LeaseFormValues>()
 
-export function LeaseTermsStep({
-	rentAmount,
-	rentDueDay,
-	securityDepositHeld,
-	lateFeeType,
-	lateFeeAmount,
-	noticePeriodDays,
-	onFieldChange,
-}: LeaseTermsStepProps) {
+	const lateFeeType = watch('lateFeeType')
+
 	return (
 		<div className="space-y-4">
 			<div className="grid grid-cols-2 gap-4">
@@ -38,15 +28,13 @@ export function LeaseTermsStep({
 					</Label>
 					<Input
 						id="rentAmount"
-						name="rentAmount"
+						{...register('rentAmount')}
 						type="number"
 						min={0}
 						step={0.01}
-						value={rentAmount}
-						onChange={onFieldChange}
 						placeholder="1500.00"
-						required
 					/>
+					<FieldError message={errors.rentAmount?.message} />
 				</div>
 				<div className="space-y-2">
 					<Label htmlFor="rentDueDay">
@@ -57,15 +45,13 @@ export function LeaseTermsStep({
 					</Label>
 					<Input
 						id="rentDueDay"
-						name="rentDueDay"
+						{...register('rentDueDay')}
 						type="number"
 						min={1}
 						max={31}
-						value={rentDueDay}
-						onChange={onFieldChange}
 						placeholder="1"
-						required
 					/>
+					<FieldError message={errors.rentDueDay?.message} />
 				</div>
 			</div>
 
@@ -73,25 +59,19 @@ export function LeaseTermsStep({
 				<Label htmlFor="securityDepositHeld">Security deposit held ($)</Label>
 				<Input
 					id="securityDepositHeld"
-					name="securityDepositHeld"
+					{...register('securityDepositHeld')}
 					type="number"
 					min={0}
 					step={0.01}
-					value={securityDepositHeld}
-					onChange={onFieldChange}
 					placeholder="Optional"
 				/>
+				<FieldError message={errors.securityDepositHeld?.message} />
 			</div>
 
 			<div className="grid grid-cols-2 gap-4">
 				<div className="space-y-2">
 					<Label htmlFor="lateFeeType">Late fee type</Label>
-					<Select
-						id="lateFeeType"
-						name="lateFeeType"
-						value={lateFeeType}
-						onChange={onFieldChange}
-					>
+					<Select id="lateFeeType" {...register('lateFeeType')}>
 						<option value="">None</option>
 						{LATE_FEE_TYPES.map((t) => (
 							<option key={t} value={t}>
@@ -104,15 +84,14 @@ export function LeaseTermsStep({
 					<Label htmlFor="lateFeeAmount">Late fee amount</Label>
 					<Input
 						id="lateFeeAmount"
-						name="lateFeeAmount"
+						{...register('lateFeeAmount')}
 						type="number"
 						min={0}
 						step={0.01}
-						value={lateFeeAmount}
-						onChange={onFieldChange}
 						placeholder="Optional"
 						disabled={!lateFeeType}
 					/>
+					<FieldError message={errors.lateFeeAmount?.message} />
 				</div>
 			</div>
 
@@ -120,13 +99,12 @@ export function LeaseTermsStep({
 				<Label htmlFor="noticePeriodDays">Notice period (days)</Label>
 				<Input
 					id="noticePeriodDays"
-					name="noticePeriodDays"
+					{...register('noticePeriodDays')}
 					type="number"
 					min={0}
-					value={noticePeriodDays}
-					onChange={onFieldChange}
 					placeholder="e.g. 30"
 				/>
+				<FieldError message={errors.noticePeriodDays?.message} />
 			</div>
 		</div>
 	)

@@ -1,23 +1,31 @@
+import { Controller, useFormContext } from 'react-hook-form'
 import { MarkdownEditor } from './MarkdownEditor'
+import type { TemplateFormValues } from './LeaseTemplateFormWizard'
+import { FieldError } from '@/components/ui/FieldError'
 
-export interface TemplateMarkdownStepProps {
-	value: string
-	onChange: (value: string) => void
-	templateParameters: Record<string, string>
-}
+export function TemplateMarkdownStep() {
+	const {
+		control,
+		watch,
+		formState: { errors },
+	} = useFormContext<TemplateFormValues>()
 
-export function TemplateMarkdownStep({
-	value,
-	onChange,
-	templateParameters,
-}: TemplateMarkdownStepProps) {
+	const templateParameters = watch('templateParameters')
+
 	return (
 		<div className="space-y-2">
-			<MarkdownEditor
-				value={value}
-				onChange={onChange}
-				customParameters={templateParameters}
+			<Controller
+				name="templateMarkdown"
+				control={control}
+				render={({ field }) => (
+					<MarkdownEditor
+						value={field.value}
+						onChange={field.onChange}
+						customParameters={templateParameters}
+					/>
+				)}
 			/>
+			<FieldError message={errors.templateMarkdown?.message} />
 		</div>
 	)
 }

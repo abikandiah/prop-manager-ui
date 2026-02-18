@@ -1,15 +1,12 @@
 import { memo, useCallback, useEffect, useRef, useState } from 'react'
+import { useFormContext } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button } from '@abumble/design-system/components/Button'
 import { Input } from '@abumble/design-system/components/Input'
 import { ChevronDown, ChevronRight, Plus, Trash2 } from 'lucide-react'
 import { SYSTEM_KEYS, SYSTEM_PARAMETERS } from '../../constants'
+import type { TemplateFormValues } from './LeaseTemplateFormWizard'
 import { normalizeParameterName, recordsShallowEqual } from '@/lib/util'
-
-export interface TemplateParametersStepProps {
-	templateParameters: Record<string, string>
-	onParametersChange: (parameters: Record<string, string>) => void
-}
 
 /**
  * Internal representation of a custom parameter with a stable ID.
@@ -17,27 +14,14 @@ export interface TemplateParametersStepProps {
  */
 type CustomParam = { id: string; key: string; value: string }
 
-/**
- * Converts incoming Record<string, string> to internal CustomParam[] with new IDs.
- * Only used for initial state - useEffect preserves existing IDs when syncing.
- */
 function recordToCustomParams(
-	templateParameters: Record<string, string>,
+	record: Record<string, string>,
 ): Array<CustomParam> {
-	return Object.entries(templateParameters)
+	return Object.entries(record)
 		.filter(([key]) => !SYSTEM_KEYS.has(key))
-		.map(([key, value]) => ({
-			id: crypto.randomUUID(),
-			key,
-			value,
-		}))
+		.map(([key, value]) => ({ id: crypto.randomUUID(), key, value }))
 }
 
-/**
- * Converts internal CustomParam[] back to Record<string, string> for parent.
- * Only includes custom parameters - system parameters are never persisted.
- * Params with blank key (after trim) are filtered out so they are not sent to parent.
- */
 function customParamsToRecord(
 	customParams: Array<CustomParam>,
 ): Record<string, string> {
@@ -48,24 +32,19 @@ function customParamsToRecord(
 	)
 }
 
-const TemplateParametersStepComponent = function TemplateParametersStep({
-	templateParameters,
-	onParametersChange,
-}: TemplateParametersStepProps) {
+const TemplateParametersStepComponent = function TemplateParametersStep() {
+	const { watch, setValue } = useFormContext<TemplateFormValues>()
+	const templateParameters = watch('templateParameters')
+
 	const [customParams, setCustomParams] = useState<Array<CustomParam>>(() =>
 		recordToCustomParams(templateParameters),
 	)
 	const [systemParamsCollapsed, setSystemParamsCollapsed] = useState(true)
 
-	const onParamsChangeRef = useRef(onParametersChange)
 	const templateParametersRef = useRef(templateParameters)
-	onParamsChangeRef.current = onParametersChange
 	templateParametersRef.current = templateParameters
 
-	// Sync from parent only when templateParameters actually changed from outside
-	// (e.g. step navigation or loaded template), not when we're receiving our own
-	// onParametersChange update back — otherwise every keystroke would overwrite
-	// local state and regenerate IDs, causing focus loss.
+	// Sync from form when templateParameters changes externally (e.g. reset/navigation)
 	useEffect(() => {
 		setCustomParams((prev) => {
 			const currentRecord = customParamsToRecord(prev)
@@ -78,18 +57,13 @@ const TemplateParametersStepComponent = function TemplateParametersStep({
 			Object.entries(templateParameters)
 				.filter(([key]) => !SYSTEM_KEYS.has(key))
 				.forEach(([key, value]) => {
-					// Try to find existing param with same key to preserve its ID
 					const existing = prev.find((p) => p.key === key)
-
 					if (existing && !usedIds.has(existing.id)) {
 						newParams.push({ id: existing.id, key, value })
 						usedIds.add(existing.id)
 					} else {
 						let newId = crypto.randomUUID()
-						// Handle duplicate IDs (extremely rare but possible)
-						while (usedIds.has(newId)) {
-							newId = crypto.randomUUID()
-						}
+						while (usedIds.has(newId)) newId = crypto.randomUUID()
 						newParams.push({ id: newId, key, value })
 						usedIds.add(newId)
 					}
@@ -99,21 +73,31 @@ const TemplateParametersStepComponent = function TemplateParametersStep({
 		})
 	}, [templateParameters])
 
+	const syncToForm = useCallback(
+		(params: Array<CustomParam>) => {
+			setValue('templateParameters', customParamsToRecord(params))
+		},
+		[setValue],
+	)
+
 	const handleAddParameter = useCallback(() => {
 		setCustomParams((prev) => {
 			const updated = [...prev, { id: crypto.randomUUID(), key: '', value: '' }]
-			onParamsChangeRef.current(customParamsToRecord(updated))
+			syncToForm(updated)
 			return updated
 		})
-	}, [])
+	}, [syncToForm])
 
-	const handleRemoveParameter = useCallback((id: string) => {
-		setCustomParams((prev) => {
-			const updated = prev.filter((p) => p.id !== id)
-			onParamsChangeRef.current(customParamsToRecord(updated))
-			return updated
-		})
-	}, [])
+	const handleRemoveParameter = useCallback(
+		(id: string) => {
+			setCustomParams((prev) => {
+				const updated = prev.filter((p) => p.id !== id)
+				syncToForm(updated)
+				return updated
+			})
+		},
+		[syncToForm],
+	)
 
 	const handleParameterChange = useCallback(
 		(id: string, newKey: string, value: string) => {
@@ -122,8 +106,6 @@ const TemplateParametersStepComponent = function TemplateParametersStep({
 				if (!param) return prev
 
 				const key = newKey.trim()
-
-				// Check for duplicate keys only when the key is non-blank
 				if (key !== '') {
 					const duplicate = prev.some(
 						(p) => p.id !== id && p.key.trim() === key,
@@ -137,17 +119,15 @@ const TemplateParametersStepComponent = function TemplateParametersStep({
 				const updated = prev.map((p) =>
 					p.id === id ? { ...p, key, value } : p,
 				)
-
-				onParamsChangeRef.current(customParamsToRecord(updated))
+				syncToForm(updated)
 				return updated
 			})
 		},
-		[],
+		[syncToForm],
 	)
 
 	return (
 		<div className="space-y-6">
-			{/* Custom Parameters */}
 			<div>
 				<div className="flex items-center justify-between mb-2">
 					<h3 className="text-lg font-semibold text-foreground">
@@ -203,7 +183,6 @@ const TemplateParametersStepComponent = function TemplateParametersStep({
 				)}
 			</div>
 
-			{/* System Parameters (Read-only, Collapsible) */}
 			<div>
 				<button
 					type="button"

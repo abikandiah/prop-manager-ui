@@ -1,36 +1,24 @@
+import { Controller, useFormContext } from 'react-hook-form'
 import { Input } from '@abumble/design-system/components/Input'
 import { Checkbox } from '@abumble/design-system/components/Checkbox'
 import { Label } from '@abumble/design-system/components/Label'
 import { Select } from '@abumble/design-system/components/Select'
-import type { LateFeeType } from '@/domain/lease'
+import type { TemplateFormValues } from './LeaseTemplateFormWizard'
+import { FieldError } from '@/components/ui/FieldError'
 import { LATE_FEE_TYPES } from '@/domain/lease'
 import { formatEnumLabel } from '@/lib/format'
 
 export interface TemplateDetailsStepProps {
-	name: string
-	versionTag: string
-	defaultLateFeeType: LateFeeType | ''
-	defaultLateFeeAmount: string
-	defaultNoticePeriodDays: string
-	active: boolean
-	onFieldChange: (
-		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-	) => void
-	onActiveChange: (checked: boolean) => void
 	isEdit: boolean
 }
 
-export function TemplateDetailsStep({
-	name,
-	versionTag,
-	defaultLateFeeType,
-	defaultLateFeeAmount,
-	defaultNoticePeriodDays,
-	active,
-	onFieldChange,
-	onActiveChange,
-	isEdit,
-}: TemplateDetailsStepProps) {
+export function TemplateDetailsStep({ isEdit }: TemplateDetailsStepProps) {
+	const {
+		register,
+		control,
+		formState: { errors },
+	} = useFormContext<TemplateFormValues>()
+
 	return (
 		<div className="space-y-4">
 			<div className="space-y-2">
@@ -42,22 +30,18 @@ export function TemplateDetailsStep({
 				</Label>
 				<Input
 					id="name"
-					name="name"
-					value={name}
-					onChange={onFieldChange}
+					{...register('name')}
 					placeholder="e.g. Ontario Residential Standard 2026"
 					maxLength={255}
-					required
 				/>
+				<FieldError message={errors.name?.message} />
 			</div>
 
 			<div className="space-y-2">
 				<Label htmlFor="versionTag">Version tag (optional)</Label>
 				<Input
 					id="versionTag"
-					name="versionTag"
-					value={versionTag}
-					onChange={onFieldChange}
+					{...register('versionTag')}
 					placeholder="e.g. v2.1"
 					maxLength={50}
 				/>
@@ -66,12 +50,7 @@ export function TemplateDetailsStep({
 			<div className="grid grid-cols-2 gap-4">
 				<div className="space-y-2">
 					<Label htmlFor="defaultLateFeeType">Default late fee type</Label>
-					<Select
-						id="defaultLateFeeType"
-						name="defaultLateFeeType"
-						value={defaultLateFeeType}
-						onChange={onFieldChange}
-					>
+					<Select id="defaultLateFeeType" {...register('defaultLateFeeType')}>
 						<option value="">None</option>
 						{LATE_FEE_TYPES.map((type) => (
 							<option key={type} value={type}>
@@ -85,14 +64,13 @@ export function TemplateDetailsStep({
 					<Label htmlFor="defaultLateFeeAmount">Default late fee amount</Label>
 					<Input
 						id="defaultLateFeeAmount"
-						name="defaultLateFeeAmount"
+						{...register('defaultLateFeeAmount')}
 						type="number"
 						min={0}
 						step={0.01}
-						value={defaultLateFeeAmount}
-						onChange={onFieldChange}
 						placeholder="Optional"
 					/>
+					<FieldError message={errors.defaultLateFeeAmount?.message} />
 				</div>
 			</div>
 
@@ -102,26 +80,31 @@ export function TemplateDetailsStep({
 				</Label>
 				<Input
 					id="defaultNoticePeriodDays"
-					name="defaultNoticePeriodDays"
+					{...register('defaultNoticePeriodDays')}
 					type="number"
 					min={1}
-					value={defaultNoticePeriodDays}
-					onChange={onFieldChange}
 					placeholder="Optional"
 				/>
+				<FieldError message={errors.defaultNoticePeriodDays?.message} />
 			</div>
 
 			{isEdit && (
-				<div className="flex items-center gap-2 pt-2">
-					<Checkbox
-						id="active"
-						checked={active}
-						onCheckedChange={(checked) => onActiveChange(checked === true)}
-					/>
-					<Label htmlFor="active" className="cursor-pointer font-normal">
-						Active (available when creating new leases)
-					</Label>
-				</div>
+				<Controller
+					name="active"
+					control={control}
+					render={({ field }) => (
+						<div className="flex items-center gap-2 pt-2">
+							<Checkbox
+								id="active"
+								checked={field.value}
+								onCheckedChange={(checked) => field.onChange(checked === true)}
+							/>
+							<Label htmlFor="active" className="cursor-pointer font-normal">
+								Active (available when creating new leases)
+							</Label>
+						</div>
+					)}
+				/>
 			)}
 		</div>
 	)

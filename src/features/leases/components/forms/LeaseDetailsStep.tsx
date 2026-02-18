@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Controller, useFormContext } from 'react-hook-form'
 import { Input } from '@abumble/design-system/components/Input'
 import { Label } from '@abumble/design-system/components/Label'
 import { Select } from '@abumble/design-system/components/Select'
@@ -12,61 +13,51 @@ import {
 	TableRow,
 } from '@abumble/design-system/components/Table'
 import { Trash2 } from 'lucide-react'
+import type { LeaseFormValues } from './LeaseAgreementFormWizard'
+import { FieldError } from '@/components/ui/FieldError'
 import { usePropsList } from '@/features/props'
 import { useUnitsList } from '@/features/units'
 import { useLeaseTemplatesActive } from '@/features/lease-templates'
 
-interface LeaseDetailsStepProps {
-	leaseTemplateId: string
-	propertyId: string
-	unitId: string
-	tenantEmails: Array<string>
-	startDate: string
-	endDate: string
-	onFieldChange: (
-		e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
-	) => void
-	onTenantEmailsChange: (emails: Array<string>) => void
-}
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
-export function LeaseDetailsStep({
-	leaseTemplateId,
-	propertyId,
-	unitId,
-	tenantEmails,
-	startDate,
-	endDate,
-	onFieldChange,
-	onTenantEmailsChange,
-}: LeaseDetailsStepProps) {
+export function LeaseDetailsStep() {
+	const {
+		register,
+		watch,
+		control,
+		setValue,
+		formState: { errors },
+	} = useFormContext<LeaseFormValues>()
+
 	const { data: propsList } = usePropsList()
 	const { data: unitsList } = useUnitsList()
 	const { data: activeTemplates } = useLeaseTemplatesActive()
+
 	const [emailInput, setEmailInput] = useState('')
+	const propertyId = watch('propertyId')
+	const tenantEmails = watch('tenantEmails')
 
 	const handleAddEmail = () => {
 		const trimmed = emailInput.trim().toLowerCase()
-		if (!trimmed) return
-
-		// Basic email validation
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-		if (!emailRegex.test(trimmed)) {
-			return
-		}
-
+		if (!trimmed || !EMAIL_REGEX.test(trimmed)) return
 		if (!tenantEmails.includes(trimmed)) {
-			onTenantEmailsChange([...tenantEmails, trimmed])
+			setValue('tenantEmails', [...tenantEmails, trimmed], {
+				shouldValidate: true,
+			})
 			setEmailInput('')
 		}
 	}
 
 	const handleRemoveEmail = (email: string) => {
-		onTenantEmailsChange(tenantEmails.filter((e) => e !== email))
+		setValue(
+			'tenantEmails',
+			tenantEmails.filter((e) => e !== email),
+			{ shouldValidate: true },
+		)
 	}
 
-	const handleEmailInputKeyDown = (
-		e: React.KeyboardEvent<HTMLInputElement>,
-	) => {
+	const handleEmailKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
 		if (e.key === 'Enter') {
 			e.preventDefault()
 			handleAddEmail()
@@ -82,13 +73,7 @@ export function LeaseDetailsStep({
 						*
 					</span>
 				</Label>
-				<Select
-					id="leaseTemplateId"
-					name="leaseTemplateId"
-					value={leaseTemplateId}
-					onChange={onFieldChange}
-					required
-				>
+				<Select id="leaseTemplateId" {...register('leaseTemplateId')}>
 					<option value="" disabled>
 						Select a template
 					</option>
@@ -99,6 +84,7 @@ export function LeaseDetailsStep({
 						</option>
 					))}
 				</Select>
+				<FieldError message={errors.leaseTemplateId?.message} />
 			</div>
 
 			<div className="space-y-2">
@@ -108,22 +94,31 @@ export function LeaseDetailsStep({
 						*
 					</span>
 				</Label>
-				<Select
-					id="propertyId"
+				<Controller
 					name="propertyId"
-					value={propertyId}
-					onChange={onFieldChange}
-					required
-				>
-					<option value="" disabled>
-						Select a property
-					</option>
-					{propsList?.map((p) => (
-						<option key={p.id} value={p.id}>
-							{p.legalName}
-						</option>
-					))}
-				</Select>
+					control={control}
+					render={({ field }) => (
+						<Select
+							id="propertyId"
+							value={field.value}
+							onChange={(e) => {
+								field.onChange(e.target.value)
+								// Clear dependent unit when property changes
+								setValue('unitId', '')
+							}}
+						>
+							<option value="" disabled>
+								Select a property
+							</option>
+							{propsList?.map((p) => (
+								<option key={p.id} value={p.id}>
+									{p.legalName}
+								</option>
+							))}
+						</Select>
+					)}
+				/>
+				<FieldError message={errors.propertyId?.message} />
 			</div>
 
 			<div className="space-y-2">
@@ -133,13 +128,7 @@ export function LeaseDetailsStep({
 						*
 					</span>
 				</Label>
-				<Select
-					id="unitId"
-					name="unitId"
-					value={unitId}
-					onChange={onFieldChange}
-					required
-				>
+				<Select id="unitId" {...register('unitId')}>
 					<option value="" disabled>
 						Select a unit
 					</option>
@@ -151,10 +140,11 @@ export function LeaseDetailsStep({
 							</option>
 						))}
 				</Select>
+				<FieldError message={errors.unitId?.message} />
 			</div>
 
 			<div className="space-y-2">
-				<Label htmlFor="tenantEmails">
+				<Label htmlFor="tenantEmailInput">
 					Tenant emails{' '}
 					<span className="text-destructive" aria-hidden>
 						*
@@ -162,17 +152,18 @@ export function LeaseDetailsStep({
 				</Label>
 				<div className="flex gap-2">
 					<Input
-						id="tenantEmails"
+						id="tenantEmailInput"
 						type="email"
 						value={emailInput}
 						onChange={(e) => setEmailInput(e.target.value)}
-						onKeyDown={handleEmailInputKeyDown}
+						onKeyDown={handleEmailKeyDown}
 						placeholder="tenant@example.com"
 					/>
 					<Button type="button" onClick={handleAddEmail} variant="outline">
 						Add
 					</Button>
 				</div>
+				<FieldError message={errors.tenantEmails?.message} />
 				{tenantEmails.length > 0 && (
 					<div className="rounded border overflow-hidden mt-1">
 						<Table>
@@ -212,14 +203,8 @@ export function LeaseDetailsStep({
 							*
 						</span>
 					</Label>
-					<Input
-						id="startDate"
-						name="startDate"
-						type="date"
-						value={startDate}
-						onChange={onFieldChange}
-						required
-					/>
+					<Input id="startDate" {...register('startDate')} type="date" />
+					<FieldError message={errors.startDate?.message} />
 				</div>
 				<div className="space-y-2">
 					<Label htmlFor="endDate">
@@ -228,14 +213,8 @@ export function LeaseDetailsStep({
 							*
 						</span>
 					</Label>
-					<Input
-						id="endDate"
-						name="endDate"
-						type="date"
-						value={endDate}
-						onChange={onFieldChange}
-						required
-					/>
+					<Input id="endDate" {...register('endDate')} type="date" />
+					<FieldError message={errors.endDate?.message} />
 				</div>
 			</div>
 		</div>

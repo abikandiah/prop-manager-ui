@@ -7,7 +7,7 @@ import {
 	DialogTrigger,
 	FormDialog,
 } from '@abumble/design-system/components/Dialog'
-import { UnitForm, UnitsTableView } from '@/features/units'
+import { UnitForm, UnitsGroupedView } from '@/features/units'
 
 export const Route = createFileRoute('/units/')({
 	component: UnitsPage,
@@ -45,7 +45,7 @@ function UnitsPage() {
 				</FormDialog>
 			</div>
 
-			<UnitsTableView />
+			<UnitsGroupedView />
 		</div>
 	)
 }

@@ -86,9 +86,7 @@ export interface UpdateLeasePayload {
 	noticePeriodDays?: number | null
 	/** Allow the owner to tweak the stamped content before sending for review */
 	executedContentMarkdown?: string | null
-	/** Extra placeholders for template: {{key}} → value */
 	templateParameters?: Record<string, string> | null
 	additionalMetadata?: Record<string, unknown> | null
-	/** Required for optimistic-lock verification */
 	version: number
 }

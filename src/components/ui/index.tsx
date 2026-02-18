@@ -90,6 +90,14 @@ export function ExternalSite({
 	)
 }
 
+export function RequiredMark() {
+	return (
+		<span className="text-destructive" aria-hidden>
+			*
+		</span>
+	)
+}
+
 // App-specific UI components
 // Import design-system components directly from @abumble/design-system
 export * from './DetailField'

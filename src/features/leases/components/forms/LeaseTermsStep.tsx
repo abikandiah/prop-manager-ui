@@ -4,6 +4,7 @@ import { Label } from '@abumble/design-system/components/Label'
 import { Select } from '@abumble/design-system/components/Select'
 import type { LeaseFormValues } from './LeaseAgreementFormWizard'
 import { FieldError } from '@/components/ui/FieldError'
+import { RequiredMark } from '@/components/ui'
 import { LATE_FEE_TYPES } from '@/domain/lease'
 import { formatEnumLabel } from '@/lib/format'
 
@@ -21,10 +22,7 @@ export function LeaseTermsStep() {
 			<div className="grid grid-cols-2 gap-4">
 				<div className="space-y-2">
 					<Label htmlFor="rentAmount">
-						Rent amount ($){' '}
-						<span className="text-destructive" aria-hidden>
-							*
-						</span>
+						Rent amount ($) <RequiredMark />
 					</Label>
 					<Input
 						id="rentAmount"
@@ -38,10 +36,7 @@ export function LeaseTermsStep() {
 				</div>
 				<div className="space-y-2">
 					<Label htmlFor="rentDueDay">
-						Rent due day{' '}
-						<span className="text-destructive" aria-hidden>
-							*
-						</span>
+						Rent due day <RequiredMark />
 					</Label>
 					<Input
 						id="rentDueDay"
@@ -68,30 +63,33 @@ export function LeaseTermsStep() {
 				<FieldError message={errors.securityDepositHeld?.message} />
 			</div>
 
-			<div className="grid grid-cols-2 gap-4">
-				<div className="space-y-2">
-					<Label htmlFor="lateFeeType">Late fee type</Label>
-					<Select id="lateFeeType" {...register('lateFeeType')}>
-						<option value="">None</option>
-						{LATE_FEE_TYPES.map((t) => (
-							<option key={t} value={t}>
-								{formatEnumLabel(t)}
-							</option>
-						))}
-					</Select>
-				</div>
-				<div className="space-y-2">
-					<Label htmlFor="lateFeeAmount">Late fee amount</Label>
-					<Input
-						id="lateFeeAmount"
-						{...register('lateFeeAmount')}
-						type="number"
-						min={0}
-						step={0.01}
-						placeholder="Optional"
-						disabled={!lateFeeType}
-					/>
-					<FieldError message={errors.lateFeeAmount?.message} />
+			<div className="rounded-md bg-muted/40 p-3 space-y-3">
+				<p className="text-xs font-medium text-muted-foreground">Late fee</p>
+				<div className="grid grid-cols-2 gap-4">
+					<div className="space-y-2">
+						<Label htmlFor="lateFeeType">Type</Label>
+						<Select id="lateFeeType" {...register('lateFeeType')}>
+							<option value="">None</option>
+							{LATE_FEE_TYPES.map((t) => (
+								<option key={t} value={t}>
+									{formatEnumLabel(t)}
+								</option>
+							))}
+						</Select>
+					</div>
+					<div className="space-y-2">
+						<Label htmlFor="lateFeeAmount">Amount</Label>
+						<Input
+							id="lateFeeAmount"
+							{...register('lateFeeAmount')}
+							type="number"
+							min={0}
+							step={0.01}
+							placeholder="Optional"
+							disabled={!lateFeeType}
+						/>
+						<FieldError message={errors.lateFeeAmount?.message} />
+					</div>
 				</div>
 			</div>
 

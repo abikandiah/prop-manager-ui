@@ -34,7 +34,7 @@ const leaseFormSchema = z
 		propertyId: z.string().min(1, 'Property is required'),
 		unitId: z.string().min(1, 'Unit is required'),
 		tenantEmails: z
-			.array(z.string().email())
+			.array(z.email())
 			.min(1, 'At least one tenant email is required'),
 		startDate: z.string().min(1, 'Start date is required'),
 		endDate: z.string().min(1, 'End date is required'),
@@ -144,7 +144,6 @@ export interface LeaseAgreementFormWizardProps {
 	submitLabel?: string
 	/** Current wizard step (controlled by parent for FormDialog integration) */
 	step?: 1 | 2 | 3
-	/** Step change handler (controlled by parent for FormDialog integration) */
 	onStepChange?: (step: 1 | 2 | 3) => void
 }
 
@@ -195,6 +194,10 @@ export function LeaseAgreementFormWizard({
 		}
 	}, [leaseTemplateId, isEdit])
 
+	const hasParameters =
+		!!selectedTemplate &&
+		Object.keys(selectedTemplate.templateParameters).length > 0
+
 	const handleNext = useCallback(async () => {
 		if (step === 1) {
 			const valid = await trigger(STEP_1_FIELDS)
@@ -223,9 +226,6 @@ export function LeaseAgreementFormWizard({
 		} else if (step === 2) {
 			const valid = await trigger(STEP_2_FIELDS)
 			if (!valid) return
-			const hasParameters =
-				selectedTemplate &&
-				Object.keys(selectedTemplate.templateParameters).length > 0
 			if (hasParameters) {
 				setStep(3)
 			} else {
@@ -239,6 +239,7 @@ export function LeaseAgreementFormWizard({
 		selectedTemplate,
 		templateDefaultsApplied,
 		setValue,
+		hasParameters,
 		handleSubmit,
 	])
 
@@ -249,28 +250,28 @@ export function LeaseAgreementFormWizard({
 
 	const submitForm = useCallback(
 		(values: LeaseFormValues) => {
+			const terms = {
+				startDate: values.startDate,
+				endDate: values.endDate,
+				rentAmount: parseFloat(values.rentAmount),
+				rentDueDay: parseInt(values.rentDueDay, 10),
+				securityDepositHeld:
+					parseFloatOrUndefined(values.securityDepositHeld) ?? null,
+				lateFeeType: (values.lateFeeType || null) as LateFeeType | null,
+				lateFeeAmount: parseFloatOrUndefined(values.lateFeeAmount) ?? null,
+				noticePeriodDays:
+					parseIntOrUndefined(values.noticePeriodDays, 10) ?? null,
+				templateParameters:
+					Object.keys(values.templateParameters).length > 0
+						? values.templateParameters
+						: null,
+			}
+
 			if (isEdit) {
 				updateLease.mutate(
 					{
 						id: initialLease.id,
-						payload: {
-							startDate: values.startDate,
-							endDate: values.endDate,
-							rentAmount: parseFloat(values.rentAmount),
-							rentDueDay: parseInt(values.rentDueDay, 10),
-							securityDepositHeld:
-								parseFloatOrUndefined(values.securityDepositHeld) ?? null,
-							lateFeeType: (values.lateFeeType || null) as LateFeeType | null,
-							lateFeeAmount:
-								parseFloatOrUndefined(values.lateFeeAmount) ?? null,
-							noticePeriodDays:
-								parseIntOrUndefined(values.noticePeriodDays, 10) ?? null,
-							templateParameters:
-								Object.keys(values.templateParameters).length > 0
-									? values.templateParameters
-									: null,
-							version: initialLease.version,
-						},
+						payload: { ...terms, version: initialLease.version },
 						unitId: initialLease.unitId,
 						propertyId: initialLease.propertyId,
 					},
@@ -292,22 +293,8 @@ export function LeaseAgreementFormWizard({
 						propertyId: values.propertyId,
 						unitId: values.unitId,
 						tenantEmails: values.tenantEmails,
-						startDate: values.startDate,
-						endDate: values.endDate,
-						rentAmount: parseFloat(values.rentAmount),
-						rentDueDay: parseInt(values.rentDueDay, 10),
-						securityDepositHeld: parseFloatOrUndefined(
-							values.securityDepositHeld,
-						),
-						lateFeeType: (values.lateFeeType || undefined) as
-							| LateFeeType
-							| undefined,
-						lateFeeAmount: parseFloatOrUndefined(values.lateFeeAmount),
-						noticePeriodDays: parseIntOrUndefined(values.noticePeriodDays, 10),
-						templateParameters:
-							Object.keys(values.templateParameters).length > 0
-								? values.templateParameters
-								: undefined,
+						...terms,
+						templateParameters: terms.templateParameters ?? undefined,
 					},
 					{
 						onSuccess: () => {
@@ -326,10 +313,6 @@ export function LeaseAgreementFormWizard({
 		},
 		[isEdit, initialLease, createLease, updateLease, onSuccess, reset, setStep],
 	)
-
-	const hasParameters =
-		selectedTemplate &&
-		Object.keys(selectedTemplate.templateParameters).length > 0
 
 	const resolvedSubmitLabel = submitLabel ?? (isEdit ? 'Save' : 'Create Lease')
 	const pendingLabel = isEdit ? 'Saving…' : 'Creating…'

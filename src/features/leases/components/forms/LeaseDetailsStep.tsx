@@ -1,25 +1,19 @@
 import { useState } from 'react'
 import { Controller, useFormContext } from 'react-hook-form'
+import { z } from 'zod'
+import { X } from 'lucide-react'
 import { Input } from '@abumble/design-system/components/Input'
 import { Label } from '@abumble/design-system/components/Label'
 import { Select } from '@abumble/design-system/components/Select'
 import { Button } from '@abumble/design-system/components/Button'
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from '@abumble/design-system/components/Table'
-import { Trash2 } from 'lucide-react'
 import type { LeaseFormValues } from './LeaseAgreementFormWizard'
 import { FieldError } from '@/components/ui/FieldError'
+import { RequiredMark } from '@/components/ui'
 import { usePropsList } from '@/features/props'
 import { useUnitsList } from '@/features/units'
 import { useLeaseTemplatesActive } from '@/features/lease-templates'
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const isValidEmail = (value: string) => z.email().safeParse(value).success
 
 export function LeaseDetailsStep() {
 	const {
@@ -40,7 +34,7 @@ export function LeaseDetailsStep() {
 
 	const handleAddEmail = () => {
 		const trimmed = emailInput.trim().toLowerCase()
-		if (!trimmed || !EMAIL_REGEX.test(trimmed)) return
+		if (!trimmed || !isValidEmail(trimmed)) return
 		if (!tenantEmails.includes(trimmed)) {
 			setValue('tenantEmails', [...tenantEmails, trimmed], {
 				shouldValidate: true,
@@ -68,10 +62,7 @@ export function LeaseDetailsStep() {
 		<div className="space-y-4">
 			<div className="space-y-2">
 				<Label htmlFor="leaseTemplateId">
-					Template{' '}
-					<span className="text-destructive" aria-hidden>
-						*
-					</span>
+					Template <RequiredMark />
 				</Label>
 				<Select id="leaseTemplateId" {...register('leaseTemplateId')}>
 					<option value="" disabled>
@@ -89,10 +80,7 @@ export function LeaseDetailsStep() {
 
 			<div className="space-y-2">
 				<Label htmlFor="propertyId">
-					Property{' '}
-					<span className="text-destructive" aria-hidden>
-						*
-					</span>
+					Property <RequiredMark />
 				</Label>
 				<Controller
 					name="propertyId"
@@ -123,10 +111,7 @@ export function LeaseDetailsStep() {
 
 			<div className="space-y-2">
 				<Label htmlFor="unitId">
-					Unit{' '}
-					<span className="text-destructive" aria-hidden>
-						*
-					</span>
+					Unit <RequiredMark />
 				</Label>
 				<Select id="unitId" {...register('unitId')}>
 					<option value="" disabled>
@@ -145,10 +130,7 @@ export function LeaseDetailsStep() {
 
 			<div className="space-y-2">
 				<Label htmlFor="tenantEmailInput">
-					Tenant emails{' '}
-					<span className="text-destructive" aria-hidden>
-						*
-					</span>
+					Tenant emails <RequiredMark />
 				</Label>
 				<div className="flex gap-2">
 					<Input
@@ -165,32 +147,23 @@ export function LeaseDetailsStep() {
 				</div>
 				<FieldError message={errors.tenantEmails?.message} />
 				{tenantEmails.length > 0 && (
-					<div className="rounded border overflow-hidden mt-1">
-						<Table>
-							<TableHeader>
-								<TableRow>
-									<TableHead>Email</TableHead>
-									<TableHead className="w-10" />
-								</TableRow>
-							</TableHeader>
-							<TableBody>
-								{tenantEmails.map((email) => (
-									<TableRow key={email}>
-										<TableCell className="text-sm">{email}</TableCell>
-										<TableCell className="text-right">
-											<button
-												type="button"
-												onClick={() => handleRemoveEmail(email)}
-												className="text-muted-foreground hover:text-destructive transition-colors"
-												aria-label={`Remove ${email}`}
-											>
-												<Trash2 className="h-4 w-4" />
-											</button>
-										</TableCell>
-									</TableRow>
-								))}
-							</TableBody>
-						</Table>
+					<div className="flex flex-wrap gap-1.5 mt-1">
+						{tenantEmails.map((email) => (
+							<span
+								key={email}
+								className="inline-flex items-center gap-1 rounded-md bg-muted px-2 py-1 text-xs font-medium text-foreground"
+							>
+								{email}
+								<button
+									type="button"
+									onClick={() => handleRemoveEmail(email)}
+									aria-label={`Remove ${email}`}
+									className="text-muted-foreground hover:text-destructive transition-colors ml-0.5"
+								>
+									<X className="h-3 w-3" />
+								</button>
+							</span>
+						))}
 					</div>
 				)}
 			</div>
@@ -198,20 +171,14 @@ export function LeaseDetailsStep() {
 			<div className="grid grid-cols-2 gap-4">
 				<div className="space-y-2">
 					<Label htmlFor="startDate">
-						Start date{' '}
-						<span className="text-destructive" aria-hidden>
-							*
-						</span>
+						Start date <RequiredMark />
 					</Label>
 					<Input id="startDate" {...register('startDate')} type="date" />
 					<FieldError message={errors.startDate?.message} />
 				</div>
 				<div className="space-y-2">
 					<Label htmlFor="endDate">
-						End date{' '}
-						<span className="text-destructive" aria-hidden>
-							*
-						</span>
+						End date <RequiredMark />
 					</Label>
 					<Input id="endDate" {...register('endDate')} type="date" />
 					<FieldError message={errors.endDate?.message} />

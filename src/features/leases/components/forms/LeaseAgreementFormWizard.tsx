@@ -271,7 +271,11 @@ export function LeaseAgreementFormWizard({
 				updateLease.mutate(
 					{
 						id: initialLease.id,
-						payload: { ...terms, version: initialLease.version },
+						payload: {
+							...terms,
+							tenantEmails: values.tenantEmails,
+							version: initialLease.version,
+						},
 						unitId: initialLease.unitId,
 						propertyId: initialLease.propertyId,
 					},

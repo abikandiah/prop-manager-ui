@@ -84,6 +84,7 @@ export interface UpdateLeasePayload {
 	lateFeeType?: LateFeeType | null
 	lateFeeAmount?: number | null
 	noticePeriodDays?: number | null
+	tenantEmails?: Array<string>
 	/** Allow the owner to tweak the stamped content before sending for review */
 	executedContentMarkdown?: string | null
 	templateParameters?: Record<string, string> | null

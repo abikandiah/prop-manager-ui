@@ -20,6 +20,7 @@ import {
 	LayoutGrid,
 	MessageSquare,
 	Package,
+	Users,
 } from 'lucide-react'
 import { useCallback } from 'react'
 import { CollapsibleSidebarSection } from './CollapsibleSidebarSection'
@@ -27,7 +28,7 @@ import type { LinkComponentProps } from '@tanstack/react-router'
 import type { LucideIcon } from 'lucide-react'
 
 type NavItem = {
-	to: '/' | '/props' | '/units' | '/messages'
+	to: '/' | '/props' | '/units' | '/tenants' | '/messages'
 	label: string
 	icon: LucideIcon
 }
@@ -91,6 +92,7 @@ export function AppSidebar() {
 									items={[
 										{ to: '/props', label: 'Props', icon: Package },
 										{ to: '/units', label: 'Units', icon: LayoutGrid },
+										{ to: '/tenants', label: 'Tenants', icon: Users },
 									]}
 									onItemClick={closeMobileSidebar}
 								/>

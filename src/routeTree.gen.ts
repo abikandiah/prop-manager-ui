@@ -12,12 +12,14 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as DevRouteRouteImport } from './routes/dev/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UnitsIndexRouteImport } from './routes/units/index'
+import { Route as TenantsIndexRouteImport } from './routes/tenants/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as PropsIndexRouteImport } from './routes/props/index'
 import { Route as ProfileIndexRouteImport } from './routes/profile/index'
 import { Route as MessagesIndexRouteImport } from './routes/messages/index'
 import { Route as DevIndexRouteImport } from './routes/dev/index'
 import { Route as UnitsUnitIdRouteImport } from './routes/units/$unitId'
+import { Route as TenantsTenantIdRouteImport } from './routes/tenants/$tenantId'
 import { Route as PublicTermsRouteImport } from './routes/public/terms'
 import { Route as PublicPrivacyRouteImport } from './routes/public/privacy'
 import { Route as DevAuthRouteImport } from './routes/dev/auth'
@@ -43,6 +45,11 @@ const IndexRoute = IndexRouteImport.update({
 const UnitsIndexRoute = UnitsIndexRouteImport.update({
   id: '/units/',
   path: '/units/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TenantsIndexRoute = TenantsIndexRouteImport.update({
+  id: '/tenants/',
+  path: '/tenants/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsIndexRoute = SettingsIndexRouteImport.update({
@@ -73,6 +80,11 @@ const DevIndexRoute = DevIndexRouteImport.update({
 const UnitsUnitIdRoute = UnitsUnitIdRouteImport.update({
   id: '/units/$unitId',
   path: '/units/$unitId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TenantsTenantIdRoute = TenantsTenantIdRouteImport.update({
+  id: '/tenants/$tenantId',
+  path: '/tenants/$tenantId',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PublicTermsRoute = PublicTermsRouteImport.update({
@@ -141,12 +153,14 @@ export interface FileRoutesByFullPath {
   '/dev/auth': typeof DevAuthRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
+  '/tenants/$tenantId': typeof TenantsTenantIdRoute
   '/units/$unitId': typeof UnitsUnitIdRoute
   '/dev/': typeof DevIndexRoute
   '/messages/': typeof MessagesIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/props/': typeof PropsIndexRoute
   '/settings/': typeof SettingsIndexRoute
+  '/tenants/': typeof TenantsIndexRoute
   '/units/': typeof UnitsIndexRoute
   '/leases/agreements/$leaseId': typeof LeasesAgreementsLeaseIdRoute
   '/leases/templates/$templateId': typeof LeasesTemplatesTemplateIdRoute
@@ -159,12 +173,14 @@ export interface FileRoutesByTo {
   '/dev/auth': typeof DevAuthRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
+  '/tenants/$tenantId': typeof TenantsTenantIdRoute
   '/units/$unitId': typeof UnitsUnitIdRoute
   '/dev': typeof DevIndexRoute
   '/messages': typeof MessagesIndexRoute
   '/profile': typeof ProfileIndexRoute
   '/props': typeof PropsIndexRoute
   '/settings': typeof SettingsIndexRoute
+  '/tenants': typeof TenantsIndexRoute
   '/units': typeof UnitsIndexRoute
   '/leases/agreements/$leaseId': typeof LeasesAgreementsLeaseIdRoute
   '/leases/templates/$templateId': typeof LeasesTemplatesTemplateIdRoute
@@ -182,12 +198,14 @@ export interface FileRoutesById {
   '/dev/auth': typeof DevAuthRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
+  '/tenants/$tenantId': typeof TenantsTenantIdRoute
   '/units/$unitId': typeof UnitsUnitIdRoute
   '/dev/': typeof DevIndexRoute
   '/messages/': typeof MessagesIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/props/': typeof PropsIndexRoute
   '/settings/': typeof SettingsIndexRoute
+  '/tenants/': typeof TenantsIndexRoute
   '/units/': typeof UnitsIndexRoute
   '/leases/agreements/$leaseId': typeof LeasesAgreementsLeaseIdRoute
   '/leases/templates/$templateId': typeof LeasesTemplatesTemplateIdRoute
@@ -206,12 +224,14 @@ export interface FileRouteTypes {
     | '/dev/auth'
     | '/public/privacy'
     | '/public/terms'
+    | '/tenants/$tenantId'
     | '/units/$unitId'
     | '/dev/'
     | '/messages/'
     | '/profile/'
     | '/props/'
     | '/settings/'
+    | '/tenants/'
     | '/units/'
     | '/leases/agreements/$leaseId'
     | '/leases/templates/$templateId'
@@ -224,12 +244,14 @@ export interface FileRouteTypes {
     | '/dev/auth'
     | '/public/privacy'
     | '/public/terms'
+    | '/tenants/$tenantId'
     | '/units/$unitId'
     | '/dev'
     | '/messages'
     | '/profile'
     | '/props'
     | '/settings'
+    | '/tenants'
     | '/units'
     | '/leases/agreements/$leaseId'
     | '/leases/templates/$templateId'
@@ -246,12 +268,14 @@ export interface FileRouteTypes {
     | '/dev/auth'
     | '/public/privacy'
     | '/public/terms'
+    | '/tenants/$tenantId'
     | '/units/$unitId'
     | '/dev/'
     | '/messages/'
     | '/profile/'
     | '/props/'
     | '/settings/'
+    | '/tenants/'
     | '/units/'
     | '/leases/agreements/$leaseId'
     | '/leases/templates/$templateId'
@@ -268,11 +292,13 @@ export interface RootRouteChildren {
   PropsIdRouteRoute: typeof PropsIdRouteRouteWithChildren
   PublicPrivacyRoute: typeof PublicPrivacyRoute
   PublicTermsRoute: typeof PublicTermsRoute
+  TenantsTenantIdRoute: typeof TenantsTenantIdRoute
   UnitsUnitIdRoute: typeof UnitsUnitIdRoute
   MessagesIndexRoute: typeof MessagesIndexRoute
   ProfileIndexRoute: typeof ProfileIndexRoute
   PropsIndexRoute: typeof PropsIndexRoute
   SettingsIndexRoute: typeof SettingsIndexRoute
+  TenantsIndexRoute: typeof TenantsIndexRoute
   UnitsIndexRoute: typeof UnitsIndexRoute
 }
 
@@ -297,6 +323,13 @@ declare module '@tanstack/react-router' {
       path: '/units'
       fullPath: '/units/'
       preLoaderRoute: typeof UnitsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tenants/': {
+      id: '/tenants/'
+      path: '/tenants'
+      fullPath: '/tenants/'
+      preLoaderRoute: typeof TenantsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings/': {
@@ -339,6 +372,13 @@ declare module '@tanstack/react-router' {
       path: '/units/$unitId'
       fullPath: '/units/$unitId'
       preLoaderRoute: typeof UnitsUnitIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tenants/$tenantId': {
+      id: '/tenants/$tenantId'
+      path: '/tenants/$tenantId'
+      fullPath: '/tenants/$tenantId'
+      preLoaderRoute: typeof TenantsTenantIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/public/terms': {
@@ -483,11 +523,13 @@ const rootRouteChildren: RootRouteChildren = {
   PropsIdRouteRoute: PropsIdRouteRouteWithChildren,
   PublicPrivacyRoute: PublicPrivacyRoute,
   PublicTermsRoute: PublicTermsRoute,
+  TenantsTenantIdRoute: TenantsTenantIdRoute,
   UnitsUnitIdRoute: UnitsUnitIdRoute,
   MessagesIndexRoute: MessagesIndexRoute,
   ProfileIndexRoute: ProfileIndexRoute,
   PropsIndexRoute: PropsIndexRoute,
   SettingsIndexRoute: SettingsIndexRoute,
+  TenantsIndexRoute: TenantsIndexRoute,
   UnitsIndexRoute: UnitsIndexRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,28 +1,27 @@
+import { AppSidebar } from '@/components/AppSidebar'
+import Footer from '@/components/Footer'
+import Header from '@/components/Header'
+import { Register } from '@/components/Register'
+import { LoadingScreen } from '@/components/ui'
+import { config } from '@/config'
+import { useAuth } from '@/contexts/auth'
+import { useNetwork } from '@/contexts/network'
 import { MessageBanner } from '@abumble/design-system/components/Banner'
+import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
 import {
 	SidebarInset,
 	SidebarProvider,
 } from '@abumble/design-system/components/Sidebar'
-import { cn } from '@abumble/design-system/utils'
 import { UnderConstruction } from '@abumble/design-system/components/UnderConstruction'
+import { cn } from '@abumble/design-system/utils'
 import { Outlet, createRootRoute, useLocation } from '@tanstack/react-router'
 import { ServerOff, WifiOff } from 'lucide-react'
-import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
-import { AppSidebar } from '@/components/AppSidebar'
-import Footer from '@/components/Footer'
-import { config } from '@/config'
-import Header from '@/components/Header'
-import { useNetwork } from '@/contexts/network'
-import { useAuth } from '@/contexts/auth'
-import { Register } from '@/components/Register'
-import { LoadingScreen } from '@/components/ui'
 
 export const Route = createRootRoute({
 	component: Root,
 })
 
 function Root() {
-	const { isOnline } = useNetwork()
 	const { isLoadingUser, isUserDefined } = useAuth()
 	const location = useLocation()
 	const isPublic = location.pathname.startsWith('/public')
@@ -61,7 +60,7 @@ function Root() {
 			<div className="layout-header-full flex min-h-screen w-full flex-col">
 				<Header />
 				<main className="flex flex-col mt-14 p-6 flex-1">
-					{!isOnline && <OfflineWarningBanner />}
+					<OfflineWarningBanner />
 					{altContent}
 				</main>
 				<Footer />
@@ -69,6 +68,10 @@ function Root() {
 		)
 	}
 
+	return <DashboardHome />
+}
+
+function DashboardHome() {
 	return (
 		<SidebarProvider>
 			<div className="layout-header-full flex min-h-screen w-full flex-col">
@@ -77,7 +80,7 @@ function Root() {
 					<AppSidebar />
 					<SidebarInset>
 						<main className="flex flex-col p-6">
-							{!isOnline && <OfflineWarningBanner />}
+							<OfflineWarningBanner />
 							<div className="flex flex-col gap-4">
 								<Outlet />
 							</div>
@@ -91,7 +94,10 @@ function Root() {
 }
 
 function OfflineWarningBanner() {
-	const { isServerReachable, consecutiveFailures } = useNetwork()
+	const { isOnline, isServerReachable, consecutiveFailures } = useNetwork()
+	if (isOnline) {
+		return null
+	}
 
 	return (
 		<MessageBanner

@@ -59,8 +59,6 @@ function UnitRowActions({ unit, onEdit }: { unit: Unit; onEdit: () => void }) {
 					{ id: unit.id, propertyId: unit.propertyId },
 					{
 						onSuccess: () => toast.success('Unit deleted'),
-						onError: (err) =>
-							toast.error(err.message || 'Failed to delete unit'),
 					},
 				)
 			}}

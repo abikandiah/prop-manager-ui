@@ -33,9 +33,6 @@ function UnitActions({ unit, onEdit }: { unit: Unit; onEdit: () => void }) {
 							toast.success('Unit deleted')
 							navigate({ to: '/units' })
 						},
-						onError: (err) => {
-							toast.error(err.message || 'Failed to delete unit')
-						},
 					},
 				)
 			}}

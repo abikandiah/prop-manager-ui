@@ -163,9 +163,6 @@ export function PropsForm({
 						toast.success('Property updated')
 						onSuccess?.()
 					},
-					onError: (error) => {
-						toast.error(error.message || 'Failed to update property')
-					},
 				},
 			)
 		} else {
@@ -178,11 +175,6 @@ export function PropsForm({
 					} else {
 						navigate({ to: '/props/$id', params: { id: data.id } })
 					}
-				},
-				onError: (error) => {
-					toast.error(
-						`Failed to create property: ${error.message || 'Unknown'}`,
-					)
 				},
 			})
 		}

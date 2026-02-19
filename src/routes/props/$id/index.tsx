@@ -35,9 +35,6 @@ function PropActions({ prop, onEdit }: { prop: Prop; onEdit: () => void }) {
 						toast.success('Property deleted')
 						navigate({ to: '/props' })
 					},
-					onError: (err) => {
-						toast.error(err.message || 'Failed to delete property')
-					},
 				})
 			}}
 			isDeletePending={deleteProp.isPending}

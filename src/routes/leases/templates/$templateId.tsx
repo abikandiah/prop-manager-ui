@@ -44,9 +44,6 @@ function LeaseTemplateActions({
 						toast.success('Template deleted')
 						navigate({ to: '/leases/templates' })
 					},
-					onError: (err) => {
-						toast.error(err.message || 'Failed to delete template')
-					},
 				})
 			}}
 			isDeletePending={deleteTemplate.isPending}

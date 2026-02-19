@@ -277,9 +277,6 @@ export function LeaseAgreementFormWizard({
 							toast.success('Lease updated')
 							onSuccess?.(updatedLease)
 						},
-						onError: (err) => {
-							toast.error(err.message || 'Failed to update lease')
-						},
 					},
 				)
 			} else {
@@ -299,9 +296,6 @@ export function LeaseAgreementFormWizard({
 							setStep(1)
 							setTemplateDefaultsApplied(false)
 							onSuccess?.(data)
-						},
-						onError: (err) => {
-							toast.error(err.message || 'Failed to create lease')
 						},
 					},
 				)

@@ -64,8 +64,6 @@ function LeaseActions({ lease, onEdit }: { lease: Lease; onEdit: () => void }) {
 							toast.success('Lease deleted')
 							navigate({ to: '/leases/agreements' })
 						},
-						onError: (err) =>
-							toast.error(err.message || 'Failed to delete lease'),
 					},
 				)
 			}}

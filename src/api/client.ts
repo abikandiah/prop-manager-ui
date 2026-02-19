@@ -1,5 +1,6 @@
-import axios from 'axios'
+import { ApiError } from '@/api/errors'
 import { config } from '@/config'
+import axios from 'axios'
 
 const DEV_AUTH_TOKEN_KEY = 'DEV_AUTH_TOKEN'
 
@@ -21,7 +22,7 @@ export const setDevToken = (token: string) => {
 
 export const clearDevToken = () => {
 	if (!config.isDevelopment) return
-	cachedToken = ''
+	cachedToken = null
 	localStorage.removeItem(DEV_AUTH_TOKEN_KEY)
 }
 
@@ -76,6 +77,6 @@ api.interceptors.response.use(
 			}
 		}
 
-		return Promise.reject(error)
+		return Promise.reject(ApiError.from(error))
 	},
 )

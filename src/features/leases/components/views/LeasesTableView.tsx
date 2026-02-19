@@ -60,8 +60,6 @@ function LeaseRowActions({
 					{ id: lease.id, unitId: lease.unitId, propertyId: lease.propertyId },
 					{
 						onSuccess: () => toast.success('Lease deleted'),
-						onError: (err) =>
-							toast.error(err.message || 'Failed to delete lease'),
 					},
 				)
 			}}

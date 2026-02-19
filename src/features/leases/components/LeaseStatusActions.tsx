@@ -106,7 +106,7 @@ export function LeaseStatusActions({ lease }: LeaseStatusActionsProps) {
 		{
 			mutate: (
 				id: string,
-				callbacks: { onSuccess: () => void; onError: (err: Error) => void },
+				callbacks: { onSuccess: () => void; onError?: (err: Error) => void },
 			) => void
 			isPending: boolean
 		}
@@ -131,9 +131,6 @@ export function LeaseStatusActions({ lease }: LeaseStatusActionsProps) {
 			onSuccess: () => {
 				toast.success(activeConfig.successMessage)
 				setConfirmAction(null)
-			},
-			onError: (err) => {
-				toast.error(err.message || activeConfig.errorMessage)
 			},
 		})
 	}

@@ -1,14 +1,3 @@
-import { useCallback, useRef, useState } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-import { z } from 'zod'
-import { toast } from 'sonner'
-import { Button } from '@abumble/design-system/components/Button'
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
-import { DialogFooter } from '@abumble/design-system/components/Dialog'
-import { TemplateDetailsStep } from './TemplateDetailsStep'
-import { TemplateParametersStep } from './TemplateParametersStep'
-import { TemplateMarkdownStep } from './TemplateMarkdownStep'
 import type { LateFeeType } from '@/domain/lease'
 import type { LeaseTemplate } from '@/domain/lease-template'
 import {
@@ -21,6 +10,17 @@ import {
 	parseIntOrUndefined,
 	trimOrUndefined,
 } from '@/lib/util'
+import { Button } from '@abumble/design-system/components/Button'
+import { DialogFooter } from '@abumble/design-system/components/Dialog'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
+import { useCallback, useRef, useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
+import { TemplateDetailsStep } from './TemplateDetailsStep'
+import { TemplateMarkdownStep } from './TemplateMarkdownStep'
+import { TemplateParametersStep } from './TemplateParametersStep'
 
 // ---------- Schema ----------
 
@@ -191,9 +191,6 @@ export function LeaseTemplateFormWizard({
 							toast.success('Template updated')
 							onSuccess?.()
 						},
-						onError: (err) => {
-							toast.error(err.message || 'Failed to update template')
-						},
 					},
 				)
 			} else {
@@ -205,9 +202,6 @@ export function LeaseTemplateFormWizard({
 							reset(defaultValues)
 							setStep(1)
 							onSuccess?.()
-						},
-						onError: (err) => {
-							toast.error(err.message || 'Failed to create template')
 						},
 					},
 				)

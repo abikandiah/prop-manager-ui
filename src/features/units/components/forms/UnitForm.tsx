@@ -190,9 +190,6 @@ export function UnitForm({
 						toast.success('Unit updated')
 						onSuccess?.()
 					},
-					onError: (err) => {
-						toast.error(err.message || 'Failed to update unit')
-					},
 				},
 			)
 		} else {
@@ -201,9 +198,6 @@ export function UnitForm({
 					toast.success('Unit created')
 					reset(makeDefaults(propId))
 					onSuccess?.()
-				},
-				onError: (err) => {
-					toast.error(err.message || 'Failed to create unit')
 				},
 			})
 		}

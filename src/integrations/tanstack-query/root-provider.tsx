@@ -1,10 +1,10 @@
-import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { createUserScopedDefaults } from './client-config'
-import type { Mutation, Query } from '@tanstack/react-query'
-import type { PersistQueryClientProviderProps } from '@tanstack/react-query-persist-client'
 import { config } from '@/config'
 import { createThrottledCachePersister } from '@/features/offline/cachePersistor'
+import type { Mutation, Query } from '@tanstack/react-query'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import type { PersistQueryClientProviderProps } from '@tanstack/react-query-persist-client'
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
+import { createMutationCache, createUserScopedDefaults } from './client-config'
 
 /** Mutation instance passed to shouldDehydrateMutation when deciding what to persist. */
 type PersistableMutation = Mutation
@@ -17,6 +17,7 @@ type PersistableMutation = Mutation
  */
 export function getContext(userId: string) {
 	const queryClient = new QueryClient({
+		mutationCache: createMutationCache(),
 		defaultOptions: createUserScopedDefaults(),
 	})
 

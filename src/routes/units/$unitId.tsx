@@ -1,5 +1,5 @@
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
@@ -9,6 +9,7 @@ import type { Unit } from '@/domain/unit'
 import { usePropDetail } from '@/features/props'
 import { UnitForm, useDeleteUnit, useUnitDetail } from '@/features/units'
 import { formatCurrency, formatDate, formatEnumLabel } from '@/lib/format'
+import { FORM_DIALOG_CLASS, useEditDialogState } from '@/lib/dialog'
 import { DetailField, EntityActions, TextLink } from '@/components/ui'
 import { config } from '@/config'
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
@@ -59,7 +60,7 @@ function UnitDetailPage() {
 		unit?.propertyId ?? null,
 	)
 
-	const [editingUnit, setEditingUnit] = useState<Unit | null>(null)
+	const editDialog = useEditDialogState<Unit>()
 
 	const isLoading = unitLoading || propLoading
 
@@ -135,7 +136,7 @@ function UnitDetailPage() {
 							</>
 						}
 						actions={
-							<UnitActions unit={unit} onEdit={() => setEditingUnit(unit)} />
+							<UnitActions unit={unit} onEdit={() => editDialog.edit(unit)} />
 						}
 					/>
 
@@ -238,19 +239,19 @@ function UnitDetailPage() {
 						</div>
 					</div>
 
-					{editingUnit && (
+					{editDialog.editing && (
 						<FormDialog
-							open={!!editingUnit}
-							onOpenChange={() => setEditingUnit(null)}
+							open={editDialog.isOpen}
+							onOpenChange={() => editDialog.close()}
 							title="Edit unit"
-							description={`Update unit ${editingUnit.unitNumber} details.`}
-							className="max-w-[calc(100vw-2rem)] sm:max-w-2xl"
+							description={`Update unit ${editDialog.editing!.unitNumber} details.`}
+							className={FORM_DIALOG_CLASS}
 						>
 							<UnitForm
 								propId={unit.propertyId}
-								initialUnit={editingUnit}
-								onSuccess={() => setEditingUnit(null)}
-								onCancel={() => setEditingUnit(null)}
+								initialUnit={editDialog.editing}
+								onSuccess={editDialog.close}
+								onCancel={editDialog.close}
 								submitLabel="Save"
 							/>
 						</FormDialog>

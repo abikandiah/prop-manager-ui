@@ -26,6 +26,7 @@ import type { LeaseTenant, LeaseTenantStatus } from '@/domain/lease-tenant'
 import { LeaseTenantRole } from '@/domain/lease-tenant'
 import { DETAIL_LABEL_CLASS } from '@/components/ui/DetailField'
 import { formatDate, formatDateTime, formatEnumLabel } from '@/lib/format'
+import { FORM_DIALOG_CLASS, useDialogState } from '@/lib/dialog'
 import { config } from '@/config'
 import {
 	useLeaseTenants,
@@ -221,7 +222,7 @@ const TABLE_COLS_WITH_ACTIONS = TABLE_COLS_BASE + 1
  * - The INVITED status badge shows a tooltip with the last resent timestamp.
  */
 export function LeaseTenantsList({ leaseId, isDraft }: LeaseTenantListProps) {
-	const [inviteOpen, setInviteOpen] = useState(false)
+	const inviteDialog = useDialogState()
 	const { data: tenants = [], isLoading } = useLeaseTenants(leaseId)
 
 	const hasActions = isDraft || tenants.some((t) => t.status === 'INVITED')
@@ -234,11 +235,7 @@ export function LeaseTenantsList({ leaseId, isDraft }: LeaseTenantListProps) {
 				<div className="flex items-center justify-between px-5 py-4">
 					<p className={DETAIL_LABEL_CLASS}>Tenants</p>
 					{isDraft && (
-						<Button
-							variant="outline"
-							size="sm"
-							onClick={() => setInviteOpen(true)}
-						>
+						<Button variant="outline" size="sm" onClick={inviteDialog.open}>
 							<UserPlus className="size-4" />
 							Invite tenants
 						</Button>
@@ -329,18 +326,16 @@ export function LeaseTenantsList({ leaseId, isDraft }: LeaseTenantListProps) {
 			{/* Invite dialog — rendered outside DelayedLoadingFallback so it stays mounted */}
 			{isDraft && (
 				<FormDialog
-					open={inviteOpen}
-					onOpenChange={(open) => {
-						if (!open) setInviteOpen(false)
-					}}
+					open={inviteDialog.isOpen}
+					onOpenChange={inviteDialog.setIsOpen}
 					title="Invite tenants"
 					description="Add people to this lease. They'll receive an email with a link to review and sign."
-					className="max-w-[calc(100vw-2rem)] sm:max-w-2xl"
+					className={FORM_DIALOG_CLASS}
 				>
 					<InviteTenantsForm
 						leaseId={leaseId}
-						onSuccess={() => setInviteOpen(false)}
-						onCancel={() => setInviteOpen(false)}
+						onSuccess={inviteDialog.close}
+						onCancel={inviteDialog.close}
 					/>
 				</FormDialog>
 			)}

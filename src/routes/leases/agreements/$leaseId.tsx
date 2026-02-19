@@ -1,5 +1,10 @@
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
-import { DETAIL_LABEL_CLASS, DetailField, EntityActions, TextLink } from '@/components/ui'
+import {
+	DETAIL_LABEL_CLASS,
+	DetailField,
+	EntityActions,
+	TextLink,
+} from '@/components/ui'
 import { config } from '@/config'
 import type { Lease } from '@/domain/lease'
 import { LateFeeType, LeaseStatus } from '@/domain/lease'
@@ -20,6 +25,7 @@ import { FormDialog } from '@abumble/design-system/components/Dialog'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
+import { FORM_DIALOG_CLASS_WIDE, useEditDialogState } from '@/lib/dialog'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 
@@ -83,11 +89,11 @@ function LeaseDetailPage() {
 	const { data: prop } = usePropDetail(lease?.propertyId ?? null)
 	const { data: unit } = useUnitDetail(lease?.unitId ?? null)
 
-	const [editingLease, setEditingLease] = useState<Lease | null>(null)
+	const editDialog = useEditDialogState<Lease>()
 	const [wizardStep, setWizardStep] = useState<1 | 2 | 3>(2)
 
 	const handleEditClose = () => {
-		setEditingLease(null)
+		editDialog.close()
 		setWizardStep(2)
 	}
 
@@ -181,7 +187,7 @@ function LeaseDetailPage() {
 								lease={lease}
 								onEdit={() => {
 									setWizardStep(2)
-									setEditingLease(lease)
+									editDialog.edit(lease)
 								}}
 							/>
 						}
@@ -354,32 +360,33 @@ function LeaseDetailPage() {
 					)}
 
 					{/* Edit dialog (draft only) */}
-					{editingLease && editingLease.status === LeaseStatus.DRAFT && (
-						<FormDialog
-							open={!!editingLease}
-							onOpenChange={(open) => {
-								if (!open) handleEditClose()
-							}}
-							title="Edit lease"
-							description="Update lease details. Only draft leases can be edited."
-							className="max-w-[calc(100vw-2rem)] sm:max-w-5xl"
-							wizard={{
-								currentStep: wizardStep,
-								totalSteps: 3,
-								stepTitle: WIZARD_STEP_TITLES[wizardStep],
-								stepLabels: ['Details', 'Terms', 'Parameters'],
-							}}
-						>
-							<LeaseAgreementFormWizard
-								initialLease={editingLease}
-								step={wizardStep}
-								onStepChange={setWizardStep}
-								onSuccess={handleEditClose}
-								onCancel={handleEditClose}
-								submitLabel="Save"
-							/>
-						</FormDialog>
-					)}
+					{editDialog.editing &&
+						editDialog.editing.status === LeaseStatus.DRAFT && (
+							<FormDialog
+								open={editDialog.isOpen}
+								onOpenChange={(open) => {
+									if (!open) handleEditClose()
+								}}
+								title="Edit lease"
+								description="Update lease details. Only draft leases can be edited."
+								className={FORM_DIALOG_CLASS_WIDE}
+								wizard={{
+									currentStep: wizardStep,
+									totalSteps: 3,
+									stepTitle: WIZARD_STEP_TITLES[wizardStep],
+									stepLabels: ['Details', 'Terms', 'Parameters'],
+								}}
+							>
+								<LeaseAgreementFormWizard
+									initialLease={editDialog.editing}
+									step={wizardStep}
+									onStepChange={setWizardStep}
+									onSuccess={handleEditClose}
+									onCancel={handleEditClose}
+									submitLabel="Save"
+								/>
+							</FormDialog>
+						)}
 				</div>
 			)}
 		</DelayedLoadingFallback>

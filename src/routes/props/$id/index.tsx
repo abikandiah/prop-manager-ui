@@ -9,12 +9,13 @@ import {
 	usePropDetail,
 } from '@/features/props'
 import { formatAddress, formatDate, formatEnumLabel } from '@/lib/format'
+import { FORM_DIALOG_CLASS, useEditDialogState } from '@/lib/dialog'
 import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
 import { FormDialog } from '@abumble/design-system/components/Dialog'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/props/$id/')({
@@ -50,7 +51,7 @@ function PropLayout() {
 	const { id } = Route.useParams()
 
 	const { data: prop, isLoading, isError, error } = usePropDetail(id)
-	const [editingProp, setEditingProp] = useState<Prop | null>(null)
+	const editDialog = useEditDialogState<Prop>()
 
 	useEffect(() => {
 		if (isError) {
@@ -122,22 +123,22 @@ function PropLayout() {
 							</>
 						}
 						actions={
-							<PropActions prop={prop} onEdit={() => setEditingProp(prop)} />
+							<PropActions prop={prop} onEdit={() => editDialog.edit(prop)} />
 						}
 					/>
 
-					{editingProp && (
+					{editDialog.editing && (
 						<FormDialog
-							open={!!editingProp}
-							onOpenChange={() => setEditingProp(null)}
+							open={editDialog.isOpen}
+							onOpenChange={() => editDialog.close()}
 							title="Edit property"
-							description={`Update ${editingProp.legalName} details.`}
-							className="max-w-[calc(100vw-2rem)] sm:max-w-2xl"
+							description={`Update ${editDialog.editing!.legalName} details.`}
+							className={FORM_DIALOG_CLASS}
 						>
 							<PropsForm
-								initialProp={editingProp}
-								onSuccess={() => setEditingProp(null)}
-								onCancel={() => setEditingProp(null)}
+								initialProp={editDialog.editing}
+								onSuccess={editDialog.close}
+								onCancel={editDialog.close}
 								submitLabel="Update Property"
 							/>
 						</FormDialog>

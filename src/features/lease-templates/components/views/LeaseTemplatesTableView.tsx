@@ -55,7 +55,14 @@ export function LeaseTemplatesTableView({
 
 	const skeletonTable = (
 		<TableSkeleton
-			headers={['Name', 'Version', 'Status', 'Late fee', 'Notice period', 'Created']}
+			headers={[
+				'Name',
+				'Version',
+				'Status',
+				'Late fee',
+				'Notice period',
+				'Created',
+			]}
 			columnWidths={['w-48', 'w-16', 'w-16', 'w-24', 'w-20', 'w-24']}
 		/>
 	)

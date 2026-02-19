@@ -7,7 +7,8 @@ export const UnitStatus = {
 
 export type UnitStatus = (typeof UnitStatus)[keyof typeof UnitStatus]
 
-export const UNIT_STATUSES: ReadonlyArray<UnitStatus> = Object.values(UnitStatus)
+export const UNIT_STATUSES: ReadonlyArray<UnitStatus> =
+	Object.values(UnitStatus)
 
 export const UnitType = {
 	APARTMENT: 'APARTMENT',

@@ -7,7 +7,7 @@ import {
 } from '@abumble/design-system/components/Dialog'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Plus } from 'lucide-react'
-import { useState } from 'react'
+import { FORM_DIALOG_CLASS_WIDE, useWizardDialogState } from '@/lib/dialog'
 
 export const Route = createFileRoute('/leases/agreements/')({
 	component: RouteComponent,
@@ -21,15 +21,7 @@ const WIZARD_STEP_TITLES: Record<1 | 2 | 3, string> = {
 
 function RouteComponent() {
 	const navigate = useNavigate()
-	const [addOpen, setAddOpen] = useState(false)
-	const [wizardStep, setWizardStep] = useState<1 | 2 | 3>(1)
-
-	const handleOpenChange = (open: boolean) => {
-		setAddOpen(open)
-		if (!open) {
-			setWizardStep(1)
-		}
-	}
+	const wizard = useWizardDialogState()
 
 	return (
 		<>
@@ -40,15 +32,15 @@ function RouteComponent() {
 
 			<div>
 				<FormDialog
-					open={addOpen}
-					onOpenChange={handleOpenChange}
+					open={wizard.isOpen}
+					onOpenChange={wizard.handleOpenChange}
 					title="Add lease agreement"
 					description="Create a new signed lease agreement."
-					className="max-w-[calc(100vw-2rem)] sm:max-w-5xl"
+					className={FORM_DIALOG_CLASS_WIDE}
 					wizard={{
-						currentStep: wizardStep,
+						currentStep: wizard.step,
 						totalSteps: 3,
-						stepTitle: WIZARD_STEP_TITLES[wizardStep],
+						stepTitle: WIZARD_STEP_TITLES[wizard.step],
 						stepLabels: ['Details', 'Terms', 'Parameters'],
 					}}
 					trigger={
@@ -61,16 +53,16 @@ function RouteComponent() {
 					}
 				>
 					<LeaseAgreementFormWizard
-						step={wizardStep}
-						onStepChange={setWizardStep}
+						step={wizard.step}
+						onStepChange={wizard.setStep}
 						onSuccess={(lease) => {
-							setAddOpen(false)
+							wizard.close()
 							navigate({
 								to: '/leases/agreements/$leaseId',
 								params: { leaseId: lease.id },
 							})
 						}}
-						onCancel={() => setAddOpen(false)}
+						onCancel={wizard.close}
 						submitLabel="Create Lease"
 					/>
 				</FormDialog>

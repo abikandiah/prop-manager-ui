@@ -1,5 +1,4 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Button } from '@abumble/design-system/components/Button'
 import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
@@ -8,6 +7,7 @@ import {
 	FormDialog,
 } from '@abumble/design-system/components/Dialog'
 import { PropsForm, PropsTableView } from '@/features/props'
+import { FORM_DIALOG_CLASS, useDialogState } from '@/lib/dialog'
 
 export const Route = createFileRoute('/props/')({
 	component: RouteComponent,
@@ -15,7 +15,7 @@ export const Route = createFileRoute('/props/')({
 
 function RouteComponent() {
 	const navigate = useNavigate()
-	const [addOpen, setAddOpen] = useState(false)
+	const dialog = useDialogState()
 	return (
 		<>
 			<BannerHeader
@@ -32,11 +32,11 @@ function RouteComponent() {
 
 			<div>
 				<FormDialog
-					open={addOpen}
-					onOpenChange={setAddOpen}
+					open={dialog.isOpen}
+					onOpenChange={dialog.setIsOpen}
 					title="Add property"
 					description="Enter the legal name, address, and property details."
-					className="max-w-[calc(100vw-2rem)] sm:max-w-2xl"
+					className={FORM_DIALOG_CLASS}
 					trigger={
 						<DialogTrigger asChild>
 							<Button>
@@ -48,10 +48,10 @@ function RouteComponent() {
 				>
 					<PropsForm
 						onSuccess={(data) => {
-							setAddOpen(false)
+							dialog.close()
 							if (data) navigate({ to: '/props/$id', params: { id: data.id } })
 						}}
-						onCancel={() => setAddOpen(false)}
+						onCancel={dialog.close}
 						submitLabel="Create Property"
 					/>
 				</FormDialog>

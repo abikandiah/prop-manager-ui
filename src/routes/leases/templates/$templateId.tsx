@@ -1,5 +1,10 @@
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
-import { DETAIL_LABEL_CLASS, DetailField, EntityActions, TextLink } from '@/components/ui'
+import {
+	DETAIL_LABEL_CLASS,
+	DetailField,
+	EntityActions,
+	TextLink,
+} from '@/components/ui'
 import { config } from '@/config'
 import { LateFeeType } from '@/domain/lease'
 import type { LeaseTemplate } from '@/domain/lease-template'
@@ -17,6 +22,7 @@ import { FormDialog } from '@abumble/design-system/components/Dialog'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
+import { FORM_DIALOG_CLASS_WIDE, useEditDialogState } from '@/lib/dialog'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 
@@ -69,13 +75,11 @@ function LeaseTemplateDetailPage() {
 		error,
 	} = useLeaseTemplateDetail(templateId)
 
-	const [editingTemplate, setEditingTemplate] = useState<LeaseTemplate | null>(
-		null,
-	)
+	const editDialog = useEditDialogState<LeaseTemplate>()
 	const [wizardStep, setWizardStep] = useState<1 | 2 | 3>(1)
 
 	const handleEditClose = () => {
-		setEditingTemplate(null)
+		editDialog.close()
 		setWizardStep(1)
 	}
 
@@ -151,7 +155,7 @@ function LeaseTemplateDetailPage() {
 						actions={
 							<LeaseTemplateActions
 								template={template}
-								onEdit={() => setEditingTemplate(template)}
+								onEdit={() => editDialog.edit(template)}
 							/>
 						}
 					/>
@@ -255,13 +259,13 @@ function LeaseTemplateDetailPage() {
 						</div>
 					</div>
 
-					{editingTemplate && (
+					{editDialog.editing && (
 						<FormDialog
-							open={!!editingTemplate}
+							open={editDialog.isOpen}
 							onOpenChange={handleEditClose}
 							title="Edit template"
 							description="Update template details."
-							className="max-w-[calc(100vw-2rem)] sm:max-w-5xl"
+							className={FORM_DIALOG_CLASS_WIDE}
 							wizard={{
 								currentStep: wizardStep,
 								totalSteps: 3,
@@ -271,7 +275,7 @@ function LeaseTemplateDetailPage() {
 							<LeaseTemplateFormWizard
 								step={wizardStep}
 								onStepChange={setWizardStep}
-								initialTemplate={editingTemplate}
+								initialTemplate={editDialog.editing}
 								onSuccess={handleEditClose}
 								onCancel={handleEditClose}
 								submitLabel="Save"

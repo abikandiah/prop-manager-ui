@@ -20,6 +20,7 @@ import { useDeleteUnit, useUnitsList } from '@/features/units'
 import { usePropsList } from '@/features/props'
 import { config } from '@/config'
 import { formatCurrency, formatEnumLabel } from '@/lib/format'
+import { FORM_DIALOG_CLASS, useEditDialogState } from '@/lib/dialog'
 import type { Prop } from '@/domain/property'
 
 interface UnitGroup {
@@ -85,9 +86,7 @@ function PropertyGroupHeader({
 	const occupiedCount = units.filter(
 		(u) => u.status === UnitStatus.OCCUPIED,
 	).length
-	const vacantCount = units.filter(
-		(u) => u.status === UnitStatus.VACANT,
-	).length
+	const vacantCount = units.filter((u) => u.status === UnitStatus.VACANT).length
 	const address = prop?.address
 	const addressText = address
 		? `${address.city}, ${address.stateProvinceRegion}`
@@ -137,7 +136,7 @@ export function UnitsGroupedView() {
 	const { data: props, isLoading: propsLoading } = usePropsList()
 	const isLoading = unitsLoading || propsLoading
 
-	const [editingUnit, setEditingUnit] = useState<Unit | null>(null)
+	const editDialog = useEditDialogState<Unit>()
 	const [expandedIds, setExpandedIds] = useState<Set<string>>(
 		readExpandedFromStorage,
 	)
@@ -283,7 +282,7 @@ export function UnitsGroupedView() {
 														<TableCell onClick={(e) => e.stopPropagation()}>
 															<UnitRowActions
 																unit={unit}
-																onEdit={() => setEditingUnit(unit)}
+																onEdit={() => editDialog.edit(unit)}
 															/>
 														</TableCell>
 													</TableRow>
@@ -296,19 +295,19 @@ export function UnitsGroupedView() {
 					</Table>
 				</div>
 
-				{editingUnit && (
+				{editDialog.editing && (
 					<FormDialog
-						open={!!editingUnit}
-						onOpenChange={() => setEditingUnit(null)}
+						open={editDialog.isOpen}
+						onOpenChange={() => editDialog.close()}
 						title="Edit unit"
-						description={`Update unit ${editingUnit.unitNumber} details.`}
-						className="max-w-[calc(100vw-2rem)] sm:max-w-2xl"
+						description={`Update unit ${editDialog.editing!.unitNumber} details.`}
+						className={FORM_DIALOG_CLASS}
 					>
 						<UnitForm
-							propId={editingUnit.propertyId}
-							initialUnit={editingUnit}
-							onSuccess={() => setEditingUnit(null)}
-							onCancel={() => setEditingUnit(null)}
+							propId={editDialog.editing!.propertyId}
+							initialUnit={editDialog.editing}
+							onSuccess={editDialog.close}
+							onCancel={editDialog.close}
 							submitLabel="Save"
 						/>
 					</FormDialog>

@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Button } from '@abumble/design-system/components/Button'
 import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
@@ -12,21 +11,14 @@ import {
 	LeaseTemplateFormWizard,
 	LeaseTemplatesTableView,
 } from '@/features/lease-templates'
+import { FORM_DIALOG_CLASS_WIDE, useWizardDialogState } from '@/lib/dialog'
 
 export const Route = createFileRoute('/leases/templates/')({
 	component: RouteComponent,
 })
 
 function RouteComponent() {
-	const [addOpen, setAddOpen] = useState(false)
-	const [wizardStep, setWizardStep] = useState<1 | 2 | 3>(1)
-
-	const handleOpenChange = (open: boolean) => {
-		setAddOpen(open)
-		if (!open) {
-			setWizardStep(1)
-		}
-	}
+	const wizard = useWizardDialogState()
 
 	return (
 		<>
@@ -44,15 +36,15 @@ function RouteComponent() {
 
 			<div>
 				<FormDialog
-					open={addOpen}
-					onOpenChange={handleOpenChange}
+					open={wizard.isOpen}
+					onOpenChange={wizard.handleOpenChange}
 					title="Add lease template"
 					description="Create a new reusable lease template with standard terms."
-					className="max-w-[calc(100vw-2rem)] sm:max-w-5xl"
+					className={FORM_DIALOG_CLASS_WIDE}
 					wizard={{
-						currentStep: wizardStep,
+						currentStep: wizard.step,
 						totalSteps: 3,
-						stepTitle: LEASE_TEMPLATE_WIZARD_STEPS[wizardStep],
+						stepTitle: LEASE_TEMPLATE_WIZARD_STEPS[wizard.step],
 						stepLabels: ['Details', 'Parameters', 'Content'],
 					}}
 					trigger={
@@ -65,10 +57,10 @@ function RouteComponent() {
 					}
 				>
 					<LeaseTemplateFormWizard
-						step={wizardStep}
-						onStepChange={setWizardStep}
-						onSuccess={() => setAddOpen(false)}
-						onCancel={() => setAddOpen(false)}
+						step={wizard.step}
+						onStepChange={wizard.setStep}
+						onSuccess={wizard.close}
+						onCancel={wizard.close}
 						submitLabel="Create Template"
 					/>
 				</FormDialog>

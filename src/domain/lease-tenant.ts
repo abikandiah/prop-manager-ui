@@ -5,7 +5,8 @@ export const LeaseTenantRole = {
 	OCCUPANT: 'OCCUPANT',
 } as const
 
-export type LeaseTenantRole = (typeof LeaseTenantRole)[keyof typeof LeaseTenantRole]
+export type LeaseTenantRole =
+	(typeof LeaseTenantRole)[keyof typeof LeaseTenantRole]
 
 export const LEASE_TENANT_ROLES: ReadonlyArray<LeaseTenantRole> =
 	Object.values(LeaseTenantRole)

@@ -1,7 +1,10 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { leaseTenantKeys } from './keys'
 import { leaseTenantApi } from './api'
-import type { InviteLeaseTenantPayload, LeaseTenant } from '@/domain/lease-tenant'
+import type {
+	InviteLeaseTenantPayload,
+	LeaseTenant,
+} from '@/domain/lease-tenant'
 import { stableRequestId } from '@/lib/offline-types'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
 
@@ -31,7 +34,10 @@ export function useInviteLeaseTenants(leaseId: string) {
 		mutationKey: ['inviteLeaseTenants', leaseId],
 		networkMode: 'online',
 		mutationFn: (payload: InviteLeaseTenantPayload) => {
-			const requestId = stableRequestId(['inviteLeaseTenants', leaseId], payload)
+			const requestId = stableRequestId(
+				['inviteLeaseTenants', leaseId],
+				payload,
+			)
 			return leaseTenantApi.invite(leaseId, payload, {
 				[IDEMPOTENCY_HEADER]: requestId,
 			})

@@ -24,7 +24,7 @@ In dev, store a JWT in localStorage:
 
 ```typescript
 // Browser console — after running the backend dev server
-setDevToken('paste-jwt-here')  // from POST /api/dev/login
+setDevToken('paste-jwt-here') // from POST /api/dev/login
 ```
 
 The axios client (`src/api/client.ts`) reads `DEV_AUTH_TOKEN` from localStorage automatically.
@@ -33,18 +33,18 @@ The axios client (`src/api/client.ts`) reads `DEV_AUTH_TOKEN` from localStorage 
 
 ## Tech Stack
 
-| Concern | Library |
-|---|---|
-| Build | Vite 7 |
-| UI | React 19 |
-| Language | TypeScript (strict) |
-| Routing | TanStack Router (file-based) |
-| Data fetching / cache | TanStack Query + IndexedDB persistence |
-| Styling | Tailwind CSS v4, @abumble/design-system |
-| UI components | @abumble/design-system + Shadcn UI (new-york, zinc, CSS vars) |
-| HTTP client | Axios (with interceptors) |
-| Offline DB | Dexie (IndexedDB) |
-| Testing | Vitest + jsdom + Testing Library |
+| Concern               | Library                                                       |
+| --------------------- | ------------------------------------------------------------- |
+| Build                 | Vite 7                                                        |
+| UI                    | React 19                                                      |
+| Language              | TypeScript (strict)                                           |
+| Routing               | TanStack Router (file-based)                                  |
+| Data fetching / cache | TanStack Query + IndexedDB persistence                        |
+| Styling               | Tailwind CSS v4, @abumble/design-system                       |
+| UI components         | @abumble/design-system + Shadcn UI (new-york, zinc, CSS vars) |
+| HTTP client           | Axios (with interceptors)                                     |
+| Offline DB            | Dexie (IndexedDB)                                             |
+| Testing               | Vitest + jsdom + Testing Library                              |
 
 ---
 
@@ -96,27 +96,27 @@ Reference implementation: `src/features/props/`
 ```typescript
 // src/domain/property.ts
 export interface Prop {
-    id: string
-    legalName: string
-    address: Address
-    propertyType: PropertyType
-    version: number       // Required — sent back on updates
-    createdAt: string
-    updatedAt: string
+	id: string
+	legalName: string
+	address: Address
+	propertyType: PropertyType
+	version: number // Required — sent back on updates
+	createdAt: string
+	updatedAt: string
 }
 
 export interface CreatePropPayload {
-    id: string            // Client-generated UUID — ALWAYS include
-    legalName: string
-    address: AddressInput
-    propertyType: PropertyType
+	id: string // Client-generated UUID — ALWAYS include
+	legalName: string
+	address: AddressInput
+	propertyType: PropertyType
 }
 
 export interface UpdatePropPayload {
-    legalName?: string
-    address?: AddressInput
-    propertyType?: PropertyType
-    version: number       // Required — from last-read entity
+	legalName?: string
+	address?: AddressInput
+	propertyType?: PropertyType
+	version: number // Required — from last-read entity
 }
 ```
 
@@ -124,12 +124,16 @@ export interface UpdatePropPayload {
 
 ```typescript
 import { BaseService } from '@/api/base-service'
-import type { Prop, CreatePropPayload, UpdatePropPayload } from '@/domain/property'
+import type {
+	Prop,
+	CreatePropPayload,
+	UpdatePropPayload,
+} from '@/domain/property'
 
 class PropsApi extends BaseService<Prop, CreatePropPayload, UpdatePropPayload> {
-    constructor() {
-        super('props') // maps to /api/props
-    }
+	constructor() {
+		super('props') // maps to /api/props
+	}
 }
 
 export const propsApi = new PropsApi()
@@ -141,11 +145,11 @@ export const propsApi = new PropsApi()
 
 ```typescript
 export const propKeys = {
-    all: ['props'] as const,
-    lists: () => [...propKeys.all, 'list'] as const,
-    list: () => propKeys.lists(),
-    details: () => [...propKeys.all, 'detail'] as const,
-    detail: (id: string) => [...propKeys.details(), id] as const,
+	all: ['props'] as const,
+	lists: () => [...propKeys.all, 'list'] as const,
+	list: () => propKeys.lists(),
+	details: () => [...propKeys.all, 'detail'] as const,
+	detail: (id: string) => [...propKeys.details(), id] as const,
 }
 ```
 
@@ -153,18 +157,18 @@ export const propKeys = {
 
 ```typescript
 export function usePropsList() {
-    return useQuery({
-        queryKey: propKeys.list(),
-        queryFn: () => propsApi.list(),
-    })
+	return useQuery({
+		queryKey: propKeys.list(),
+		queryFn: () => propsApi.list(),
+	})
 }
 
 export function usePropById(id: string) {
-    return useQuery({
-        queryKey: propKeys.detail(id),
-        queryFn: () => propsApi.getById(id),
-        enabled: !!id,
-    })
+	return useQuery({
+		queryKey: propKeys.detail(id),
+		queryFn: () => propsApi.getById(id),
+		enabled: !!id,
+	})
 }
 ```
 
@@ -172,34 +176,42 @@ export function usePropById(id: string) {
 
 ```typescript
 export function useCreateProp() {
-    const queryClient = useQueryClient()
-    return useMutation({
-        mutationKey: ['createProp'],
-        networkMode: 'online',     // Pause offline, auto-resume on reconnect
-        mutationFn: (payload: CreatePropPayload) => {
-            const requestId = stableRequestId(['createProp'], payload)
-            return propsApi.create(payload, { [IDEMPOTENCY_HEADER]: requestId })
-        },
-        onMutate: async (payload) => {
-            await queryClient.cancelQueries({ queryKey: propKeys.list() })
-            const previous = queryClient.getQueryData<Prop[]>(propKeys.list())
-            // Use payload.id — client pre-generated the ID
-            const optimistic: Prop = { ...payload, version: 0, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() }
-            queryClient.setQueryData(propKeys.list(), (old: Prop[] | undefined) =>
-                old ? [...old, optimistic] : [optimistic])
-            return { previous }
-        },
-        onError: (_err, _payload, context) => {
-            if (context?.previous) queryClient.setQueryData(propKeys.list(), context.previous)
-        },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: propKeys.all })
-        },
-    })
+	const queryClient = useQueryClient()
+	return useMutation({
+		mutationKey: ['createProp'],
+		networkMode: 'online', // Pause offline, auto-resume on reconnect
+		mutationFn: (payload: CreatePropPayload) => {
+			const requestId = stableRequestId(['createProp'], payload)
+			return propsApi.create(payload, { [IDEMPOTENCY_HEADER]: requestId })
+		},
+		onMutate: async (payload) => {
+			await queryClient.cancelQueries({ queryKey: propKeys.list() })
+			const previous = queryClient.getQueryData<Prop[]>(propKeys.list())
+			// Use payload.id — client pre-generated the ID
+			const optimistic: Prop = {
+				...payload,
+				version: 0,
+				createdAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
+			}
+			queryClient.setQueryData(propKeys.list(), (old: Prop[] | undefined) =>
+				old ? [...old, optimistic] : [optimistic],
+			)
+			return { previous }
+		},
+		onError: (_err, _payload, context) => {
+			if (context?.previous)
+				queryClient.setQueryData(propKeys.list(), context.previous)
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: propKeys.all })
+		},
+	})
 }
 ```
 
 **Key rules:**
+
 - `networkMode: 'online'` on **all** mutations
 - `stableRequestId()` + `IDEMPOTENCY_HEADER` on every mutation call
 - Call `generateId()` **before** building the payload (in the form component's submit handler)
@@ -213,12 +225,12 @@ import { generateId } from '@/lib'
 
 // In form submit handler or buildCreatePayload()
 function handleSubmit(values: FormValues) {
-    const payload: CreatePropPayload = {
-        id: generateId(),    // Real UUID sent to backend — NOT a temporary ID
-        legalName: values.legalName,
-        // ...
-    }
-    createProp(payload)
+	const payload: CreatePropPayload = {
+		id: generateId(), // Real UUID sent to backend — NOT a temporary ID
+		legalName: values.legalName,
+		// ...
+	}
+	createProp(payload)
 }
 ```
 
@@ -231,11 +243,11 @@ API errors come as RFC 7807 `ProblemDetail`. The axios client throws on non-2xx 
 ```typescript
 // In a mutation's onError or component error boundary
 function handleApiError(error: unknown) {
-    if (axios.isAxiosError(error)) {
-        const problem = error.response?.data
-        // problem.status, problem.title, problem.detail
-        // problem.errors: [{ field, message }] for validation failures
-    }
+	if (axios.isAxiosError(error)) {
+		const problem = error.response?.data
+		// problem.status, problem.title, problem.detail
+		// problem.errors: [{ field, message }] for validation failures
+	}
 }
 
 // Show validation errors from a 400 response
@@ -284,8 +296,8 @@ User-facing text must be **conversational and layperson**:
 ```typescript
 // src/config/index.ts — for values that vary by environment/deployment
 export const config = {
-    apiBaseUrl: import.meta.env.VITE_API_BASE_URL ?? '',
-    queryCacheStaleTimeMs: 5 * 60 * 1000,
+	apiBaseUrl: import.meta.env.VITE_API_BASE_URL ?? '',
+	queryCacheStaleTimeMs: 5 * 60 * 1000,
 }
 
 // In-module constants — for fixed domain/protocol values
@@ -361,13 +373,13 @@ import { describe, it, expect } from 'vitest'
 import { formatCurrency } from '@/lib/format'
 
 describe('formatCurrency', () => {
-    it('formats positive amounts', () => {
-        expect(formatCurrency(1234.56)).toBe('$1,234.56')
-    })
+	it('formats positive amounts', () => {
+		expect(formatCurrency(1234.56)).toBe('$1,234.56')
+	})
 
-    it('handles zero', () => {
-        expect(formatCurrency(0)).toBe('$0.00')
-    })
+	it('handles zero', () => {
+		expect(formatCurrency(0)).toBe('$0.00')
+	})
 })
 ```
 

@@ -121,10 +121,7 @@ export function LeaseParametersStep({
 						<div className="grid gap-3">
 							{parameterKeys.map((key) => (
 								<div key={key} className="space-y-2">
-									<Label
-										htmlFor={`param-${key}`}
-										className="font-mono text-xs"
-									>
+									<Label htmlFor={`param-${key}`} className="font-mono text-xs">
 										{'{{'}
 										{key}
 										{'}}'}

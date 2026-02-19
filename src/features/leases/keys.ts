@@ -4,8 +4,7 @@ export const leaseTenantKeys = {
 	all: ['leaseTenants'] as const,
 	lists: () => [...leaseTenantKeys.all, 'list'] as const,
 	/** Scoped to a single lease — the only granularity we need. */
-	list: (leaseId: string) =>
-		[...leaseTenantKeys.lists(), leaseId] as const,
+	list: (leaseId: string) => [...leaseTenantKeys.lists(), leaseId] as const,
 }
 
 export const leaseKeys = {

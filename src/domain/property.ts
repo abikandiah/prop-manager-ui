@@ -12,7 +12,8 @@ export const PropertyType = {
 
 export type PropertyType = (typeof PropertyType)[keyof typeof PropertyType]
 
-export const PROPERTY_TYPES: ReadonlyArray<PropertyType> = Object.values(PropertyType)
+export const PROPERTY_TYPES: ReadonlyArray<PropertyType> =
+	Object.values(PropertyType)
 
 /** API response for a property. Matches backend PropResponse (addressId/address null when address not set). */
 export interface Prop {

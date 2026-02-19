@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useRef } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import {
@@ -17,6 +17,7 @@ import { EntityActions, TableSkeleton } from '@/components/ui'
 import { useDeleteUnit, useUnitsByPropId, useUnitsList } from '@/features/units'
 import { config } from '@/config'
 import { formatCurrency, formatEnumLabel } from '@/lib/format'
+import { FORM_DIALOG_CLASS, useEditDialogState } from '@/lib/dialog'
 
 function UnitRowActions({ unit, onEdit }: { unit: Unit; onEdit: () => void }) {
 	const deleteUnit = useDeleteUnit()
@@ -58,7 +59,7 @@ export function UnitsTableView({ propId }: UnitsTableViewProps) {
 		isError,
 		error,
 	} = propId ? unitsByProp : unitsAll
-	const [editingUnit, setEditingUnit] = useState<Unit | null>(null)
+	const editDialog = useEditDialogState<Unit>()
 
 	const handleRowClick = (unit: Unit) => {
 		navigate({
@@ -142,7 +143,7 @@ export function UnitsTableView({ propId }: UnitsTableViewProps) {
 										<TableCell onClick={(e) => e.stopPropagation()}>
 											<UnitRowActions
 												unit={unit}
-												onEdit={() => setEditingUnit(unit)}
+												onEdit={() => editDialog.edit(unit)}
 											/>
 										</TableCell>
 									</TableRow>
@@ -152,19 +153,19 @@ export function UnitsTableView({ propId }: UnitsTableViewProps) {
 					</Table>
 				</div>
 
-				{editingUnit && (
+				{editDialog.editing && (
 					<FormDialog
-						open={!!editingUnit}
-						onOpenChange={() => setEditingUnit(null)}
+						open={editDialog.isOpen}
+						onOpenChange={() => editDialog.close()}
 						title="Edit unit"
-						description={`Update unit ${editingUnit.unitNumber} details.`}
-						className="max-w-[calc(100vw-2rem)] sm:max-w-2xl"
+						description={`Update unit ${editDialog.editing!.unitNumber} details.`}
+						className={FORM_DIALOG_CLASS}
 					>
 						<UnitForm
 							propId={propId}
-							initialUnit={editingUnit}
-							onSuccess={() => setEditingUnit(null)}
-							onCancel={() => setEditingUnit(null)}
+							initialUnit={editDialog.editing}
+							onSuccess={editDialog.close}
+							onCancel={editDialog.close}
 							submitLabel="Save"
 						/>
 					</FormDialog>

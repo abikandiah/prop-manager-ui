@@ -1,5 +1,8 @@
 import { api } from '@/api/client'
-import type { LeaseTenant, InviteLeaseTenantPayload } from '@/domain/lease-tenant'
+import type {
+	LeaseTenant,
+	InviteLeaseTenantPayload,
+} from '@/domain/lease-tenant'
 
 const endpoint = (leaseId: string) => `leases/${leaseId}/tenants`
 

@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
 import { Plus } from 'lucide-react'
 import { Button } from '@abumble/design-system/components/Button'
 import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
@@ -8,13 +7,14 @@ import {
 	FormDialog,
 } from '@abumble/design-system/components/Dialog'
 import { UnitForm, UnitsGroupedView } from '@/features/units'
+import { FORM_DIALOG_CLASS, useDialogState } from '@/lib/dialog'
 
 export const Route = createFileRoute('/units/')({
 	component: UnitsPage,
 })
 
 function UnitsPage() {
-	const [addOpen, setAddOpen] = useState(false)
+	const dialog = useDialogState()
 	return (
 		<div className="space-y-6">
 			<BannerHeader
@@ -24,11 +24,11 @@ function UnitsPage() {
 
 			<div>
 				<FormDialog
-					open={addOpen}
-					onOpenChange={setAddOpen}
+					open={dialog.isOpen}
+					onOpenChange={dialog.setIsOpen}
 					title="Add unit"
 					description="Select a property and enter the unit details."
-					className="max-w-[calc(100vw-2rem)] sm:max-w-2xl"
+					className={FORM_DIALOG_CLASS}
 					trigger={
 						<DialogTrigger asChild>
 							<Button>
@@ -39,8 +39,8 @@ function UnitsPage() {
 					}
 				>
 					<UnitForm
-						onSuccess={() => setAddOpen(false)}
-						onCancel={() => setAddOpen(false)}
+						onSuccess={dialog.close}
+						onCancel={dialog.close}
 						submitLabel="Create Unit"
 					/>
 				</FormDialog>

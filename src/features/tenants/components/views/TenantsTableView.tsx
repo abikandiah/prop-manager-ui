@@ -78,7 +78,11 @@ export function TenantsTableView() {
 										{tenant.phoneNumber ?? '—'}
 									</TableCell>
 									<TableCell className="text-muted-foreground">
-										{tenant.hasPets == null ? '—' : tenant.hasPets ? 'Yes' : 'No'}
+										{tenant.hasPets == null
+											? '—'
+											: tenant.hasPets
+												? 'Yes'
+												: 'No'}
 									</TableCell>
 								</TableRow>
 							))

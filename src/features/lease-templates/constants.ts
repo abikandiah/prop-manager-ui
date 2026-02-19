@@ -62,7 +62,8 @@ export function buildLeaseSystemParameters(context: {
 	if (context.endDate) vals.end_date = context.endDate
 	if (context.rentAmount) vals.rent_amount = `$${context.rentAmount}`
 	if (context.rentDueDay) vals.rent_due_day = context.rentDueDay
-	if (context.securityDeposit) vals.security_deposit = `$${context.securityDeposit}`
+	if (context.securityDeposit)
+		vals.security_deposit = `$${context.securityDeposit}`
 	return vals
 }
 

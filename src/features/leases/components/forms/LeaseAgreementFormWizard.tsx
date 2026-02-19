@@ -33,9 +33,6 @@ const leaseFormSchema = z
 		leaseTemplateId: z.string().min(1, 'Template is required'),
 		propertyId: z.string().min(1, 'Property is required'),
 		unitId: z.string().min(1, 'Unit is required'),
-		tenantEmails: z
-			.array(z.email())
-			.min(1, 'At least one tenant email is required'),
 		startDate: z.string().min(1, 'Start date is required'),
 		endDate: z.string().min(1, 'End date is required'),
 		// Step 2 fields
@@ -81,7 +78,6 @@ const STEP_1_FIELDS: Array<keyof LeaseFormValues> = [
 	'leaseTemplateId',
 	'propertyId',
 	'unitId',
-	'tenantEmails',
 	'startDate',
 	'endDate',
 ]
@@ -99,7 +95,6 @@ const defaultValues: LeaseFormValues = {
 	leaseTemplateId: '',
 	propertyId: '',
 	unitId: '',
-	tenantEmails: [],
 	startDate: '',
 	endDate: '',
 	rentAmount: '',
@@ -116,7 +111,6 @@ function leaseToFormValues(lease: Lease): LeaseFormValues {
 		leaseTemplateId: lease.leaseTemplateId ?? '',
 		propertyId: lease.propertyId,
 		unitId: lease.unitId,
-		tenantEmails: [],
 		startDate: lease.startDate,
 		endDate: lease.endDate,
 		rentAmount: String(lease.rentAmount),
@@ -273,7 +267,6 @@ export function LeaseAgreementFormWizard({
 						id: initialLease.id,
 						payload: {
 							...terms,
-							tenantEmails: values.tenantEmails,
 							version: initialLease.version,
 						},
 						unitId: initialLease.unitId,
@@ -296,7 +289,6 @@ export function LeaseAgreementFormWizard({
 						leaseTemplateId: values.leaseTemplateId,
 						propertyId: values.propertyId,
 						unitId: values.unitId,
-						tenantEmails: values.tenantEmails,
 						...terms,
 						templateParameters: terms.templateParameters ?? undefined,
 					},

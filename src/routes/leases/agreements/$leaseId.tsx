@@ -1,12 +1,11 @@
-import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-import ReactMarkdown from 'react-markdown'
-import { Skeleton } from '@abumble/design-system/components/Skeleton'
-import { Badge } from '@abumble/design-system/components/Badge'
-import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
-import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
-import { FormDialog } from '@abumble/design-system/components/Dialog'
+import { CenteredEmptyState } from '@/components/CenteredEmptyState'
+import {
+	DETAIL_LABEL_CLASS,
+	DetailField,
+	EntityActions,
+	TextLink,
+} from '@/components/ui'
+import { config } from '@/config'
 import type { Lease } from '@/domain/lease'
 import { LateFeeType, LeaseStatus } from '@/domain/lease'
 import {
@@ -18,14 +17,15 @@ import {
 import { usePropDetail } from '@/features/props'
 import { useUnitDetail } from '@/features/units'
 import { formatCurrency, formatDate, formatEnumLabel } from '@/lib/format'
-import {
-	DETAIL_LABEL_CLASS,
-	DetailField,
-	EntityActions,
-	TextLink,
-} from '@/components/ui'
-import { config } from '@/config'
-import { CenteredEmptyState } from '@/components/CenteredEmptyState'
+import { Badge } from '@abumble/design-system/components/Badge'
+import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
+import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
+import { FormDialog } from '@abumble/design-system/components/Dialog'
+import { Skeleton } from '@abumble/design-system/components/Skeleton'
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import { toast } from 'sonner'
 
 export const Route = createFileRoute('/leases/agreements/$leaseId')({
 	component: LeaseDetailPage,
@@ -300,20 +300,6 @@ function LeaseDetailPage() {
 								</div>
 							)}
 
-						{/* Executed content markdown */}
-						{lease.executedContentMarkdown && (
-							<div className="md:col-span-2 lg:col-span-3 border-t pt-4">
-								<label className={DETAIL_LABEL_CLASS}>Lease Content</label>
-								<div className="mt-2 rounded-md border bg-muted/20 p-6">
-									<div className="prose prose-sm dark:prose-invert max-w-none">
-										<ReactMarkdown>
-											{lease.executedContentMarkdown}
-										</ReactMarkdown>
-									</div>
-								</div>
-							</div>
-						)}
-
 						{/* Metadata */}
 						<div className="md:col-span-2 lg:col-span-3 border-t pt-4">
 							<div className="grid gap-x-8 gap-y-4 sm:grid-cols-3">
@@ -326,6 +312,20 @@ function LeaseDetailPage() {
 								</DetailField>
 							</div>
 						</div>
+
+						{/* Executed content markdown */}
+						{lease.executedContentMarkdown && (
+							<div className="md:col-span-2 lg:col-span-3 pt-4">
+								<label className={DETAIL_LABEL_CLASS}>Lease Content</label>
+								<div className="mt-2 rounded-md border bg-muted/20 p-6">
+									<div className="prose prose-sm dark:prose-invert max-w-none">
+										<ReactMarkdown>
+											{lease.executedContentMarkdown}
+										</ReactMarkdown>
+									</div>
+								</div>
+							</div>
+						)}
 					</div>
 
 					{/* Edit dialog (draft only) */}

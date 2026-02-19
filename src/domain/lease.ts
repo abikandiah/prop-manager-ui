@@ -54,13 +54,12 @@ export interface Lease {
 
 // --- Lease Requests ---
 
-/** Stamps a new lease from a template */
+/** Stamps a new lease from a template. Tenants are invited separately via POST /api/leases/{id}/tenants/invite. */
 export interface CreateLeasePayload {
 	id: string // Client-generated UUID for idempotency
 	leaseTemplateId: string
 	unitId: string
 	propertyId: string
-	tenantEmails: Array<string>
 	startDate: string
 	endDate: string
 	rentAmount: number
@@ -84,7 +83,6 @@ export interface UpdateLeasePayload {
 	lateFeeType?: LateFeeType | null
 	lateFeeAmount?: number | null
 	noticePeriodDays?: number | null
-	tenantEmails?: Array<string>
 	/** Allow the owner to tweak the stamped content before sending for review */
 	executedContentMarkdown?: string | null
 	templateParameters?: Record<string, string> | null

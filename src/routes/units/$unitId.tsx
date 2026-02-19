@@ -8,13 +8,8 @@ import { FormDialog } from '@abumble/design-system/components/Dialog'
 import type { Unit } from '@/domain/unit'
 import { usePropDetail } from '@/features/props'
 import { UnitForm, useDeleteUnit, useUnitDetail } from '@/features/units'
-import { formatCurrency, formatEnumLabel } from '@/lib/format'
-import {
-	DetailField,
-	DETAIL_LABEL_CLASS,
-	EntityActions,
-	TextLink,
-} from '@/components/ui'
+import { formatCurrency, formatDate, formatEnumLabel } from '@/lib/format'
+import { DetailField, EntityActions, TextLink } from '@/components/ui'
 import { config } from '@/config'
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
 
@@ -83,13 +78,31 @@ function UnitDetailPage() {
 				<Skeleton className="h-9 w-9 rounded" />
 				<Skeleton className="h-8 w-48" />
 			</div>
-			<div className="grid gap-x-8 gap-y-6 md:grid-cols-2 lg:grid-cols-3">
-				{[1, 2, 3, 4, 5, 6].map((i) => (
-					<div key={i} className="space-y-2">
-						<Skeleton className="h-4 w-24" />
-						<Skeleton className="h-6 w-full" />
+			<div className="grid gap-4 lg:grid-cols-[1fr_260px]">
+				<div className="flex flex-col gap-4">
+					{[3, 3].map((count, si) => (
+						<div key={si} className="rounded-lg border bg-card px-5 py-4">
+							<div className="grid gap-4 sm:grid-cols-3">
+								{Array.from({ length: count }).map((_, i) => (
+									<div key={i} className="space-y-2">
+										<Skeleton className="h-3 w-20" />
+										<Skeleton className="h-5 w-full" />
+									</div>
+								))}
+							</div>
+						</div>
+					))}
+				</div>
+				<div className="rounded-lg border bg-card px-5 py-4">
+					<div className="flex flex-col gap-4">
+						{[1, 2, 3].map((i) => (
+							<div key={i} className="space-y-2">
+								<Skeleton className="h-3 w-16" />
+								<Skeleton className="h-5 w-full" />
+							</div>
+						))}
 					</div>
-				))}
+				</div>
 			</div>
 		</div>
 	)
@@ -129,87 +142,103 @@ function UnitDetailPage() {
 						}
 					/>
 
-					<div className="grid gap-x-8 gap-y-6 md:grid-cols-2 lg:grid-cols-3">
-						{/* Group: Primary Info */}
-						<div className="space-y-6">
-							<DetailField
-								label="Unit Number"
-								valueClassName="text-lg font-semibold text-foreground"
-							>
-								{unit.unitNumber}
-							</DetailField>
-							<DetailField label="Status">
-								{formatEnumLabel(unit.status)}
-							</DetailField>
-							<DetailField
-								label="Property"
-								valueClassName="text-foreground font-medium"
-							>
-								{prop?.legalName ?? '—'}
-							</DetailField>
-						</div>
-
-						{/* Group: Financials */}
-						<div className="space-y-6">
-							<DetailField label="Rent">
-								{formatCurrency(unit.rentAmount)}
-							</DetailField>
-							<DetailField label="Security Deposit">
-								{unit.securityDeposit != null
-									? formatCurrency(unit.securityDeposit)
-									: '—'}
-							</DetailField>
-						</div>
-
-						{/* Group: Specs */}
-						<div className="space-y-6">
-							<DetailField label="Beds / Baths">
-								{unit.bedrooms ?? '—'} / {unit.bathrooms ?? '—'}
-							</DetailField>
-							<DetailField label="Square Footage">
-								{unit.squareFootage != null
-									? `${unit.squareFootage.toLocaleString()} sq ft`
-									: '—'}
-							</DetailField>
-						</div>
-
-						{/* Group: Features (Full width on small, grid-col span on large) */}
-						<div className="md:col-span-2 lg:col-span-3 border-t pt-4">
-							<label className={DETAIL_LABEL_CLASS}>Features</label>
-							<div className="mt-2 flex flex-wrap gap-2">
-								{[
-									unit.balcony && 'Balcony',
-									unit.laundryInUnit && 'Laundry in unit',
-									unit.hardwoodFloors && 'Hardwood floors',
-								]
-									.filter(Boolean)
-									.map((feature) => (
-										<span
-											key={feature as string}
-											className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary"
-										>
-											{feature}
-										</span>
-									))}
-								{!unit.balcony &&
-									!unit.laundryInUnit &&
-									!unit.hardwoodFloors && (
-										<p className="text-muted-foreground">No features listed</p>
-									)}
+					{/* Two-column body */}
+					<div className="grid gap-4 lg:grid-cols-[1fr_260px]">
+						{/* Left: main detail sections */}
+						<div className="flex flex-col gap-4">
+							{/* Primary Info & Specs */}
+							<div className="rounded-lg border bg-card px-5 py-4">
+								<div className="grid gap-4 sm:grid-cols-3">
+									<DetailField
+										label="Unit Number"
+										valueClassName="text-lg font-semibold text-foreground"
+									>
+										{unit.unitNumber}
+									</DetailField>
+									<DetailField label="Status">
+										{formatEnumLabel(unit.status)}
+									</DetailField>
+									<DetailField
+										label="Property"
+										valueClassName="text-foreground font-medium"
+									>
+										{prop?.legalName ?? '—'}
+									</DetailField>
+									<DetailField label="Rent">
+										{formatCurrency(unit.rentAmount)}
+									</DetailField>
+									<DetailField label="Security Deposit">
+										{unit.securityDeposit != null
+											? formatCurrency(unit.securityDeposit)
+											: '—'}
+									</DetailField>
+									<DetailField label="Beds / Baths">
+										{unit.bedrooms ?? '—'} / {unit.bathrooms ?? '—'}
+									</DetailField>
+									<DetailField label="Square Footage">
+										{unit.squareFootage != null
+											? `${unit.squareFootage.toLocaleString()} sq ft`
+											: '—'}
+									</DetailField>
+								</div>
 							</div>
-						</div>
 
-						{/* Group: Description (Full Width) */}
-						{unit.description && (
-							<div className="md:col-span-2 lg:col-span-3 border-t pt-4">
-								<DetailField
-									label="Description"
-									valueClassName="text-foreground whitespace-pre-wrap leading-relaxed"
-								>
-									{unit.description}
+							{/* Features */}
+							<div className="rounded-lg border bg-card px-5 py-4">
+								<DetailField label="Features">
+									<div className="flex flex-wrap gap-2">
+										{[
+											unit.balcony && 'Balcony',
+											unit.laundryInUnit && 'Laundry in unit',
+											unit.hardwoodFloors && 'Hardwood floors',
+										]
+											.filter(Boolean)
+											.map((feature) => (
+												<span
+													key={feature as string}
+													className="inline-flex items-center rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary"
+												>
+													{feature}
+												</span>
+											))}
+										{!unit.balcony &&
+											!unit.laundryInUnit &&
+											!unit.hardwoodFloors && (
+												<p className="text-muted-foreground">
+													No features listed
+												</p>
+											)}
+									</div>
 								</DetailField>
 							</div>
-						)}
+
+							{/* Description — conditional */}
+							{unit.description && (
+								<div className="rounded-lg border bg-card px-5 py-4">
+									<DetailField
+										label="Description"
+										valueClassName="text-foreground whitespace-pre-wrap leading-relaxed"
+									>
+										{unit.description}
+									</DetailField>
+								</div>
+							)}
+						</div>
+
+						{/* Right: metadata sidebar */}
+						<div className="flex flex-col gap-4">
+							<div className="rounded-lg border bg-card px-5 py-4">
+								<div className="flex flex-col gap-4">
+									<DetailField label="Version">v{unit.version}</DetailField>
+									<DetailField label="Created">
+										{formatDate(unit.createdAt)}
+									</DetailField>
+									<DetailField label="Last Updated">
+										{formatDate(unit.updatedAt)}
+									</DetailField>
+								</div>
+							</div>
+						</div>
 					</div>
 
 					{editingUnit && (

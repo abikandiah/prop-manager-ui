@@ -1,10 +1,5 @@
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
-import {
-	DETAIL_LABEL_CLASS,
-	DetailField,
-	EntityActions,
-	TextLink,
-} from '@/components/ui'
+import { DETAIL_LABEL_CLASS, DetailField, EntityActions, TextLink } from '@/components/ui'
 import { config } from '@/config'
 import type { Lease } from '@/domain/lease'
 import { LateFeeType, LeaseStatus } from '@/domain/lease'
@@ -112,13 +107,33 @@ function LeaseDetailPage() {
 			<div className="flex gap-2">
 				<Skeleton className="h-6 w-20 rounded-full" />
 			</div>
-			<div className="grid gap-x-8 gap-y-6 md:grid-cols-2 lg:grid-cols-3">
-				{[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-					<div key={i} className="space-y-2">
-						<Skeleton className="h-4 w-24" />
-						<Skeleton className="h-6 w-full" />
+			<div className="grid gap-4 lg:grid-cols-[1fr_260px]">
+				<div className="flex flex-col gap-4">
+					{[3, 3, 3].map((count, si) => (
+						<div key={si} className="rounded-lg border bg-card px-5 py-4">
+							<Skeleton className="mb-4 h-3 w-32" />
+							<div className="grid gap-4 sm:grid-cols-2">
+								{Array.from({ length: count }).map((_, i) => (
+									<div key={i} className="space-y-2">
+										<Skeleton className="h-3 w-20" />
+										<Skeleton className="h-5 w-full" />
+									</div>
+								))}
+							</div>
+						</div>
+					))}
+				</div>
+				<div className="rounded-lg border bg-card px-5 py-4">
+					<Skeleton className="mb-4 h-3 w-24" />
+					<div className="flex flex-col gap-4">
+						{[1, 2, 3].map((i) => (
+							<div key={i} className="space-y-2">
+								<Skeleton className="h-3 w-16" />
+								<Skeleton className="h-5 w-full" />
+							</div>
+						))}
 					</div>
-				))}
+				</div>
 			</div>
 		</div>
 	)
@@ -181,152 +196,157 @@ function LeaseDetailPage() {
 						<LeaseStatusActions lease={lease} />
 					</div>
 
-					{/* Detail grid */}
-					<div className="grid gap-x-8 gap-y-6 md:grid-cols-2 lg:grid-cols-3">
-						{/* Col 1: Template & property/unit */}
-						<div className="space-y-6">
-							<DetailField label="Template">
-								{lease.leaseTemplateName || '—'}
-								{lease.leaseTemplateVersionTag && (
-									<span className="ml-2 text-xs text-muted-foreground">
-										v{lease.leaseTemplateVersionTag}
-									</span>
-								)}
-							</DetailField>
-							<DetailField label="Property">
-								{prop ? (
-									<TextLink to="/props/$id" params={{ id: lease.propertyId }}>
-										{prop.legalName}
-									</TextLink>
-								) : (
-									'—'
-								)}
-							</DetailField>
-							<DetailField label="Unit">
-								{unit ? (
-									<TextLink
-										to="/units/$unitId"
-										params={{ unitId: lease.unitId }}
-									>
-										Unit {unit.unitNumber}
-									</TextLink>
-								) : (
-									'—'
-								)}
-							</DetailField>
-						</div>
-
-						{/* Col 2: Financial terms */}
-						<div className="space-y-6">
-							<DetailField
-								label="Monthly Rent"
-								valueClassName="text-lg font-semibold text-foreground"
-							>
-								{formatCurrency(lease.rentAmount)}
-							</DetailField>
-							<DetailField label="Rent Due Day">
-								{lease.rentDueDay
-									? `Day ${lease.rentDueDay} of each month`
-									: '—'}
-							</DetailField>
-							<DetailField label="Security Deposit">
-								{lease.securityDepositHeld != null
-									? formatCurrency(lease.securityDepositHeld)
-									: '—'}
-							</DetailField>
-						</div>
-
-						{/* Col 3: Lease terms & dates */}
-						<div className="space-y-6">
-							<DetailField label="Start Date">
-								{formatDate(lease.startDate)}
-							</DetailField>
-							<DetailField label="End Date">
-								{formatDate(lease.endDate)}
-							</DetailField>
-							<DetailField label="Notice Period">
-								{lease.noticePeriodDays != null
-									? `${lease.noticePeriodDays} days`
-									: '—'}
-							</DetailField>
-						</div>
-
-						{/* Late fee — full row on its own if present */}
-						{(lease.lateFeeType || lease.lateFeeAmount != null) && (
-							<div className="md:col-span-2 lg:col-span-3 border-t pt-4">
-								<div className="grid gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
-									<DetailField label="Late Fee Type">
-										{lease.lateFeeType
-											? formatEnumLabel(lease.lateFeeType)
-											: '—'}
+					{/* Two-column body */}
+					<div className="grid gap-4 lg:grid-cols-[1fr_260px]">
+						{/* Left: main detail sections */}
+						<div className="flex flex-col gap-4">
+							{/* Property & Unit */}
+							<div className="rounded-lg border bg-card px-5 py-4">
+								<div className="grid gap-4 sm:grid-cols-2">
+									<DetailField label="Property">
+										{prop ? (
+											<TextLink
+												to="/props/$id"
+												params={{ id: lease.propertyId }}
+											>
+												{prop.legalName}
+											</TextLink>
+										) : (
+											'—'
+										)}
 									</DetailField>
-									<DetailField label="Late Fee Amount">
-										{lease.lateFeeAmount != null
-											? lease.lateFeeType === LateFeeType.PERCENTAGE
-												? `${lease.lateFeeAmount}%`
-												: formatCurrency(lease.lateFeeAmount)
-											: '—'}
+									<DetailField label="Unit">
+										{unit ? (
+											<TextLink
+												to="/units/$unitId"
+												params={{ unitId: lease.unitId }}
+											>
+												Unit {unit.unitNumber}
+											</TextLink>
+										) : (
+											'—'
+										)}
 									</DetailField>
 								</div>
 							</div>
-						)}
 
-						{/* Template parameters */}
-						{lease.templateParameters &&
-							Object.keys(lease.templateParameters).length > 0 && (
-								<div className="md:col-span-2 lg:col-span-3 border-t pt-4">
-									<label className={DETAIL_LABEL_CLASS}>
-										Template Parameters
-									</label>
-									<div className="mt-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-										{Object.entries(lease.templateParameters).map(
-											([key, value]) => (
-												<div
-													key={key}
-													className="rounded-md border bg-muted/30 p-3"
-												>
-													<p className="text-xs font-mono text-muted-foreground">
-														{'{{'}
-														{key}
-														{'}}'}
-													</p>
-													<p className="mt-1 text-sm font-medium text-foreground">
-														{value || '—'}
-													</p>
-												</div>
-											),
+							{/* Lease Period, Financial Terms & Late Fees */}
+							<div className="rounded-lg border bg-card px-5 py-4">
+								<div className="grid gap-4 sm:grid-cols-3">
+									<DetailField
+										label="Monthly Rent"
+										valueClassName="text-lg font-semibold text-foreground"
+									>
+										{formatCurrency(lease.rentAmount)}
+									</DetailField>
+									<DetailField label="Rent Due Day">
+										{lease.rentDueDay
+											? `Day ${lease.rentDueDay} of each month`
+											: '—'}
+									</DetailField>
+									<DetailField label="Security Deposit">
+										{lease.securityDepositHeld != null
+											? formatCurrency(lease.securityDepositHeld)
+											: '—'}
+									</DetailField>
+									<DetailField label="Start Date">
+										{formatDate(lease.startDate)}
+									</DetailField>
+									<DetailField label="End Date">
+										{formatDate(lease.endDate)}
+									</DetailField>
+									<DetailField label="Notice Period">
+										{lease.noticePeriodDays != null
+											? `${lease.noticePeriodDays} days`
+											: '—'}
+									</DetailField>
+									{(lease.lateFeeType || lease.lateFeeAmount != null) && (
+										<>
+											<DetailField label="Late Fee Type">
+												{lease.lateFeeType
+													? formatEnumLabel(lease.lateFeeType)
+													: '—'}
+											</DetailField>
+											<DetailField label="Late Fee Amount">
+												{lease.lateFeeAmount != null
+													? lease.lateFeeType === LateFeeType.PERCENTAGE
+														? `${lease.lateFeeAmount}%`
+														: formatCurrency(lease.lateFeeAmount)
+													: '—'}
+											</DetailField>
+										</>
+									)}
+								</div>
+							</div>
+
+							{/* Template & Parameters — conditional */}
+							{(lease.leaseTemplateName ||
+								(lease.templateParameters &&
+									Object.keys(lease.templateParameters).length > 0)) && (
+								<div className="rounded-lg border bg-card px-5 py-4">
+									<DetailField label="Template">
+										{lease.leaseTemplateName || '—'}
+										{lease.leaseTemplateVersionTag && (
+											<span className="ml-2 text-xs text-muted-foreground">
+												v{lease.leaseTemplateVersionTag}
+											</span>
 										)}
-									</div>
+									</DetailField>
+									{lease.templateParameters &&
+										Object.keys(lease.templateParameters).length > 0 && (
+											<div className="mt-4">
+												<p className={`${DETAIL_LABEL_CLASS} mb-3`}>
+													Parameters
+												</p>
+												<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+													{Object.entries(lease.templateParameters).map(
+														([key, value]) => (
+															<div
+																key={key}
+																className="rounded-md border bg-muted/30 p-3"
+															>
+																<p className="text-xs font-mono text-muted-foreground">
+																	{'{{'}
+																	{key}
+																	{'}}'}
+																</p>
+																<p className="mt-1 text-sm font-medium text-foreground">
+																	{value || '—'}
+																</p>
+															</div>
+														),
+													)}
+												</div>
+											</div>
+										)}
 								</div>
 							)}
-
-						{/* Metadata */}
-						<div className="md:col-span-2 lg:col-span-3 border-t pt-4">
-							<div className="grid gap-x-8 gap-y-4 sm:grid-cols-3">
-								<DetailField label="Version">v{lease.version}</DetailField>
-								<DetailField label="Created">
-									{formatDate(lease.createdAt)}
-								</DetailField>
-								<DetailField label="Last Updated">
-									{formatDate(lease.updatedAt)}
-								</DetailField>
-							</div>
 						</div>
 
-						{/* Executed content markdown */}
-						{lease.executedContentMarkdown && (
-							<div className="md:col-span-2 lg:col-span-3 border-t pt-4">
-								<label className={DETAIL_LABEL_CLASS}>Lease Content</label>
-								<div className="mt-2 rounded-md border bg-muted/20 p-6">
-									<div className="prose prose-sm dark:prose-invert max-w-none">
-										<ReactMarkdown>
-											{lease.executedContentMarkdown}
-										</ReactMarkdown>
-									</div>
+						{/* Right: metadata sidebar */}
+						<div className="flex flex-col gap-4">
+							<div className="rounded-lg border bg-card px-5 py-4">
+								<div className="flex flex-col gap-4">
+									<DetailField label="Version">v{lease.version}</DetailField>
+									<DetailField label="Created">
+										{formatDate(lease.createdAt)}
+									</DetailField>
+									<DetailField label="Last Updated">
+										{formatDate(lease.updatedAt)}
+									</DetailField>
 								</div>
 							</div>
-						)}
+						</div>
 					</div>
+
+					{/* Executed content markdown — full width */}
+					{lease.executedContentMarkdown && (
+						<div className="rounded-lg bg-card px-5 py-4">
+							<div className="prose prose-sm dark:prose-invert max-w-none">
+								<ReactMarkdown>{lease.executedContentMarkdown}</ReactMarkdown>
+							</div>
+						</div>
+					)}
 
 					{/* Edit dialog (draft only) */}
 					{editingLease && editingLease.status === LeaseStatus.DRAFT && (

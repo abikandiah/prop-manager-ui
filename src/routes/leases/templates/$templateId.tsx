@@ -1,14 +1,8 @@
-import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-import ReactMarkdown from 'react-markdown'
-import { Skeleton } from '@abumble/design-system/components/Skeleton'
-import { Badge } from '@abumble/design-system/components/Badge'
-import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
-import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
-import { FormDialog } from '@abumble/design-system/components/Dialog'
-import type { LeaseTemplate } from '@/domain/lease-template'
+import { CenteredEmptyState } from '@/components/CenteredEmptyState'
+import { DETAIL_LABEL_CLASS, DetailField, EntityActions, TextLink } from '@/components/ui'
+import { config } from '@/config'
 import { LateFeeType } from '@/domain/lease'
+import type { LeaseTemplate } from '@/domain/lease-template'
 import {
 	LEASE_TEMPLATE_WIZARD_STEPS,
 	LeaseTemplateFormWizard,
@@ -16,14 +10,15 @@ import {
 	useLeaseTemplateDetail,
 } from '@/features/lease-templates'
 import { formatCurrency, formatDate, formatEnumLabel } from '@/lib/format'
-import {
-	DETAIL_LABEL_CLASS,
-	DetailField,
-	EntityActions,
-	TextLink,
-} from '@/components/ui'
-import { config } from '@/config'
-import { CenteredEmptyState } from '@/components/CenteredEmptyState'
+import { Badge } from '@abumble/design-system/components/Badge'
+import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
+import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
+import { FormDialog } from '@abumble/design-system/components/Dialog'
+import { Skeleton } from '@abumble/design-system/components/Skeleton'
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import { toast } from 'sonner'
 
 export const Route = createFileRoute('/leases/templates/$templateId')({
 	component: LeaseTemplateDetailPage,
@@ -99,13 +94,31 @@ function LeaseTemplateDetailPage() {
 				<Skeleton className="h-9 w-9 rounded" />
 				<Skeleton className="h-8 w-48" />
 			</div>
-			<div className="grid gap-x-8 gap-y-6 md:grid-cols-2 lg:grid-cols-3">
-				{[1, 2, 3, 4, 5, 6].map((i) => (
-					<div key={i} className="space-y-2">
-						<Skeleton className="h-4 w-24" />
-						<Skeleton className="h-6 w-full" />
+			<div className="grid gap-4 lg:grid-cols-[1fr_260px]">
+				<div className="flex flex-col gap-4">
+					{[3, 3].map((count, si) => (
+						<div key={si} className="rounded-lg border bg-card px-5 py-4">
+							<div className="grid gap-4 sm:grid-cols-2">
+								{Array.from({ length: count }).map((_, i) => (
+									<div key={i} className="space-y-2">
+										<Skeleton className="h-3 w-20" />
+										<Skeleton className="h-5 w-full" />
+									</div>
+								))}
+							</div>
+						</div>
+					))}
+				</div>
+				<div className="rounded-lg border bg-card px-5 py-4">
+					<div className="flex flex-col gap-4">
+						{[1, 2, 3].map((i) => (
+							<div key={i} className="space-y-2">
+								<Skeleton className="h-3 w-16" />
+								<Skeleton className="h-5 w-full" />
+							</div>
+						))}
 					</div>
-				))}
+				</div>
 			</div>
 		</div>
 	)
@@ -153,86 +166,95 @@ function LeaseTemplateDetailPage() {
 						</Badge>
 					</div>
 
-					<div className="grid gap-x-8 gap-y-6 md:grid-cols-2 lg:grid-cols-3">
-						{/* Group: Template Info */}
-						<div className="space-y-6">
-							<DetailField
-								label="Template Name"
-								valueClassName="text-lg font-semibold text-foreground"
-							>
-								{template.name}
-							</DetailField>
-							<DetailField label="Version Tag">
-								{template.versionTag || '—'}
-							</DetailField>
-						</div>
-
-						{/* Group: Default Terms */}
-						<div className="space-y-6">
-							<DetailField label="Default Late Fee Type">
-								{template.defaultLateFeeType ? formatEnumLabel(template.defaultLateFeeType) : '—'}
-							</DetailField>
-							<DetailField label="Default Late Fee Amount">
-								{template.defaultLateFeeAmount != null
-									? template.defaultLateFeeType === LateFeeType.PERCENTAGE
-										? `${template.defaultLateFeeAmount}%`
-										: formatCurrency(template.defaultLateFeeAmount)
-									: '—'}
-							</DetailField>
-							<DetailField label="Default Notice Period">
-								{template.defaultNoticePeriodDays != null
-									? `${template.defaultNoticePeriodDays} days`
-									: '—'}
-							</DetailField>
-						</div>
-
-						{/* Group: Metadata */}
-						<div className="space-y-6">
-							<DetailField label="Version">v{template.version}</DetailField>
-							<DetailField label="Created">
-								{formatDate(template.createdAt)}
-							</DetailField>
-							<DetailField label="Last Updated">
-								{formatDate(template.updatedAt)}
-							</DetailField>
-						</div>
-
-						{/* Group: Template Parameters (Full width) */}
-						{Object.keys(template.templateParameters).length > 0 && (
-							<div className="md:col-span-2 lg:col-span-3 border-t pt-4">
-								<label className={DETAIL_LABEL_CLASS}>
-									Template Parameters
-								</label>
-								<div className="mt-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-									{Object.entries(template.templateParameters).map(
-										([key, value]) => (
-											<div
-												key={key}
-												className="rounded-md border bg-muted/30 p-3"
-											>
-												<p className="text-xs font-mono text-muted-foreground">
-													{'{{'}
-													{key}
-													{'}}'}
-												</p>
-												<p className="mt-1 text-sm font-medium text-foreground">
-													{value || '—'}
-												</p>
-											</div>
-										),
-									)}
+					{/* Two-column body */}
+					<div className="grid gap-4 lg:grid-cols-[1fr_260px]">
+						{/* Left: main detail sections */}
+						<div className="flex flex-col gap-4">
+							{/* Template Info */}
+							<div className="rounded-lg border bg-card px-5 py-4">
+								<div className="grid gap-4 sm:grid-cols-2">
+									<DetailField
+										label="Template Name"
+										valueClassName="text-lg font-semibold text-foreground"
+									>
+										{template.name}
+									</DetailField>
+									<DetailField label="Version Tag">
+										{template.versionTag || '—'}
+									</DetailField>
 								</div>
 							</div>
-						)}
 
-						{/* Group: Template Markdown Content (Full width) */}
-						<div className="md:col-span-2 lg:col-span-3 border-t pt-4">
-							<label className={DETAIL_LABEL_CLASS}>Template Content</label>
-							<div className="mt-2 rounded-md border bg-muted/20 p-6">
-								<div className="prose prose-sm dark:prose-invert max-w-none">
-									<ReactMarkdown>{template.templateMarkdown}</ReactMarkdown>
+							{/* Default Terms */}
+							<div className="rounded-lg border bg-card px-5 py-4">
+								<div className="grid gap-4 sm:grid-cols-3">
+									<DetailField label="Default Late Fee Type">
+										{template.defaultLateFeeType
+											? formatEnumLabel(template.defaultLateFeeType)
+											: '—'}
+									</DetailField>
+									<DetailField label="Default Late Fee Amount">
+										{template.defaultLateFeeAmount != null
+											? template.defaultLateFeeType === LateFeeType.PERCENTAGE
+												? `${template.defaultLateFeeAmount}%`
+												: formatCurrency(template.defaultLateFeeAmount)
+											: '—'}
+									</DetailField>
+									<DetailField label="Default Notice Period">
+										{template.defaultNoticePeriodDays != null
+											? `${template.defaultNoticePeriodDays} days`
+											: '—'}
+									</DetailField>
 								</div>
 							</div>
+
+							{/* Template Parameters — conditional */}
+							{Object.keys(template.templateParameters).length > 0 && (
+								<div className="rounded-lg border bg-card px-5 py-4">
+									<p className={`${DETAIL_LABEL_CLASS} mb-3`}>Parameters</p>
+									<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+										{Object.entries(template.templateParameters).map(
+											([key, value]) => (
+												<div
+													key={key}
+													className="rounded-md border bg-muted/30 p-3"
+												>
+													<p className="text-xs font-mono text-muted-foreground">
+														{'{{'}
+														{key}
+														{'}}'}
+													</p>
+													<p className="mt-1 text-sm font-medium text-foreground">
+														{value || '—'}
+													</p>
+												</div>
+											),
+										)}
+									</div>
+								</div>
+							)}
+						</div>
+
+						{/* Right: metadata sidebar */}
+						<div className="flex flex-col gap-4">
+							<div className="rounded-lg border bg-card px-5 py-4">
+								<div className="flex flex-col gap-4">
+									<DetailField label="Version">v{template.version}</DetailField>
+									<DetailField label="Created">
+										{formatDate(template.createdAt)}
+									</DetailField>
+									<DetailField label="Last Updated">
+										{formatDate(template.updatedAt)}
+									</DetailField>
+								</div>
+							</div>
+						</div>
+					</div>
+
+					{/* Template Content — full width */}
+					<div className="rounded-lg bg-card px-5 py-4">
+						<div className="prose prose-sm dark:prose-invert max-w-none">
+							<ReactMarkdown>{template.templateMarkdown}</ReactMarkdown>
 						</div>
 					</div>
 

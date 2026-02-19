@@ -1,10 +1,6 @@
-import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
-import { toast } from 'sonner'
-import { Skeleton } from '@abumble/design-system/components/Skeleton'
-import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
-import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
-import { FormDialog } from '@abumble/design-system/components/Dialog'
+import { CenteredEmptyState } from '@/components/CenteredEmptyState'
+import { DetailField, EntityActions, TextLink } from '@/components/ui'
+import { config } from '@/config'
 import type { Prop } from '@/domain/property'
 import {
 	AddressDisplay,
@@ -12,15 +8,14 @@ import {
 	useDeleteProp,
 	usePropDetail,
 } from '@/features/props'
-import { formatAddress, formatEnumLabel } from '@/lib/format'
-import {
-	DetailField,
-	DETAIL_LABEL_CLASS,
-	EntityActions,
-	TextLink,
-} from '@/components/ui'
-import { config } from '@/config'
-import { CenteredEmptyState } from '@/components/CenteredEmptyState'
+import { formatAddress, formatDate, formatEnumLabel } from '@/lib/format'
+import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
+import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
+import { FormDialog } from '@abumble/design-system/components/Dialog'
+import { Skeleton } from '@abumble/design-system/components/Skeleton'
+import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
+import { toast } from 'sonner'
 
 export const Route = createFileRoute('/props/$id/')({
 	component: PropLayout,
@@ -72,29 +67,30 @@ function PropLayout() {
 				<Skeleton className="h-9 w-9 rounded" />
 				<Skeleton className="h-8 w-48" />
 			</div>
-			<div className="grid gap-x-8 gap-y-6 md:grid-cols-2">
-				<div className="space-y-6">
-					{[1, 2].map((i) => (
-						<div key={i} className="space-y-2">
-							<Skeleton className="h-4 w-24" />
-							<Skeleton className="h-6 w-48" />
+			<div className="grid gap-4 lg:grid-cols-[1fr_260px]">
+				<div className="flex flex-col gap-4">
+					{[3, 2].map((count, si) => (
+						<div key={si} className="rounded-lg border bg-card px-5 py-4">
+							<div className="grid gap-4 sm:grid-cols-2">
+								{Array.from({ length: count }).map((_, i) => (
+									<div key={i} className="space-y-2">
+										<Skeleton className="h-3 w-20" />
+										<Skeleton className="h-5 w-full" />
+									</div>
+								))}
+							</div>
 						</div>
 					))}
 				</div>
-				<div className="grid grid-cols-2 gap-6">
-					{[1, 2, 3].map((i) => (
-						<div
-							key={i}
-							className={i === 3 ? 'col-span-2 space-y-2' : 'space-y-2'}
-						>
-							<Skeleton className="h-4 w-24" />
-							<Skeleton className="h-6 w-full" />
-						</div>
-					))}
-				</div>
-				<div className="md:col-span-2 pt-4 border-t space-y-2">
-					<Skeleton className="h-4 w-24" />
-					<Skeleton className="h-6 w-full" />
+				<div className="rounded-lg border bg-card px-5 py-4">
+					<div className="flex flex-col gap-4">
+						{[1, 2, 3].map((i) => (
+							<div key={i} className="space-y-2">
+								<Skeleton className="h-3 w-16" />
+								<Skeleton className="h-5 w-full" />
+							</div>
+						))}
+					</div>
 				</div>
 			</div>
 		</div>
@@ -149,62 +145,76 @@ function PropLayout() {
 						</FormDialog>
 					)}
 
-					<div className="grid gap-x-8 gap-y-6 md:grid-cols-2">
-						{/* Group: Primary Info */}
-						<div className="space-y-6">
-							<DetailField
-								label="Legal Name"
-								valueClassName="text-lg font-semibold text-foreground"
-							>
-								{prop.legalName}
-							</DetailField>
-							<DetailField label="Property Type">
-								{formatEnumLabel(prop.propertyType)}
-							</DetailField>
-						</div>
+					{/* Two-column body */}
+					<div className="grid gap-4 lg:grid-cols-[1fr_260px]">
+						{/* Left: main detail sections */}
+						<div className="flex flex-col gap-4">
+							{/* Primary Info & Details */}
+							<div className="rounded-lg border bg-card px-5 py-4">
+								<div className="grid gap-4 sm:grid-cols-2">
+									<DetailField
+										label="Legal Name"
+										valueClassName="text-lg font-semibold text-foreground"
+									>
+										{prop.legalName}
+									</DetailField>
+									<DetailField label="Property Type">
+										{formatEnumLabel(prop.propertyType)}
+									</DetailField>
+									<DetailField label="Total Area">
+										{prop.totalArea != null
+											? `${prop.totalArea.toLocaleString()} sq ft`
+											: '—'}
+									</DetailField>
+									<DetailField label="Year Built">
+										{prop.yearBuilt ?? '—'}
+									</DetailField>
+									<DetailField
+										label="Parcel Number"
+										valueClassName="text-foreground font-mono"
+									>
+										{prop.parcelNumber ?? '—'}
+									</DetailField>
+								</div>
+							</div>
 
-						{/* Group: Details */}
-						<div className="grid grid-cols-2 gap-6">
-							<DetailField label="Total Area">
-								{prop.totalArea != null
-									? `${prop.totalArea.toLocaleString()} sq ft`
-									: '—'}
-							</DetailField>
-							<DetailField label="Year Built">
-								{prop.yearBuilt ?? '—'}
-							</DetailField>
-							<div className="col-span-2">
-								<DetailField
-									label="Parcel Number"
-									valueClassName="text-foreground font-mono"
-								>
-									{prop.parcelNumber ?? '—'}
+							{/* Location */}
+							<div className="rounded-lg border bg-card px-5 py-4">
+								<DetailField label="Location">
+									<AddressDisplay
+										address={prop.address}
+										className="text-foreground"
+									/>
 								</DetailField>
 							</div>
+
+							{/* Description — conditional */}
+							{prop.description && (
+								<div className="rounded-lg border bg-card px-5 py-4">
+									<DetailField
+										label="Description"
+										valueClassName="text-foreground whitespace-pre-wrap leading-relaxed"
+									>
+										{prop.description}
+									</DetailField>
+								</div>
+							)}
 						</div>
 
-						{/* Group: Location (Full Width) */}
-						<div className="md:col-span-2 border-t pt-4">
-							<label className={DETAIL_LABEL_CLASS}>Location</label>
-							<div className="mt-2">
-								<AddressDisplay
-									address={prop.address}
-									className="text-foreground"
-								/>
+						{/* Right: metadata sidebar */}
+						<div className="flex flex-col gap-4">
+							<div className="rounded-lg border bg-card px-5 py-4">
+								<div className="flex flex-col gap-4">
+									<DetailField label="Version">v{prop.version}</DetailField>
+									<DetailField label="Created">
+										{formatDate(prop.createdAt)}
+									</DetailField>
+									<DetailField label="Last Updated">
+										{formatDate(prop.updatedAt)}
+									</DetailField>
+								</div>
 							</div>
 						</div>
-
-						{/* Group: Description (Full Width) */}
-						{prop.description && (
-							<div className="md:col-span-2 border-t pt-4">
-								<DetailField
-									label="Description"
-									valueClassName="text-foreground whitespace-pre-wrap leading-relaxed"
-								>
-									{prop.description}
-								</DetailField>
-							</div>
-						)}
 					</div>
 				</div>
 			)}

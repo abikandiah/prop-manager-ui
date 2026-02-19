@@ -1,12 +1,16 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { leaseKeys } from './keys'
-import { leasesApi } from './api'
+import { leaseKeys, leaseTenantKeys } from './keys'
+import { leasesApi, leaseTenantApi } from './api'
 import type {
 	CreateLeasePayload,
 	Lease,
 	UpdateLeasePayload,
 } from '@/domain/lease'
 import { LeaseStatus } from '@/domain/lease'
+import type {
+	InviteLeaseTenantPayload,
+	LeaseTenant,
+} from '@/domain/lease-tenant'
 import { stableRequestId } from '@/lib/offline-types'
 import { nowIso } from '@/lib/util'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
@@ -482,3 +486,107 @@ export const useTerminateLease = makeLeaseStatusTransitionHook(
 	LeaseStatus.TERMINATED,
 	'Terminate lease',
 )
+
+// --- Lease Tenant Queries ---
+
+/** Fetch all tenants for a single lease. */
+export function useLeaseTenants(leaseId: string | null) {
+	return useQuery({
+		queryKey: leaseTenantKeys.list(leaseId!),
+		queryFn: () => leaseTenantApi.listByLeaseId(leaseId!),
+		enabled: leaseId != null,
+	})
+}
+
+// --- Lease Tenant Mutations ---
+
+export type InviteTenantsVariables = {
+	leaseId: string
+	payload: InviteLeaseTenantPayload
+}
+
+/**
+ * Invite one or more tenants to a DRAFT lease.
+ * No optimistic update — the server creates both the Invite and LeaseTenant records atomically,
+ * so we invalidate on settle to show the real server state.
+ */
+export function useInviteLeaseTenants() {
+	const queryClient = useQueryClient()
+
+	return useMutation({
+		mutationKey: ['inviteLeaseTenants'],
+		networkMode: 'online',
+		mutationFn: ({ leaseId, payload }: InviteTenantsVariables) => {
+			const requestId = stableRequestId(['inviteLeaseTenants'], {
+				leaseId,
+				...payload,
+			})
+			return leaseTenantApi.invite(leaseId, payload, {
+				[IDEMPOTENCY_HEADER]: requestId,
+			})
+		},
+		onError: (err) => {
+			console.error('[Mutation] Invite lease tenants failed:', err)
+		},
+		onSettled: (_data, _error, { leaseId }) => {
+			queryClient.invalidateQueries({
+				queryKey: leaseTenantKeys.list(leaseId),
+			})
+		},
+	})
+}
+
+export type RemoveLeaseTenantVariables = {
+	leaseId: string
+	leaseTenantId: string
+}
+
+/**
+ * Remove a tenant from a DRAFT lease (only permitted when they haven't signed).
+ * Optimistically removes the row from cache; rolls back on error.
+ */
+export function useRemoveLeaseTenant() {
+	const queryClient = useQueryClient()
+
+	return useMutation({
+		mutationKey: ['removeLeaseTenant'],
+		networkMode: 'online',
+		mutationFn: ({ leaseId, leaseTenantId }: RemoveLeaseTenantVariables) => {
+			const requestId = stableRequestId(['removeLeaseTenant'], {
+				leaseId,
+				leaseTenantId,
+			})
+			return leaseTenantApi.remove(leaseId, leaseTenantId, {
+				[IDEMPOTENCY_HEADER]: requestId,
+			})
+		},
+		onMutate: async ({ leaseId, leaseTenantId }) => {
+			await queryClient.cancelQueries({
+				queryKey: leaseTenantKeys.list(leaseId),
+			})
+			const previous = queryClient.getQueryData<Array<LeaseTenant>>(
+				leaseTenantKeys.list(leaseId),
+			)
+			queryClient.setQueryData(
+				leaseTenantKeys.list(leaseId),
+				(old: Array<LeaseTenant> | undefined) =>
+					old?.filter((t) => t.id !== leaseTenantId) ?? [],
+			)
+			return { previous }
+		},
+		onError: (err, { leaseId }, context) => {
+			if (context?.previous) {
+				queryClient.setQueryData(
+					leaseTenantKeys.list(leaseId),
+					context.previous,
+				)
+			}
+			console.error('[Mutation] Remove lease tenant failed:', err)
+		},
+		onSettled: (_data, _error, { leaseId }) => {
+			queryClient.invalidateQueries({
+				queryKey: leaseTenantKeys.list(leaseId),
+			})
+		},
+	})
+}

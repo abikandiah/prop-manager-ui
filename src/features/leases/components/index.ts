@@ -1,3 +1,5 @@
 export * from './forms/LeaseAgreementFormWizard'
+export * from './forms/InviteTenantsForm'
 export * from './views/LeasesTableView'
+export * from './views/LeaseTenantsList'
 export * from './LeaseStatusActions'

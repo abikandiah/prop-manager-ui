@@ -3,6 +3,10 @@ import type {
 	Lease,
 	UpdateLeasePayload,
 } from '@/domain/lease'
+import type {
+	InviteLeaseTenantPayload,
+	LeaseTenant,
+} from '@/domain/lease-tenant'
 import { api } from '@/api/client'
 import { BaseService } from '@/api/base-service'
 
@@ -59,3 +63,47 @@ class LeasesApi extends BaseService<
 }
 
 export const leasesApi = new LeasesApi()
+
+// --- Lease Tenants ---
+
+class LeaseTenantApi {
+	private endpoint(leaseId: string): string {
+		return `leases/${leaseId}/tenants`
+	}
+
+	/** List all tenants for a lease. */
+	async listByLeaseId(leaseId: string): Promise<Array<LeaseTenant>> {
+		const res = await api.get<Array<LeaseTenant>>(this.endpoint(leaseId))
+		return res.data
+	}
+
+	/**
+	 * Invite one or more tenants to a DRAFT lease.
+	 * Returns the newly created LeaseTenant records.
+	 */
+	async invite(
+		leaseId: string,
+		payload: InviteLeaseTenantPayload,
+		headers?: Record<string, string>,
+	): Promise<Array<LeaseTenant>> {
+		const res = await api.post<Array<LeaseTenant>>(
+			`${this.endpoint(leaseId)}/invite`,
+			payload,
+			{ headers },
+		)
+		return res.data
+	}
+
+	/** Remove a tenant from a DRAFT lease (only allowed if they haven't signed). */
+	async remove(
+		leaseId: string,
+		leaseTenantId: string,
+		headers?: Record<string, string>,
+	): Promise<void> {
+		await api.delete(`${this.endpoint(leaseId)}/${leaseTenantId}`, {
+			headers,
+		})
+	}
+}
+
+export const leaseTenantApi = new LeaseTenantApi()

@@ -5,6 +5,7 @@ import type { Lease } from '@/domain/lease'
 import { LateFeeType, LeaseStatus } from '@/domain/lease'
 import {
 	LeaseAgreementFormWizard,
+	LeaseTenantsList,
 	LeaseStatusActions,
 	useDeleteLease,
 	useLeaseDetail,
@@ -276,6 +277,12 @@ function LeaseDetailPage() {
 									)}
 								</div>
 							</div>
+
+							{/* Tenants */}
+							<LeaseTenantsList
+								leaseId={lease.id}
+								isDraft={lease.status === LeaseStatus.DRAFT}
+							/>
 
 							{/* Template & Parameters — conditional */}
 							{(lease.leaseTemplateName ||

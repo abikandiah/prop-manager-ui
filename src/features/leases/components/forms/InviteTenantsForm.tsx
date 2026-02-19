@@ -10,7 +10,6 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 import { LEASE_TENANT_ROLES, LeaseTenantRole } from '@/domain/lease-tenant'
 import { FieldError } from '@/components/ui/FieldError'
-import { RequiredMark } from '@/components/ui'
 import { formatEnumLabel } from '@/lib/format'
 import { useInviteLeaseTenants } from '@/features/leases/hooks'
 
@@ -80,116 +79,118 @@ export function InviteTenantsForm({
 					)
 					onSuccess()
 				},
-				onError: () => {
-					toast.error('Failed to send invitations. Please try again.')
-				},
 			},
 		)
 	}
 
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} noValidate>
-			<div className="space-y-3">
-				{/* Column headers */}
-				<div className="grid grid-cols-[1fr_160px_32px] gap-3 px-1">
-					<p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-						Email <RequiredMark />
-					</p>
-					<p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-						Role <RequiredMark />
-					</p>
-					{/* spacer for remove button column */}
-					<span />
+			<div className="space-y-4 mt-4">
+				{/* Table */}
+				<div className="rounded-lg border overflow-hidden">
+					{/* Header */}
+					<div className="grid grid-cols-[1fr_148px_36px] gap-3 border-b bg-muted/50 px-3 py-2">
+						<p className="text-xs font-medium text-muted-foreground">Email</p>
+						<p className="text-xs font-medium text-muted-foreground">Role</p>
+						<span />
+					</div>
+
+					{/* Rows */}
+					<div className="divide-y">
+						{fields.map((field, index) => (
+							<div
+								key={field.id}
+								className="grid grid-cols-[1fr_148px_36px] items-start gap-3 px-3 py-2.5"
+							>
+								{/* Email */}
+								<div className="space-y-1">
+									<Label htmlFor={`invites.${index}.email`} className="sr-only">
+										Email for person {index + 1}
+									</Label>
+									<Input
+										id={`invites.${index}.email`}
+										{...register(`invites.${index}.email`)}
+										type="email"
+										placeholder="tenant@example.com"
+										autoComplete="off"
+									/>
+									<FieldError
+										message={errors.invites?.[index]?.email?.message}
+									/>
+								</div>
+
+								{/* Role */}
+								<div className="space-y-1">
+									<Label htmlFor={`invites.${index}.role`} className="sr-only">
+										Role for person {index + 1}
+									</Label>
+									<Select
+										id={`invites.${index}.role`}
+										{...register(`invites.${index}.role`)}
+									>
+										{LEASE_TENANT_ROLES.map((r) => (
+											<option key={r} value={r}>
+												{formatEnumLabel(r)}
+											</option>
+										))}
+									</Select>
+									<FieldError
+										message={errors.invites?.[index]?.role?.message}
+									/>
+								</div>
+
+								{/* Remove */}
+								<div className="flex items-center pt-0.5">
+									<Button
+										type="button"
+										variant="ghost"
+										size="icon"
+										className="size-8 shrink-0 text-muted-foreground hover:text-destructive"
+										onClick={() => remove(index)}
+										disabled={fields.length === 1}
+										aria-label={`Remove person ${index + 1}`}
+									>
+										<Trash2 className="size-4" />
+									</Button>
+								</div>
+							</div>
+						))}
+					</div>
+
+					{/* Add row */}
+					<div className="border-t px-3 py-2">
+						<Button
+							type="button"
+							variant="ghost"
+							size="sm"
+							className="h-8 text-muted-foreground hover:text-foreground"
+							onClick={() => append({ ...DEFAULT_ROW })}
+							disabled={isPending}
+						>
+							<Plus className="size-4" />
+							Add another person
+						</Button>
+					</div>
 				</div>
 
-				{/* Invite rows */}
-				{fields.map((field, index) => (
-					<div
-						key={field.id}
-						className="grid grid-cols-[1fr_160px_32px] items-start gap-3"
+				<DialogFooter>
+					<Button
+						type="button"
+						variant="outline"
+						onClick={onCancel}
+						disabled={isPending}
 					>
-						{/* Email */}
-						<div className="space-y-1">
-							<Label htmlFor={`invites.${index}.email`} className="sr-only">
-								Email for row {index + 1}
-							</Label>
-							<Input
-								id={`invites.${index}.email`}
-								{...register(`invites.${index}.email`)}
-								type="email"
-								placeholder="tenant@example.com"
-								autoComplete="off"
-							/>
-							<FieldError message={errors.invites?.[index]?.email?.message} />
-						</div>
-
-						{/* Role */}
-						<div className="space-y-1">
-							<Label htmlFor={`invites.${index}.role`} className="sr-only">
-								Role for row {index + 1}
-							</Label>
-							<Select
-								id={`invites.${index}.role`}
-								{...register(`invites.${index}.role`)}
-							>
-								{LEASE_TENANT_ROLES.map((r) => (
-									<option key={r} value={r}>
-										{formatEnumLabel(r)}
-									</option>
-								))}
-							</Select>
-							<FieldError message={errors.invites?.[index]?.role?.message} />
-						</div>
-
-						{/* Remove row */}
-						<div className="pt-0.5">
-							<Button
-								type="button"
-								variant="ghost"
-								size="icon"
-								className="size-8 text-muted-foreground hover:text-destructive"
-								onClick={() => remove(index)}
-								disabled={fields.length === 1}
-								aria-label={`Remove row ${index + 1}`}
-							>
-								<Trash2 className="size-4" />
-							</Button>
-						</div>
-					</div>
-				))}
-
-				{/* Add row */}
-				<Button
-					type="button"
-					variant="outline"
-					size="sm"
-					onClick={() => append({ ...DEFAULT_ROW })}
-					disabled={isPending}
-				>
-					<Plus className="size-4" />
-					Add another
-				</Button>
-			</div>
-
-			<DialogFooter className="mt-6">
-				<Button
-					type="button"
-					variant="outline"
-					onClick={onCancel}
-					disabled={isPending}
-				>
-					Cancel
-				</Button>
-				<Button type="submit" disabled={isPending}>
-					{isPending
-						? fields.length === 1
+						Cancel
+					</Button>
+					<Button type="submit" disabled={isPending}>
+						{isPending
 							? 'Sending…'
-							: 'Sending…'
-						: fields.length === 1
-							? 'Send invite'
-							: `Send ${fields.length} invites`}
-				</Button>
-			</DialogFooter>
+							: fields.length === 1
+								? 'Send invite'
+								: `Send ${fields.length} invites`}
+					</Button>
+				</DialogFooter>
+			</div>
 		</form>
 	)
 }

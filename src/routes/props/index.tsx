@@ -36,6 +36,7 @@ function RouteComponent() {
 					onOpenChange={setAddOpen}
 					title="Add property"
 					description="Enter the legal name, address, and property details."
+					className="max-w-[calc(100vw-2rem)] sm:max-w-2xl"
 					trigger={
 						<DialogTrigger asChild>
 							<Button>

@@ -32,9 +32,23 @@ export function formatCurrency(n: number | null): string {
 
 /** Converts SCREAMING_SNAKE_CASE enum values to Title Case for display. e.g. "SINGLE_FAMILY_HOME" → "Single Family Home" */
 export function formatEnumLabel(value: string): string {
-	return value
-		.replace(/_/g, ' ')
-		.replace(/\b\w/g, (c) => c.toUpperCase())
+	return value.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+}
+
+export function formatDateTime(dateString: string | null): string {
+	if (!dateString) return '—'
+	try {
+		const date = new Date(dateString)
+		return new Intl.DateTimeFormat(undefined, {
+			year: 'numeric',
+			month: 'short',
+			day: 'numeric',
+			hour: 'numeric',
+			minute: '2-digit',
+		}).format(date)
+	} catch {
+		return '—'
+	}
 }
 
 export function formatDate(dateString: string | null): string {

@@ -132,6 +132,7 @@ function PropLayout() {
 							onOpenChange={() => setEditingProp(null)}
 							title="Edit property"
 							description={`Update ${editingProp.legalName} details.`}
+							className="max-w-[calc(100vw-2rem)] sm:max-w-2xl"
 						>
 							<PropsForm
 								initialProp={editingProp}

@@ -1,11 +1,18 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { UserPlus, Trash2 } from 'lucide-react'
+import { UserPlus, Trash2, Send } from 'lucide-react'
 import { Badge } from '@abumble/design-system/components/Badge'
 import { Button } from '@abumble/design-system/components/Button'
+import { ActionsPopover } from '@abumble/design-system/components/ActionsPopover'
 import { ConfirmDeleteDialog } from '@abumble/design-system/components/ConfirmDeleteDialog'
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
 import { FormDialog } from '@abumble/design-system/components/Dialog'
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipProvider,
+	TooltipTrigger,
+} from '@abumble/design-system/components/Tooltip'
 import {
 	Table,
 	TableBody,
@@ -18,9 +25,13 @@ import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import type { LeaseTenant, LeaseTenantStatus } from '@/domain/lease-tenant'
 import { LeaseTenantRole } from '@/domain/lease-tenant'
 import { DETAIL_LABEL_CLASS } from '@/components/ui/DetailField'
-import { formatDate, formatEnumLabel } from '@/lib/format'
+import { formatDate, formatDateTime, formatEnumLabel } from '@/lib/format'
 import { config } from '@/config'
-import { useLeaseTenants, useRemoveLeaseTenant } from '@/features/leases/hooks'
+import {
+	useLeaseTenants,
+	useRemoveLeaseTenant,
+	useResendLeaseTenantInvite,
+} from '@/features/leases/hooks'
 import { InviteTenantsForm } from '../forms/InviteTenantsForm'
 
 // ---------- Badge helpers ----------
@@ -59,7 +70,7 @@ function TenantsSkeleton({ showActions }: { showActions: boolean }) {
 				<p className={DETAIL_LABEL_CLASS}>Tenants</p>
 				{showActions && <Skeleton className="h-8 w-32" />}
 			</div>
-			<Table>
+			<Table className="[&_th:first-child]:pl-5 [&_td:first-child]:pl-5 [&_th:last-child]:pr-5 [&_td:last-child]:pr-5">
 				<TableHeader>
 					<TableRow>
 						<TableHead>Email</TableHead>
@@ -97,60 +108,96 @@ function TenantsSkeleton({ showActions }: { showActions: boolean }) {
 	)
 }
 
-// ---------- Remove button + confirm ----------
+// ---------- Row actions ----------
 
-interface RemoveTenantButtonProps {
+interface TenantRowActionsProps {
 	tenant: LeaseTenant
 	leaseId: string
+	isDraft: boolean
 }
 
-function RemoveTenantButton({ tenant, leaseId }: RemoveTenantButtonProps) {
+function TenantRowActions({ tenant, leaseId, isDraft }: TenantRowActionsProps) {
 	const [confirmOpen, setConfirmOpen] = useState(false)
 	const removeTenant = useRemoveLeaseTenant()
+	const resendInvite = useResendLeaseTenantInvite()
 
-	const handleConfirm = () => {
+	const canResend = tenant.status === 'INVITED'
+	const canRemove = isDraft && tenant.status !== 'SIGNED'
+
+	if (!canResend && !canRemove) return null
+
+	const handleResend = () => {
+		resendInvite.mutate(
+			{ leaseId, leaseTenantId: tenant.id, email: tenant.email },
+			{
+				onSuccess: () => {
+					toast.success(`Invitation resent to ${tenant.email}`)
+				},
+			},
+		)
+	}
+
+	const handleRemoveConfirm = () => {
 		removeTenant.mutate(
 			{ leaseId, leaseTenantId: tenant.id },
 			{
 				onSuccess: () => {
 					toast.success(`${tenant.email} removed from this lease`)
-					setConfirmOpen(false)
 				},
-				onError: () => {
-					toast.error('Failed to remove tenant. Please try again.')
+				onSettled: () => {
 					setConfirmOpen(false)
 				},
 			},
 		)
 	}
 
+	const actions = [
+		...(canResend
+			? [
+					{
+						label: 'Resend invite',
+						icon: <Send className="size-4" />,
+						onClick: handleResend,
+						disabled: resendInvite.isPending,
+					},
+				]
+			: []),
+		...(canRemove
+			? [
+					{
+						label: 'Remove',
+						icon: <Trash2 className="size-4" />,
+						onClick: () => setConfirmOpen(true),
+						variant: 'destructive' as const,
+						disabled: removeTenant.isPending,
+					},
+				]
+			: []),
+	]
+
 	return (
 		<>
-			<Button
-				variant="ghost"
-				size="icon"
-				className="size-8 text-muted-foreground hover:text-destructive"
-				onClick={() => setConfirmOpen(true)}
-				disabled={removeTenant.isPending}
-				aria-label={`Remove ${tenant.email}`}
-			>
-				<Trash2 className="size-4" />
-			</Button>
-
-			<ConfirmDeleteDialog
-				open={confirmOpen}
-				onOpenChange={setConfirmOpen}
-				title="Remove tenant?"
-				description={
-					<>
-						<strong>{tenant.email}</strong> will be removed from this
-						lease and their invite will be revoked. This can&apos;t be
-						undone.
-					</>
-				}
-				onConfirm={handleConfirm}
-				isPending={removeTenant.isPending}
+			<ActionsPopover
+				label={`Actions for ${tenant.email}`}
+				items={actions}
+				stopTriggerPropagation
 			/>
+
+			{canRemove && (
+				<ConfirmDeleteDialog
+					open={confirmOpen}
+					onOpenChange={setConfirmOpen}
+					title="Remove tenant?"
+					description={
+						<>
+							<strong>{tenant.email}</strong> will be removed from this lease
+							and their invite will be revoked. This can&apos;t be undone.
+						</>
+					}
+					onConfirm={handleRemoveConfirm}
+					isPending={removeTenant.isPending}
+				/>
+			)}
 		</>
 	)
 }
@@ -164,99 +211,109 @@ export interface LeaseTenantListProps {
 }
 
 const TABLE_COLS_BASE = 4
-const TABLE_COLS_DRAFT = TABLE_COLS_BASE + 1
+const TABLE_COLS_WITH_ACTIONS = TABLE_COLS_BASE + 1
 
 /**
  * Displays a list of tenants for a lease.
- * In DRAFT mode: shows an "Invite tenants" button and a per-row remove action
- * (only for tenants who haven't signed yet).
+ * - INVITED tenants always get a "Resend invite" action (regardless of lease status).
+ * - In DRAFT mode: also shows "Invite tenants" button and a per-row "Remove" action
+ *   (only for tenants who haven't signed yet).
+ * - The INVITED status badge shows a tooltip with the last resent timestamp.
  */
 export function LeaseTenantsList({ leaseId, isDraft }: LeaseTenantListProps) {
 	const [inviteOpen, setInviteOpen] = useState(false)
 	const { data: tenants = [], isLoading } = useLeaseTenants(leaseId)
 
-	const totalCols = isDraft ? TABLE_COLS_DRAFT : TABLE_COLS_BASE
+	const hasActions = isDraft || tenants.some((t) => t.status === 'INVITED')
+	const totalCols = hasActions ? TABLE_COLS_WITH_ACTIONS : TABLE_COLS_BASE
 
 	const tableContent = (
-		<div className="rounded-lg border bg-card overflow-hidden">
-			{/* Card header */}
-			<div className="flex items-center justify-between px-5 py-4">
-				<p className={DETAIL_LABEL_CLASS}>Tenants</p>
-				{isDraft && (
-					<Button
-						variant="outline"
-						size="sm"
-						onClick={() => setInviteOpen(true)}
-					>
-						<UserPlus className="size-4" />
-						Invite tenants
-					</Button>
-				)}
-			</div>
+		<TooltipProvider>
+			<div className="rounded-lg border bg-card overflow-hidden">
+				{/* Card header */}
+				<div className="flex items-center justify-between px-5 py-4">
+					<p className={DETAIL_LABEL_CLASS}>Tenants</p>
+					{isDraft && (
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => setInviteOpen(true)}
+						>
+							<UserPlus className="size-4" />
+							Invite tenants
+						</Button>
+					)}
+				</div>
 
-			{/* Table */}
-			<Table>
-				<TableHeader>
-					<TableRow>
-						<TableHead>Email</TableHead>
-						<TableHead>Role</TableHead>
-						<TableHead>Status</TableHead>
-						<TableHead>Invited</TableHead>
-						{isDraft && <TableHead className="w-12" />}
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					{tenants.length === 0 ? (
+				{/* Table */}
+				<Table className="[&_th:first-child]:pl-5 [&_td:first-child]:pl-5 [&_th:last-child]:pr-5 [&_td:last-child]:pr-5">
+					<TableHeader>
 						<TableRow>
-							<TableCell
-								colSpan={totalCols}
-								className="h-20 text-center text-muted-foreground"
-							>
-								{isDraft
-									? 'No tenants yet. Use "Invite tenants" to add people to this lease.'
-									: 'No tenants on this lease.'}
-							</TableCell>
+							<TableHead>Email</TableHead>
+							<TableHead>Role</TableHead>
+							<TableHead>Status</TableHead>
+							<TableHead>Invited</TableHead>
+							{hasActions && <TableHead className="w-12" />}
 						</TableRow>
-					) : (
-						tenants.map((tenant) => {
-							const canRemove =
-								isDraft && tenant.status !== 'SIGNED'
-
-							return (
+					</TableHeader>
+					<TableBody>
+						{tenants.length === 0 ? (
+							<TableRow>
+								<TableCell
+									colSpan={totalCols}
+									className="h-20 text-center text-muted-foreground"
+								>
+									{isDraft
+										? 'No tenants yet. Use "Invite tenants" to add people to this lease.'
+										: 'No tenants on this lease.'}
+								</TableCell>
+							</TableRow>
+						) : (
+							tenants.map((tenant) => (
 								<TableRow key={tenant.id}>
-									<TableCell className="font-medium">
-										{tenant.email}
-									</TableCell>
+									<TableCell className="font-medium">{tenant.email}</TableCell>
 									<TableCell>
 										<Badge variant={roleVariant(tenant.role)}>
 											{formatEnumLabel(tenant.role)}
 										</Badge>
 									</TableCell>
 									<TableCell>
-										<Badge variant={statusVariant(tenant.status)}>
-											{formatEnumLabel(tenant.status)}
-										</Badge>
+										{tenant.status === 'INVITED' && tenant.lastResentAt ? (
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<Badge variant={statusVariant(tenant.status)}>
+														{formatEnumLabel(tenant.status)}
+													</Badge>
+												</TooltipTrigger>
+												<TooltipContent>
+													Resent {formatDateTime(tenant.lastResentAt)}
+												</TooltipContent>
+											</Tooltip>
+										) : (
+											<Badge variant={statusVariant(tenant.status)}>
+												{formatEnumLabel(tenant.status)}
+											</Badge>
+										)}
 									</TableCell>
 									<TableCell className="text-muted-foreground">
 										{formatDate(tenant.invitedDate)}
 									</TableCell>
-									{isDraft && (
+									{hasActions && (
 										<TableCell>
-											{canRemove && (
-												<RemoveTenantButton
-													tenant={tenant}
-													leaseId={leaseId}
-												/>
-											)}
+											<TenantRowActions
+												tenant={tenant}
+												leaseId={leaseId}
+												isDraft={isDraft}
+											/>
 										</TableCell>
 									)}
 								</TableRow>
-							)
-						})
-					)}
-				</TableBody>
-			</Table>
-		</div>
+							))
+						)}
+					</TableBody>
+				</Table>
+			</div>
+		</TooltipProvider>
 	)
 
 	return (
@@ -278,7 +335,7 @@ export function LeaseTenantsList({ leaseId, isDraft }: LeaseTenantListProps) {
 					}}
 					title="Invite tenants"
 					description="Add people to this lease. They'll receive an email with a link to review and sign."
-					className="max-w-[calc(100vw-2rem)] sm:max-w-xl"
+					className="max-w-[calc(100vw-2rem)] sm:max-w-2xl"
 				>
 					<InviteTenantsForm
 						leaseId={leaseId}

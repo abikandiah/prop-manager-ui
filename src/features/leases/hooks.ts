@@ -47,10 +47,8 @@ function applyCreate(
 	}
 
 	// Update unfiltered list
-	queryClient.setQueryData(
-		leaseKeys.list(),
-		(old: Array<Lease> | undefined) =>
-			old ? [...old, optimistic] : [optimistic],
+	queryClient.setQueryData(leaseKeys.list(), (old: Array<Lease> | undefined) =>
+		old ? [...old, optimistic] : [optimistic],
 	)
 
 	// Update unit list
@@ -527,6 +525,47 @@ export function useInviteLeaseTenants() {
 		},
 		onError: (err) => {
 			console.error('[Mutation] Invite lease tenants failed:', err)
+		},
+		onSettled: (_data, _error, { leaseId }) => {
+			queryClient.invalidateQueries({
+				queryKey: leaseTenantKeys.list(leaseId),
+			})
+		},
+	})
+}
+
+export type ResendLeaseTenantInviteVariables = {
+	leaseId: string
+	leaseTenantId: string
+	/** Used to build the success toast message. */
+	email: string
+}
+
+/**
+ * Resend the invite for a lease tenant who hasn't accepted yet.
+ * Error messages come directly from the server's ProblemDetail.detail
+ * (e.g. cooldown: "Please wait before resending this invitation").
+ */
+export function useResendLeaseTenantInvite() {
+	const queryClient = useQueryClient()
+
+	return useMutation({
+		mutationKey: ['resendLeaseTenantInvite'],
+		networkMode: 'online',
+		mutationFn: ({
+			leaseId,
+			leaseTenantId,
+		}: ResendLeaseTenantInviteVariables) => {
+			const requestId = stableRequestId(['resendLeaseTenantInvite'], {
+				leaseId,
+				leaseTenantId,
+			})
+			return leaseTenantApi.resendInvite(leaseId, leaseTenantId, {
+				[IDEMPOTENCY_HEADER]: requestId,
+			})
+		},
+		onError: (err) => {
+			console.error('[Mutation] Resend lease tenant invite failed:', err)
 		},
 		onSettled: (_data, _error, { leaseId }) => {
 			queryClient.invalidateQueries({

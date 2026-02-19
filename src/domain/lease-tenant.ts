@@ -37,6 +37,8 @@ export interface LeaseTenant {
 	inviteId: string
 	invitedDate: string | null
 	signedDate: string | null
+	/** Timestamp of the last resend, null if never resent. */
+	lastResentAt: string | null
 	version: number
 	createdAt: string
 	updatedAt: string

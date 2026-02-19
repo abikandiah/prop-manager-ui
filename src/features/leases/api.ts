@@ -94,6 +94,20 @@ class LeaseTenantApi {
 		return res.data
 	}
 
+	/** Resend the invite for a tenant who hasn't accepted yet. */
+	async resendInvite(
+		leaseId: string,
+		leaseTenantId: string,
+		headers?: Record<string, string>,
+	): Promise<LeaseTenant> {
+		const res = await api.post<LeaseTenant>(
+			`${this.endpoint(leaseId)}/${leaseTenantId}/resend`,
+			undefined,
+			{ headers },
+		)
+		return res.data
+	}
+
 	/** Remove a tenant from a DRAFT lease (only allowed if they haven't signed). */
 	async remove(
 		leaseId: string,

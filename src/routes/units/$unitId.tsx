@@ -244,6 +244,7 @@ function UnitDetailPage() {
 							onOpenChange={() => setEditingUnit(null)}
 							title="Edit unit"
 							description={`Update unit ${editingUnit.unitNumber} details.`}
+							className="max-w-[calc(100vw-2rem)] sm:max-w-2xl"
 						>
 							<UnitForm
 								propId={unit.propertyId}

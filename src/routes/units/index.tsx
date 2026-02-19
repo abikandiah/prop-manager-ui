@@ -28,6 +28,7 @@ function UnitsPage() {
 					onOpenChange={setAddOpen}
 					title="Add unit"
 					description="Select a property and enter the unit details."
+					className="max-w-[calc(100vw-2rem)] sm:max-w-2xl"
 					trigger={
 						<DialogTrigger asChild>
 							<Button>

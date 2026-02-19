@@ -315,7 +315,7 @@ function LeaseDetailPage() {
 
 						{/* Executed content markdown */}
 						{lease.executedContentMarkdown && (
-							<div className="md:col-span-2 lg:col-span-3 pt-4">
+							<div className="md:col-span-2 lg:col-span-3 border-t pt-4">
 								<label className={DETAIL_LABEL_CLASS}>Lease Content</label>
 								<div className="mt-2 rounded-md border bg-muted/20 p-6">
 									<div className="prose prose-sm dark:prose-invert max-w-none">

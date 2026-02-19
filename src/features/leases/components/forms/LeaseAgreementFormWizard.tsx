@@ -1,22 +1,22 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-import { z } from 'zod'
-import { toast } from 'sonner'
-import { Button } from '@abumble/design-system/components/Button'
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
-import { DialogFooter } from '@abumble/design-system/components/Dialog'
-import { LeaseDetailsStep } from './LeaseDetailsStep'
-import { LeaseTermsStep } from './LeaseTermsStep'
-import { LeaseParametersStep } from './LeaseParametersStep'
 import type { LateFeeType, Lease } from '@/domain/lease'
-import { useCreateLease, useUpdateLease } from '@/features/leases/hooks'
 import { useLeaseTemplateDetail } from '@/features/lease-templates'
+import { useCreateLease, useUpdateLease } from '@/features/leases/hooks'
 import {
 	generateId,
 	parseFloatOrUndefined,
 	parseIntOrUndefined,
 } from '@/lib/util'
+import { Button } from '@abumble/design-system/components/Button'
+import { DialogFooter } from '@abumble/design-system/components/Dialog'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
+import { LeaseDetailsStep } from './LeaseDetailsStep'
+import { LeaseParametersStep } from './LeaseParametersStep'
+import { LeaseTermsStep } from './LeaseTermsStep'
 
 // ---------- Schema ----------
 
@@ -133,7 +133,7 @@ function leaseToFormValues(lease: Lease): LeaseFormValues {
 export interface LeaseAgreementFormWizardProps {
 	/** When set, the wizard operates in edit mode using useUpdateLease */
 	initialLease?: Lease | null
-	onSuccess?: () => void
+	onSuccess?: (lease: Lease) => void
 	onCancel?: () => void
 	submitLabel?: string
 	/** Current wizard step (controlled by parent for FormDialog integration) */
@@ -273,9 +273,9 @@ export function LeaseAgreementFormWizard({
 						propertyId: initialLease.propertyId,
 					},
 					{
-						onSuccess: () => {
+						onSuccess: (updatedLease) => {
 							toast.success('Lease updated')
-							onSuccess?.()
+							onSuccess?.(updatedLease)
 						},
 						onError: (err) => {
 							toast.error(err.message || 'Failed to update lease')
@@ -293,12 +293,12 @@ export function LeaseAgreementFormWizard({
 						templateParameters: terms.templateParameters ?? undefined,
 					},
 					{
-						onSuccess: () => {
+						onSuccess: (data) => {
 							toast.success('Lease created')
 							reset(defaultValues)
 							setStep(1)
 							setTemplateDefaultsApplied(false)
-							onSuccess?.()
+							onSuccess?.(data)
 						},
 						onError: (err) => {
 							toast.error(err.message || 'Failed to create lease')

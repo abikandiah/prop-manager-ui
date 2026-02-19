@@ -1,13 +1,13 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { useState } from 'react'
-import { Plus } from 'lucide-react'
-import { Button } from '@abumble/design-system/components/Button'
+import { LeaseAgreementFormWizard, LeasesTableView } from '@/features/leases'
 import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
+import { Button } from '@abumble/design-system/components/Button'
 import {
 	DialogTrigger,
 	FormDialog,
 } from '@abumble/design-system/components/Dialog'
-import { LeaseAgreementFormWizard, LeasesTableView } from '@/features/leases'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { Plus } from 'lucide-react'
+import { useState } from 'react'
 
 export const Route = createFileRoute('/leases/agreements/')({
 	component: RouteComponent,
@@ -20,6 +20,7 @@ const WIZARD_STEP_TITLES: Record<1 | 2 | 3, string> = {
 }
 
 function RouteComponent() {
+	const navigate = useNavigate()
 	const [addOpen, setAddOpen] = useState(false)
 	const [wizardStep, setWizardStep] = useState<1 | 2 | 3>(1)
 
@@ -62,7 +63,13 @@ function RouteComponent() {
 					<LeaseAgreementFormWizard
 						step={wizardStep}
 						onStepChange={setWizardStep}
-						onSuccess={() => setAddOpen(false)}
+						onSuccess={(lease) => {
+							setAddOpen(false)
+							navigate({
+								to: '/leases/agreements/$leaseId',
+								params: { leaseId: lease.id },
+							})
+						}}
 						onCancel={() => setAddOpen(false)}
 						submitLabel="Create Lease"
 					/>

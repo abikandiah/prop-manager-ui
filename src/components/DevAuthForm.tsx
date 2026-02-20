@@ -21,7 +21,7 @@ export function DevAuthForm({
 	onSuccess,
 	wrappedInCard = true,
 }: DevAuthFormProps) {
-	const [username, setUsername] = useState('')
+	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
 	const [loading, setLoading] = useState(false)
 
@@ -30,7 +30,7 @@ export function DevAuthForm({
 		setLoading(true)
 		try {
 			const response = await api.post<{ token: string }>('/dev/login', {
-				username,
+				email,
 				password,
 			})
 			const token = response.data.token
@@ -59,13 +59,13 @@ export function DevAuthForm({
 	const form = (
 		<form onSubmit={handleSubmit} className="grid gap-5">
 			<div className="grid gap-2">
-				<Label htmlFor="dev-username">Username</Label>
+				<Label htmlFor="dev-email">Email</Label>
 				<Input
-					id="dev-username"
-					type="text"
-					autoComplete="username"
-					value={username}
-					onChange={(e) => setUsername(e.target.value)}
+					id="dev-email"
+					type="email"
+					autoComplete="email"
+					value={email}
+					onChange={(e) => setEmail(e.target.value)}
 					required
 				/>
 			</div>
@@ -83,7 +83,7 @@ export function DevAuthForm({
 			<Button
 				type="submit"
 				className="w-full h-11 mt-2 font-medium"
-				disabled={loading || !username.trim() || !password}
+				disabled={loading || !email.trim() || !password}
 			>
 				{loading ? 'Logging in...' : 'Login'}
 			</Button>

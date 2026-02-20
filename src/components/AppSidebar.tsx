@@ -13,14 +13,21 @@ import {
 } from '@abumble/design-system/components/Sidebar'
 import { Link } from '@tanstack/react-router'
 import {
+	ArrowLeftRight,
+	BarChart3,
+	Building2,
+	ClipboardList,
 	FileCheck,
 	FileSignature,
 	FileText,
-	Home,
+	Hammer,
+	LayoutDashboard,
 	LayoutGrid,
-	MessageSquare,
-	Package,
+	Receipt,
+	Store,
+	UserCheck,
 	Users,
+	Wrench,
 } from 'lucide-react'
 import { useCallback } from 'react'
 import { CollapsibleSidebarSection } from './CollapsibleSidebarSection'
@@ -28,7 +35,7 @@ import type { LinkComponentProps } from '@tanstack/react-router'
 import type { LucideIcon } from 'lucide-react'
 
 type NavItem = {
-	to: '/' | '/props' | '/units' | '/tenants' | '/messages'
+	to: '/'
 	label: string
 	icon: LucideIcon
 }
@@ -53,10 +60,6 @@ function SidebarNavLink({
 		</SidebarMenuItem>
 	)
 }
-
-const navItemsAfterProps: Array<NavItem> = [
-	{ to: '/messages', label: 'Messages', icon: MessageSquare },
-] as const
 
 export function AppSidebar() {
 	const state = useSidebar()
@@ -83,21 +86,30 @@ export function AppSidebar() {
 						<SidebarGroupContent>
 							<SidebarMenu>
 								<SidebarNavLink
-									item={{ to: '/', label: 'Home', icon: Home }}
+									item={{ to: '/', label: 'Dashboard', icon: LayoutDashboard }}
 									onClick={closeMobileSidebar}
 								/>
 								<CollapsibleSidebarSection
-									title="Properties"
-									icon={Package}
+									title="Portfolio"
+									icon={Building2}
 									items={[
-										{ to: '/props', label: 'Props', icon: Package },
+										{ to: '/props', label: 'Properties', icon: Building2 },
 										{ to: '/units', label: 'Units', icon: LayoutGrid },
-										{ to: '/tenants', label: 'Tenants', icon: Users },
 									]}
 									onItemClick={closeMobileSidebar}
 								/>
 								<CollapsibleSidebarSection
-									title="Leases"
+									title="People"
+									icon={Users}
+									items={[
+										{ to: '/tenants', label: 'Tenants', icon: Users },
+										{ to: '/people/owners', label: 'Owners', icon: UserCheck },
+										{ to: '/people/vendors', label: 'Vendors', icon: Store },
+									]}
+									onItemClick={closeMobileSidebar}
+								/>
+								<CollapsibleSidebarSection
+									title="Leasing"
 									icon={FileText}
 									items={[
 										{
@@ -110,16 +122,53 @@ export function AppSidebar() {
 											label: 'Agreements',
 											icon: FileCheck,
 										},
+										{
+											to: '/leases/applications',
+											label: 'Applications',
+											icon: ClipboardList,
+										},
 									]}
 									onItemClick={closeMobileSidebar}
 								/>
-								{navItemsAfterProps.map((item) => (
-									<SidebarNavLink
-										key={item.to}
-										item={item}
-										onClick={closeMobileSidebar}
-									/>
-								))}
+								<CollapsibleSidebarSection
+									title="Maintenance"
+									icon={Wrench}
+									items={[
+										{
+											to: '/maintenance/requests',
+											label: 'Requests',
+											icon: ClipboardList,
+										},
+										{
+											to: '/maintenance/work-orders',
+											label: 'Work Orders',
+											icon: Hammer,
+										},
+									]}
+									onItemClick={closeMobileSidebar}
+								/>
+								<CollapsibleSidebarSection
+									title="Finance"
+									icon={BarChart3}
+									items={[
+										{
+											to: '/finance/transactions',
+											label: 'Transactions',
+											icon: ArrowLeftRight,
+										},
+										{
+											to: '/finance/invoices',
+											label: 'Invoices',
+											icon: Receipt,
+										},
+										{
+											to: '/finance/reports',
+											label: 'Reports',
+											icon: BarChart3,
+										},
+									]}
+									onItemClick={closeMobileSidebar}
+								/>
 							</SidebarMenu>
 						</SidebarGroupContent>
 					</SidebarGroup>

@@ -1,7 +1,6 @@
 import {
 	Sidebar,
 	SidebarContent,
-	SidebarFooter,
 	SidebarGroup,
 	SidebarGroupContent,
 	SidebarMenu,
@@ -78,7 +77,7 @@ export function AppSidebar() {
 			<Sidebar
 				side="left"
 				variant="sidebar"
-				collapsible="icon"
+				collapsible="offcanvas"
 				className="bg-sidebar border-r border-sidebar-border h-[calc(100vh-3.5rem)]"
 			>
 				<SidebarContent>
@@ -173,12 +172,6 @@ export function AppSidebar() {
 						</SidebarGroupContent>
 					</SidebarGroup>
 				</SidebarContent>
-
-				{!state.isMobile && (
-					<SidebarFooter className="border-t border-sidebar-border mb-2">
-						<SidebarTrigger className="ml-auto" />
-					</SidebarFooter>
-				)}
 
 				<SidebarRail />
 			</Sidebar>

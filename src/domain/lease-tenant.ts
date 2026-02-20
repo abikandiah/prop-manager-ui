@@ -1,5 +1,14 @@
 // --- Enums ---
 
+export const EmailDeliveryStatus = {
+	NOT_SENT: 'NOT_SENT',
+	SENT: 'SENT',
+	FAILED: 'FAILED',
+} as const
+
+export type EmailDeliveryStatus =
+	(typeof EmailDeliveryStatus)[keyof typeof EmailDeliveryStatus]
+
 export const LeaseTenantRole = {
 	PRIMARY: 'PRIMARY',
 	OCCUPANT: 'OCCUPANT',
@@ -40,6 +49,10 @@ export interface LeaseTenant {
 	signedDate: string | null
 	/** Timestamp of the last resend, null if never resent. */
 	lastResentAt: string | null
+	/** Delivery status of the most recent invite email. */
+	emailStatus: EmailDeliveryStatus
+	/** Error message from the last failed send attempt, null if last send succeeded. */
+	emailError: string | null
 	version: number
 	createdAt: string
 	updatedAt: string

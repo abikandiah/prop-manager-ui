@@ -23,7 +23,7 @@ import {
 } from '@abumble/design-system/components/Table'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import type { LeaseTenant, LeaseTenantStatus } from '@/domain/lease-tenant'
-import { LeaseTenantRole } from '@/domain/lease-tenant'
+import { EmailDeliveryStatus, LeaseTenantRole } from '@/domain/lease-tenant'
 import { DETAIL_LABEL_CLASS } from '@/components/ui/DetailField'
 import { formatDate, formatDateTime, formatEnumLabel } from '@/lib/format'
 import { FORM_DIALOG_CLASS, useDialogState } from '@/lib/dialog'
@@ -275,7 +275,19 @@ export function LeaseTenantsList({ leaseId, isDraft }: LeaseTenantListProps) {
 										</Badge>
 									</TableCell>
 									<TableCell>
-										{tenant.status === 'INVITED' && tenant.lastResentAt ? (
+										{tenant.status === 'INVITED' &&
+										tenant.emailStatus === EmailDeliveryStatus.FAILED ? (
+											<Tooltip>
+												<TooltipTrigger asChild>
+													<Badge variant="destructive">
+														Email failed
+													</Badge>
+												</TooltipTrigger>
+												<TooltipContent>
+													{tenant.emailError ?? 'Email could not be delivered. Use "Resend invite" to try again.'}
+												</TooltipContent>
+											</Tooltip>
+										) : tenant.status === 'INVITED' && tenant.lastResentAt ? (
 											<Tooltip>
 												<TooltipTrigger asChild>
 													<Badge variant={statusVariant(tenant.status)}>

@@ -37,7 +37,9 @@ function Root() {
 		)
 	}
 
-	const isPublicOrDev = isPublic || location.pathname.startsWith('/dev')
+	const isPublicOrDev = isPublic
+		|| location.pathname.startsWith('/dev')
+		|| location.pathname.startsWith('/invite')
 	let altContent = null
 	if (isPublicOrDev) {
 		altContent = <Outlet />

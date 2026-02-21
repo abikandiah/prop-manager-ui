@@ -22,6 +22,7 @@ import { Route as UnitsUnitIdRouteImport } from './routes/units/$unitId'
 import { Route as TenantsTenantIdRouteImport } from './routes/tenants/$tenantId'
 import { Route as PublicTermsRouteImport } from './routes/public/terms'
 import { Route as PublicPrivacyRouteImport } from './routes/public/privacy'
+import { Route as InviteTokenRouteImport } from './routes/invite/$token'
 import { Route as DevAuthRouteImport } from './routes/dev/auth'
 import { Route as PropsIdRouteRouteImport } from './routes/props/$id/route'
 import { Route as LeasesTemplatesRouteRouteImport } from './routes/leases/templates/route'
@@ -103,6 +104,11 @@ const PublicTermsRoute = PublicTermsRouteImport.update({
 const PublicPrivacyRoute = PublicPrivacyRouteImport.update({
   id: '/public/privacy',
   path: '/public/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InviteTokenRoute = InviteTokenRouteImport.update({
+  id: '/invite/$token',
+  path: '/invite/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DevAuthRoute = DevAuthRouteImport.update({
@@ -202,6 +208,7 @@ export interface FileRoutesByFullPath {
   '/leases/templates': typeof LeasesTemplatesRouteRouteWithChildren
   '/props/$id': typeof PropsIdRouteRouteWithChildren
   '/dev/auth': typeof DevAuthRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
   '/tenants/$tenantId': typeof TenantsTenantIdRoute
@@ -230,6 +237,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dev/auth': typeof DevAuthRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
   '/tenants/$tenantId': typeof TenantsTenantIdRoute
@@ -263,6 +271,7 @@ export interface FileRoutesById {
   '/leases/templates': typeof LeasesTemplatesRouteRouteWithChildren
   '/props/$id': typeof PropsIdRouteRouteWithChildren
   '/dev/auth': typeof DevAuthRoute
+  '/invite/$token': typeof InviteTokenRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
   '/tenants/$tenantId': typeof TenantsTenantIdRoute
@@ -297,6 +306,7 @@ export interface FileRouteTypes {
     | '/leases/templates'
     | '/props/$id'
     | '/dev/auth'
+    | '/invite/$token'
     | '/public/privacy'
     | '/public/terms'
     | '/tenants/$tenantId'
@@ -325,6 +335,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/dev/auth'
+    | '/invite/$token'
     | '/public/privacy'
     | '/public/terms'
     | '/tenants/$tenantId'
@@ -357,6 +368,7 @@ export interface FileRouteTypes {
     | '/leases/templates'
     | '/props/$id'
     | '/dev/auth'
+    | '/invite/$token'
     | '/public/privacy'
     | '/public/terms'
     | '/tenants/$tenantId'
@@ -389,6 +401,7 @@ export interface RootRouteChildren {
   LeasesAgreementsRouteRoute: typeof LeasesAgreementsRouteRouteWithChildren
   LeasesTemplatesRouteRoute: typeof LeasesTemplatesRouteRouteWithChildren
   PropsIdRouteRoute: typeof PropsIdRouteRouteWithChildren
+  InviteTokenRoute: typeof InviteTokenRoute
   PublicPrivacyRoute: typeof PublicPrivacyRoute
   PublicTermsRoute: typeof PublicTermsRoute
   TenantsTenantIdRoute: typeof TenantsTenantIdRoute
@@ -500,6 +513,13 @@ declare module '@tanstack/react-router' {
       path: '/public/privacy'
       fullPath: '/public/privacy'
       preLoaderRoute: typeof PublicPrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invite/$token': {
+      id: '/invite/$token'
+      path: '/invite/$token'
+      fullPath: '/invite/$token'
+      preLoaderRoute: typeof InviteTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/dev/auth': {
@@ -684,6 +704,7 @@ const rootRouteChildren: RootRouteChildren = {
   LeasesAgreementsRouteRoute: LeasesAgreementsRouteRouteWithChildren,
   LeasesTemplatesRouteRoute: LeasesTemplatesRouteRouteWithChildren,
   PropsIdRouteRoute: PropsIdRouteRouteWithChildren,
+  InviteTokenRoute: InviteTokenRoute,
   PublicPrivacyRoute: PublicPrivacyRoute,
   PublicTermsRoute: PublicTermsRoute,
   TenantsTenantIdRoute: TenantsTenantIdRoute,

@@ -19,10 +19,11 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
 
 	const isDevNoToken = config.isDevelopment && !hasDevToken
 
-	const registerMutation = useMutation({
-		mutationFn: () => api.post<User>('/register', {}),
+	const acceptTermsMutation = useMutation({
+		mutationFn: () =>
+			api.patch<User>('/me', { termsAccepted: true }),
 		onSuccess: () => {
-			toast.success('Account created successfully.')
+			toast.success('Terms accepted. Welcome!')
 			onSuccess()
 		},
 	})
@@ -33,7 +34,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
 			toast.error('Please accept the Terms of Service and Privacy Policy to continue.')
 			return
 		}
-		registerMutation.mutate()
+		acceptTermsMutation.mutate()
 	}
 
 	if (isDevNoToken) {
@@ -83,10 +84,10 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
 			<Button
 				type="submit"
 				className="w-full"
-				disabled={registerMutation.isPending || !agreedToTermsAndPrivacy}
-				aria-busy={registerMutation.isPending}
+				disabled={acceptTermsMutation.isPending || !agreedToTermsAndPrivacy}
+				aria-busy={acceptTermsMutation.isPending}
 			>
-				{registerMutation.isPending ? 'Creating account...' : 'Create account'}
+				{acceptTermsMutation.isPending ? 'Accepting...' : 'I accept — continue'}
 			</Button>
 		</form>
 	)

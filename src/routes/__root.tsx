@@ -22,7 +22,7 @@ export const Route = createRootRoute({
 })
 
 function Root() {
-	const { isLoadingUser, isUserDefined } = useAuth()
+	const { user, isLoadingUser, isUserDefined } = useAuth()
 	const location = useLocation()
 	const isPublic = location.pathname.startsWith('/public')
 
@@ -40,6 +40,7 @@ function Root() {
 	const isPublicOrDev = isPublic
 		|| location.pathname.startsWith('/dev')
 		|| location.pathname.startsWith('/invite')
+	const needsTermsAcceptance = isUserDefined && user && !user.termsAccepted
 	let altContent = null
 	if (isPublicOrDev) {
 		altContent = <Outlet />
@@ -53,11 +54,11 @@ function Root() {
 				{null}
 			</DelayedLoadingFallback>
 		)
-	} else if (!isUserDefined) {
+	} else if (!isUserDefined || needsTermsAcceptance) {
 		altContent = <Register />
 	}
 
-	if (isPublicOrDev || isLoadingUser || !isUserDefined) {
+	if (isPublicOrDev || isLoadingUser || !isUserDefined || needsTermsAcceptance) {
 		return (
 			<div className="layout-header-full flex min-h-screen w-full flex-col">
 				<Header />

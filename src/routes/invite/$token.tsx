@@ -2,11 +2,11 @@ import { CenteredEmptyState } from '@/components/CenteredEmptyState'
 import { RegisterForm } from '@/components/RegisterForm'
 import { DetailField, TextLink } from '@/components/ui'
 import { config } from '@/config'
+import type { User } from '@/contexts/auth'
 import { useAuth } from '@/contexts/auth'
 import { useAcceptInvite, useInvitePreview } from '@/features/invites/hooks'
 import { InviteStatus } from '@/features/invites/types'
 import { formatCurrency, formatDate, formatDateTime } from '@/lib/format'
-import type { User } from '@/contexts/auth'
 import { Button } from '@abumble/design-system/components/Button'
 import {
 	Card,
@@ -108,6 +108,8 @@ function InvitePageContent({
 		.filter(Boolean)
 		.join(', ')
 
+	const isPending = status === InviteStatus.PENDING
+
 	return (
 		<div className="flex flex-col gap-6">
 			{/* Page header */}
@@ -131,40 +133,42 @@ function InvitePageContent({
 				</div>
 			</div>
 
-			{/* Detail sections */}
-			<div className="flex flex-col gap-4">
-				{/* Unit */}
-				<div className="rounded-lg border bg-card px-5 py-4">
-					<div className="grid gap-4 sm:grid-cols-2">
-						<DetailField label="Unit">
-							{unit.unitNumber}
-							{unit.unitType ? ` · ${unit.unitType}` : ''}
-						</DetailField>
-						<DetailField label="Sent to">{maskedEmail}</DetailField>
+			{/* Detail sections — only when invite is pending */}
+			{isPending && (
+				<div className="flex flex-col gap-4">
+					{/* Unit */}
+					<div className="rounded-lg border bg-card px-5 py-4">
+						<div className="grid gap-4 sm:grid-cols-2">
+							<DetailField label="Unit">
+								{unit.unitNumber}
+								{unit.unitType ? ` · ${unit.unitType}` : ''}
+							</DetailField>
+							<DetailField label="Sent to">{maskedEmail}</DetailField>
+						</div>
 					</div>
-				</div>
 
-				{/* Lease terms */}
-				<div className="rounded-lg border bg-card px-5 py-4">
-					<div className="grid gap-4 sm:grid-cols-3">
-						<DetailField
-							label="Monthly Rent"
-							valueClassName="text-lg font-semibold text-foreground"
-						>
-							{formatCurrency(lease.rentAmount)}
-						</DetailField>
-						<DetailField label="Lease Start">
-							{formatDate(lease.startDate)}
-						</DetailField>
-						<DetailField label="Lease End">
-							{formatDate(lease.endDate)}
-						</DetailField>
+					{/* Lease terms */}
+					<div className="rounded-lg border bg-card px-5 py-4">
+						<div className="grid gap-4 sm:grid-cols-3">
+							<DetailField
+								label="Monthly Rent"
+								valueClassName="text-lg font-semibold text-foreground"
+							>
+								{formatCurrency(lease.rentAmount)}
+							</DetailField>
+							<DetailField label="Lease Start">
+								{formatDate(lease.startDate)}
+							</DetailField>
+							<DetailField label="Lease End">
+								{formatDate(lease.endDate)}
+							</DetailField>
+						</div>
 					</div>
 				</div>
-			</div>
+			)}
 
 			{/* Action card — centered below details */}
-			<div className="flex justify-center">
+			<div className="flex justify-center mt-8">
 				<div className="w-full max-w-md">
 					<InviteActionCard
 						status={status}
@@ -213,54 +217,64 @@ function InviteActionCard({
 		)
 	}
 
-	if (status === InviteStatus.ACCEPTED) {
-		return (
-			<Card>
-				<CardContent className="pt-6 text-center">
-					<p className="text-sm text-muted-foreground">
-						You've already accepted this invite.
-					</p>
-				</CardContent>
-			</Card>
-		)
-	}
-
-	if (status === InviteStatus.EXPIRED) {
-		return (
-			<Card>
-				<CardContent className="pt-6 text-center">
-					<p className="text-sm text-amber-600 dark:text-amber-400">
-						This invite expired on {formatDateTime(expiresAt)}.
-					</p>
-				</CardContent>
-			</Card>
-		)
-	}
-
+	const canAccept = status === InviteStatus.PENDING
 	const isRevoked = status === InviteStatus.REVOKED
+	const isExpired = status === InviteStatus.EXPIRED
+	const isAccepted = status === InviteStatus.ACCEPTED
 
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle className="text-base">Accept your invite</CardTitle>
-				<p className="text-sm text-muted-foreground">
-					By accepting, you'll be added as a tenant on this lease. This invite
-					expires {formatDateTime(expiresAt)}.
+				<CardTitle className="text-base">
+					{canAccept
+						? 'Accept your invite'
+						: isRevoked
+							? 'Invite revoked'
+							: isExpired
+								? 'Invite expired'
+								: 'Invite accepted'}
+				</CardTitle>
+				<p
+					className="text-sm text-muted-foreground"
+					{...(canAccept
+						? {}
+						: { role: 'status' as const, 'aria-live': 'polite' as const })}
+				>
+					{canAccept ? (
+						<>
+							Accept the invite to join this lease as a tenant. You will be able
+							to discuss and review the lease with property management.
+							<br />
+							<br />
+							This invite expires {formatDateTime(expiresAt)}.
+						</>
+					) : (
+						<>
+							{isRevoked &&
+								'This invite is no longer valid and cannot be accepted.'}
+							{isExpired &&
+								`This invite expired on ${formatDateTime(expiresAt)}.`}
+							{isAccepted &&
+								"You've already accepted this invite and have access to the lease."}
+						</>
+					)}
 				</p>
 			</CardHeader>
 			<CardContent className="flex flex-col items-center gap-3">
-				<Button
-					className="w-full"
-					onClick={onAccept}
-					disabled={isAccepting || isRevoked}
-					aria-busy={isAccepting}
-				>
-					{isAccepting ? 'Joining...' : 'Accept Invite'}
-				</Button>
-				{isRevoked && (
-					<p className="text-sm text-destructive text-center">
-						This invite has been revoked.
-					</p>
+				{canAccept && (
+					<>
+						<Button
+							className="w-full"
+							onClick={onAccept}
+							disabled={isAccepting}
+							aria-busy={isAccepting}
+						>
+							{isAccepting ? 'Joining...' : 'Accept Invite'}
+						</Button>
+						<p className="text-xs text-muted-foreground text-center">
+							* Accepting this invite is not the same as signing the lease.
+						</p>
+					</>
 				)}
 			</CardContent>
 		</Card>

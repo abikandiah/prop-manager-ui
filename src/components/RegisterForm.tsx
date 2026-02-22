@@ -1,13 +1,13 @@
+import { api, getDevToken } from '@/api/client'
+import { DevAuthForm } from '@/components/DevAuthForm'
+import { TextLink } from '@/components/ui'
+import { config } from '@/config'
+import type { User } from '@/contexts/auth'
 import { Button } from '@abumble/design-system/components/Button'
 import { Checkbox } from '@abumble/design-system/components/Checkbox'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import type { User } from '@/contexts/auth'
-import { TextLink } from '@/components/ui'
-import { api, getDevToken } from '@/api/client'
-import { config } from '@/config'
-import { DevAuthForm } from '@/components/DevAuthForm'
 
 interface RegisterFormProps {
 	onSuccess: () => void | Promise<unknown>
@@ -20,8 +20,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
 	const isDevNoToken = config.isDevelopment && !hasDevToken
 
 	const acceptTermsMutation = useMutation({
-		mutationFn: () =>
-			api.patch<User>('/me', { termsAccepted: true }),
+		mutationFn: () => api.patch<User>('/me', { termsAccepted: true }),
 		onSuccess: () => {
 			toast.success('Terms accepted. Welcome!')
 			onSuccess()
@@ -31,7 +30,9 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
 	const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		if (!agreedToTermsAndPrivacy) {
-			toast.error('Please accept the Terms of Service and Privacy Policy to continue.')
+			toast.error(
+				'Please accept the Terms of Service and Privacy Policy to continue.',
+			)
 			return
 		}
 		acceptTermsMutation.mutate()
@@ -87,7 +88,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
 				disabled={acceptTermsMutation.isPending || !agreedToTermsAndPrivacy}
 				aria-busy={acceptTermsMutation.isPending}
 			>
-				{acceptTermsMutation.isPending ? 'Accepting...' : 'I accept — continue'}
+				{acceptTermsMutation.isPending ? 'Accepting...' : 'I accept'}
 			</Button>
 		</form>
 	)

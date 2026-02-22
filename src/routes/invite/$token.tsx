@@ -1,27 +1,23 @@
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
-import { TextLink } from '@/components/ui'
+import { RegisterForm } from '@/components/RegisterForm'
+import { DetailField, TextLink } from '@/components/ui'
 import { config } from '@/config'
 import { useAuth } from '@/contexts/auth'
 import { useAcceptInvite, useInvitePreview } from '@/features/invites/hooks'
 import { InviteStatus } from '@/features/invites/types'
-import { formatCurrency, formatDate } from '@/lib/format'
-import { api, getDevToken } from '@/api/client'
+import { formatCurrency, formatDate, formatDateTime } from '@/lib/format'
 import type { User } from '@/contexts/auth'
 import { Button } from '@abumble/design-system/components/Button'
 import {
 	Card,
 	CardContent,
 	CardHeader,
+	CardTitle,
 } from '@abumble/design-system/components/Card'
-import { Checkbox } from '@abumble/design-system/components/Checkbox'
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
-import { Separator } from '@abumble/design-system/components/Separator'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
-import { DevAuthForm } from '@/components/DevAuthForm'
-import { useMutation } from '@tanstack/react-query'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Home } from 'lucide-react'
-import { useState } from 'react'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/invite/$token')({
@@ -51,33 +47,35 @@ function InviteAcceptPage() {
 	const isPageLoading = isLoading || isLoadingUser
 
 	return (
-		<div className="flex flex-1 flex-col justify-center items-center px-4 py-8">
-			<DelayedLoadingFallback
-				isLoading={isPageLoading}
-				delayMs={config.loadingFallbackDelayMs}
-				fallback={<InviteCardSkeleton />}
-			>
-				{isError || !preview ? (
-					<CenteredEmptyState
-						title="Invite not found"
-						description="This link may be invalid or expired."
-						action={<TextLink to="/">Back to home</TextLink>}
-					/>
-				) : (
-					<InviteCard
-						preview={preview}
-						user={user}
-						onAccept={handleAccept}
-						isAccepting={acceptInvite.isPending}
-						onRegistered={refetchUser}
-					/>
-				)}
-			</DelayedLoadingFallback>
+		<div className="flex flex-1 flex-col px-4 py-8 sm:px-6 lg:px-8">
+			<div className="mx-auto w-full max-w-5xl">
+				<DelayedLoadingFallback
+					isLoading={isPageLoading}
+					delayMs={config.loadingFallbackDelayMs}
+					fallback={<InvitePageSkeleton />}
+				>
+					{isError || !preview ? (
+						<CenteredEmptyState
+							title="Invite not found"
+							description="This link may be invalid or expired."
+							action={<TextLink to="/">Back to home</TextLink>}
+						/>
+					) : (
+						<InvitePageContent
+							preview={preview}
+							user={user}
+							onAccept={handleAccept}
+							isAccepting={acceptInvite.isPending}
+							onRegistered={refetchUser}
+						/>
+					)}
+				</DelayedLoadingFallback>
+			</div>
 		</div>
 	)
 }
 
-interface InviteCardProps {
+interface InvitePageContentProps {
 	preview: NonNullable<ReturnType<typeof useInvitePreview>['data']>
 	user: User | null
 	onAccept: () => void
@@ -85,8 +83,22 @@ interface InviteCardProps {
 	onRegistered: () => Promise<unknown>
 }
 
-function InviteCard({ preview, user, onAccept, isAccepting, onRegistered }: InviteCardProps) {
-	const { property, unit, lease, maskedEmail, expiresAt, invitedByName, status } = preview
+function InvitePageContent({
+	preview,
+	user,
+	onAccept,
+	isAccepting,
+	onRegistered,
+}: InvitePageContentProps) {
+	const {
+		property,
+		unit,
+		lease,
+		maskedEmail,
+		expiresAt,
+		invitedByName,
+		status,
+	} = preview
 
 	const propertyAddress = [
 		property.addressLine1,
@@ -97,232 +109,207 @@ function InviteCard({ preview, user, onAccept, isAccepting, onRegistered }: Invi
 		.join(', ')
 
 	return (
-		<Card className="w-full max-w-lg">
-			<CardHeader className="space-y-1">
+		<div className="flex flex-col gap-6">
+			{/* Page header */}
+			<div className="flex flex-col gap-1">
 				<p className="text-sm text-muted-foreground">
-					Invited by <span className="font-medium text-foreground">{invitedByName}</span>
+					Invited by{' '}
+					<span className="font-medium text-foreground">{invitedByName}</span>
 				</p>
 				<h1 className="text-2xl font-semibold text-foreground">
 					You've been invited to join as a tenant
 				</h1>
-			</CardHeader>
+				<div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+					<Home className="size-3.5 shrink-0" />
+					<span>{property.legalName}</span>
+					{propertyAddress && (
+						<>
+							<span>·</span>
+							<span>{propertyAddress}</span>
+						</>
+					)}
+				</div>
+			</div>
 
-			<CardContent className="space-y-5">
-				<div className="space-y-3">
-					<div className="flex items-start gap-2">
-						<Home className="size-4 mt-0.5 shrink-0 text-muted-foreground" />
-						<div>
-							<p className="font-medium text-foreground">{property.legalName}</p>
-							<p className="text-sm text-muted-foreground">{propertyAddress}</p>
-						</div>
-					</div>
-
-					<div className="grid grid-cols-2 gap-3 text-sm">
-						<div>
-							<p className="text-muted-foreground">Unit</p>
-							<p className="font-medium text-foreground">
-								{unit.unitNumber}
-								{unit.unitType ? ` · ${unit.unitType}` : ''}
-							</p>
-						</div>
-						<div>
-							<p className="text-muted-foreground">Rent</p>
-							<p className="font-medium text-foreground">
-								{formatCurrency(lease.rentAmount)} / month
-							</p>
-						</div>
-						<div>
-							<p className="text-muted-foreground">Lease start</p>
-							<p className="font-medium text-foreground">{formatDate(lease.startDate)}</p>
-						</div>
-						<div>
-							<p className="text-muted-foreground">Lease end</p>
-							<p className="font-medium text-foreground">{formatDate(lease.endDate)}</p>
-						</div>
-					</div>
-
-					<div className="flex items-center justify-between text-sm text-muted-foreground">
-						<span>Sent to: <span className="font-medium">{maskedEmail}</span></span>
-						<span>Expires: {formatDate(expiresAt)}</span>
+			{/* Detail sections */}
+			<div className="flex flex-col gap-4">
+				{/* Unit */}
+				<div className="rounded-lg border bg-card px-5 py-4">
+					<div className="grid gap-4 sm:grid-cols-2">
+						<DetailField label="Unit">
+							{unit.unitNumber}
+							{unit.unitType ? ` · ${unit.unitType}` : ''}
+						</DetailField>
+						<DetailField label="Sent to">{maskedEmail}</DetailField>
 					</div>
 				</div>
 
-				<Separator />
+				{/* Lease terms */}
+				<div className="rounded-lg border bg-card px-5 py-4">
+					<div className="grid gap-4 sm:grid-cols-3">
+						<DetailField
+							label="Monthly Rent"
+							valueClassName="text-lg font-semibold text-foreground"
+						>
+							{formatCurrency(lease.rentAmount)}
+						</DetailField>
+						<DetailField label="Lease Start">
+							{formatDate(lease.startDate)}
+						</DetailField>
+						<DetailField label="Lease End">
+							{formatDate(lease.endDate)}
+						</DetailField>
+					</div>
+				</div>
+			</div>
 
-				<InviteAction
-					status={status}
-					user={user}
-					onAccept={onAccept}
-					isAccepting={isAccepting}
-					onRegistered={onRegistered}
-				/>
-			</CardContent>
-		</Card>
+			{/* Action card — centered below details */}
+			<div className="flex justify-center">
+				<div className="w-full max-w-md">
+					<InviteActionCard
+						status={status}
+						user={user}
+						expiresAt={expiresAt}
+						onAccept={onAccept}
+						isAccepting={isAccepting}
+						onRegistered={onRegistered}
+					/>
+				</div>
+			</div>
+		</div>
 	)
 }
 
-interface InviteActionProps {
+interface InviteActionCardProps {
 	status: InviteStatus
 	user: User | null
+	expiresAt: string
 	onAccept: () => void
 	isAccepting: boolean
 	onRegistered: () => Promise<unknown>
 }
 
-function InviteAction({ status, user, onAccept, isAccepting, onRegistered }: InviteActionProps) {
+function InviteActionCard({
+	status,
+	user,
+	expiresAt,
+	onAccept,
+	isAccepting,
+	onRegistered,
+}: InviteActionCardProps) {
 	if (!user) {
-		return <InlineRegister onRegistered={onRegistered} />
+		return (
+			<Card>
+				<CardHeader>
+					<CardTitle className="text-base">Create your account</CardTitle>
+					<p className="text-sm text-muted-foreground">
+						Register to accept this invite and access your lease.
+					</p>
+				</CardHeader>
+				<CardContent>
+					<RegisterForm onSuccess={onRegistered} />
+				</CardContent>
+			</Card>
+		)
 	}
 
 	if (status === InviteStatus.ACCEPTED) {
 		return (
-			<p className="text-sm text-muted-foreground text-center">
-				You've already accepted this invite.
-			</p>
+			<Card>
+				<CardContent className="pt-6 text-center">
+					<p className="text-sm text-muted-foreground">
+						You've already accepted this invite.
+					</p>
+				</CardContent>
+			</Card>
 		)
 	}
 
 	if (status === InviteStatus.EXPIRED) {
 		return (
-			<p className="text-sm text-amber-600 dark:text-amber-400 text-center">
-				This invite has expired.
-			</p>
+			<Card>
+				<CardContent className="pt-6 text-center">
+					<p className="text-sm text-amber-600 dark:text-amber-400">
+						This invite expired on {formatDateTime(expiresAt)}.
+					</p>
+				</CardContent>
+			</Card>
 		)
 	}
 
-	if (status === InviteStatus.REVOKED) {
-		return (
-			<p className="text-sm text-destructive text-center">
-				This invite has been revoked.
-			</p>
-		)
-	}
+	const isRevoked = status === InviteStatus.REVOKED
 
 	return (
-		<Button
-			className="w-full"
-			onClick={onAccept}
-			disabled={isAccepting}
-			aria-busy={isAccepting}
-		>
-			{isAccepting ? 'Joining...' : 'Accept Invite'}
-		</Button>
-	)
-}
-
-interface InlineRegisterProps {
-	onRegistered: () => Promise<unknown>
-}
-
-function InlineRegister({ onRegistered }: InlineRegisterProps) {
-	const [agreedToTermsAndPrivacy, setAgreedToTermsAndPrivacy] = useState(false)
-	const [hasDevToken, setHasDevToken] = useState(() => !!getDevToken())
-
-	const isDevNoToken = config.isDevelopment && !hasDevToken
-
-	const registerMutation = useMutation({
-		mutationFn: () => api.post<User>('/register', {}),
-		onSuccess: () => {
-			onRegistered()
-			toast.success('Account created successfully.')
-		},
-	})
-
-	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-		e.preventDefault()
-		if (!agreedToTermsAndPrivacy) {
-			toast.error('Please accept the Terms of Service and Privacy Policy to continue.')
-			return
-		}
-		registerMutation.mutate()
-	}
-
-	if (isDevNoToken) {
-		return (
-			<DevAuthForm
-				onSuccess={() => setHasDevToken(true)}
-				wrappedInCard={false}
-			/>
-		)
-	}
-
-	return (
-		<div className="space-y-4">
-			<p className="text-sm text-muted-foreground">
-				Create an account to accept this invite.
-			</p>
-			<form onSubmit={handleSubmit} className="space-y-4">
-				<div className="flex items-start gap-3">
-					<Checkbox
-						id="invite-agreement"
-						checked={agreedToTermsAndPrivacy}
-						onCheckedChange={(checked) => setAgreedToTermsAndPrivacy(!!checked)}
-					/>
-					<label className="text-sm font-normal -mt-0.5 text-foreground" htmlFor="invite-agreement">
-						I've read and agree to the{' '}
-						<TextLink
-							to="/public/terms"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="text-foreground underline underline-offset-2"
-						>
-							Terms of Service
-						</TextLink>{' '}
-						and{' '}
-						<TextLink
-							to="/public/privacy"
-							target="_blank"
-							rel="noopener noreferrer"
-							className="text-foreground underline underline-offset-2"
-						>
-							Privacy Policy
-						</TextLink>
-						.
-					</label>
-				</div>
-
-				<Button
-					type="submit"
-					className="w-full"
-					disabled={registerMutation.isPending || !agreedToTermsAndPrivacy}
-					aria-busy={registerMutation.isPending}
-				>
-					{registerMutation.isPending ? 'Creating account...' : 'Create account'}
-				</Button>
-			</form>
-		</div>
-	)
-}
-
-function InviteCardSkeleton() {
-	return (
-		<Card className="w-full max-w-lg">
-			<CardHeader className="space-y-2">
-				<Skeleton className="h-4 w-32" />
-				<Skeleton className="h-7 w-3/4" />
+		<Card>
+			<CardHeader>
+				<CardTitle className="text-base">Accept your invite</CardTitle>
+				<p className="text-sm text-muted-foreground">
+					By accepting, you'll be added as a tenant on this lease. This invite
+					expires {formatDateTime(expiresAt)}.
+				</p>
 			</CardHeader>
-			<CardContent className="space-y-5">
-				<div className="space-y-3">
-					<div className="flex items-start gap-2">
-						<Skeleton className="size-4 mt-0.5 shrink-0" />
-						<div className="space-y-1.5 flex-1">
-							<Skeleton className="h-4 w-40" />
-							<Skeleton className="h-3 w-56" />
-						</div>
-					</div>
-					<div className="grid grid-cols-2 gap-3">
-						{Array.from({ length: 4 }).map((_, i) => (
-							<div key={i} className="space-y-1">
+			<CardContent className="flex flex-col items-center gap-3">
+				<Button
+					className="w-full"
+					onClick={onAccept}
+					disabled={isAccepting || isRevoked}
+					aria-busy={isAccepting}
+				>
+					{isAccepting ? 'Joining...' : 'Accept Invite'}
+				</Button>
+				{isRevoked && (
+					<p className="text-sm text-destructive text-center">
+						This invite has been revoked.
+					</p>
+				)}
+			</CardContent>
+		</Card>
+	)
+}
+
+function InvitePageSkeleton() {
+	return (
+		<div className="flex flex-col gap-6">
+			{/* Header skeleton */}
+			<div className="flex flex-col gap-2">
+				<Skeleton className="h-3.5 w-36" />
+				<Skeleton className="h-8 w-80" />
+				<Skeleton className="h-3.5 w-56" />
+			</div>
+
+			{/* Detail skeletons */}
+			<div className="flex flex-col gap-4">
+				<div className="rounded-lg border bg-card px-5 py-4">
+					<div className="grid gap-4 sm:grid-cols-2">
+						{Array.from({ length: 2 }).map((_, i) => (
+							<div key={i} className="space-y-2">
 								<Skeleton className="h-3 w-16" />
-								<Skeleton className="h-4 w-24" />
+								<Skeleton className="h-5 w-28" />
 							</div>
 						))}
 					</div>
-					<Skeleton className="h-3 w-full" />
 				</div>
-				<Skeleton className="h-px w-full" />
-				<Skeleton className="h-9 w-full" />
-			</CardContent>
-		</Card>
+				<div className="rounded-lg border bg-card px-5 py-4">
+					<div className="grid gap-4 sm:grid-cols-3">
+						{Array.from({ length: 3 }).map((_, i) => (
+							<div key={i} className="space-y-2">
+								<Skeleton className="h-3 w-20" />
+								<Skeleton className="h-5 w-24" />
+							</div>
+						))}
+					</div>
+				</div>
+			</div>
+
+			{/* Action card skeleton — centered */}
+			<div className="flex justify-center">
+				<div className="w-full max-w-md rounded-lg border bg-card px-5 py-4 flex flex-col gap-3">
+					<Skeleton className="h-5 w-36" />
+					<Skeleton className="h-3.5 w-full" />
+					<Skeleton className="h-3.5 w-3/4" />
+					<Skeleton className="h-9 w-full mt-2" />
+				</div>
+			</div>
+		</div>
 	)
 }

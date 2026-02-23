@@ -279,12 +279,11 @@ export function LeaseTenantsList({ leaseId, isDraft }: LeaseTenantListProps) {
 										tenant.emailStatus === EmailDeliveryStatus.FAILED ? (
 											<Tooltip>
 												<TooltipTrigger asChild>
-													<Badge variant="destructive">
-														Email failed
-													</Badge>
+													<Badge variant="destructive">Email failed</Badge>
 												</TooltipTrigger>
 												<TooltipContent>
-													{tenant.emailError ?? 'Email could not be delivered. Use "Resend invite" to try again.'}
+													{tenant.emailError ??
+														'Email could not be delivered. Use "Resend invite" to try again.'}
 												</TooltipContent>
 											</Tooltip>
 										) : tenant.status === 'INVITED' && tenant.lastResentAt ? (

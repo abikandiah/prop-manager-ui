@@ -37,9 +37,10 @@ function Root() {
 		)
 	}
 
-	const isPublicOrDev = isPublic
-		|| location.pathname.startsWith('/dev')
-		|| location.pathname.startsWith('/invite')
+	const isPublicOrDev =
+		isPublic ||
+		location.pathname.startsWith('/dev') ||
+		location.pathname.startsWith('/invite')
 	const needsTermsAcceptance = isUserDefined && user && !user.termsAccepted
 	let altContent = null
 	if (isPublicOrDev) {
@@ -58,7 +59,12 @@ function Root() {
 		altContent = <Register />
 	}
 
-	if (isPublicOrDev || isLoadingUser || !isUserDefined || needsTermsAcceptance) {
+	if (
+		isPublicOrDev ||
+		isLoadingUser ||
+		!isUserDefined ||
+		needsTermsAcceptance
+	) {
 		return (
 			<div className="layout-header-full flex min-h-screen w-full flex-col">
 				<Header />

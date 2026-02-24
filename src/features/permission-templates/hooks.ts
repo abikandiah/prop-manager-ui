@@ -82,10 +82,7 @@ export function useUpdatePermissionTemplate() {
 			payload: UpdatePermissionTemplatePayload
 		}) => {
 			const variables = { id, payload }
-			const requestId = stableRequestId(
-				['updatePermissionTemplate'],
-				variables,
-			)
+			const requestId = stableRequestId(['updatePermissionTemplate'], variables)
 			return permissionTemplatesApi.update(id, payload, {
 				[IDEMPOTENCY_HEADER]: requestId,
 			})
@@ -116,7 +113,9 @@ export function useUpdatePermissionTemplate() {
 			}
 		},
 		onSettled: (data, _err, { id }) => {
-			queryClient.invalidateQueries({ queryKey: permissionTemplateKeys.detail(id) })
+			queryClient.invalidateQueries({
+				queryKey: permissionTemplateKeys.detail(id),
+			})
 			if (data?.orgId) {
 				queryClient.invalidateQueries({
 					queryKey: permissionTemplateKeys.listByOrg(data.orgId),

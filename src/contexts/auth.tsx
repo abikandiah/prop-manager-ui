@@ -4,11 +4,14 @@ import type { ReactNode } from 'react'
 import { api } from '@/api/client'
 import { clearUserDb } from '@/features/offline/db'
 
+import { Organization } from '@/domain/organization'
+
 export interface User {
 	id: string
 	email: string
 	name: string
 	termsAccepted: boolean
+	organizations: Organization[]
 }
 
 interface AuthContextType {

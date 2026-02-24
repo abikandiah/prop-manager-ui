@@ -9,14 +9,15 @@ import {
 	TableRow,
 } from '@abumble/design-system/components/Table'
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
-import {
-	FormDialog,
-} from '@abumble/design-system/components/Dialog'
+import { FormDialog } from '@abumble/design-system/components/Dialog'
 import type { PermissionTemplate } from '@/domain/permission-template'
 import { TableSkeleton, EntityActions } from '@/components/ui'
 import { config } from '@/config'
 import { formatDate } from '@/lib/format'
-import { useDeletePermissionTemplate, usePermissionTemplates } from '../../hooks'
+import {
+	useDeletePermissionTemplate,
+	usePermissionTemplates,
+} from '../../hooks'
 import { PermissionTemplateForm } from '../forms/PermissionTemplateForm'
 import { FORM_DIALOG_CLASS } from '@/lib/dialog'
 
@@ -34,14 +35,21 @@ function formatPermissions(perms: Record<string, string>): string {
 export function PermissionTemplatesTableView({
 	orgId,
 }: PermissionTemplatesTableViewProps) {
-	const { data: templates, isLoading, isError, error } = usePermissionTemplates(orgId)
+	const {
+		data: templates,
+		isLoading,
+		isError,
+		error,
+	} = usePermissionTemplates(orgId)
 	const deleteTemplate = useDeletePermissionTemplate()
 	const [editing, setEditing] = useState<PermissionTemplate | null>(null)
 
 	const lastErrorRef = useRef<unknown>(null)
 	if (isError && error !== lastErrorRef.current) {
 		lastErrorRef.current = error
-		toast.error(`Error loading templates: ${(error as Error).message ?? 'Unknown'}`)
+		toast.error(
+			`Error loading templates: ${(error as Error).message ?? 'Unknown'}`,
+		)
 	}
 	if (!isError) lastErrorRef.current = null
 
@@ -62,7 +70,9 @@ export function PermissionTemplatesTableView({
 		<>
 			<FormDialog
 				open={editing !== null}
-				onOpenChange={(open) => { if (!open) setEditing(null) }}
+				onOpenChange={(open) => {
+					if (!open) setEditing(null)
+				}}
 				title="Edit template"
 				description="Update the template name or permissions."
 				className={FORM_DIALOG_CLASS}

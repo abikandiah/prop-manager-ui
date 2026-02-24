@@ -130,6 +130,23 @@ export function AppSidebar() {
 									onItemClick={closeMobileSidebar}
 								/>
 								<CollapsibleSidebarSection
+									title="Team"
+									icon={UserCheck}
+									items={[
+										{
+											to: '/organization/members',
+											label: 'Members',
+											icon: Users,
+										},
+										{
+											to: '/organization/roles',
+											label: 'Roles',
+											icon: FileSignature,
+										},
+									]}
+									onItemClick={closeMobileSidebar}
+								/>
+								<CollapsibleSidebarSection
 									title="Maintenance"
 									icon={Wrench}
 									items={[

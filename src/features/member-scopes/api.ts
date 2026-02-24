@@ -63,10 +63,9 @@ class MemberScopesApi {
 		scopeId: string,
 		headers?: Record<string, string>,
 	): Promise<void> {
-		await api.delete(
-			`${this.endpoint(orgId, membershipId)}/${scopeId}`,
-			{ headers },
-		)
+		await api.delete(`${this.endpoint(orgId, membershipId)}/${scopeId}`, {
+			headers,
+		})
 	}
 }
 

@@ -30,21 +30,16 @@ const createScopeSchema = z
 		permissions: z.record(z.string(), z.string()),
 	})
 	.refine(
-		(data) =>
-			data.scopeType === 'ORG' ||
-			(data.scopeId.trim().length > 0),
+		(data) => data.scopeType === 'ORG' || data.scopeId.trim().length > 0,
 		{
 			message: 'Scope ID is required for PROPERTY and UNIT scopes',
 			path: ['scopeId'],
 		},
 	)
-	.refine(
-		(data) => !data.useTemplate || data.templateId.trim().length > 0,
-		{
-			message: 'Select a template',
-			path: ['templateId'],
-		},
-	)
+	.refine((data) => !data.useTemplate || data.templateId.trim().length > 0, {
+		message: 'Select a template',
+		path: ['templateId'],
+	})
 	.refine(
 		(data) =>
 			data.useTemplate ||
@@ -205,10 +200,7 @@ export function CreateScopeForm({
 							<p className="text-xs text-muted-foreground">
 								Preview of permissions granted by this template:
 							</p>
-							<PermissionMatrixEditor
-								value={previewPermissions}
-								readOnly
-							/>
+							<PermissionMatrixEditor value={previewPermissions} readOnly />
 						</div>
 					)}
 				</div>

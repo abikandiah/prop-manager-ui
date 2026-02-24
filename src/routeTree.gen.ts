@@ -23,6 +23,8 @@ import { Route as TenantsTenantIdRouteImport } from './routes/tenants/$tenantId'
 import { Route as SettingsPermissionTemplatesRouteImport } from './routes/settings/permission-templates'
 import { Route as PublicTermsRouteImport } from './routes/public/terms'
 import { Route as PublicPrivacyRouteImport } from './routes/public/privacy'
+import { Route as OrganizationRolesRouteImport } from './routes/organization/roles'
+import { Route as OrganizationMembersRouteImport } from './routes/organization/members'
 import { Route as InviteTokenRouteImport } from './routes/invite/$token'
 import { Route as DevAuthRouteImport } from './routes/dev/auth'
 import { Route as PropsIdRouteRouteImport } from './routes/props/$id/route'
@@ -39,6 +41,7 @@ import { Route as LeasesAgreementsIndexRouteImport } from './routes/leases/agree
 import { Route as FinanceTransactionsIndexRouteImport } from './routes/finance/transactions/index'
 import { Route as FinanceReportsIndexRouteImport } from './routes/finance/reports/index'
 import { Route as FinanceInvoicesIndexRouteImport } from './routes/finance/invoices/index'
+import { Route as OrganizationMembersMembershipIdRouteImport } from './routes/organization/members.$membershipId'
 import { Route as LeasesTemplatesTemplateIdRouteImport } from './routes/leases/templates/$templateId'
 import { Route as LeasesAgreementsLeaseIdRouteImport } from './routes/leases/agreements/$leaseId'
 
@@ -111,6 +114,16 @@ const PublicTermsRoute = PublicTermsRouteImport.update({
 const PublicPrivacyRoute = PublicPrivacyRouteImport.update({
   id: '/public/privacy',
   path: '/public/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrganizationRolesRoute = OrganizationRolesRouteImport.update({
+  id: '/organization/roles',
+  path: '/organization/roles',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrganizationMembersRoute = OrganizationMembersRouteImport.update({
+  id: '/organization/members',
+  path: '/organization/members',
   getParentRoute: () => rootRouteImport,
 } as any)
 const InviteTokenRoute = InviteTokenRouteImport.update({
@@ -196,6 +209,12 @@ const FinanceInvoicesIndexRoute = FinanceInvoicesIndexRouteImport.update({
   path: '/finance/invoices/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrganizationMembersMembershipIdRoute =
+  OrganizationMembersMembershipIdRouteImport.update({
+    id: '/$membershipId',
+    path: '/$membershipId',
+    getParentRoute: () => OrganizationMembersRoute,
+  } as any)
 const LeasesTemplatesTemplateIdRoute =
   LeasesTemplatesTemplateIdRouteImport.update({
     id: '/$templateId',
@@ -216,6 +235,8 @@ export interface FileRoutesByFullPath {
   '/props/$id': typeof PropsIdRouteRouteWithChildren
   '/dev/auth': typeof DevAuthRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/organization/members': typeof OrganizationMembersRouteWithChildren
+  '/organization/roles': typeof OrganizationRolesRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
   '/settings/permission-templates': typeof SettingsPermissionTemplatesRoute
@@ -230,6 +251,7 @@ export interface FileRoutesByFullPath {
   '/units/': typeof UnitsIndexRoute
   '/leases/agreements/$leaseId': typeof LeasesAgreementsLeaseIdRoute
   '/leases/templates/$templateId': typeof LeasesTemplatesTemplateIdRoute
+  '/organization/members/$membershipId': typeof OrganizationMembersMembershipIdRoute
   '/finance/invoices/': typeof FinanceInvoicesIndexRoute
   '/finance/reports/': typeof FinanceReportsIndexRoute
   '/finance/transactions/': typeof FinanceTransactionsIndexRoute
@@ -246,6 +268,8 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dev/auth': typeof DevAuthRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/organization/members': typeof OrganizationMembersRouteWithChildren
+  '/organization/roles': typeof OrganizationRolesRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
   '/settings/permission-templates': typeof SettingsPermissionTemplatesRoute
@@ -260,6 +284,7 @@ export interface FileRoutesByTo {
   '/units': typeof UnitsIndexRoute
   '/leases/agreements/$leaseId': typeof LeasesAgreementsLeaseIdRoute
   '/leases/templates/$templateId': typeof LeasesTemplatesTemplateIdRoute
+  '/organization/members/$membershipId': typeof OrganizationMembersMembershipIdRoute
   '/finance/invoices': typeof FinanceInvoicesIndexRoute
   '/finance/reports': typeof FinanceReportsIndexRoute
   '/finance/transactions': typeof FinanceTransactionsIndexRoute
@@ -281,6 +306,8 @@ export interface FileRoutesById {
   '/props/$id': typeof PropsIdRouteRouteWithChildren
   '/dev/auth': typeof DevAuthRoute
   '/invite/$token': typeof InviteTokenRoute
+  '/organization/members': typeof OrganizationMembersRouteWithChildren
+  '/organization/roles': typeof OrganizationRolesRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
   '/settings/permission-templates': typeof SettingsPermissionTemplatesRoute
@@ -295,6 +322,7 @@ export interface FileRoutesById {
   '/units/': typeof UnitsIndexRoute
   '/leases/agreements/$leaseId': typeof LeasesAgreementsLeaseIdRoute
   '/leases/templates/$templateId': typeof LeasesTemplatesTemplateIdRoute
+  '/organization/members/$membershipId': typeof OrganizationMembersMembershipIdRoute
   '/finance/invoices/': typeof FinanceInvoicesIndexRoute
   '/finance/reports/': typeof FinanceReportsIndexRoute
   '/finance/transactions/': typeof FinanceTransactionsIndexRoute
@@ -317,6 +345,8 @@ export interface FileRouteTypes {
     | '/props/$id'
     | '/dev/auth'
     | '/invite/$token'
+    | '/organization/members'
+    | '/organization/roles'
     | '/public/privacy'
     | '/public/terms'
     | '/settings/permission-templates'
@@ -331,6 +361,7 @@ export interface FileRouteTypes {
     | '/units/'
     | '/leases/agreements/$leaseId'
     | '/leases/templates/$templateId'
+    | '/organization/members/$membershipId'
     | '/finance/invoices/'
     | '/finance/reports/'
     | '/finance/transactions/'
@@ -347,6 +378,8 @@ export interface FileRouteTypes {
     | '/'
     | '/dev/auth'
     | '/invite/$token'
+    | '/organization/members'
+    | '/organization/roles'
     | '/public/privacy'
     | '/public/terms'
     | '/settings/permission-templates'
@@ -361,6 +394,7 @@ export interface FileRouteTypes {
     | '/units'
     | '/leases/agreements/$leaseId'
     | '/leases/templates/$templateId'
+    | '/organization/members/$membershipId'
     | '/finance/invoices'
     | '/finance/reports'
     | '/finance/transactions'
@@ -381,6 +415,8 @@ export interface FileRouteTypes {
     | '/props/$id'
     | '/dev/auth'
     | '/invite/$token'
+    | '/organization/members'
+    | '/organization/roles'
     | '/public/privacy'
     | '/public/terms'
     | '/settings/permission-templates'
@@ -395,6 +431,7 @@ export interface FileRouteTypes {
     | '/units/'
     | '/leases/agreements/$leaseId'
     | '/leases/templates/$templateId'
+    | '/organization/members/$membershipId'
     | '/finance/invoices/'
     | '/finance/reports/'
     | '/finance/transactions/'
@@ -415,6 +452,8 @@ export interface RootRouteChildren {
   LeasesTemplatesRouteRoute: typeof LeasesTemplatesRouteRouteWithChildren
   PropsIdRouteRoute: typeof PropsIdRouteRouteWithChildren
   InviteTokenRoute: typeof InviteTokenRoute
+  OrganizationMembersRoute: typeof OrganizationMembersRouteWithChildren
+  OrganizationRolesRoute: typeof OrganizationRolesRoute
   PublicPrivacyRoute: typeof PublicPrivacyRoute
   PublicTermsRoute: typeof PublicTermsRoute
   SettingsPermissionTemplatesRoute: typeof SettingsPermissionTemplatesRoute
@@ -536,6 +575,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicPrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/organization/roles': {
+      id: '/organization/roles'
+      path: '/organization/roles'
+      fullPath: '/organization/roles'
+      preLoaderRoute: typeof OrganizationRolesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/organization/members': {
+      id: '/organization/members'
+      path: '/organization/members'
+      fullPath: '/organization/members'
+      preLoaderRoute: typeof OrganizationMembersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/invite/$token': {
       id: '/invite/$token'
       path: '/invite/$token'
@@ -648,6 +701,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FinanceInvoicesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/organization/members/$membershipId': {
+      id: '/organization/members/$membershipId'
+      path: '/$membershipId'
+      fullPath: '/organization/members/$membershipId'
+      preLoaderRoute: typeof OrganizationMembersMembershipIdRouteImport
+      parentRoute: typeof OrganizationMembersRoute
+    }
     '/leases/templates/$templateId': {
       id: '/leases/templates/$templateId'
       path: '/$templateId'
@@ -719,6 +779,17 @@ const PropsIdRouteRouteWithChildren = PropsIdRouteRoute._addFileChildren(
   PropsIdRouteRouteChildren,
 )
 
+interface OrganizationMembersRouteChildren {
+  OrganizationMembersMembershipIdRoute: typeof OrganizationMembersMembershipIdRoute
+}
+
+const OrganizationMembersRouteChildren: OrganizationMembersRouteChildren = {
+  OrganizationMembersMembershipIdRoute: OrganizationMembersMembershipIdRoute,
+}
+
+const OrganizationMembersRouteWithChildren =
+  OrganizationMembersRoute._addFileChildren(OrganizationMembersRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DevRouteRoute: DevRouteRouteWithChildren,
@@ -726,6 +797,8 @@ const rootRouteChildren: RootRouteChildren = {
   LeasesTemplatesRouteRoute: LeasesTemplatesRouteRouteWithChildren,
   PropsIdRouteRoute: PropsIdRouteRouteWithChildren,
   InviteTokenRoute: InviteTokenRoute,
+  OrganizationMembersRoute: OrganizationMembersRouteWithChildren,
+  OrganizationRolesRoute: OrganizationRolesRoute,
   PublicPrivacyRoute: PublicPrivacyRoute,
   PublicTermsRoute: PublicTermsRoute,
   SettingsPermissionTemplatesRoute: SettingsPermissionTemplatesRoute,

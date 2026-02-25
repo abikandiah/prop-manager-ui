@@ -129,7 +129,12 @@ function TenantRowActions({ tenant, leaseId, isDraft }: TenantRowActionsProps) {
 
 	const handleResend = () => {
 		resendInvite.mutate(
-			{ leaseId, leaseTenantId: tenant.id, email: tenant.email },
+			{
+				leaseId,
+				leaseTenantId: tenant.id,
+				inviteId: tenant.inviteId,
+				email: tenant.email,
+			},
 			{
 				onSuccess: () => {
 					toast.success(`Invitation resent to ${tenant.email}`)

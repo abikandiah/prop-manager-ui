@@ -5,7 +5,13 @@ import { config } from '@/config'
 import type { User } from '@/contexts/auth'
 import { useAuth } from '@/contexts/auth'
 import { useAcceptInvite, useInvitePreview } from '@/features/invites/hooks'
-import { InviteStatus } from '@/features/invites/types'
+import {
+	InviteStatus,
+	TargetType,
+	type InvitePreviewResponse,
+	type LeaseInvitePreview,
+	type MembershipInvitePreview,
+} from '@/features/invites/types'
 import { formatCurrency, formatDate, formatDateTime } from '@/lib/format'
 import { Button } from '@abumble/design-system/components/Button'
 import {
@@ -17,7 +23,7 @@ import {
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import { Home } from 'lucide-react'
+import { Building2, Home } from 'lucide-react'
 import { toast } from 'sonner'
 
 export const Route = createFileRoute('/invite/$token')({
@@ -35,11 +41,16 @@ function InviteAcceptPage() {
 	const handleAccept = () => {
 		acceptInvite.mutate(token, {
 			onSuccess: (data) => {
-				toast.success("You've joined the lease!")
-				navigate({
-					to: '/leases/agreements/$leaseId',
-					params: { leaseId: data.targetId },
-				})
+				if (data.targetType === TargetType.LEASE) {
+					toast.success("You've joined the lease!")
+					navigate({
+						to: '/leases/agreements/$leaseId',
+						params: { leaseId: data.targetId },
+					})
+				} else {
+					toast.success("You've joined the organization!")
+					navigate({ to: '/' })
+				}
 			},
 		})
 	}
@@ -76,7 +87,7 @@ function InviteAcceptPage() {
 }
 
 interface InvitePageContentProps {
-	preview: NonNullable<ReturnType<typeof useInvitePreview>['data']>
+	preview: InvitePreviewResponse
 	user: User | null
 	onAccept: () => void
 	isAccepting: boolean
@@ -90,25 +101,13 @@ function InvitePageContent({
 	isAccepting,
 	onRegistered,
 }: InvitePageContentProps) {
-	const {
-		property,
-		unit,
-		lease,
-		maskedEmail,
-		expiresAt,
-		invitedByName,
-		status,
-	} = preview
-
-	const propertyAddress = [
-		property.addressLine1,
-		property.addressLine2,
-		`${property.city}, ${property.stateProvinceRegion} ${property.postalCode}`,
-	]
-		.filter(Boolean)
-		.join(', ')
+	const { maskedEmail, expiresAt, invitedByName, status, targetType, preview: snapshot } =
+		preview
 
 	const isPending = status === InviteStatus.PENDING
+	const isLease = targetType === TargetType.LEASE
+	const leaseSnapshot = isLease ? (snapshot as LeaseInvitePreview) : null
+	const membershipSnapshot = !isLease ? (snapshot as MembershipInvitePreview) : null
 
 	return (
 		<div className="flex flex-col gap-6">
@@ -119,29 +118,47 @@ function InvitePageContent({
 					<span className="font-medium text-foreground">{invitedByName}</span>
 				</p>
 				<h1 className="text-2xl font-semibold text-foreground">
-					You've been invited to join as a tenant
+					{isLease
+						? "You've been invited to join as a tenant"
+						: `You've been invited to join ${membershipSnapshot?.organizationName}`}
 				</h1>
-				<div className="flex items-center gap-1.5 text-sm text-muted-foreground">
-					<Home className="size-3.5 shrink-0" />
-					<span>{property.legalName}</span>
-					{propertyAddress && (
-						<>
-							<span>·</span>
-							<span>{propertyAddress}</span>
-						</>
-					)}
-				</div>
+				{isLease && leaseSnapshot && (
+					<div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+						<Home className="size-3.5 shrink-0" />
+						<span>{leaseSnapshot.property.legalName}</span>
+						{leaseSnapshot.property.addressLine1 && (
+							<>
+								<span>·</span>
+								<span>
+									{[
+										leaseSnapshot.property.addressLine1,
+										leaseSnapshot.property.addressLine2,
+										`${leaseSnapshot.property.city}, ${leaseSnapshot.property.stateProvinceRegion} ${leaseSnapshot.property.postalCode}`,
+									]
+										.filter(Boolean)
+										.join(', ')}
+								</span>
+							</>
+						)}
+					</div>
+				)}
+				{!isLease && membershipSnapshot && (
+					<div className="flex items-center gap-1.5 text-sm text-muted-foreground">
+						<Building2 className="size-3.5 shrink-0" />
+						<span>{membershipSnapshot.organizationName}</span>
+					</div>
+				)}
 			</div>
 
 			{/* Detail sections — only when invite is pending */}
-			{isPending && (
+			{isPending && isLease && leaseSnapshot && (
 				<div className="flex flex-col gap-4">
 					{/* Unit */}
 					<div className="rounded-lg border bg-card px-5 py-4">
 						<div className="grid gap-4 sm:grid-cols-2">
 							<DetailField label="Unit">
-								{unit.unitNumber}
-								{unit.unitType ? ` · ${unit.unitType}` : ''}
+								{leaseSnapshot.unit.unitNumber}
+								{leaseSnapshot.unit.unitType ? ` · ${leaseSnapshot.unit.unitType}` : ''}
 							</DetailField>
 							<DetailField label="Sent to">{maskedEmail}</DetailField>
 						</div>
@@ -154,15 +171,26 @@ function InvitePageContent({
 								label="Monthly Rent"
 								valueClassName="text-lg font-semibold text-foreground"
 							>
-								{formatCurrency(lease.rentAmount)}
+								{formatCurrency(leaseSnapshot.lease.rentAmount)}
 							</DetailField>
 							<DetailField label="Lease Start">
-								{formatDate(lease.startDate)}
+								{formatDate(leaseSnapshot.lease.startDate)}
 							</DetailField>
 							<DetailField label="Lease End">
-								{formatDate(lease.endDate)}
+								{formatDate(leaseSnapshot.lease.endDate)}
 							</DetailField>
 						</div>
+					</div>
+				</div>
+			)}
+
+			{isPending && !isLease && membershipSnapshot && (
+				<div className="rounded-lg border bg-card px-5 py-4">
+					<div className="grid gap-4 sm:grid-cols-2">
+						<DetailField label="Organization">
+							{membershipSnapshot.organizationName}
+						</DetailField>
+						<DetailField label="Sent to">{maskedEmail}</DetailField>
 					</div>
 				</div>
 			)}
@@ -172,6 +200,8 @@ function InvitePageContent({
 				<div className="w-full max-w-md">
 					<InviteActionCard
 						status={status}
+						targetType={targetType}
+						organizationName={membershipSnapshot?.organizationName}
 						user={user}
 						expiresAt={expiresAt}
 						onAccept={onAccept}
@@ -186,6 +216,8 @@ function InvitePageContent({
 
 interface InviteActionCardProps {
 	status: InviteStatus
+	targetType: TargetType
+	organizationName?: string
 	user: User | null
 	expiresAt: string
 	onAccept: () => void
@@ -195,19 +227,25 @@ interface InviteActionCardProps {
 
 function InviteActionCard({
 	status,
+	targetType,
+	organizationName,
 	user,
 	expiresAt,
 	onAccept,
 	isAccepting,
 	onRegistered,
 }: InviteActionCardProps) {
+	const isLease = targetType === TargetType.LEASE
+
 	if (!user) {
 		return (
 			<Card>
 				<CardHeader>
 					<CardTitle className="text-base">Create your account</CardTitle>
 					<p className="text-sm text-muted-foreground">
-						Register to accept this invite and access your lease.
+						{isLease
+							? 'Register to accept this invite and access your lease.'
+							: `Register to accept this invite and join ${organizationName}.`}
 					</p>
 				</CardHeader>
 				<CardContent>
@@ -242,8 +280,9 @@ function InviteActionCard({
 				>
 					{canAccept ? (
 						<>
-							Accept the invite to join this lease as a tenant. You will be able
-							to discuss and review the lease with property management.
+							{isLease
+								? 'Accept the invite to join this lease as a tenant. You will be able to discuss and review the lease with property management.'
+								: `Accept the invite to join ${organizationName} as a member.`}
 							<br />
 							<br />
 							This invite expires {formatDateTime(expiresAt)}.
@@ -255,7 +294,9 @@ function InviteActionCard({
 							{isExpired &&
 								`This invite expired on ${formatDateTime(expiresAt)}.`}
 							{isAccepted &&
-								"You've already accepted this invite and have access to the lease."}
+								(isLease
+									? "You've already accepted this invite and have access to the lease."
+									: "You've already accepted this invite and have access to the organization.")}
 						</>
 					)}
 				</p>
@@ -271,9 +312,11 @@ function InviteActionCard({
 						>
 							{isAccepting ? 'Joining...' : 'Accept Invite'}
 						</Button>
-						<p className="text-xs text-muted-foreground text-center">
-							* Accepting this invite is not the same as signing the lease.
-						</p>
+						{isLease && (
+							<p className="text-xs text-muted-foreground text-center">
+								* Accepting this invite is not the same as signing the lease.
+							</p>
+						)}
 					</>
 				)}
 			</CardContent>

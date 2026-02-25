@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { leaseKeys, leaseTenantKeys } from './keys'
 import { leasesApi, leaseTenantApi } from './api'
+import { invitesApi } from '@/features/invites/api'
 import type {
 	CreateLeasePayload,
 	Lease,

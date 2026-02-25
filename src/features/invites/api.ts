@@ -1,9 +1,9 @@
 import { api } from '@/api/client'
-import type { Invite, CreateInvitePayload } from './types'
+import type { Invite, CreateInvitePayload, InvitePreviewResponse } from './types'
 
 export const invitesApi = {
 	getPreview: (token: string) =>
-		api.get<any>(`/public/invites/${token}`).then((r) => r.data),
+		api.get<InvitePreviewResponse>(`/public/invites/${token}`).then((r) => r.data),
 
 	accept: (token: string) =>
 		api.post<Invite>(`/invites/${token}/accept`).then((r) => r.data),

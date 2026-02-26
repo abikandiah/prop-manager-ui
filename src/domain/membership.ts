@@ -26,10 +26,13 @@ export interface CreateMembershipPayload {
 
 export interface InviteMemberPayload {
 	email: string
-	initialScopes: Array<{
+	/** Optional template to link to the membership. Template items resolve live at JWT hydration. */
+	templateId?: string
+	/** Binding scope rows. For ORG-only templates, omit or leave empty. For PROPERTY/UNIT templates,
+	 *  include one row per resource (empty permissions = pure binding row). */
+	initialScopes?: Array<{
 		scopeType: 'ORG' | 'PROPERTY' | 'UNIT'
 		scopeId: string
-		templateId?: string
 		permissions?: Record<string, string>
 	}>
 }

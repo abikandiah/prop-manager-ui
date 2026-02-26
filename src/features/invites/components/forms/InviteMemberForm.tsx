@@ -10,13 +10,27 @@ import { Input } from '@abumble/design-system/components/Input'
 import { Label } from '@abumble/design-system/components/Label'
 import { FieldError } from '@/components/ui/FieldError'
 import { RequiredMark } from '@/components/ui'
-import { PermissionTemplateSelect } from '@/features/permission-templates'
+import {
+	PermissionTemplateSelect,
+	usePermissionTemplateDetail,
+} from '@/features/permission-templates'
 import { useInviteMember } from '@/features/memberships'
+import { usePropsList } from '@/features/props'
 
-const inviteSchema = z.object({
-	email: z.string().email('Invalid email address'),
-	templateId: z.string().min(1, 'Please select a role'),
-})
+const inviteSchema = z
+	.object({
+		email: z.string().email('Invalid email address'),
+		templateId: z.string().min(1, 'Please select a role'),
+		propertyIds: z.array(z.string()),
+		unitId: z.string(),
+	})
+	.refine(
+		(_data) => {
+			// Resource IDs validated in onSubmit after template data loads
+			return true
+		},
+		{ message: '' },
+	)
 
 type InviteFormValues = z.infer<typeof inviteSchema>
 
@@ -32,10 +46,12 @@ export function InviteMemberForm({
 	onCancel,
 }: InviteMemberFormProps) {
 	const inviteMember = useInviteMember()
+	const { data: props } = usePropsList()
 
 	const {
 		register,
 		control,
+		watch,
 		handleSubmit,
 		formState: { errors },
 	} = useForm<InviteFormValues>({
@@ -43,24 +59,46 @@ export function InviteMemberForm({
 		defaultValues: {
 			email: '',
 			templateId: '',
+			propertyIds: [],
+			unitId: '',
 		},
 		mode: 'onTouched',
 	})
 
+	const templateId = watch('templateId')
+
+	const { data: selectedTemplate } = usePermissionTemplateDetail(
+		templateId || null,
+	)
+
+	const needsPropertyBinding =
+		selectedTemplate?.items.some((i) => i.scopeType === 'PROPERTY') ?? false
+	const needsUnitBinding =
+		selectedTemplate?.items.some((i) => i.scopeType === 'UNIT') ?? false
+
 	const onSubmit = useCallback(
 		(values: InviteFormValues) => {
+			const scopes: Array<{
+				scopeType: 'ORG' | 'PROPERTY' | 'UNIT'
+				scopeId: string
+			}> = []
+
+			if (needsPropertyBinding) {
+				for (const propId of values.propertyIds) {
+					scopes.push({ scopeType: 'PROPERTY', scopeId: propId })
+				}
+			}
+			if (needsUnitBinding && values.unitId) {
+				scopes.push({ scopeType: 'UNIT', scopeId: values.unitId })
+			}
+
 			inviteMember.mutate(
 				{
 					orgId,
 					payload: {
 						email: values.email,
-						initialScopes: [
-							{
-								scopeType: 'ORG',
-								scopeId: orgId,
-								templateId: values.templateId,
-							},
-						],
+						templateId: values.templateId,
+						initialScopes: scopes,
 					},
 				},
 				{
@@ -71,7 +109,7 @@ export function InviteMemberForm({
 				},
 			)
 		},
-		[orgId, inviteMember, onSuccess],
+		[orgId, inviteMember, onSuccess, needsPropertyBinding, needsUnitBinding],
 	)
 
 	return (
@@ -106,10 +144,73 @@ export function InviteMemberForm({
 					)}
 				/>
 				<p className="text-xs text-muted-foreground">
-					Select a role to define this member's initial permissions.
+					Select a role to define this member's permissions.
 				</p>
 				<FieldError message={errors.templateId?.message} />
 			</div>
+
+			{needsPropertyBinding && (
+				<div className="space-y-2">
+					<Label>
+						Properties <RequiredMark />
+					</Label>
+					<p className="text-xs text-muted-foreground">
+						Select the properties this member will manage.
+					</p>
+					<Controller
+						name="propertyIds"
+						control={control}
+						render={({ field }) => (
+							<div className="space-y-1 max-h-40 overflow-y-auto rounded border p-2">
+								{props && props.length > 0 ? (
+									props.map((prop) => (
+										<label
+											key={prop.id}
+											className="flex items-center gap-2 text-sm cursor-pointer rounded px-2 py-1 hover:bg-muted/50"
+										>
+											<input
+												type="checkbox"
+												value={prop.id}
+												checked={field.value.includes(prop.id)}
+												onChange={(e) => {
+													if (e.target.checked) {
+														field.onChange([...field.value, prop.id])
+													} else {
+														field.onChange(
+															field.value.filter((id) => id !== prop.id),
+														)
+													}
+												}}
+											/>
+											{prop.legalName}
+										</label>
+									))
+								) : (
+									<p className="text-sm text-muted-foreground px-2 py-1">
+										No properties found.
+									</p>
+								)}
+							</div>
+						)}
+					/>
+				</div>
+			)}
+
+			{needsUnitBinding && (
+				<div className="space-y-2">
+					<Label htmlFor="unitId">
+						Unit ID <RequiredMark />
+					</Label>
+					<Input
+						id="unitId"
+						placeholder="Paste the unit UUID"
+						{...register('unitId')}
+					/>
+					<p className="text-xs text-muted-foreground">
+						The unique ID of the unit this tenant will occupy.
+					</p>
+				</div>
+			)}
 
 			<DialogFooter className="gap-2">
 				{onCancel && (

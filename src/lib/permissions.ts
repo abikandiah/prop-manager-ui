@@ -13,10 +13,12 @@ export const Actions = {
  * Short domain keys used as permission map keys in access entries.
  */
 export const PermissionDomains = {
+	PORTFOLIO: 'p',
 	LEASES: 'l',
 	MAINTENANCE: 'm',
 	FINANCES: 'f',
 	TENANTS: 't',
+	ORGANIZATION: 'o',
 } as const
 
 /**

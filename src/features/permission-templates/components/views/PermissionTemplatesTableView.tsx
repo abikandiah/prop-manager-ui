@@ -25,11 +25,18 @@ export interface PermissionTemplatesTableViewProps {
 	orgId: string
 }
 
-/** Summarises a permissions map as a short human-readable string, e.g. "l:rcud · m:r". */
-function formatPermissions(perms: Record<string, string>): string {
-	const entries = Object.entries(perms).filter(([, v]) => v)
-	if (entries.length === 0) return '—'
-	return entries.map(([k, v]) => `${k}: ${v}`).join(' · ')
+/** Summarises template items as a short human-readable string, e.g. "ORG: l:rcud · PROPERTY: m:r". */
+function formatItems(items: PermissionTemplate['items']): string {
+	if (!items || items.length === 0) return '—'
+	return items
+		.map((item) => {
+			const perms = Object.entries(item.permissions)
+				.filter(([, v]) => v)
+				.map(([k, v]) => `${k}:${v}`)
+				.join(' ')
+			return `${item.scopeType}: ${perms}`
+		})
+		.join(' · ')
 }
 
 export function PermissionTemplatesTableView({
@@ -124,7 +131,7 @@ export function PermissionTemplatesTableView({
 											{template.orgId === null ? 'System' : 'Organization'}
 										</TableCell>
 										<TableCell className="text-muted-foreground text-sm font-mono">
-											{formatPermissions(template.defaultPermissions)}
+											{formatItems(template.items)}
 										</TableCell>
 										<TableCell className="text-muted-foreground">
 											{formatDate(template.createdAt)}

@@ -6,7 +6,7 @@ import type {
 import { api } from '@/api/client'
 import { BaseService } from '@/api/base-service'
 
-const ENDPOINT = 'permission-templates'
+const ENDPOINT = 'membership-templates'
 
 class PermissionTemplatesApi extends BaseService<
 	PermissionTemplate,

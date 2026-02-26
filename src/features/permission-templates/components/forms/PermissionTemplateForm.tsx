@@ -8,7 +8,10 @@ import { Button } from '@abumble/design-system/components/Button'
 import { DialogFooter } from '@abumble/design-system/components/Dialog'
 import { Input } from '@abumble/design-system/components/Input'
 import { Label } from '@abumble/design-system/components/Label'
-import type { PermissionTemplate } from '@/domain/permission-template'
+import type {
+	MembershipTemplateItem,
+	PermissionTemplate,
+} from '@/domain/permission-template'
 import { FieldError } from '@/components/ui/FieldError'
 import { RequiredMark } from '@/components/ui'
 import {
@@ -19,21 +22,59 @@ import { PermissionMatrixEditor } from '../PermissionMatrixEditor'
 
 // ---------- Schema ----------
 
+const permissionsRecord = z.record(z.string(), z.string())
+
 const permissionTemplateSchema = z
 	.object({
 		name: z.string().min(1, 'Name is required').max(255),
-		defaultPermissions: z.record(z.string(), z.string()),
+		orgPermissions: permissionsRecord,
+		propertyPermissions: permissionsRecord,
+		unitPermissions: permissionsRecord,
 	})
 	.refine(
 		(data) =>
-			Object.values(data.defaultPermissions).some((v) => v.trim() !== ''),
+			[
+				data.orgPermissions,
+				data.propertyPermissions,
+				data.unitPermissions,
+			].some((p) => Object.values(p).some((v) => v.trim() !== '')),
 		{
-			message: 'Grant at least one permission',
-			path: ['defaultPermissions'],
+			message: 'Grant at least one permission across any scope level',
+			path: ['orgPermissions'],
 		},
 	)
 
 type PermissionTemplateFormValues = z.infer<typeof permissionTemplateSchema>
+
+function itemsToFormValues(items: MembershipTemplateItem[]) {
+	const org = items.find((i) => i.scopeType === 'ORG')?.permissions ?? {}
+	const property =
+		items.find((i) => i.scopeType === 'PROPERTY')?.permissions ?? {}
+	const unit = items.find((i) => i.scopeType === 'UNIT')?.permissions ?? {}
+	return {
+		orgPermissions: org,
+		propertyPermissions: property,
+		unitPermissions: unit,
+	}
+}
+
+function formValuesToItems(
+	values: PermissionTemplateFormValues,
+): MembershipTemplateItem[] {
+	const items: MembershipTemplateItem[] = []
+	const hasPerms = (p: Record<string, string>) =>
+		Object.values(p).some((v) => v.trim() !== '')
+	if (hasPerms(values.orgPermissions))
+		items.push({ scopeType: 'ORG', permissions: values.orgPermissions })
+	if (hasPerms(values.propertyPermissions))
+		items.push({
+			scopeType: 'PROPERTY',
+			permissions: values.propertyPermissions,
+		})
+	if (hasPerms(values.unitPermissions))
+		items.push({ scopeType: 'UNIT', permissions: values.unitPermissions })
+	return items
+}
 
 // ---------- Props ----------
 
@@ -61,6 +102,10 @@ export function PermissionTemplateForm({
 	const updateTemplate = useUpdatePermissionTemplate()
 	const pending = createTemplate.isPending || updateTemplate.isPending
 
+	const defaultPerms = initialTemplate
+		? itemsToFormValues(initialTemplate.items)
+		: { orgPermissions: {}, propertyPermissions: {}, unitPermissions: {} }
+
 	const {
 		register,
 		control,
@@ -68,27 +113,23 @@ export function PermissionTemplateForm({
 		formState: { errors },
 	} = useForm<PermissionTemplateFormValues>({
 		resolver: standardSchemaResolver(permissionTemplateSchema),
-		defaultValues: initialTemplate
-			? {
-					name: initialTemplate.name,
-					defaultPermissions: initialTemplate.defaultPermissions,
-				}
-			: {
-					name: '',
-					defaultPermissions: {},
-				},
+		defaultValues: {
+			name: initialTemplate?.name ?? '',
+			...defaultPerms,
+		},
 		mode: 'onTouched',
 	})
 
 	const onSubmit = useCallback(
 		(values: PermissionTemplateFormValues) => {
+			const items = formValuesToItems(values)
 			if (isEdit) {
 				updateTemplate.mutate(
 					{
 						id: initialTemplate.id,
 						payload: {
 							name: values.name.trim(),
-							defaultPermissions: values.defaultPermissions,
+							items,
 							version: initialTemplate.version,
 						},
 					},
@@ -104,7 +145,7 @@ export function PermissionTemplateForm({
 					{
 						name: values.name.trim(),
 						orgId: orgId ?? null,
-						defaultPermissions: values.defaultPermissions,
+						items,
 					},
 					{
 						onSuccess: () => {
@@ -134,12 +175,12 @@ export function PermissionTemplateForm({
 			</div>
 
 			<div className="space-y-2">
-				<Label>Permissions</Label>
+				<Label>Organization-level permissions</Label>
 				<p className="text-sm text-muted-foreground">
-					Choose which actions to grant for each domain.
+					Granted automatically to all holders — no resource binding needed.
 				</p>
 				<Controller
-					name="defaultPermissions"
+					name="orgPermissions"
 					control={control}
 					render={({ field }) => (
 						<PermissionMatrixEditor
@@ -148,7 +189,42 @@ export function PermissionTemplateForm({
 						/>
 					)}
 				/>
-				<FieldError message={errors.defaultPermissions?.message} />
+				<FieldError message={errors.orgPermissions?.message as string | undefined} />
+			</div>
+
+			<div className="space-y-2">
+				<Label>Property-level permissions</Label>
+				<p className="text-sm text-muted-foreground">
+					Applied per property when a binding scope row exists for that
+					property.
+				</p>
+				<Controller
+					name="propertyPermissions"
+					control={control}
+					render={({ field }) => (
+						<PermissionMatrixEditor
+							value={field.value}
+							onChange={field.onChange}
+						/>
+					)}
+				/>
+			</div>
+
+			<div className="space-y-2">
+				<Label>Unit-level permissions</Label>
+				<p className="text-sm text-muted-foreground">
+					Applied per unit when a binding scope row exists for that unit.
+				</p>
+				<Controller
+					name="unitPermissions"
+					control={control}
+					render={({ field }) => (
+						<PermissionMatrixEditor
+							value={field.value}
+							onChange={field.onChange}
+						/>
+					)}
+				/>
 			</div>
 
 			<DialogFooter className="gap-2">

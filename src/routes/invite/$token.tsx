@@ -101,13 +101,21 @@ function InvitePageContent({
 	isAccepting,
 	onRegistered,
 }: InvitePageContentProps) {
-	const { maskedEmail, expiresAt, invitedByName, status, targetType, preview: snapshot } =
-		preview
+	const {
+		maskedEmail,
+		expiresAt,
+		invitedByName,
+		status,
+		targetType,
+		preview: snapshot,
+	} = preview
 
 	const isPending = status === InviteStatus.PENDING
 	const isLease = targetType === TargetType.LEASE
 	const leaseSnapshot = isLease ? (snapshot as LeaseInvitePreview) : null
-	const membershipSnapshot = !isLease ? (snapshot as MembershipInvitePreview) : null
+	const membershipSnapshot = !isLease
+		? (snapshot as MembershipInvitePreview)
+		: null
 
 	return (
 		<div className="flex flex-col gap-6">
@@ -158,7 +166,9 @@ function InvitePageContent({
 						<div className="grid gap-4 sm:grid-cols-2">
 							<DetailField label="Unit">
 								{leaseSnapshot.unit.unitNumber}
-								{leaseSnapshot.unit.unitType ? ` · ${leaseSnapshot.unit.unitType}` : ''}
+								{leaseSnapshot.unit.unitType
+									? ` · ${leaseSnapshot.unit.unitType}`
+									: ''}
 							</DetailField>
 							<DetailField label="Sent to">{maskedEmail}</DetailField>
 						</div>

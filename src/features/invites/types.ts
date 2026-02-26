@@ -66,5 +66,8 @@ export interface InvitePreviewResponse {
 	expiresAt: string
 	invitedByName: string
 	targetType: TargetType
-	preview: LeaseInvitePreview | MembershipInvitePreview | Record<string, unknown>
+	preview:
+		| LeaseInvitePreview
+		| MembershipInvitePreview
+		| Record<string, unknown>
 }

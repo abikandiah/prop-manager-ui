@@ -2,6 +2,8 @@ import { cn } from '@abumble/design-system/utils'
 import { Checkbox } from '@abumble/design-system/components/Checkbox'
 
 const DOMAINS = [
+	{ key: 'o', label: 'Organization' },
+	{ key: 'p', label: 'Portfolio' },
 	{ key: 'l', label: 'Leases' },
 	{ key: 'm', label: 'Maintenance' },
 	{ key: 'f', label: 'Finances' },

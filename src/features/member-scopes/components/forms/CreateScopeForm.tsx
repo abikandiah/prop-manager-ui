@@ -98,9 +98,11 @@ export function CreateScopeForm({
 	const useTemplate = watch('useTemplate')
 	const templateId = watch('templateId')
 
-	// Preview permissions from the currently selected template
+	// Preview permissions for the selected template at the current scope level
 	const selectedTemplate = templates?.find((t) => t.id === templateId)
-	const previewPermissions = selectedTemplate?.defaultPermissions ?? {}
+	const previewPermissions =
+		selectedTemplate?.items.find((item) => item.scopeType === scopeType)
+			?.permissions ?? {}
 
 	const handleToggleAdvanced = () => {
 		const next = !advancedOpen
@@ -127,9 +129,9 @@ export function CreateScopeForm({
 					payload: {
 						scopeType: values.scopeType as ScopeType,
 						scopeId: resolvedScopeId,
-						...(values.useTemplate
-							? { templateId: values.templateId }
-							: { permissions: values.permissions }),
+						// In template mode the binding row alone activates the template;
+						// in manual mode supply explicit permissions.
+						permissions: values.useTemplate ? {} : values.permissions,
 					},
 				},
 				{

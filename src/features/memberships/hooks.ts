@@ -1,10 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { membershipsApi } from './api'
 import { membershipKeys } from './keys'
-import type {
-	Membership,
-	UpdateMembershipPayload,
-	InviteMemberPayload,
+import {
+	InviteStatus,
+	type Membership,
+	type UpdateMembershipPayload,
+	type InviteMemberPayload,
 } from '@/domain/membership'
 import { stableRequestId } from '@/lib/offline-types'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
@@ -62,7 +63,7 @@ export function useInviteMember() {
 				organizationId: orgId,
 				inviteId: null,
 				inviteEmail: payload.email,
-				inviteStatus: 'PENDING',
+				inviteStatus: InviteStatus.PENDING,
 				version: 0,
 				createdAt: nowIso(),
 				updatedAt: nowIso(),
@@ -113,7 +114,9 @@ export function useUpdateMembership() {
 			})
 		},
 		onSettled: (_data, _err, variables) => {
-			queryClient.invalidateQueries({ queryKey: membershipKeys.all })
+			queryClient.invalidateQueries({
+				queryKey: membershipKeys.all(variables.orgId),
+			})
 			queryClient.invalidateQueries({
 				queryKey: membershipKeys.detail(
 					variables.orgId,

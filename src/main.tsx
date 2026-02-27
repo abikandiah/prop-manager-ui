@@ -7,6 +7,7 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import { NotFound } from './components/NotFound.tsx'
 import { AuthProvider, useAuth } from './contexts/auth'
 import { NetworkProvider } from './contexts/network'
+import { OrganizationProvider } from './contexts/organization'
 import { ThemeProvider, useTheme } from './contexts/theme'
 import { createBootstrapDefaults } from './integrations/tanstack-query/client-config'
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
@@ -64,8 +65,10 @@ function AppWithProviders() {
 		<TanStackQueryProvider.Provider {...queryContext}>
 			<ThemeProvider>
 				<NetworkProvider>
-					<RouterProvider router={router} />
-					<ThemedToaster />
+					<OrganizationProvider>
+						<RouterProvider router={router} />
+						<ThemedToaster />
+					</OrganizationProvider>
 				</NetworkProvider>
 			</ThemeProvider>
 		</TanStackQueryProvider.Provider>

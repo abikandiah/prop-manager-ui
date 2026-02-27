@@ -1,9 +1,10 @@
 export const memberScopeKeys = {
-	all: ['member-scopes'] as const,
-	lists: () => [...memberScopeKeys.all, 'list'] as const,
+	all: (orgId: string) => ['org', orgId, 'member-scopes'] as const,
+	lists: (orgId: string) => [...memberScopeKeys.all(orgId), 'list'] as const,
 	list: (orgId: string, membershipId: string) =>
-		[...memberScopeKeys.lists(), orgId, membershipId] as const,
-	details: () => [...memberScopeKeys.all, 'detail'] as const,
+		[...memberScopeKeys.lists(orgId), membershipId] as const,
+	details: (orgId: string) =>
+		[...memberScopeKeys.all(orgId), 'detail'] as const,
 	detail: (orgId: string, membershipId: string, scopeId: string) =>
-		[...memberScopeKeys.details(), orgId, membershipId, scopeId] as const,
+		[...memberScopeKeys.details(orgId), membershipId, scopeId] as const,
 }

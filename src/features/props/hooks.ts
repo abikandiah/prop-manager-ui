@@ -10,6 +10,7 @@ import type {
 import { stableRequestId } from '@/lib/offline-types'
 import { generateId, nowIso } from '@/lib/util'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
+import { useOrganization } from '@/contexts/organization'
 
 /** Payload for create without id (hook adds it for optimistic update; request body matches CreatePropRequest). */
 export type CreatePropPayloadWithoutId = CreatePropRequest
@@ -19,6 +20,7 @@ export type CreatePropPayloadWithoutId = CreatePropRequest
 function applyCreate(
 	queryClient: ReturnType<typeof useQueryClient>,
 	payload: CreatePropPayload,
+	orgId: string,
 ): Prop {
 	const optimistic: Prop = {
 		id: payload.id, // Use client-generated ID from payload
@@ -35,8 +37,10 @@ function applyCreate(
 		updatedAt: nowIso(),
 		version: 0,
 	}
-	queryClient.setQueryData(propKeys.list(), (old: Array<Prop> | undefined) =>
-		old ? [...old, optimistic] : [optimistic],
+	queryClient.setQueryData(
+		propKeys.list(orgId),
+		(old: Array<Prop> | undefined) =>
+			old ? [...old, optimistic] : [optimistic],
 	)
 	return optimistic
 }
@@ -45,12 +49,13 @@ function applyUpdate(
 	queryClient: ReturnType<typeof useQueryClient>,
 	id: string,
 	payload: UpdatePropPayload,
+	orgId: string,
 ): void {
 	const updatedAt = nowIso()
 	// Omit nested address from cache merge; server response will have full address
 	const { address: _addr, ...propFields } = payload
 	queryClient.setQueryData(
-		propKeys.list(),
+		propKeys.list(orgId),
 		(old: Array<Prop> | undefined) =>
 			old?.map((p) =>
 				p.id === id
@@ -64,52 +69,59 @@ function applyUpdate(
 					: p,
 			) ?? [],
 	)
-	queryClient.setQueryData(propKeys.detail(id), (old: Prop | undefined) =>
-		old
-			? {
-					...old,
-					...propFields,
-					updatedAt,
-					address: _addr != null ? null : old.address,
-					version: old.version + 1,
-				}
-			: undefined,
+	queryClient.setQueryData(
+		propKeys.detail(orgId, id),
+		(old: Prop | undefined) =>
+			old
+				? {
+						...old,
+						...propFields,
+						updatedAt,
+						address: _addr != null ? null : old.address,
+						version: old.version + 1,
+					}
+				: undefined,
 	)
 }
 
 function applyDelete(
 	queryClient: ReturnType<typeof useQueryClient>,
 	id: string,
+	orgId: string,
 ): void {
 	queryClient.setQueryData(
-		propKeys.list(),
+		propKeys.list(orgId),
 		(old: Array<Prop> | undefined) => old?.filter((p) => p.id !== id) ?? [],
 	)
-	queryClient.removeQueries({ queryKey: propKeys.detail(id) })
+	queryClient.removeQueries({ queryKey: propKeys.detail(orgId, id) })
 }
 
 // --- Queries ---
 
 export function usePropsList() {
+	const { activeOrgId } = useOrganization()
 	return useQuery({
-		queryKey: propKeys.list(),
+		queryKey: propKeys.list(activeOrgId!),
 		queryFn: () => propsApi.list(),
+		enabled: !!activeOrgId,
 	})
 }
 
 export function usePropDetail(id: string | null) {
+	const { activeOrgId } = useOrganization()
 	return useQuery({
-		queryKey: propKeys.detail(id!),
+		queryKey: propKeys.detail(activeOrgId!, id!),
 		queryFn: () => propsApi.getById(id!),
-		enabled: id != null,
+		enabled: !!activeOrgId && id != null,
 	})
 }
 
 export function usePropUnits(propId: string | null) {
+	const { activeOrgId } = useOrganization()
 	return useQuery({
-		queryKey: propKeys.units(propId!),
+		queryKey: propKeys.units(activeOrgId!, propId!),
 		queryFn: () => propsApi.listUnits(propId!),
-		enabled: propId != null,
+		enabled: !!activeOrgId && propId != null,
 	})
 }
 
@@ -117,6 +129,7 @@ export function usePropUnits(propId: string | null) {
 
 export function useCreateProp() {
 	const queryClient = useQueryClient()
+	const { activeOrgId } = useOrganization()
 
 	const mutation = useMutation({
 		mutationKey: ['createProp'],
@@ -127,21 +140,24 @@ export function useCreateProp() {
 			return propsApi.create(body, { [IDEMPOTENCY_HEADER]: requestId })
 		},
 		onMutate: async (payload: CreatePropPayload) => {
-			await queryClient.cancelQueries({ queryKey: propKeys.list() })
+			await queryClient.cancelQueries({ queryKey: propKeys.list(activeOrgId!) })
 			const previousProps = queryClient.getQueryData<Array<Prop>>(
-				propKeys.list(),
+				propKeys.list(activeOrgId!),
 			)
-			const optimistic = applyCreate(queryClient, payload)
+			const optimistic = applyCreate(queryClient, payload, activeOrgId!)
 			return { previousProps, optimisticId: optimistic.id }
 		},
 		onError: (err, _, context) => {
 			if (context?.previousProps) {
-				queryClient.setQueryData(propKeys.list(), context.previousProps)
+				queryClient.setQueryData(
+					propKeys.list(activeOrgId!),
+					context.previousProps,
+				)
 			}
 			console.error('[Mutation] Create failed:', err)
 		},
 		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: propKeys.all })
+			queryClient.invalidateQueries({ queryKey: propKeys.all(activeOrgId!) })
 		},
 	})
 
@@ -160,6 +176,7 @@ export function useCreateProp() {
 
 export function useUpdateProp() {
 	const queryClient = useQueryClient()
+	const { activeOrgId } = useOrganization()
 
 	return useMutation({
 		mutationKey: ['updateProp'],
@@ -176,32 +193,43 @@ export function useUpdateProp() {
 			return propsApi.update(id, payload, { [IDEMPOTENCY_HEADER]: requestId })
 		},
 		onMutate: async ({ id, payload }) => {
-			await queryClient.cancelQueries({ queryKey: propKeys.all })
+			await queryClient.cancelQueries({ queryKey: propKeys.all(activeOrgId!) })
 			const previousProps = queryClient.getQueryData<Array<Prop>>(
-				propKeys.list(),
+				propKeys.list(activeOrgId!),
 			)
-			const previousProp = queryClient.getQueryData<Prop>(propKeys.detail(id))
-			applyUpdate(queryClient, id, payload)
+			const previousProp = queryClient.getQueryData<Prop>(
+				propKeys.detail(activeOrgId!, id),
+			)
+			applyUpdate(queryClient, id, payload, activeOrgId!)
 			return { previousProps, previousProp }
 		},
 		onError: (err, { id }, context) => {
 			if (context?.previousProps) {
-				queryClient.setQueryData(propKeys.list(), context.previousProps)
+				queryClient.setQueryData(
+					propKeys.list(activeOrgId!),
+					context.previousProps,
+				)
 			}
 			if (context?.previousProp) {
-				queryClient.setQueryData(propKeys.detail(id), context.previousProp)
+				queryClient.setQueryData(
+					propKeys.detail(activeOrgId!, id),
+					context.previousProp,
+				)
 			}
 			console.error('[Mutation] Update failed:', err)
 		},
 		onSettled: (_, __, { id }) => {
-			queryClient.invalidateQueries({ queryKey: propKeys.detail(id) })
-			queryClient.invalidateQueries({ queryKey: propKeys.list() })
+			queryClient.invalidateQueries({
+				queryKey: propKeys.detail(activeOrgId!, id),
+			})
+			queryClient.invalidateQueries({ queryKey: propKeys.list(activeOrgId!) })
 		},
 	})
 }
 
 export function useDeleteProp() {
 	const queryClient = useQueryClient()
+	const { activeOrgId } = useOrganization()
 
 	return useMutation({
 		mutationKey: ['deleteProp'],
@@ -211,25 +239,33 @@ export function useDeleteProp() {
 			return propsApi.delete(id, { [IDEMPOTENCY_HEADER]: requestId })
 		},
 		onMutate: async (id) => {
-			await queryClient.cancelQueries({ queryKey: propKeys.all })
+			await queryClient.cancelQueries({ queryKey: propKeys.all(activeOrgId!) })
 			const previousProps = queryClient.getQueryData<Array<Prop>>(
-				propKeys.list(),
+				propKeys.list(activeOrgId!),
 			)
-			const previousProp = queryClient.getQueryData<Prop>(propKeys.detail(id))
-			applyDelete(queryClient, id)
+			const previousProp = queryClient.getQueryData<Prop>(
+				propKeys.detail(activeOrgId!, id),
+			)
+			applyDelete(queryClient, id, activeOrgId!)
 			return { previousProps, previousProp }
 		},
 		onError: (err, id, context) => {
 			if (context?.previousProps) {
-				queryClient.setQueryData(propKeys.list(), context.previousProps)
+				queryClient.setQueryData(
+					propKeys.list(activeOrgId!),
+					context.previousProps,
+				)
 			}
 			if (context?.previousProp) {
-				queryClient.setQueryData(propKeys.detail(id), context.previousProp)
+				queryClient.setQueryData(
+					propKeys.detail(activeOrgId!, id),
+					context.previousProp,
+				)
 			}
 			console.error('[Mutation] Delete failed:', err)
 		},
 		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: propKeys.all })
+			queryClient.invalidateQueries({ queryKey: propKeys.all(activeOrgId!) })
 		},
 	})
 }

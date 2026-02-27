@@ -9,15 +9,17 @@ import type {
 import { stableRequestId } from '@/lib/offline-types'
 import { nowIso } from '@/lib/util'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
+import { useOrganization } from '@/contexts/organization'
 
 // --- Helpers: Optimistic Updates ---
 
 function applyCreate(
 	queryClient: ReturnType<typeof useQueryClient>,
 	payload: CreateLeaseTemplatePayload,
+	orgId: string,
 ): LeaseTemplate {
 	const optimistic: LeaseTemplate = {
-		id: payload.id, // ✅ Use client-generated ID from payload
+		id: payload.id, // Use client-generated ID from payload
 		name: payload.name,
 		versionTag: payload.versionTag ?? null,
 		version: 0,
@@ -31,7 +33,7 @@ function applyCreate(
 		updatedAt: nowIso(),
 	}
 	queryClient.setQueryData(
-		leaseTemplateKeys.list(),
+		leaseTemplateKeys.list(orgId),
 		(old: Array<LeaseTemplate> | undefined) =>
 			old ? [...old, optimistic] : [optimistic],
 	)
@@ -42,13 +44,14 @@ function applyUpdate(
 	queryClient: ReturnType<typeof useQueryClient>,
 	id: string,
 	payload: UpdateLeaseTemplatePayload,
+	orgId: string,
 ): void {
 	const updatedAt = nowIso()
 	const { version: _version, ...templateFields } = payload
 
 	// Update list cache
 	queryClient.setQueryData(
-		leaseTemplateKeys.list(),
+		leaseTemplateKeys.list(orgId),
 		(old: Array<LeaseTemplate> | undefined) =>
 			old?.map((t) =>
 				t.id === id
@@ -64,7 +67,7 @@ function applyUpdate(
 
 	// Update detail cache
 	queryClient.setQueryData(
-		leaseTemplateKeys.detail(id),
+		leaseTemplateKeys.detail(orgId, id),
 		(old: LeaseTemplate | undefined) =>
 			old
 				? {
@@ -80,36 +83,42 @@ function applyUpdate(
 function applyDelete(
 	queryClient: ReturnType<typeof useQueryClient>,
 	id: string,
+	orgId: string,
 ): void {
 	queryClient.setQueryData(
-		leaseTemplateKeys.list(),
+		leaseTemplateKeys.list(orgId),
 		(old: Array<LeaseTemplate> | undefined) =>
 			old?.filter((t) => t.id !== id) ?? [],
 	)
-	queryClient.removeQueries({ queryKey: leaseTemplateKeys.detail(id) })
+	queryClient.removeQueries({ queryKey: leaseTemplateKeys.detail(orgId, id) })
 }
 
 // --- Queries ---
 
 export function useLeaseTemplatesList() {
+	const { activeOrgId } = useOrganization()
 	return useQuery({
-		queryKey: leaseTemplateKeys.list(),
+		queryKey: leaseTemplateKeys.list(activeOrgId!),
 		queryFn: () => leaseTemplatesApi.list(),
+		enabled: !!activeOrgId,
 	})
 }
 
 export function useLeaseTemplatesActive() {
+	const { activeOrgId } = useOrganization()
 	return useQuery({
-		queryKey: leaseTemplateKeys.list({ active: true }),
+		queryKey: leaseTemplateKeys.list(activeOrgId!, { active: true }),
 		queryFn: () => leaseTemplatesApi.listActive(),
+		enabled: !!activeOrgId,
 	})
 }
 
 export function useLeaseTemplatesSearch(query: string | null) {
+	const { activeOrgId } = useOrganization()
 	return useQuery({
-		queryKey: leaseTemplateKeys.list({ search: query }),
+		queryKey: leaseTemplateKeys.list(activeOrgId!, { search: query }),
 		queryFn: () => leaseTemplatesApi.search(query!),
-		enabled: query != null && query.trim().length > 0,
+		enabled: !!activeOrgId && query != null && query.trim().length > 0,
 	})
 }
 
@@ -117,10 +126,11 @@ export function useLeaseTemplateDetail(
 	id: string | null,
 	options?: { enabled?: boolean },
 ) {
+	const { activeOrgId } = useOrganization()
 	return useQuery({
-		queryKey: leaseTemplateKeys.detail(id!),
+		queryKey: leaseTemplateKeys.detail(activeOrgId!, id!),
 		queryFn: () => leaseTemplatesApi.getById(id!),
-		enabled: options?.enabled ?? id != null,
+		enabled: options?.enabled ?? (!!activeOrgId && id != null),
 	})
 }
 
@@ -128,6 +138,7 @@ export function useLeaseTemplateDetail(
 
 export function useCreateLeaseTemplate() {
 	const queryClient = useQueryClient()
+	const { activeOrgId } = useOrganization()
 
 	return useMutation({
 		mutationKey: ['createLeaseTemplate'],
@@ -139,30 +150,35 @@ export function useCreateLeaseTemplate() {
 			})
 		},
 		onMutate: async (payload) => {
-			await queryClient.cancelQueries({ queryKey: leaseTemplateKeys.lists() })
+			await queryClient.cancelQueries({
+				queryKey: leaseTemplateKeys.lists(activeOrgId!),
+			})
 			const previousTemplates = queryClient.getQueryData<Array<LeaseTemplate>>(
-				leaseTemplateKeys.list(),
+				leaseTemplateKeys.list(activeOrgId!),
 			)
-			const optimistic = applyCreate(queryClient, payload)
+			const optimistic = applyCreate(queryClient, payload, activeOrgId!)
 			return { previousTemplates, optimisticId: optimistic.id }
 		},
 		onError: (err, _, context) => {
 			if (context?.previousTemplates) {
 				queryClient.setQueryData(
-					leaseTemplateKeys.list(),
+					leaseTemplateKeys.list(activeOrgId!),
 					context.previousTemplates,
 				)
 			}
 			console.error('[Mutation] Create lease template failed:', err)
 		},
 		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: leaseTemplateKeys.all })
+			queryClient.invalidateQueries({
+				queryKey: leaseTemplateKeys.all(activeOrgId!),
+			})
 		},
 	})
 }
 
 export function useUpdateLeaseTemplate() {
 	const queryClient = useQueryClient()
+	const { activeOrgId } = useOrganization()
 
 	return useMutation({
 		mutationKey: ['updateLeaseTemplate'],
@@ -181,42 +197,49 @@ export function useUpdateLeaseTemplate() {
 			})
 		},
 		onMutate: async ({ id, payload }) => {
-			await queryClient.cancelQueries({ queryKey: leaseTemplateKeys.all })
+			await queryClient.cancelQueries({
+				queryKey: leaseTemplateKeys.all(activeOrgId!),
+			})
 			const previousTemplates = queryClient.getQueryData<Array<LeaseTemplate>>(
-				leaseTemplateKeys.list(),
+				leaseTemplateKeys.list(activeOrgId!),
 			)
 			const previousTemplate = queryClient.getQueryData<LeaseTemplate>(
-				leaseTemplateKeys.detail(id),
+				leaseTemplateKeys.detail(activeOrgId!, id),
 			)
 
-			applyUpdate(queryClient, id, payload)
+			applyUpdate(queryClient, id, payload, activeOrgId!)
 
 			return { previousTemplates, previousTemplate }
 		},
 		onError: (err, { id }, context) => {
 			if (context?.previousTemplates) {
 				queryClient.setQueryData(
-					leaseTemplateKeys.list(),
+					leaseTemplateKeys.list(activeOrgId!),
 					context.previousTemplates,
 				)
 			}
 			if (context?.previousTemplate) {
 				queryClient.setQueryData(
-					leaseTemplateKeys.detail(id),
+					leaseTemplateKeys.detail(activeOrgId!, id),
 					context.previousTemplate,
 				)
 			}
 			console.error('[Mutation] Update lease template failed:', err)
 		},
 		onSettled: (_, __, { id }) => {
-			queryClient.invalidateQueries({ queryKey: leaseTemplateKeys.detail(id) })
-			queryClient.invalidateQueries({ queryKey: leaseTemplateKeys.all })
+			queryClient.invalidateQueries({
+				queryKey: leaseTemplateKeys.detail(activeOrgId!, id),
+			})
+			queryClient.invalidateQueries({
+				queryKey: leaseTemplateKeys.all(activeOrgId!),
+			})
 		},
 	})
 }
 
 export function useDeleteLeaseTemplate() {
 	const queryClient = useQueryClient()
+	const { activeOrgId } = useOrganization()
 
 	return useMutation({
 		mutationKey: ['deleteLeaseTemplate'],
@@ -226,33 +249,37 @@ export function useDeleteLeaseTemplate() {
 			return leaseTemplatesApi.delete(id, { [IDEMPOTENCY_HEADER]: requestId })
 		},
 		onMutate: async (id) => {
-			await queryClient.cancelQueries({ queryKey: leaseTemplateKeys.all })
+			await queryClient.cancelQueries({
+				queryKey: leaseTemplateKeys.all(activeOrgId!),
+			})
 			const previousTemplates = queryClient.getQueryData<Array<LeaseTemplate>>(
-				leaseTemplateKeys.list(),
+				leaseTemplateKeys.list(activeOrgId!),
 			)
 			const previousTemplate = queryClient.getQueryData<LeaseTemplate>(
-				leaseTemplateKeys.detail(id),
+				leaseTemplateKeys.detail(activeOrgId!, id),
 			)
-			applyDelete(queryClient, id)
+			applyDelete(queryClient, id, activeOrgId!)
 			return { previousTemplates, previousTemplate }
 		},
 		onError: (err, id, context) => {
 			if (context?.previousTemplates) {
 				queryClient.setQueryData(
-					leaseTemplateKeys.list(),
+					leaseTemplateKeys.list(activeOrgId!),
 					context.previousTemplates,
 				)
 			}
 			if (context?.previousTemplate) {
 				queryClient.setQueryData(
-					leaseTemplateKeys.detail(id),
+					leaseTemplateKeys.detail(activeOrgId!, id),
 					context.previousTemplate,
 				)
 			}
 			console.error('[Mutation] Delete lease template failed:', err)
 		},
 		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: leaseTemplateKeys.all })
+			queryClient.invalidateQueries({
+				queryKey: leaseTemplateKeys.all(activeOrgId!),
+			})
 		},
 	})
 }

@@ -5,12 +5,14 @@ import type { CreateUnitPayload, Unit, UpdateUnitPayload } from '@/domain/unit'
 import { stableRequestId } from '@/lib/offline-types'
 import { nowIso } from '@/lib/util'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
+import { useOrganization } from '@/contexts/organization'
 
 // --- Helpers: Optimistic Updates ---
 
 function applyCreate(
 	queryClient: ReturnType<typeof useQueryClient>,
 	payload: CreateUnitPayload,
+	orgId: string,
 ): Unit {
 	const optimistic: Unit = {
 		id: payload.id, // Use client-generated ID from payload
@@ -32,7 +34,7 @@ function applyCreate(
 		version: 0,
 	}
 	queryClient.setQueryData(
-		unitKeys.list(payload.propertyId),
+		unitKeys.list(orgId, payload.propertyId),
 		(old: Array<Unit> | undefined) =>
 			old ? [...old, optimistic] : [optimistic],
 	)
@@ -44,6 +46,7 @@ function applyUpdate(
 	id: string,
 	payload: UpdateUnitPayload,
 	previousPropertyId: string,
+	orgId: string,
 ): void {
 	const updatedAt = nowIso()
 	const { version: _version, ...unitFields } = payload
@@ -51,7 +54,7 @@ function applyUpdate(
 
 	// Update list cache for old property
 	queryClient.setQueryData(
-		unitKeys.list(previousPropertyId),
+		unitKeys.list(orgId, previousPropertyId),
 		(old: Array<Unit> | undefined) =>
 			old?.map((u) =>
 				u.id === id
@@ -68,7 +71,7 @@ function applyUpdate(
 	// If property changed, update list cache for new property
 	if (payload.propertyId && payload.propertyId !== previousPropertyId) {
 		queryClient.setQueryData(
-			unitKeys.list(newPropertyId),
+			unitKeys.list(orgId, newPropertyId),
 			(old: Array<Unit> | undefined) =>
 				old?.map((u) =>
 					u.id === id
@@ -84,15 +87,17 @@ function applyUpdate(
 	}
 
 	// Update detail cache
-	queryClient.setQueryData(unitKeys.detail(id), (old: Unit | undefined) =>
-		old
-			? {
-					...old,
-					...unitFields,
-					updatedAt,
-					version: old.version + 1,
-				}
-			: undefined,
+	queryClient.setQueryData(
+		unitKeys.detail(orgId, id),
+		(old: Unit | undefined) =>
+			old
+				? {
+						...old,
+						...unitFields,
+						updatedAt,
+						version: old.version + 1,
+					}
+				: undefined,
 	)
 }
 
@@ -100,36 +105,41 @@ function applyDelete(
 	queryClient: ReturnType<typeof useQueryClient>,
 	id: string,
 	propertyId: string,
+	orgId: string,
 ): void {
 	queryClient.setQueryData(
-		unitKeys.list(propertyId),
+		unitKeys.list(orgId, propertyId),
 		(old: Array<Unit> | undefined) => old?.filter((u) => u.id !== id) ?? [],
 	)
-	queryClient.removeQueries({ queryKey: unitKeys.detail(id) })
+	queryClient.removeQueries({ queryKey: unitKeys.detail(orgId, id) })
 }
 
 // --- Queries ---
 
 export function useUnitsList() {
+	const { activeOrgId } = useOrganization()
 	return useQuery({
-		queryKey: unitKeys.list(null),
+		queryKey: unitKeys.list(activeOrgId!, null),
 		queryFn: () => unitsApi.list(),
+		enabled: !!activeOrgId,
 	})
 }
 
 export function useUnitsByPropId(propId: string | null) {
+	const { activeOrgId } = useOrganization()
 	return useQuery({
-		queryKey: unitKeys.list(propId),
+		queryKey: unitKeys.list(activeOrgId!, propId),
 		queryFn: () => unitsApi.listByPropId(propId!),
-		enabled: propId != null,
+		enabled: !!activeOrgId && propId != null,
 	})
 }
 
 export function useUnitDetail(id: string | null) {
+	const { activeOrgId } = useOrganization()
 	return useQuery({
-		queryKey: unitKeys.detail(id!),
+		queryKey: unitKeys.detail(activeOrgId!, id!),
 		queryFn: () => unitsApi.getById(id!),
-		enabled: id != null,
+		enabled: !!activeOrgId && id != null,
 	})
 }
 
@@ -137,6 +147,7 @@ export function useUnitDetail(id: string | null) {
 
 export function useCreateUnit() {
 	const queryClient = useQueryClient()
+	const { activeOrgId } = useOrganization()
 
 	return useMutation({
 		mutationKey: ['createUnit'],
@@ -147,18 +158,18 @@ export function useCreateUnit() {
 		},
 		onMutate: async (payload) => {
 			await queryClient.cancelQueries({
-				queryKey: unitKeys.list(payload.propertyId),
+				queryKey: unitKeys.list(activeOrgId!, payload.propertyId),
 			})
 			const previousUnits = queryClient.getQueryData<Array<Unit>>(
-				unitKeys.list(payload.propertyId),
+				unitKeys.list(activeOrgId!, payload.propertyId),
 			)
-			const optimistic = applyCreate(queryClient, payload)
+			const optimistic = applyCreate(queryClient, payload, activeOrgId!)
 			return { previousUnits, optimisticId: optimistic.id }
 		},
 		onError: (err, payload, context) => {
 			if (context?.previousUnits) {
 				queryClient.setQueryData(
-					unitKeys.list(payload.propertyId),
+					unitKeys.list(activeOrgId!, payload.propertyId),
 					context.previousUnits,
 				)
 			}
@@ -166,15 +177,16 @@ export function useCreateUnit() {
 		},
 		onSuccess: (data) => {
 			queryClient.invalidateQueries({
-				queryKey: unitKeys.list(data.propertyId),
+				queryKey: unitKeys.list(activeOrgId!, data.propertyId),
 			})
-			queryClient.invalidateQueries({ queryKey: unitKeys.all })
+			queryClient.invalidateQueries({ queryKey: unitKeys.all(activeOrgId!) })
 		},
 	})
 }
 
 export function useUpdateUnit() {
 	const queryClient = useQueryClient()
+	const { activeOrgId } = useOrganization()
 
 	return useMutation({
 		mutationKey: ['updateUnit'],
@@ -192,17 +204,21 @@ export function useUpdateUnit() {
 		},
 		onMutate: async ({ id, payload }) => {
 			// Get the current unit to know its propertyId
-			const currentUnit = queryClient.getQueryData<Unit>(unitKeys.detail(id))
+			const currentUnit = queryClient.getQueryData<Unit>(
+				unitKeys.detail(activeOrgId!, id),
+			)
 			const propertyId = currentUnit?.propertyId ?? payload.propertyId ?? ''
 
-			await queryClient.cancelQueries({ queryKey: unitKeys.all })
+			await queryClient.cancelQueries({ queryKey: unitKeys.all(activeOrgId!) })
 			const previousUnits = queryClient.getQueryData<Array<Unit>>(
-				unitKeys.list(propertyId),
+				unitKeys.list(activeOrgId!, propertyId),
 			)
-			const previousUnit = queryClient.getQueryData<Unit>(unitKeys.detail(id))
+			const previousUnit = queryClient.getQueryData<Unit>(
+				unitKeys.detail(activeOrgId!, id),
+			)
 
 			if (propertyId) {
-				applyUpdate(queryClient, id, payload, propertyId)
+				applyUpdate(queryClient, id, payload, propertyId, activeOrgId!)
 			}
 
 			return { previousUnits, previousUnit, propertyId }
@@ -210,31 +226,35 @@ export function useUpdateUnit() {
 		onError: (err, { id }, context) => {
 			if (context?.previousUnits && context.propertyId) {
 				queryClient.setQueryData(
-					unitKeys.list(context.propertyId),
+					unitKeys.list(activeOrgId!, context.propertyId),
 					context.previousUnits,
 				)
 			}
 			if (context?.previousUnit) {
-				queryClient.setQueryData(unitKeys.detail(id), context.previousUnit)
+				queryClient.setQueryData(
+					unitKeys.detail(activeOrgId!, id),
+					context.previousUnit,
+				)
 			}
 			console.error('[Mutation] Update failed:', err)
 		},
 		onSettled: (data, _, { id }) => {
 			if (data) {
 				queryClient.invalidateQueries({
-					queryKey: unitKeys.list(data.propertyId),
+					queryKey: unitKeys.list(activeOrgId!, data.propertyId),
 				})
 			}
 			queryClient.invalidateQueries({
-				queryKey: unitKeys.detail(id),
+				queryKey: unitKeys.detail(activeOrgId!, id),
 			})
-			queryClient.invalidateQueries({ queryKey: unitKeys.all })
+			queryClient.invalidateQueries({ queryKey: unitKeys.all(activeOrgId!) })
 		},
 	})
 }
 
 export function useDeleteUnit() {
 	const queryClient = useQueryClient()
+	const { activeOrgId } = useOrganization()
 
 	return useMutation({
 		mutationKey: ['deleteUnit'],
@@ -246,33 +266,33 @@ export function useDeleteUnit() {
 			})
 		},
 		onMutate: async (variables) => {
-			await queryClient.cancelQueries({ queryKey: unitKeys.all })
+			await queryClient.cancelQueries({ queryKey: unitKeys.all(activeOrgId!) })
 			const previousUnits = queryClient.getQueryData<Array<Unit>>(
-				unitKeys.list(variables.propertyId),
+				unitKeys.list(activeOrgId!, variables.propertyId),
 			)
 			const previousUnit = queryClient.getQueryData<Unit>(
-				unitKeys.detail(variables.id),
+				unitKeys.detail(activeOrgId!, variables.id),
 			)
-			applyDelete(queryClient, variables.id, variables.propertyId)
+			applyDelete(queryClient, variables.id, variables.propertyId, activeOrgId!)
 			return { previousUnits, previousUnit, propertyId: variables.propertyId }
 		},
 		onError: (err, variables, context) => {
 			if (context?.previousUnits && context.propertyId) {
 				queryClient.setQueryData(
-					unitKeys.list(context.propertyId),
+					unitKeys.list(activeOrgId!, context.propertyId),
 					context.previousUnits,
 				)
 			}
 			if (context?.previousUnit) {
 				queryClient.setQueryData(
-					unitKeys.detail(variables.id),
+					unitKeys.detail(activeOrgId!, variables.id),
 					context.previousUnit,
 				)
 			}
 			console.error('[Mutation] Delete failed:', err)
 		},
 		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: unitKeys.all })
+			queryClient.invalidateQueries({ queryKey: unitKeys.all(activeOrgId!) })
 		},
 	})
 }

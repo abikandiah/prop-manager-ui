@@ -189,7 +189,9 @@ export function PermissionTemplateForm({
 						/>
 					)}
 				/>
-				<FieldError message={errors.orgPermissions?.message as string | undefined} />
+				<FieldError
+					message={errors.orgPermissions?.message as string | undefined}
+				/>
 			</div>
 
 			<div className="space-y-2">

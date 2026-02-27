@@ -74,7 +74,7 @@ const userMenuLinks = [
 
 function UserProfile() {
 	const [open, setOpen] = useState(false)
-	const { user } = useAuth()
+	const { user, logout } = useAuth()
 	const close = () => setOpen(false)
 
 	const pathname = useRouterState({ select: (s) => s.location.pathname })
@@ -124,7 +124,7 @@ function UserProfile() {
 							type="button"
 							variant="ghost"
 							className={cn(userMenuItemClass, 'justify-start')}
-							onClick={close}
+							onClick={logout}
 							aria-label="Sign out"
 						>
 							<LogOut className="size-4 shrink-0" />

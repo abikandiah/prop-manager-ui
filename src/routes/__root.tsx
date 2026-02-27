@@ -1,11 +1,13 @@
 import { AppSidebar } from '@/components/AppSidebar'
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
+import { OnboardingPage } from '@/components/OnboardingPage'
 import { Register } from '@/components/Register'
 import { LoadingScreen } from '@/components/ui'
 import { config } from '@/config'
 import { useAuth } from '@/contexts/auth'
 import { useNetwork } from '@/contexts/network'
+import { useOrganization } from '@/contexts/organization'
 import { MessageBanner } from '@abumble/design-system/components/Banner'
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
 import {
@@ -23,8 +25,15 @@ export const Route = createRootRoute({
 
 function Root() {
 	const { user, isLoadingUser, isUserDefined } = useAuth()
+	const { organizations } = useOrganization()
 	const location = useLocation()
 	const isPublic = location.pathname.startsWith('/public')
+
+	// Paths that bypass auth and org guards — rendered as plain outlet (no sidebar)
+	const isUnguarded =
+		isPublic ||
+		location.pathname.startsWith('/dev') ||
+		location.pathname.startsWith('/invite')
 
 	if (!config.constructionDisabled) {
 		return (
@@ -37,13 +46,14 @@ function Root() {
 		)
 	}
 
-	const isPublicOrDev =
-		isPublic ||
-		location.pathname.startsWith('/dev') ||
-		location.pathname.startsWith('/invite')
+	const needsOnboarding =
+		isUserDefined && user?.termsAccepted && organizations.length === 0
+
 	const needsTermsAcceptance = isUserDefined && user && !user.termsAccepted
+
 	let altContent = null
-	if (isPublicOrDev) {
+
+	if (isUnguarded) {
 		altContent = <Outlet />
 	} else if (isLoadingUser) {
 		altContent = (
@@ -57,14 +67,11 @@ function Root() {
 		)
 	} else if (!isUserDefined || needsTermsAcceptance) {
 		altContent = <Register />
+	} else if (needsOnboarding) {
+		altContent = <OnboardingPage />
 	}
 
-	if (
-		isPublicOrDev ||
-		isLoadingUser ||
-		!isUserDefined ||
-		needsTermsAcceptance
-	) {
+	if (altContent != null) {
 		return (
 			<div className="layout-header-full flex min-h-screen w-full flex-col">
 				<Header />

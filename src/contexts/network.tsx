@@ -1,3 +1,5 @@
+import { config } from '@/config'
+import { onlineManager, useQueryClient } from '@tanstack/react-query'
 import {
 	createContext,
 	useContext,
@@ -6,8 +8,6 @@ import {
 	useRef,
 	useState,
 } from 'react'
-import { onlineManager, useQueryClient } from '@tanstack/react-query'
-import { config } from '@/config'
 
 /**
  * Network status context for offline-first UX.
@@ -45,7 +45,7 @@ export function NetworkProvider({ children }: { children: React.ReactNode }) {
 	/**
 	 * Check if the API server is reachable
 	 */
-	const checkServerHealth = async (): Promise<boolean> => {
+	const checkServerHealth = async (): Promise<boolean | undefined> => {
 		try {
 			abortControllerRef.current?.abort()
 			abortControllerRef.current = new AbortController()
@@ -62,7 +62,7 @@ export function NetworkProvider({ children }: { children: React.ReactNode }) {
 			return true
 		} catch (err: unknown) {
 			if (err instanceof Error && err.name === 'AbortError') {
-				return false // Aborted, don't change state
+				return undefined // Aborted, don't change state
 			}
 
 			console.warn('[Network] Server unreachable:', err)
@@ -82,7 +82,9 @@ export function NetworkProvider({ children }: { children: React.ReactNode }) {
 			if (value) {
 				// Network came back, check if server is reachable
 				const serverOk = await checkServerHealth()
-				setIsServerReachable(serverOk)
+				if (serverOk != undefined) {
+					setIsServerReachable(serverOk)
+				}
 
 				if (serverOk) {
 					setConsecutiveFailures(0)

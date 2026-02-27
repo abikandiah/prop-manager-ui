@@ -9,6 +9,7 @@ import type {
 import { stableRequestId } from '@/lib/offline-types'
 import { nowIso } from '@/lib/util'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
+import { useOrganization } from '@/contexts/organization'
 
 // --- Queries ---
 
@@ -18,7 +19,7 @@ import { IDEMPOTENCY_HEADER } from '@/lib/constants'
  */
 export function usePermissionTemplates(orgId: string) {
 	return useQuery({
-		queryKey: permissionTemplateKeys.listByOrg(orgId),
+		queryKey: permissionTemplateKeys.list(orgId),
 		queryFn: () => permissionTemplatesApi.listByOrg(orgId),
 		enabled: !!orgId,
 		select: (data) =>
@@ -32,10 +33,11 @@ export function usePermissionTemplates(orgId: string) {
 }
 
 export function usePermissionTemplateDetail(id: string | null) {
+	const { activeOrgId } = useOrganization()
 	return useQuery({
-		queryKey: permissionTemplateKeys.detail(id!),
+		queryKey: permissionTemplateKeys.detail(activeOrgId!, id!),
 		queryFn: () => permissionTemplatesApi.getById(id!),
-		enabled: id != null,
+		enabled: !!activeOrgId && id != null,
 	})
 }
 
@@ -43,6 +45,7 @@ export function usePermissionTemplateDetail(id: string | null) {
 
 export function useCreatePermissionTemplate() {
 	const queryClient = useQueryClient()
+	const { activeOrgId } = useOrganization()
 
 	return useMutation({
 		mutationKey: ['createPermissionTemplate'],
@@ -54,22 +57,17 @@ export function useCreatePermissionTemplate() {
 			})
 		},
 		onSettled: (_data, _err, payload) => {
-			// Invalidate the org-specific list (or all if orgId unknown)
-			if (payload.orgId) {
-				queryClient.invalidateQueries({
-					queryKey: permissionTemplateKeys.listByOrg(payload.orgId),
-				})
-			} else {
-				queryClient.invalidateQueries({
-					queryKey: permissionTemplateKeys.lists(),
-				})
-			}
+			const orgId = payload.orgId ?? activeOrgId!
+			queryClient.invalidateQueries({
+				queryKey: permissionTemplateKeys.list(orgId),
+			})
 		},
 	})
 }
 
 export function useUpdatePermissionTemplate() {
 	const queryClient = useQueryClient()
+	const { activeOrgId } = useOrganization()
 
 	return useMutation({
 		mutationKey: ['updatePermissionTemplate'],
@@ -89,48 +87,47 @@ export function useUpdatePermissionTemplate() {
 		},
 		onMutate: async ({ id, payload }) => {
 			await queryClient.cancelQueries({
-				queryKey: permissionTemplateKeys.all,
+				queryKey: permissionTemplateKeys.all(activeOrgId!),
 			})
 			const previous = queryClient.getQueryData<PermissionTemplate>(
-				permissionTemplateKeys.detail(id),
+				permissionTemplateKeys.detail(activeOrgId!, id),
 			)
 			if (previous) {
-				queryClient.setQueryData(permissionTemplateKeys.detail(id), {
-					...previous,
-					...payload,
-					updatedAt: nowIso(),
-					version: previous.version + 1,
-				})
+				queryClient.setQueryData(
+					permissionTemplateKeys.detail(activeOrgId!, id),
+					{
+						...previous,
+						...payload,
+						updatedAt: nowIso(),
+						version: previous.version + 1,
+					},
+				)
 			}
 			return { previous }
 		},
 		onError: (_err, { id }, context) => {
 			if (context?.previous) {
 				queryClient.setQueryData(
-					permissionTemplateKeys.detail(id),
+					permissionTemplateKeys.detail(activeOrgId!, id),
 					context.previous,
 				)
 			}
 		},
 		onSettled: (data, _err, { id }) => {
 			queryClient.invalidateQueries({
-				queryKey: permissionTemplateKeys.detail(id),
+				queryKey: permissionTemplateKeys.detail(activeOrgId!, id),
 			})
-			if (data?.orgId) {
-				queryClient.invalidateQueries({
-					queryKey: permissionTemplateKeys.listByOrg(data.orgId),
-				})
-			} else {
-				queryClient.invalidateQueries({
-					queryKey: permissionTemplateKeys.lists(),
-				})
-			}
+			const orgId = data?.orgId ?? activeOrgId!
+			queryClient.invalidateQueries({
+				queryKey: permissionTemplateKeys.list(orgId),
+			})
 		},
 	})
 }
 
 export function useDeletePermissionTemplate() {
 	const queryClient = useQueryClient()
+	const { activeOrgId } = useOrganization()
 
 	return useMutation({
 		mutationKey: ['deletePermissionTemplate'],
@@ -143,7 +140,7 @@ export function useDeletePermissionTemplate() {
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({
-				queryKey: permissionTemplateKeys.all,
+				queryKey: permissionTemplateKeys.all(activeOrgId!),
 			})
 		},
 	})

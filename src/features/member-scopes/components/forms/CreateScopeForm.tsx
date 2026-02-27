@@ -1,23 +1,23 @@
-import { useCallback, useState } from 'react'
-import { useForm, Controller } from 'react-hook-form'
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-import { z } from 'zod'
-import { toast } from 'sonner'
-import { Check, ChevronDown, ChevronUp } from 'lucide-react'
-import { Button } from '@abumble/design-system/components/Button'
-import { DialogFooter } from '@abumble/design-system/components/Dialog'
-import { Input } from '@abumble/design-system/components/Input'
-import { Label } from '@abumble/design-system/components/Label'
-import { Select } from '@abumble/design-system/components/Select'
-import { FieldError } from '@/components/ui/FieldError'
 import { RequiredMark } from '@/components/ui'
+import { FieldError } from '@/components/ui/FieldError'
+import type { ScopeType } from '@/domain/member-scope'
 import {
 	PermissionMatrixEditor,
 	PermissionTemplateSelect,
 } from '@/features/permission-templates'
 import { usePermissionTemplates } from '@/features/permission-templates/hooks'
+import { Button } from '@abumble/design-system/components/Button'
+import { DialogFooter } from '@abumble/design-system/components/Dialog'
+import { Input } from '@abumble/design-system/components/Input'
+import { Label } from '@abumble/design-system/components/Label'
+import { Select } from '@abumble/design-system/components/Select'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { Check, ChevronDown, ChevronUp } from 'lucide-react'
+import { useCallback, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
 import { useCreateMemberScope } from '../../hooks'
-import type { ScopeType } from '@/domain/member-scope'
 
 // ---------- Schema ----------
 

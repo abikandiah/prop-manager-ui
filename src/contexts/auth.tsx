@@ -1,10 +1,11 @@
 import { createContext, useContext } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
-import { api } from '@/api/client'
+import { api, clearDevToken } from '@/api/client'
 import { clearUserDb } from '@/features/offline/db'
+import { config } from '@/config'
 
-import { Organization } from '@/domain/organization'
+import type { Organization } from '@/domain/organization'
 
 export interface User {
 	id: string
@@ -40,19 +41,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	})
 
 	const logout = async () => {
-		// Clear user's offline database
 		if (user?.id) {
 			console.log('[Auth] Logging out user:', user.id)
 			await clearUserDb(user.id)
 		}
 
-		// Clear query cache
+		// Clear local storage token in development
+		if (config.isDevelopment) {
+			clearDevToken()
+		}
+
 		queryClient.clear()
 
-		// TODO: Call backend logout endpoint
-		// await api.post('/logout')
+		try {
+			// Call backend logout endpoint to get optional OIDC redirect URL
+			const { data } = await api.post<{ logoutUrl?: string }>('/logout')
 
-		// Redirect or refresh
+			if (data.logoutUrl) {
+				window.location.href = data.logoutUrl
+				return
+			}
+		} catch (error) {
+			console.error('[Auth] Backend logout failed:', error)
+		}
+
+		// Fallback redirect to home
 		window.location.href = '/'
 	}
 

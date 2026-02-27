@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { leaseKeys, leaseTenantKeys } from './keys'
 import { leasesApi, leaseTenantApi } from './api'
-import { invitesApi } from '@/features/invites/api'
 import type {
 	CreateLeasePayload,
 	Lease,
@@ -15,15 +14,18 @@ import type {
 import { stableRequestId } from '@/lib/offline-types'
 import { nowIso } from '@/lib/util'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
+import { useOrganization } from '@/contexts/organization'
+import { invitesApi } from '../invites/api'
 
 // --- Helpers: Optimistic Updates ---
 
 function applyCreate(
 	queryClient: ReturnType<typeof useQueryClient>,
 	payload: CreateLeasePayload,
+	orgId: string,
 ): Lease {
 	const optimistic: Lease = {
-		id: payload.id, // ✅ Use client-generated ID from payload
+		id: payload.id, // Use client-generated ID from payload
 		leaseTemplateId: payload.leaseTemplateId,
 		leaseTemplateName: null,
 		leaseTemplateVersionTag: null,
@@ -48,20 +50,22 @@ function applyCreate(
 	}
 
 	// Update unfiltered list
-	queryClient.setQueryData(leaseKeys.list(), (old: Array<Lease> | undefined) =>
-		old ? [...old, optimistic] : [optimistic],
+	queryClient.setQueryData(
+		leaseKeys.list(orgId),
+		(old: Array<Lease> | undefined) =>
+			old ? [...old, optimistic] : [optimistic],
 	)
 
 	// Update unit list
 	queryClient.setQueryData(
-		leaseKeys.list({ unitId: payload.unitId }),
+		leaseKeys.list(orgId, { unitId: payload.unitId }),
 		(old: Array<Lease> | undefined) =>
 			old ? [...old, optimistic] : [optimistic],
 	)
 
 	// Update property list
 	queryClient.setQueryData(
-		leaseKeys.list({ propertyId: payload.propertyId }),
+		leaseKeys.list(orgId, { propertyId: payload.propertyId }),
 		(old: Array<Lease> | undefined) =>
 			old ? [...old, optimistic] : [optimistic],
 	)
@@ -75,6 +79,7 @@ function applyUpdate(
 	payload: UpdateLeasePayload,
 	previousUnitId: string,
 	previousPropertyId: string,
+	orgId: string,
 ): void {
 	const updatedAt = nowIso()
 	const { version: _version, ...leaseFields } = payload
@@ -92,24 +97,29 @@ function applyUpdate(
 		) ?? []
 
 	// Update unit list
-	queryClient.setQueryData(leaseKeys.list({ unitId: previousUnitId }), updateFn)
+	queryClient.setQueryData(
+		leaseKeys.list(orgId, { unitId: previousUnitId }),
+		updateFn,
+	)
 
 	// Update property list
 	queryClient.setQueryData(
-		leaseKeys.list({ propertyId: previousPropertyId }),
+		leaseKeys.list(orgId, { propertyId: previousPropertyId }),
 		updateFn,
 	)
 
 	// Update detail cache
-	queryClient.setQueryData(leaseKeys.detail(id), (old: Lease | undefined) =>
-		old
-			? {
-					...old,
-					...leaseFields,
-					updatedAt,
-					version: old.version + 1,
-				}
-			: undefined,
+	queryClient.setQueryData(
+		leaseKeys.detail(orgId, id),
+		(old: Lease | undefined) =>
+			old
+				? {
+						...old,
+						...leaseFields,
+						updatedAt,
+						version: old.version + 1,
+					}
+				: undefined,
 	)
 }
 
@@ -117,6 +127,7 @@ function applyStatusChange(
 	queryClient: ReturnType<typeof useQueryClient>,
 	lease: Lease,
 	newStatus: Lease['status'],
+	orgId: string,
 ): void {
 	const updatedAt = nowIso()
 
@@ -133,15 +144,18 @@ function applyStatusChange(
 		) ?? []
 
 	// Update all relevant list caches
-	queryClient.setQueryData(leaseKeys.list({ unitId: lease.unitId }), updateFn)
 	queryClient.setQueryData(
-		leaseKeys.list({ propertyId: lease.propertyId }),
+		leaseKeys.list(orgId, { unitId: lease.unitId }),
+		updateFn,
+	)
+	queryClient.setQueryData(
+		leaseKeys.list(orgId, { propertyId: lease.propertyId }),
 		updateFn,
 	)
 
 	// Update detail cache
 	queryClient.setQueryData(
-		leaseKeys.detail(lease.id),
+		leaseKeys.detail(orgId, lease.id),
 		(old: Lease | undefined) =>
 			old
 				? {
@@ -159,48 +173,54 @@ function applyDelete(
 	id: string,
 	unitId: string,
 	propertyId: string,
+	orgId: string,
 ): void {
 	queryClient.setQueryData(
-		leaseKeys.list({ unitId }),
+		leaseKeys.list(orgId, { unitId }),
 		(old: Array<Lease> | undefined) => old?.filter((l) => l.id !== id) ?? [],
 	)
 	queryClient.setQueryData(
-		leaseKeys.list({ propertyId }),
+		leaseKeys.list(orgId, { propertyId }),
 		(old: Array<Lease> | undefined) => old?.filter((l) => l.id !== id) ?? [],
 	)
-	queryClient.removeQueries({ queryKey: leaseKeys.detail(id) })
+	queryClient.removeQueries({ queryKey: leaseKeys.detail(orgId, id) })
 }
 
 // --- Queries ---
 
 export function useLeasesList() {
+	const { activeOrgId } = useOrganization()
 	return useQuery({
-		queryKey: leaseKeys.list(),
+		queryKey: leaseKeys.list(activeOrgId!),
 		queryFn: () => leasesApi.list(),
+		enabled: !!activeOrgId,
 	})
 }
 
 export function useLeasesByUnitId(unitId: string | null) {
+	const { activeOrgId } = useOrganization()
 	return useQuery({
-		queryKey: leaseKeys.list({ unitId }),
+		queryKey: leaseKeys.list(activeOrgId!, { unitId }),
 		queryFn: () => leasesApi.listByUnitId(unitId!),
-		enabled: unitId != null,
+		enabled: !!activeOrgId && unitId != null,
 	})
 }
 
 export function useLeasesByPropertyId(propertyId: string | null) {
+	const { activeOrgId } = useOrganization()
 	return useQuery({
-		queryKey: leaseKeys.list({ propertyId }),
+		queryKey: leaseKeys.list(activeOrgId!, { propertyId }),
 		queryFn: () => leasesApi.listByPropertyId(propertyId!),
-		enabled: propertyId != null,
+		enabled: !!activeOrgId && propertyId != null,
 	})
 }
 
 export function useLeaseDetail(id: string | null) {
+	const { activeOrgId } = useOrganization()
 	return useQuery({
-		queryKey: leaseKeys.detail(id!),
+		queryKey: leaseKeys.detail(activeOrgId!, id!),
 		queryFn: () => leasesApi.getById(id!),
-		enabled: id != null,
+		enabled: !!activeOrgId && id != null,
 	})
 }
 
@@ -208,6 +228,7 @@ export function useLeaseDetail(id: string | null) {
 
 export function useCreateLease() {
 	const queryClient = useQueryClient()
+	const { activeOrgId } = useOrganization()
 
 	return useMutation({
 		mutationKey: ['createLease'],
@@ -217,17 +238,19 @@ export function useCreateLease() {
 			return leasesApi.create(payload, { [IDEMPOTENCY_HEADER]: requestId })
 		},
 		onMutate: async (payload) => {
-			await queryClient.cancelQueries({ queryKey: leaseKeys.lists() })
+			await queryClient.cancelQueries({
+				queryKey: leaseKeys.lists(activeOrgId!),
+			})
 			const previousAllLeases = queryClient.getQueryData<Array<Lease>>(
-				leaseKeys.list(),
+				leaseKeys.list(activeOrgId!),
 			)
 			const previousUnitLeases = queryClient.getQueryData<Array<Lease>>(
-				leaseKeys.list({ unitId: payload.unitId }),
+				leaseKeys.list(activeOrgId!, { unitId: payload.unitId }),
 			)
 			const previousPropertyLeases = queryClient.getQueryData<Array<Lease>>(
-				leaseKeys.list({ propertyId: payload.propertyId }),
+				leaseKeys.list(activeOrgId!, { propertyId: payload.propertyId }),
 			)
-			const optimistic = applyCreate(queryClient, payload)
+			const optimistic = applyCreate(queryClient, payload, activeOrgId!)
 			return {
 				previousAllLeases,
 				previousUnitLeases,
@@ -237,24 +260,27 @@ export function useCreateLease() {
 		},
 		onError: (err, payload, context) => {
 			if (context?.previousAllLeases) {
-				queryClient.setQueryData(leaseKeys.list(), context.previousAllLeases)
+				queryClient.setQueryData(
+					leaseKeys.list(activeOrgId!),
+					context.previousAllLeases,
+				)
 			}
 			if (context?.previousUnitLeases) {
 				queryClient.setQueryData(
-					leaseKeys.list({ unitId: payload.unitId }),
+					leaseKeys.list(activeOrgId!, { unitId: payload.unitId }),
 					context.previousUnitLeases,
 				)
 			}
 			if (context?.previousPropertyLeases) {
 				queryClient.setQueryData(
-					leaseKeys.list({ propertyId: payload.propertyId }),
+					leaseKeys.list(activeOrgId!, { propertyId: payload.propertyId }),
 					context.previousPropertyLeases,
 				)
 			}
 			console.error('[Mutation] Create lease failed:', err)
 		},
 		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: leaseKeys.all })
+			queryClient.invalidateQueries({ queryKey: leaseKeys.all(activeOrgId!) })
 		},
 	})
 }
@@ -270,6 +296,7 @@ export type UpdateLeaseVariables = {
 
 export function useUpdateLease() {
 	const queryClient = useQueryClient()
+	const { activeOrgId } = useOrganization()
 
 	return useMutation({
 		mutationKey: ['updateLease'],
@@ -285,21 +312,23 @@ export function useUpdateLease() {
 			unitId: varUnitId,
 			propertyId: varPropertyId,
 		}) => {
-			const currentLease = queryClient.getQueryData<Lease>(leaseKeys.detail(id))
+			const currentLease = queryClient.getQueryData<Lease>(
+				leaseKeys.detail(activeOrgId!, id),
+			)
 			const unitId = varUnitId ?? currentLease?.unitId ?? ''
 			const propertyId = varPropertyId ?? currentLease?.propertyId ?? ''
 
-			await queryClient.cancelQueries({ queryKey: leaseKeys.all })
+			await queryClient.cancelQueries({ queryKey: leaseKeys.all(activeOrgId!) })
 			const previousUnitLeases = queryClient.getQueryData<Array<Lease>>(
-				leaseKeys.list({ unitId }),
+				leaseKeys.list(activeOrgId!, { unitId }),
 			)
 			const previousPropertyLeases = queryClient.getQueryData<Array<Lease>>(
-				leaseKeys.list({ propertyId }),
+				leaseKeys.list(activeOrgId!, { propertyId }),
 			)
 			const previousLease = currentLease
 
 			if (unitId && propertyId) {
-				applyUpdate(queryClient, id, payload, unitId, propertyId)
+				applyUpdate(queryClient, id, payload, unitId, propertyId, activeOrgId!)
 			}
 
 			return {
@@ -313,30 +342,36 @@ export function useUpdateLease() {
 		onError: (err, { id }, context) => {
 			if (context?.previousUnitLeases && context.unitId) {
 				queryClient.setQueryData(
-					leaseKeys.list({ unitId: context.unitId }),
+					leaseKeys.list(activeOrgId!, { unitId: context.unitId }),
 					context.previousUnitLeases,
 				)
 			}
 			if (context?.previousPropertyLeases && context.propertyId) {
 				queryClient.setQueryData(
-					leaseKeys.list({ propertyId: context.propertyId }),
+					leaseKeys.list(activeOrgId!, { propertyId: context.propertyId }),
 					context.previousPropertyLeases,
 				)
 			}
 			if (context?.previousLease) {
-				queryClient.setQueryData(leaseKeys.detail(id), context.previousLease)
+				queryClient.setQueryData(
+					leaseKeys.detail(activeOrgId!, id),
+					context.previousLease,
+				)
 			}
 			console.error('[Mutation] Update lease failed:', err)
 		},
 		onSettled: (_, __, { id }) => {
-			queryClient.invalidateQueries({ queryKey: leaseKeys.detail(id) })
-			queryClient.invalidateQueries({ queryKey: leaseKeys.all })
+			queryClient.invalidateQueries({
+				queryKey: leaseKeys.detail(activeOrgId!, id),
+			})
+			queryClient.invalidateQueries({ queryKey: leaseKeys.all(activeOrgId!) })
 		},
 	})
 }
 
 export function useDeleteLease() {
 	const queryClient = useQueryClient()
+	const { activeOrgId } = useOrganization()
 
 	return useMutation({
 		mutationKey: ['deleteLease'],
@@ -352,21 +387,22 @@ export function useDeleteLease() {
 			})
 		},
 		onMutate: async (variables) => {
-			await queryClient.cancelQueries({ queryKey: leaseKeys.all })
+			await queryClient.cancelQueries({ queryKey: leaseKeys.all(activeOrgId!) })
 			const previousUnitLeases = queryClient.getQueryData<Array<Lease>>(
-				leaseKeys.list({ unitId: variables.unitId }),
+				leaseKeys.list(activeOrgId!, { unitId: variables.unitId }),
 			)
 			const previousPropertyLeases = queryClient.getQueryData<Array<Lease>>(
-				leaseKeys.list({ propertyId: variables.propertyId }),
+				leaseKeys.list(activeOrgId!, { propertyId: variables.propertyId }),
 			)
 			const previousLease = queryClient.getQueryData<Lease>(
-				leaseKeys.detail(variables.id),
+				leaseKeys.detail(activeOrgId!, variables.id),
 			)
 			applyDelete(
 				queryClient,
 				variables.id,
 				variables.unitId,
 				variables.propertyId,
+				activeOrgId!,
 			)
 			return {
 				previousUnitLeases,
@@ -379,26 +415,26 @@ export function useDeleteLease() {
 		onError: (err, variables, context) => {
 			if (context?.previousUnitLeases && context.unitId) {
 				queryClient.setQueryData(
-					leaseKeys.list({ unitId: context.unitId }),
+					leaseKeys.list(activeOrgId!, { unitId: context.unitId }),
 					context.previousUnitLeases,
 				)
 			}
 			if (context?.previousPropertyLeases && context.propertyId) {
 				queryClient.setQueryData(
-					leaseKeys.list({ propertyId: context.propertyId }),
+					leaseKeys.list(activeOrgId!, { propertyId: context.propertyId }),
 					context.previousPropertyLeases,
 				)
 			}
 			if (context?.previousLease) {
 				queryClient.setQueryData(
-					leaseKeys.detail(variables.id),
+					leaseKeys.detail(activeOrgId!, variables.id),
 					context.previousLease,
 				)
 			}
 			console.error('[Mutation] Delete lease failed:', err)
 		},
 		onSettled: () => {
-			queryClient.invalidateQueries({ queryKey: leaseKeys.all })
+			queryClient.invalidateQueries({ queryKey: leaseKeys.all(activeOrgId!) })
 		},
 	})
 }
@@ -413,6 +449,7 @@ function makeLeaseStatusTransitionHook(
 ) {
 	return function useLeaseStatusTransition() {
 		const queryClient = useQueryClient()
+		const { activeOrgId } = useOrganization()
 
 		return useMutation({
 			mutationKey: [mutationKey],
@@ -420,39 +457,48 @@ function makeLeaseStatusTransitionHook(
 			mutationFn,
 			onMutate: async (id: string) => {
 				const currentLease = queryClient.getQueryData<Lease>(
-					leaseKeys.detail(id),
+					leaseKeys.detail(activeOrgId!, id),
 				)
 				if (!currentLease) return
 
-				await queryClient.cancelQueries({ queryKey: leaseKeys.all })
+				await queryClient.cancelQueries({
+					queryKey: leaseKeys.all(activeOrgId!),
+				})
 				const previousUnitLeases = queryClient.getQueryData<Array<Lease>>(
-					leaseKeys.list({ unitId: currentLease.unitId }),
+					leaseKeys.list(activeOrgId!, { unitId: currentLease.unitId }),
 				)
 				const previousPropertyLeases = queryClient.getQueryData<Array<Lease>>(
-					leaseKeys.list({ propertyId: currentLease.propertyId }),
+					leaseKeys.list(activeOrgId!, { propertyId: currentLease.propertyId }),
 				)
 				const previousLease = currentLease
 
-				applyStatusChange(queryClient, currentLease, newStatus)
+				applyStatusChange(queryClient, currentLease, newStatus, activeOrgId!)
 
 				return { previousUnitLeases, previousPropertyLeases, previousLease }
 			},
 			onError: (err, id, context) => {
 				if (context?.previousLease) {
 					queryClient.setQueryData(
-						leaseKeys.list({ unitId: context.previousLease.unitId }),
+						leaseKeys.list(activeOrgId!, {
+							unitId: context.previousLease.unitId,
+						}),
 						context.previousUnitLeases,
 					)
 					queryClient.setQueryData(
-						leaseKeys.list({ propertyId: context.previousLease.propertyId }),
+						leaseKeys.list(activeOrgId!, {
+							propertyId: context.previousLease.propertyId,
+						}),
 						context.previousPropertyLeases,
 					)
-					queryClient.setQueryData(leaseKeys.detail(id), context.previousLease)
+					queryClient.setQueryData(
+						leaseKeys.detail(activeOrgId!, id),
+						context.previousLease,
+					)
 				}
 				console.error(`[Mutation] ${errorLabel} failed:`, err)
 			},
 			onSettled: () => {
-				queryClient.invalidateQueries({ queryKey: leaseKeys.all })
+				queryClient.invalidateQueries({ queryKey: leaseKeys.all(activeOrgId!) })
 			},
 		})
 	}
@@ -490,10 +536,11 @@ export const useTerminateLease = makeLeaseStatusTransitionHook(
 
 /** Fetch all tenants for a single lease. */
 export function useLeaseTenants(leaseId: string | null) {
+	const { activeOrgId } = useOrganization()
 	return useQuery({
-		queryKey: leaseTenantKeys.list(leaseId!),
+		queryKey: leaseTenantKeys.list(activeOrgId!, leaseId!),
 		queryFn: () => leaseTenantApi.listByLeaseId(leaseId!),
-		enabled: leaseId != null,
+		enabled: !!activeOrgId && leaseId != null,
 	})
 }
 
@@ -511,6 +558,7 @@ export type InviteTenantsVariables = {
  */
 export function useInviteLeaseTenants() {
 	const queryClient = useQueryClient()
+	const { activeOrgId } = useOrganization()
 
 	return useMutation({
 		mutationKey: ['inviteLeaseTenants'],
@@ -529,7 +577,7 @@ export function useInviteLeaseTenants() {
 		},
 		onSettled: (_data, _error, { leaseId }) => {
 			queryClient.invalidateQueries({
-				queryKey: leaseTenantKeys.list(leaseId),
+				queryKey: leaseTenantKeys.list(activeOrgId!, leaseId),
 			})
 		},
 	})
@@ -538,6 +586,7 @@ export function useInviteLeaseTenants() {
 export type ResendLeaseTenantInviteVariables = {
 	leaseId: string
 	leaseTenantId: string
+	inviteId: string
 	/** Used to build the success toast message. */
 	email: string
 }
@@ -549,19 +598,14 @@ export type ResendLeaseTenantInviteVariables = {
  */
 export function useResendLeaseTenantInvite() {
 	const queryClient = useQueryClient()
+	const { activeOrgId } = useOrganization()
 
 	return useMutation({
 		mutationKey: ['resendLeaseTenantInvite'],
 		networkMode: 'online',
-		mutationFn: ({
-			leaseId,
-			leaseTenantId,
-		}: ResendLeaseTenantInviteVariables) => {
-			const requestId = stableRequestId(['resendLeaseTenantInvite'], {
-				leaseId,
-				leaseTenantId,
-			})
-			return leaseTenantApi.resendInvite(leaseId, leaseTenantId, {
+		mutationFn: ({ inviteId }: ResendLeaseTenantInviteVariables) => {
+			const requestId = stableRequestId(['resendLeaseTenantInvite'], inviteId)
+			return invitesApi.resend(inviteId, {
 				[IDEMPOTENCY_HEADER]: requestId,
 			})
 		},
@@ -570,7 +614,7 @@ export function useResendLeaseTenantInvite() {
 		},
 		onSettled: (_data, _error, { leaseId }) => {
 			queryClient.invalidateQueries({
-				queryKey: leaseTenantKeys.list(leaseId),
+				queryKey: leaseTenantKeys.list(activeOrgId!, leaseId),
 			})
 		},
 	})
@@ -587,6 +631,7 @@ export type RemoveLeaseTenantVariables = {
  */
 export function useRemoveLeaseTenant() {
 	const queryClient = useQueryClient()
+	const { activeOrgId } = useOrganization()
 
 	return useMutation({
 		mutationKey: ['removeLeaseTenant'],
@@ -602,13 +647,13 @@ export function useRemoveLeaseTenant() {
 		},
 		onMutate: async ({ leaseId, leaseTenantId }) => {
 			await queryClient.cancelQueries({
-				queryKey: leaseTenantKeys.list(leaseId),
+				queryKey: leaseTenantKeys.list(activeOrgId!, leaseId),
 			})
 			const previous = queryClient.getQueryData<Array<LeaseTenant>>(
-				leaseTenantKeys.list(leaseId),
+				leaseTenantKeys.list(activeOrgId!, leaseId),
 			)
 			queryClient.setQueryData(
-				leaseTenantKeys.list(leaseId),
+				leaseTenantKeys.list(activeOrgId!, leaseId),
 				(old: Array<LeaseTenant> | undefined) =>
 					old?.filter((t) => t.id !== leaseTenantId) ?? [],
 			)
@@ -617,7 +662,7 @@ export function useRemoveLeaseTenant() {
 		onError: (err, { leaseId }, context) => {
 			if (context?.previous) {
 				queryClient.setQueryData(
-					leaseTenantKeys.list(leaseId),
+					leaseTenantKeys.list(activeOrgId!, leaseId),
 					context.previous,
 				)
 			}
@@ -625,7 +670,7 @@ export function useRemoveLeaseTenant() {
 		},
 		onSettled: (_data, _error, { leaseId }) => {
 			queryClient.invalidateQueries({
-				queryKey: leaseTenantKeys.list(leaseId),
+				queryKey: leaseTenantKeys.list(activeOrgId!, leaseId),
 			})
 		},
 	})

@@ -1,8 +1,10 @@
 export const permissionTemplateKeys = {
-	all: ['permission-templates'] as const,
-	lists: () => [...permissionTemplateKeys.all, 'list'] as const,
-	listByOrg: (orgId: string) =>
-		[...permissionTemplateKeys.lists(), { orgId }] as const,
-	details: () => [...permissionTemplateKeys.all, 'detail'] as const,
-	detail: (id: string) => [...permissionTemplateKeys.details(), id] as const,
+	all: (orgId: string) => ['org', orgId, 'permission-templates'] as const,
+	lists: (orgId: string) =>
+		[...permissionTemplateKeys.all(orgId), 'list'] as const,
+	list: (orgId: string) => permissionTemplateKeys.lists(orgId),
+	details: (orgId: string) =>
+		[...permissionTemplateKeys.all(orgId), 'detail'] as const,
+	detail: (orgId: string, id: string) =>
+		[...permissionTemplateKeys.details(orgId), id] as const,
 }

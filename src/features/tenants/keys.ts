@@ -1,7 +1,8 @@
 export const tenantKeys = {
-	all: ['tenants'] as const,
-	lists: () => [...tenantKeys.all, 'list'] as const,
-	list: () => tenantKeys.lists(),
-	details: () => [...tenantKeys.all, 'detail'] as const,
-	detail: (id: string) => [...tenantKeys.details(), id] as const,
+	all: (orgId: string) => ['org', orgId, 'tenants'] as const,
+	lists: (orgId: string) => [...tenantKeys.all(orgId), 'list'] as const,
+	list: (orgId: string) => tenantKeys.lists(orgId),
+	details: (orgId: string) => [...tenantKeys.all(orgId), 'detail'] as const,
+	detail: (orgId: string, id: string) =>
+		[...tenantKeys.details(orgId), id] as const,
 }

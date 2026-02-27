@@ -1,11 +1,16 @@
 export const leaseTemplateKeys = {
-	all: ['lease-templates'] as const,
-	lists: () => [...leaseTemplateKeys.all, 'list'] as const,
-	list: (filters?: { active?: boolean; search?: string | null }) => {
+	all: (orgId: string) => ['org', orgId, 'lease-templates'] as const,
+	lists: (orgId: string) => [...leaseTemplateKeys.all(orgId), 'list'] as const,
+	list: (
+		orgId: string,
+		filters?: { active?: boolean; search?: string | null },
+	) => {
 		if (!filters || (!filters.active && !filters.search)) {
-			return ['lease-templates', 'list'] as const
+			return [...leaseTemplateKeys.all(orgId), 'list'] as const
 		}
 		const parts: Array<string | boolean | null | undefined> = [
+			'org',
+			orgId,
 			'lease-templates',
 			'list',
 		]
@@ -13,6 +18,8 @@ export const leaseTemplateKeys = {
 		if (filters.search) parts.push(filters.search)
 		return parts as ReadonlyArray<string | boolean | null | undefined>
 	},
-	details: () => [...leaseTemplateKeys.all, 'detail'] as const,
-	detail: (id: string) => [...leaseTemplateKeys.details(), id] as const,
+	details: (orgId: string) =>
+		[...leaseTemplateKeys.all(orgId), 'detail'] as const,
+	detail: (orgId: string, id: string) =>
+		[...leaseTemplateKeys.details(orgId), id] as const,
 }

@@ -9,6 +9,8 @@ import type {
 import { stableRequestId } from '@/lib/offline-types'
 import { generateId, nowIso } from '@/lib/util'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
+import { api, setDevToken } from '@/api/client'
+import { config } from '@/config'
 
 /** Payload without id — the hook generates it. */
 export type CreateOrganizationPayloadWithoutId = Omit<
@@ -74,10 +76,22 @@ export function useCreateOrganization() {
 				queryClient.setQueryData(organizationKeys.list(), context.previous)
 			}
 		},
-		onSuccess: () => {
-			queryClient.invalidateQueries({
-				queryKey: organizationKeys.all,
-			})
+		onSuccess: async () => {
+			// In dev, the JWT access claim is stale after org creation.
+			// Refresh the token so the new org's permissions are embedded immediately.
+			if (config.isDevelopment) {
+				try {
+					const { data } = await api.post<{ token: string }>(
+						'/dev/token/refresh',
+					)
+					setDevToken(data.token)
+				} catch (err) {
+					console.warn('[CreateOrganization] Token refresh failed:', err)
+				}
+			}
+			// Re-fetch the user profile — updates user.organizations in AuthContext.
+			await queryClient.invalidateQueries({ queryKey: ['me'] })
+			queryClient.invalidateQueries({ queryKey: organizationKeys.all })
 		},
 	})
 

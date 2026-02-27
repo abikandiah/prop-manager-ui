@@ -1,8 +1,10 @@
 export const propKeys = {
-	all: ['props'] as const,
-	lists: () => [...propKeys.all, 'list'] as const,
-	list: () => propKeys.lists(),
-	details: () => [...propKeys.all, 'detail'] as const,
-	detail: (id: string) => [...propKeys.details(), id] as const,
-	units: (propId: string) => [...propKeys.detail(propId), 'units'] as const,
+	all: (orgId: string) => ['org', orgId, 'props'] as const,
+	lists: (orgId: string) => [...propKeys.all(orgId), 'list'] as const,
+	list: (orgId: string) => propKeys.lists(orgId),
+	details: (orgId: string) => [...propKeys.all(orgId), 'detail'] as const,
+	detail: (orgId: string, id: string) =>
+		[...propKeys.details(orgId), id] as const,
+	units: (orgId: string, propId: string) =>
+		[...propKeys.detail(orgId, propId), 'units'] as const,
 }

@@ -6,6 +6,19 @@ const DEV_AUTH_TOKEN_KEY = 'DEV_AUTH_TOKEN'
 
 let cachedToken: string | null = null
 
+// Module-level org store — one variable per browser tab, never localStorage.
+let _activeOrgId: string | null = null
+
+/** Called by OrganizationProvider on every activeOrg change. */
+export function setActiveOrgId(id: string | null): void {
+	_activeOrgId = id
+}
+
+/** Called by the Axios request interceptor on every outgoing request. */
+export function getActiveOrgId(): string | null {
+	return _activeOrgId
+}
+
 export const getDevToken = () => {
 	if (!config.isDevelopment) return null
 	if (cachedToken === null) {
@@ -35,13 +48,23 @@ export const api = axios.create({
 	withCredentials: true,
 })
 
-// Request Interceptor: Add Dev Token (development only)
+// Request Interceptor: Dev token + org context injection
 api.interceptors.request.use((_config) => {
-	if (!config.isDevelopment) return _config
-	const token = getDevToken()
-	if (token) {
-		_config.headers['Authorization'] = `Bearer ${token}`
+	// Dev: attach Bearer token from localStorage
+	if (config.isDevelopment) {
+		const token = getDevToken()
+		if (token) {
+			_config.headers['Authorization'] = `Bearer ${token}`
+		}
 	}
+
+	// Append ?orgId= to every request when an active org is set.
+	// The backend's @RequestParam UUID orgId binding resolves it for authorization.
+	const orgId = getActiveOrgId()
+	if (orgId) {
+		_config.params = { ..._config.params, orgId }
+	}
+
 	return _config
 })
 

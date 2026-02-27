@@ -7,8 +7,11 @@ import type {
 	UpdateMemberScopePayload,
 } from '@/domain/member-scope'
 import { stableRequestId } from '@/lib/offline-types'
-import { nowIso } from '@/lib/util'
+import { generateId, nowIso } from '@/lib/util'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
+
+/** Payload for create without id — the hook generates it. */
+export type CreateMemberScopePayloadWithoutId = Omit<CreateMemberScopePayload, 'id'>
 
 // --- Queries ---
 
@@ -37,7 +40,7 @@ export function useMemberScopeDetail(
 export function useCreateMemberScope() {
 	const queryClient = useQueryClient()
 
-	return useMutation({
+	const mutation = useMutation({
 		mutationKey: ['createMemberScope'],
 		networkMode: 'online',
 		mutationFn: ({
@@ -64,6 +67,18 @@ export function useCreateMemberScope() {
 			})
 		},
 	})
+
+	return {
+		...mutation,
+		mutate: (
+			args: { orgId: string; membershipId: string; payload: CreateMemberScopePayloadWithoutId },
+			options?: Parameters<typeof mutation.mutate>[1],
+		) => mutation.mutate({ ...args, payload: { ...args.payload, id: generateId() } }, options),
+		mutateAsync: (
+			args: { orgId: string; membershipId: string; payload: CreateMemberScopePayloadWithoutId },
+			options?: Parameters<typeof mutation.mutateAsync>[1],
+		) => mutation.mutateAsync({ ...args, payload: { ...args.payload, id: generateId() } }, options),
+	}
 }
 
 export function useUpdateMemberScope() {

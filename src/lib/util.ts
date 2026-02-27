@@ -5,17 +5,12 @@ export function nowIso(): string {
 }
 
 /**
- * Generate a client-side UUID for new entities.
- * Use this for all create operations to ensure idempotency.
+ * Generate a client-side UUID v7 for new entities.
+ * UUID v7 is time-sortable and monotonically increasing, matching the backend's
+ * ID generation strategy. Use this for all create operations to ensure
+ * idempotency and stable optimistic IDs.
  */
 export function generateId(): string {
-	return crypto.randomUUID()
-}
-
-/**
- * @deprecated Use generateId() instead
- */
-export function generateOptimisticId(): string {
 	return uuidv7()
 }
 

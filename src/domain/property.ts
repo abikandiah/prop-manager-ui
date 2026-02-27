@@ -47,8 +47,8 @@ export interface CreatePropPayload {
 	version?: number
 }
 
-/** Request body for POST /props. Matches backend CreatePropRequest (no id; server generates it). */
-export type CreatePropRequest = Omit<CreatePropPayload, 'id'>
+/** Request body for POST /props. Includes client-supplied id for idempotency. */
+export type CreatePropRequest = Omit<CreatePropPayload, 'version'>
 
 /** Request body for PATCH /props/{id}. Matches backend UpdatePropRequest (version required for optimistic locking). */
 export interface UpdatePropPayload {

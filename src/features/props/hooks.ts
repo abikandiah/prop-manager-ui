@@ -12,8 +12,8 @@ import { generateId, nowIso } from '@/lib/util'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
 import { useOrganization } from '@/contexts/organization'
 
-/** Payload for create without id (hook adds it for optimistic update; request body matches CreatePropRequest). */
-export type CreatePropPayloadWithoutId = CreatePropRequest
+/** Payload for create without id — hook adds it before calling the API. */
+export type CreatePropPayloadWithoutId = Omit<CreatePropRequest, 'id'>
 
 // --- Helpers: Optimistic Updates ---
 
@@ -136,8 +136,7 @@ export function useCreateProp() {
 		networkMode: 'online',
 		mutationFn: (payload: CreatePropPayload) => {
 			const requestId = stableRequestId(['createProp'], payload)
-			const { id: _id, ...body } = payload
-			return propsApi.create(body, { [IDEMPOTENCY_HEADER]: requestId })
+			return propsApi.create(payload, { [IDEMPOTENCY_HEADER]: requestId })
 		},
 		onMutate: async (payload: CreatePropPayload) => {
 			await queryClient.cancelQueries({ queryKey: propKeys.list(activeOrgId!) })

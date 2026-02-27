@@ -1,3 +1,16 @@
+🤖 AI Collaboration Protocol
+
+You (Claude) are the Primary Implementer. You are paired with the Gemini CLI, which acts as your High-Context Research Assistant.
+When to use Gemini via CLI:
+
+    Massive Context: If you need to analyze patterns across the entire codebase (which exceeds your current context window).
+
+    Needle-in-a-Haystack: When searching for specific logic or variable flows across many directories.
+
+    Architectural Review: When a plan .md needs a "second opinion" based on global project knowledge.
+
+    Usage: Run gemini -p "@src/ [your query]" to get a summary of global patterns.
+
 # prop-manager-ui — React Frontend
 
 Property management frontend. React 19, TypeScript (strict), Vite 7, TanStack Router + Query, Tailwind v4, offline-first architecture.

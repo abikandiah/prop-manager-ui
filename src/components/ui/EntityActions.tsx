@@ -13,6 +13,8 @@ export interface EntityActionsProps {
 	onDelete: () => void
 	/** Whether delete operation is pending */
 	isDeletePending?: boolean
+	/** Disable the delete action (e.g. permission guard). */
+	disableDelete?: boolean
 	/** Additional action items to show before edit/delete */
 	additionalItems?: Array<ActionItem>
 	/** Stop propagation on trigger click (useful in table rows) */
@@ -60,6 +62,7 @@ export function EntityActions({
 	onEdit,
 	onDelete,
 	isDeletePending = false,
+	disableDelete = false,
 	additionalItems = [],
 	stopTriggerPropagation = false,
 	deleteTitle,
@@ -88,7 +91,7 @@ export function EntityActions({
 			icon: <Trash2 className="size-4 shrink-0" />,
 			onClick: () => setDeleteConfirmOpen(true),
 			variant: 'destructive' as const,
-			disabled: isDeletePending,
+			disabled: isDeletePending || disableDelete,
 		},
 	]
 

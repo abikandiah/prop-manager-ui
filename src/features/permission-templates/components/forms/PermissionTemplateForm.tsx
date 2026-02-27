@@ -83,6 +83,8 @@ export interface PermissionTemplateFormProps {
 	orgId?: string | null
 	/** If set, the form is in edit mode. */
 	initialTemplate?: PermissionTemplate | null
+	/** Pre-fills create mode fields (ignored when initialTemplate is set). */
+	prefill?: { name: string; items: MembershipTemplateItem[] }
 	onSuccess?: () => void
 	onCancel?: () => void
 	submitLabel?: string
@@ -93,6 +95,7 @@ export interface PermissionTemplateFormProps {
 export function PermissionTemplateForm({
 	orgId,
 	initialTemplate = null,
+	prefill,
 	onSuccess,
 	onCancel,
 	submitLabel = 'Create template',
@@ -104,7 +107,9 @@ export function PermissionTemplateForm({
 
 	const defaultPerms = initialTemplate
 		? itemsToFormValues(initialTemplate.items)
-		: { orgPermissions: {}, propertyPermissions: {}, unitPermissions: {} }
+		: prefill
+			? itemsToFormValues(prefill.items)
+			: { orgPermissions: {}, propertyPermissions: {}, unitPermissions: {} }
 
 	const {
 		register,
@@ -114,7 +119,7 @@ export function PermissionTemplateForm({
 	} = useForm<PermissionTemplateFormValues>({
 		resolver: standardSchemaResolver(permissionTemplateSchema),
 		defaultValues: {
-			name: initialTemplate?.name ?? '',
+			name: initialTemplate?.name ?? prefill?.name ?? '',
 			...defaultPerms,
 		},
 		mode: 'onTouched',

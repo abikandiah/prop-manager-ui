@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
+import { Copy, Shield } from 'lucide-react'
 import {
 	Table,
 	TableBody,
@@ -10,10 +11,12 @@ import {
 } from '@abumble/design-system/components/Table'
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
 import { FormDialog } from '@abumble/design-system/components/Dialog'
+import { Badge } from '@abumble/design-system/components/Badge'
 import type { PermissionTemplate } from '@/domain/permission-template'
 import { TableSkeleton, EntityActions } from '@/components/ui'
 import { config } from '@/config'
 import { formatDate } from '@/lib/format'
+import { useAuth } from '@/contexts/auth'
 import {
 	useDeletePermissionTemplate,
 	usePermissionTemplates,
@@ -42,6 +45,7 @@ function formatItems(items: PermissionTemplate['items']): string {
 export function PermissionTemplatesTableView({
 	orgId,
 }: PermissionTemplatesTableViewProps) {
+	const { user } = useAuth()
 	const {
 		data: templates,
 		isLoading,
@@ -50,6 +54,11 @@ export function PermissionTemplatesTableView({
 	} = usePermissionTemplates(orgId)
 	const deleteTemplate = useDeletePermissionTemplate()
 	const [editing, setEditing] = useState<PermissionTemplate | null>(null)
+	const [duplicating, setDuplicating] = useState<PermissionTemplate | null>(
+		null,
+	)
+
+	const isGlobalAdmin = user?.roles?.includes('ROLE_ADMIN') ?? false
 
 	const lastErrorRef = useRef<unknown>(null)
 	if (isError && error !== lastErrorRef.current) {
@@ -95,6 +104,29 @@ export function PermissionTemplatesTableView({
 				)}
 			</FormDialog>
 
+			<FormDialog
+				open={duplicating !== null}
+				onOpenChange={(open) => {
+					if (!open) setDuplicating(null)
+				}}
+				title="Duplicate template"
+				description="Create a copy of this system template for your organization."
+				className={FORM_DIALOG_CLASS}
+			>
+				{duplicating && (
+					<PermissionTemplateForm
+						orgId={orgId}
+						prefill={{
+							name: `Copy of ${duplicating.name}`,
+							items: structuredClone(duplicating.items),
+						}}
+						onSuccess={() => setDuplicating(null)}
+						onCancel={() => setDuplicating(null)}
+						submitLabel="Create copy"
+					/>
+				)}
+			</FormDialog>
+
 			<DelayedLoadingFallback
 				isLoading={isLoading}
 				delayMs={config.loadingFallbackDelayMs}
@@ -122,32 +154,60 @@ export function PermissionTemplatesTableView({
 									</TableCell>
 								</TableRow>
 							) : (
-								templates.map((template) => (
-									<TableRow key={template.id}>
-										<TableCell className="font-medium">
-											{template.name}
-										</TableCell>
-										<TableCell className="text-muted-foreground text-sm">
-											{template.orgId === null ? 'System' : 'Organization'}
-										</TableCell>
-										<TableCell className="text-muted-foreground text-sm font-mono">
-											{formatItems(template.items)}
-										</TableCell>
-										<TableCell className="text-muted-foreground">
-											{formatDate(template.createdAt)}
-										</TableCell>
-										<TableCell>
-											<EntityActions
-												onEdit={() => setEditing(template)}
-												onDelete={() => handleDelete(template)}
-												isDeletePending={deleteTemplate.isPending}
-												deleteTitle={`Delete "${template.name}"?`}
-												deleteDescription="This template will be permanently removed. Scopes that used it will keep their current permissions."
-												stopTriggerPropagation
-											/>
-										</TableCell>
-									</TableRow>
-								))
+								templates.map((template) => {
+									const isSystem = template.orgId === null
+									const canMutate = !isSystem || isGlobalAdmin
+									return (
+										<TableRow key={template.id}>
+											<TableCell className="font-medium">
+												<span className="flex items-center gap-2">
+													{template.name}
+													{isSystem && (
+														<Badge
+															variant="secondary"
+															className="flex items-center gap-1 text-xs"
+														>
+															<Shield className="size-3" />
+															System
+														</Badge>
+													)}
+												</span>
+											</TableCell>
+											<TableCell className="text-muted-foreground text-sm">
+												{isSystem ? 'System' : 'Organization'}
+											</TableCell>
+											<TableCell className="text-muted-foreground text-sm font-mono">
+												{formatItems(template.items)}
+											</TableCell>
+											<TableCell className="text-muted-foreground">
+												{formatDate(template.createdAt)}
+											</TableCell>
+											<TableCell>
+												<EntityActions
+													onEdit={canMutate ? () => setEditing(template) : false}
+													onDelete={() => handleDelete(template)}
+													isDeletePending={deleteTemplate.isPending}
+													disableDelete={!canMutate}
+													deleteTitle={`Delete "${template.name}"?`}
+													deleteDescription="This template will be permanently removed. Scopes that used it will keep their current permissions."
+													stopTriggerPropagation
+													additionalItems={
+														isSystem
+															? [
+																	{
+																		label: 'Duplicate',
+																		icon: <Copy className="size-4 shrink-0" />,
+																		onClick: () =>
+																			setDuplicating(template),
+																	},
+																]
+															: []
+													}
+												/>
+											</TableCell>
+										</TableRow>
+									)
+								})
 							)}
 						</TableBody>
 					</Table>

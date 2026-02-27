@@ -14,6 +14,7 @@ export interface MemberScope {
 }
 
 export interface CreateMemberScopePayload {
+	id: string
 	scopeType: ScopeType
 	/** For ORG scope, pass the org ID here. Required by the backend. */
 	scopeId: string

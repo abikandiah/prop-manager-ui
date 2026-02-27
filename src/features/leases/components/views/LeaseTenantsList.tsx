@@ -258,6 +258,7 @@ export function LeaseTenantsList({ leaseId, isDraft }: LeaseTenantListProps) {
 										<InviteStatusBadge
 											status={tenant.status === 'INVITED' ? 'PENDING' : 'ACTIVE'}
 											lastResentAt={tenant.lastResentAt}
+											expiresAt={tenant.expiresAt}
 											emailStatus={tenant.emailStatus}
 											emailError={tenant.emailError}
 										/>

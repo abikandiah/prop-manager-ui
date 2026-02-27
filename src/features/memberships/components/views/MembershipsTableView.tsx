@@ -170,7 +170,8 @@ function MemberRowActions({
 	if (!canResend && !canRemove) return null
 
 	const handleResend = () => {
-		resendInvite.mutate(membership.inviteId!, {
+		if (!membership.inviteId) return
+		resendInvite.mutate(membership.inviteId, {
 			onSuccess: () => toast.success('Invitation resent'),
 			onSettled: () =>
 				queryClient.invalidateQueries({

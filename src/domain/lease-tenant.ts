@@ -49,6 +49,8 @@ export interface LeaseTenant {
 	signedDate: string | null
 	/** Timestamp of the last resend, null if never resent. */
 	lastResentAt: string | null
+	/** Expiry timestamp of the originating invite. */
+	expiresAt: string | null
 	/** Delivery status of the most recent invite email. */
 	emailStatus: EmailDeliveryStatus
 	/** Error message from the last failed send attempt, null if last send succeeded. */

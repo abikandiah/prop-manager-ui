@@ -580,7 +580,7 @@ import { generateId } from '@/lib/util'
 export function PropForm({ onSuccess, onCancel }: PropFormProps) {
   const createProp = useCreateProp()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault()
 
     const payload: CreatePropPayload = {

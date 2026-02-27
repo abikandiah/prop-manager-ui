@@ -15,7 +15,6 @@ import { stableRequestId } from '@/lib/offline-types'
 import { nowIso } from '@/lib/util'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
 import { useOrganization } from '@/contexts/organization'
-import { invitesApi } from '../invites/api'
 
 // --- Helpers: Optimistic Updates ---
 
@@ -258,7 +257,7 @@ export function useCreateLease() {
 				optimisticId: optimistic.id,
 			}
 		},
-		onError: (err, payload, context) => {
+		onError: (_err, payload, context) => {
 			if (context?.previousAllLeases) {
 				queryClient.setQueryData(
 					leaseKeys.list(activeOrgId!),
@@ -277,7 +276,6 @@ export function useCreateLease() {
 					context.previousPropertyLeases,
 				)
 			}
-			console.error('[Mutation] Create lease failed:', err)
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: leaseKeys.all(activeOrgId!) })
@@ -339,7 +337,7 @@ export function useUpdateLease() {
 				propertyId,
 			}
 		},
-		onError: (err, { id }, context) => {
+		onError: (_err, { id }, context) => {
 			if (context?.previousUnitLeases && context.unitId) {
 				queryClient.setQueryData(
 					leaseKeys.list(activeOrgId!, { unitId: context.unitId }),
@@ -358,7 +356,6 @@ export function useUpdateLease() {
 					context.previousLease,
 				)
 			}
-			console.error('[Mutation] Update lease failed:', err)
 		},
 		onSettled: (_, __, { id }) => {
 			queryClient.invalidateQueries({
@@ -412,7 +409,7 @@ export function useDeleteLease() {
 				propertyId: variables.propertyId,
 			}
 		},
-		onError: (err, variables, context) => {
+		onError: (_err, variables, context) => {
 			if (context?.previousUnitLeases && context.unitId) {
 				queryClient.setQueryData(
 					leaseKeys.list(activeOrgId!, { unitId: context.unitId }),
@@ -431,7 +428,6 @@ export function useDeleteLease() {
 					context.previousLease,
 				)
 			}
-			console.error('[Mutation] Delete lease failed:', err)
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({ queryKey: leaseKeys.all(activeOrgId!) })
@@ -445,7 +441,6 @@ function makeLeaseStatusTransitionHook(
 	mutationKey: string,
 	mutationFn: (id: string) => Promise<Lease>,
 	newStatus: LeaseStatus,
-	errorLabel: string,
 ) {
 	return function useLeaseStatusTransition() {
 		const queryClient = useQueryClient()
@@ -476,7 +471,7 @@ function makeLeaseStatusTransitionHook(
 
 				return { previousUnitLeases, previousPropertyLeases, previousLease }
 			},
-			onError: (err, id, context) => {
+			onError: (_err, id, context) => {
 				if (context?.previousLease) {
 					queryClient.setQueryData(
 						leaseKeys.list(activeOrgId!, {
@@ -495,7 +490,6 @@ function makeLeaseStatusTransitionHook(
 						context.previousLease,
 					)
 				}
-				console.error(`[Mutation] ${errorLabel} failed:`, err)
 			},
 			onSettled: () => {
 				queryClient.invalidateQueries({ queryKey: leaseKeys.all(activeOrgId!) })
@@ -508,28 +502,24 @@ export const useSubmitLeaseForReview = makeLeaseStatusTransitionHook(
 	'submitLeaseForReview',
 	(id) => leasesApi.submitForReview(id),
 	LeaseStatus.REVIEW,
-	'Submit lease for review',
 )
 
 export const useActivateLease = makeLeaseStatusTransitionHook(
 	'activateLease',
 	(id) => leasesApi.activate(id),
 	LeaseStatus.ACTIVE,
-	'Activate lease',
 )
 
 export const useRevertLeaseToDraft = makeLeaseStatusTransitionHook(
 	'revertLeaseToDraft',
 	(id) => leasesApi.revertToDraft(id),
 	LeaseStatus.DRAFT,
-	'Revert lease to draft',
 )
 
 export const useTerminateLease = makeLeaseStatusTransitionHook(
 	'terminateLease',
 	(id) => leasesApi.terminate(id),
 	LeaseStatus.TERMINATED,
-	'Terminate lease',
 )
 
 // --- Lease Tenant Queries ---
@@ -572,9 +562,6 @@ export function useInviteLeaseTenants() {
 				[IDEMPOTENCY_HEADER]: requestId,
 			})
 		},
-		onError: (err) => {
-			console.error('[Mutation] Invite lease tenants failed:', err)
-		},
 		onSettled: (_data, _error, { leaseId }) => {
 			queryClient.invalidateQueries({
 				queryKey: leaseTenantKeys.list(activeOrgId!, leaseId),
@@ -583,42 +570,6 @@ export function useInviteLeaseTenants() {
 	})
 }
 
-export type ResendLeaseTenantInviteVariables = {
-	leaseId: string
-	leaseTenantId: string
-	inviteId: string
-	/** Used to build the success toast message. */
-	email: string
-}
-
-/**
- * Resend the invite for a lease tenant who hasn't accepted yet.
- * Error messages come directly from the server's ProblemDetail.detail
- * (e.g. cooldown: "Please wait before resending this invitation").
- */
-export function useResendLeaseTenantInvite() {
-	const queryClient = useQueryClient()
-	const { activeOrgId } = useOrganization()
-
-	return useMutation({
-		mutationKey: ['resendLeaseTenantInvite'],
-		networkMode: 'online',
-		mutationFn: ({ inviteId }: ResendLeaseTenantInviteVariables) => {
-			const requestId = stableRequestId(['resendLeaseTenantInvite'], inviteId)
-			return invitesApi.resend(inviteId, {
-				[IDEMPOTENCY_HEADER]: requestId,
-			})
-		},
-		onError: (err) => {
-			console.error('[Mutation] Resend lease tenant invite failed:', err)
-		},
-		onSettled: (_data, _error, { leaseId }) => {
-			queryClient.invalidateQueries({
-				queryKey: leaseTenantKeys.list(activeOrgId!, leaseId),
-			})
-		},
-	})
-}
 
 export type RemoveLeaseTenantVariables = {
 	leaseId: string
@@ -659,14 +610,13 @@ export function useRemoveLeaseTenant() {
 			)
 			return { previous }
 		},
-		onError: (err, { leaseId }, context) => {
+		onError: (_err, { leaseId }, context) => {
 			if (context?.previous) {
 				queryClient.setQueryData(
 					leaseTenantKeys.list(activeOrgId!, leaseId),
 					context.previous,
 				)
 			}
-			console.error('[Mutation] Remove lease tenant failed:', err)
 		},
 		onSettled: (_data, _error, { leaseId }) => {
 			queryClient.invalidateQueries({

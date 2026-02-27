@@ -1,16 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
-import { Plus } from 'lucide-react'
+import { UserPlus } from 'lucide-react'
 import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
 import { Button } from '@abumble/design-system/components/Button'
 import {
 	DialogTrigger,
 	FormDialog,
 } from '@abumble/design-system/components/Dialog'
-import {
-	PermissionTemplateForm,
-	PermissionTemplatesTableView,
-} from '@/features/permission-templates'
+import { MembershipsTableView } from '@/features/memberships'
+import { InviteMemberForm } from '@/features/invites/components/forms/InviteMemberForm'
 import { FORM_DIALOG_CLASS, useDialogState } from '@/lib/dialog'
 import { useAuth } from '@/contexts/auth'
 
@@ -18,7 +16,7 @@ const searchSchema = z.object({
 	orgId: z.string().optional(),
 })
 
-export const Route = createFileRoute('/organization/roles')({
+export const Route = createFileRoute('/organization/members/')({
 	validateSearch: searchSchema,
 	component: RouteComponent,
 })
@@ -35,8 +33,8 @@ function RouteComponent() {
 		return (
 			<>
 				<BannerHeader
-					title="Team Roles"
-					description="Reusable permission sets for quickly granting standard access to team members."
+					title="Team Members"
+					description="Manage your organization's members and their access levels."
 				/>
 				<p className="text-muted-foreground text-sm">
 					No organization selected. Please ensure you are logged in and belong
@@ -49,27 +47,27 @@ function RouteComponent() {
 	return (
 		<>
 			<BannerHeader
-				title="Team Roles"
-				description="Manage reusable permission sets (roles) for your organization. Roles can be system-wide or specific to your organization."
+				title="Team Members"
+				description="Manage your team, invite new members, and control their permissions."
 			/>
 
 			<div>
 				<FormDialog
 					open={dialog.isOpen}
 					onOpenChange={dialog.setIsOpen}
-					title="Add role"
-					description="Create a reusable permission set for your team."
+					title="Invite team member"
+					description="Send an invitation to join your organization."
 					className={FORM_DIALOG_CLASS}
 					trigger={
 						<DialogTrigger asChild>
 							<Button>
-								<Plus className="size-4" />
-								Add role
+								<UserPlus className="size-4" />
+								Invite member
 							</Button>
 						</DialogTrigger>
 					}
 				>
-					<PermissionTemplateForm
+					<InviteMemberForm
 						orgId={orgId}
 						onSuccess={dialog.close}
 						onCancel={dialog.close}
@@ -77,7 +75,7 @@ function RouteComponent() {
 				</FormDialog>
 			</div>
 
-			<PermissionTemplatesTableView orgId={orgId} />
+			<MembershipsTableView orgId={orgId} />
 		</>
 	)
 }

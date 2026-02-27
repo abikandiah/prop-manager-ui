@@ -1,16 +1,17 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { organizationsApi } from './api'
-import { organizationKeys } from './keys'
-import type {
-	Organization,
-	CreateOrganizationPayload,
-	UpdateOrganizationPayload,
-} from '@/domain/organization'
-import { stableRequestId } from '@/lib/offline-types'
-import { generateId, nowIso } from '@/lib/util'
-import { IDEMPOTENCY_HEADER } from '@/lib/constants'
 import { api, setDevToken } from '@/api/client'
 import { config } from '@/config'
+import { useAuth } from '@/contexts/auth'
+import type {
+	CreateOrganizationPayload,
+	Organization,
+	UpdateOrganizationPayload,
+} from '@/domain/organization'
+import { IDEMPOTENCY_HEADER } from '@/lib/constants'
+import { stableRequestId } from '@/lib/offline-types'
+import { generateId, nowIso } from '@/lib/util'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { organizationsApi } from './api'
+import { organizationKeys } from './keys'
 
 /** Payload without id — the hook generates it. */
 export type CreateOrganizationPayloadWithoutId = Omit<
@@ -39,6 +40,7 @@ export function useOrganizationById(id: string | null) {
 
 export function useCreateOrganization() {
 	const queryClient = useQueryClient()
+	const { refreshUser } = useAuth()
 
 	const mutation = useMutation({
 		mutationKey: ['createOrganization'],
@@ -90,7 +92,7 @@ export function useCreateOrganization() {
 				}
 			}
 			// Re-fetch the user profile — updates user.organizations in AuthContext.
-			await queryClient.invalidateQueries({ queryKey: ['me'] })
+			refreshUser()
 			queryClient.invalidateQueries({ queryKey: organizationKeys.all })
 		},
 	})

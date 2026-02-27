@@ -32,7 +32,7 @@ export const Route = createFileRoute('/invite/$token')({
 
 function InviteAcceptPage() {
 	const { token } = Route.useParams()
-	const { user, isLoadingUser, refetchUser } = useAuth()
+	const { user, isLoadingUser } = useAuth()
 	const navigate = useNavigate()
 
 	const { data: preview, isLoading, isError } = useInvitePreview(token)
@@ -77,7 +77,6 @@ function InviteAcceptPage() {
 							user={user}
 							onAccept={handleAccept}
 							isAccepting={acceptInvite.isPending}
-							onRegistered={refetchUser}
 						/>
 					)}
 				</DelayedLoadingFallback>
@@ -91,7 +90,6 @@ interface InvitePageContentProps {
 	user: User | null
 	onAccept: () => void
 	isAccepting: boolean
-	onRegistered: () => Promise<unknown>
 }
 
 function InvitePageContent({
@@ -99,7 +97,6 @@ function InvitePageContent({
 	user,
 	onAccept,
 	isAccepting,
-	onRegistered,
 }: InvitePageContentProps) {
 	const {
 		maskedEmail,
@@ -216,7 +213,6 @@ function InvitePageContent({
 						expiresAt={expiresAt}
 						onAccept={onAccept}
 						isAccepting={isAccepting}
-						onRegistered={onRegistered}
 					/>
 				</div>
 			</div>
@@ -232,7 +228,6 @@ interface InviteActionCardProps {
 	expiresAt: string
 	onAccept: () => void
 	isAccepting: boolean
-	onRegistered: () => Promise<unknown>
 }
 
 function InviteActionCard({
@@ -243,7 +238,6 @@ function InviteActionCard({
 	expiresAt,
 	onAccept,
 	isAccepting,
-	onRegistered,
 }: InviteActionCardProps) {
 	const isLease = targetType === TargetType.LEASE
 
@@ -259,7 +253,7 @@ function InviteActionCard({
 					</p>
 				</CardHeader>
 				<CardContent>
-					<RegisterForm onSuccess={onRegistered} />
+					<RegisterForm />
 				</CardContent>
 			</Card>
 		)

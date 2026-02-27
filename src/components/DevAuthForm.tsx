@@ -1,3 +1,4 @@
+import { api, setDevToken } from '@/api/client'
 import { Button } from '@abumble/design-system/components/Button'
 import {
 	Card,
@@ -5,10 +6,9 @@ import {
 	CardHeader,
 } from '@abumble/design-system/components/Card'
 import { Input } from '@abumble/design-system/components/Input'
+import { Label } from '@abumble/design-system/components/Label'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Label } from '@abumble/design-system/components/Label'
-import { api, setDevToken } from '@/api/client'
 
 interface DevAuthFormProps {
 	/** Called after successful login (e.g. to re-render parent or navigate). */
@@ -25,7 +25,7 @@ export function DevAuthForm({
 	const [password, setPassword] = useState('')
 	const [loading, setLoading] = useState(false)
 
-	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+	const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault()
 		setLoading(true)
 		try {

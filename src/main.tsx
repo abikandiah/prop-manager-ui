@@ -1,5 +1,5 @@
 import { Toaster } from '@abumble/design-system/components/Toaster'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { StrictMode, useMemo } from 'react'
 import { createRoot } from 'react-dom/client'
@@ -9,16 +9,11 @@ import { AuthProvider, useAuth } from './contexts/auth'
 import { NetworkProvider } from './contexts/network'
 import { OrganizationProvider } from './contexts/organization'
 import { ThemeProvider, useTheme } from './contexts/theme'
-import { createBootstrapDefaults } from './integrations/tanstack-query/client-config'
+import { bootstrapQueryClient } from './integrations/tanstack-query/bootstrap.ts'
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
 import reportWebVitals from './reportWebVitals'
 import { routeTree } from './routeTree.gen'
 import './styles.css'
-
-// Bootstrap client used only for auth (e.g. /me). User-scoped client lives inside AppWithProviders.
-const bootstrapQueryClient = new QueryClient({
-	defaultOptions: createBootstrapDefaults(),
-})
 
 const router = createRouter({
 	routeTree,

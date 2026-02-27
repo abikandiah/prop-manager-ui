@@ -14,14 +14,7 @@ export const Route = createFileRoute('/dev/')({
 	component: DevIndex,
 })
 
-const devRoutes = [
-	{
-		to: '/dev/auth',
-		title: 'Dev auth',
-		description:
-			'Authenticate with the backend using /api/dev/login. Use this to sign in when developing against a local API.',
-	},
-] as const
+const devRoutes = [] as const
 
 function DevIndex() {
 	return (

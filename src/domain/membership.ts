@@ -14,6 +14,8 @@ export interface Membership {
 	inviteId: string | null
 	inviteEmail: string | null
 	inviteStatus: InviteStatus | null
+	lastResentAt: string | null
+	expiresAt: string | null
 	version: number
 	createdAt: string
 	updatedAt: string

@@ -64,6 +64,8 @@ export function useInviteMember() {
 				inviteId: null,
 				inviteEmail: payload.email,
 				inviteStatus: InviteStatus.PENDING,
+				lastResentAt: null,
+				expiresAt: null,
 				version: 0,
 				createdAt: nowIso(),
 				updatedAt: nowIso(),

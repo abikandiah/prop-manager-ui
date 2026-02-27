@@ -144,7 +144,7 @@ export function PropsForm({
   // Validation (pure function)
   const error = validateForm(form)
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e: React.SubmitEvent) => {
     e.preventDefault()
     if (error) return
 

@@ -10,28 +10,22 @@ import {
 	SidebarTrigger,
 	useSidebar,
 } from '@abumble/design-system/components/Sidebar'
+import type { LinkComponentProps } from '@tanstack/react-router'
 import { Link } from '@tanstack/react-router'
+import type { LucideIcon } from 'lucide-react'
 import {
-	ArrowLeftRight,
-	BarChart3,
 	Building2,
-	ClipboardList,
 	FileCheck,
 	FileSignature,
 	FileText,
-	Hammer,
 	LayoutDashboard,
 	LayoutGrid,
-	Receipt,
 	Store,
 	UserCheck,
 	Users,
-	Wrench,
 } from 'lucide-react'
 import { useCallback } from 'react'
 import { CollapsibleSidebarSection } from './CollapsibleSidebarSection'
-import type { LinkComponentProps } from '@tanstack/react-router'
-import type { LucideIcon } from 'lucide-react'
 
 type NavItem = {
 	to: '/'
@@ -101,7 +95,7 @@ export function AppSidebar() {
 									title="People"
 									icon={Users}
 									items={[
-										{ to: '/tenants', label: 'Tenants', icon: Users },
+										{ to: '/people/tenants', label: 'Tenants', icon: Users },
 										{ to: '/people/owners', label: 'Owners', icon: UserCheck },
 										{ to: '/people/vendors', label: 'Vendors', icon: Store },
 									]}
@@ -121,11 +115,11 @@ export function AppSidebar() {
 											label: 'Agreements',
 											icon: FileCheck,
 										},
-										{
-											to: '/leases/applications',
-											label: 'Applications',
-											icon: ClipboardList,
-										},
+										// {
+										// 	to: '/leases/applications',
+										// 	label: 'Applications',
+										// 	icon: ClipboardList,
+										// },
 									]}
 									onItemClick={closeMobileSidebar}
 								/>
@@ -146,7 +140,7 @@ export function AppSidebar() {
 									]}
 									onItemClick={closeMobileSidebar}
 								/>
-								<CollapsibleSidebarSection
+								{/* <CollapsibleSidebarSection
 									title="Maintenance"
 									icon={Wrench}
 									items={[
@@ -162,8 +156,8 @@ export function AppSidebar() {
 										},
 									]}
 									onItemClick={closeMobileSidebar}
-								/>
-								<CollapsibleSidebarSection
+								/> */}
+								{/* <CollapsibleSidebarSection
 									title="Finance"
 									icon={BarChart3}
 									items={[
@@ -184,7 +178,7 @@ export function AppSidebar() {
 										},
 									]}
 									onItemClick={closeMobileSidebar}
-								/>
+								/> */}
 							</SidebarMenu>
 						</SidebarGroupContent>
 					</SidebarGroup>

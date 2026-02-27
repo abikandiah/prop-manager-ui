@@ -8,12 +8,6 @@ import { ConfirmDeleteDialog } from '@abumble/design-system/components/ConfirmDe
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
 import { FormDialog } from '@abumble/design-system/components/Dialog'
 import {
-	Tooltip,
-	TooltipContent,
-	TooltipProvider,
-	TooltipTrigger,
-} from '@abumble/design-system/components/Tooltip'
-import {
 	Table,
 	TableBody,
 	TableCell,
@@ -22,44 +16,27 @@ import {
 	TableRow,
 } from '@abumble/design-system/components/Table'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
-import type { LeaseTenant, LeaseTenantStatus } from '@/domain/lease-tenant'
-import { EmailDeliveryStatus, LeaseTenantRole } from '@/domain/lease-tenant'
+import type { LeaseTenant } from '@/domain/lease-tenant'
+import { LeaseTenantRole } from '@/domain/lease-tenant'
 import { DETAIL_LABEL_CLASS } from '@/components/ui/DetailField'
-import { formatDate, formatDateTime, formatEnumLabel } from '@/lib/format'
+import { formatDate, formatEnumLabel } from '@/lib/format'
+import { InviteStatusBadge } from '@/components/InviteStatusBadge'
 import { FORM_DIALOG_CLASS, useDialogState } from '@/lib/dialog'
 import { config } from '@/config'
+import { useQueryClient } from '@tanstack/react-query'
+import { useOrganization } from '@/contexts/organization'
+import { useResendInvite } from '@/features/invites/hooks'
+import { leaseTenantKeys } from '@/features/leases/keys'
 import {
 	useLeaseTenants,
 	useRemoveLeaseTenant,
-	useResendLeaseTenantInvite,
 } from '@/features/leases/hooks'
 import { InviteTenantsForm } from '../forms/InviteTenantsForm'
 
 // ---------- Badge helpers ----------
 
-type BadgeVariant =
-	| 'default'
-	| 'secondary'
-	| 'success'
-	| 'warning'
-	| 'destructive'
-	| 'outline'
-
-function statusVariant(status: LeaseTenantStatus): BadgeVariant {
-	switch (status) {
-		case 'INVITED':
-			return 'warning'
-		case 'REGISTERED':
-			return 'secondary'
-		case 'SIGNED':
-			return 'success'
-		default:
-			return 'default'
-	}
-}
-
-function roleVariant(role: LeaseTenant['role']): BadgeVariant {
-	return role === LeaseTenantRole.PRIMARY ? 'default' : 'outline'
+function roleVariant(role: LeaseTenant['role']) {
+	return role === LeaseTenantRole.PRIMARY ? 'default' : ('outline' as const)
 }
 
 // ---------- Skeleton ----------
@@ -120,7 +97,9 @@ interface TenantRowActionsProps {
 function TenantRowActions({ tenant, leaseId, isDraft }: TenantRowActionsProps) {
 	const [confirmOpen, setConfirmOpen] = useState(false)
 	const removeTenant = useRemoveLeaseTenant()
-	const resendInvite = useResendLeaseTenantInvite()
+	const resendInvite = useResendInvite()
+	const queryClient = useQueryClient()
+	const { activeOrgId } = useOrganization()
 
 	const canResend = tenant.status === 'INVITED'
 	const canRemove = isDraft && tenant.status !== 'SIGNED'
@@ -128,19 +107,16 @@ function TenantRowActions({ tenant, leaseId, isDraft }: TenantRowActionsProps) {
 	if (!canResend && !canRemove) return null
 
 	const handleResend = () => {
-		resendInvite.mutate(
-			{
-				leaseId,
-				leaseTenantId: tenant.id,
-				inviteId: tenant.inviteId,
-				email: tenant.email,
+		resendInvite.mutate(tenant.inviteId, {
+			onSuccess: () => {
+				toast.success(`Invitation resent to ${tenant.email}`)
 			},
-			{
-				onSuccess: () => {
-					toast.success(`Invitation resent to ${tenant.email}`)
-				},
+			onSettled: () => {
+				queryClient.invalidateQueries({
+					queryKey: leaseTenantKeys.list(activeOrgId!, leaseId),
+				})
 			},
-		)
+		})
 	}
 
 	const handleRemoveConfirm = () => {
@@ -234,8 +210,7 @@ export function LeaseTenantsList({ leaseId, isDraft }: LeaseTenantListProps) {
 	const totalCols = hasActions ? TABLE_COLS_WITH_ACTIONS : TABLE_COLS_BASE
 
 	const tableContent = (
-		<TooltipProvider>
-			<div className="rounded-lg border bg-card overflow-hidden">
+		<div className="rounded-lg border bg-card overflow-hidden">
 				{/* Card header */}
 				<div className="flex items-center justify-between px-5 py-4">
 					<p className={DETAIL_LABEL_CLASS}>Tenants</p>
@@ -280,33 +255,12 @@ export function LeaseTenantsList({ leaseId, isDraft }: LeaseTenantListProps) {
 										</Badge>
 									</TableCell>
 									<TableCell>
-										{tenant.status === 'INVITED' &&
-										tenant.emailStatus === EmailDeliveryStatus.FAILED ? (
-											<Tooltip>
-												<TooltipTrigger asChild>
-													<Badge variant="destructive">Email failed</Badge>
-												</TooltipTrigger>
-												<TooltipContent>
-													{tenant.emailError ??
-														'Email could not be delivered. Use "Resend invite" to try again.'}
-												</TooltipContent>
-											</Tooltip>
-										) : tenant.status === 'INVITED' && tenant.lastResentAt ? (
-											<Tooltip>
-												<TooltipTrigger asChild>
-													<Badge variant={statusVariant(tenant.status)}>
-														{formatEnumLabel(tenant.status)}
-													</Badge>
-												</TooltipTrigger>
-												<TooltipContent>
-													Resent {formatDateTime(tenant.lastResentAt)}
-												</TooltipContent>
-											</Tooltip>
-										) : (
-											<Badge variant={statusVariant(tenant.status)}>
-												{formatEnumLabel(tenant.status)}
-											</Badge>
-										)}
+										<InviteStatusBadge
+											status={tenant.status === 'INVITED' ? 'PENDING' : 'ACTIVE'}
+											lastResentAt={tenant.lastResentAt}
+											emailStatus={tenant.emailStatus}
+											emailError={tenant.emailError}
+										/>
 									</TableCell>
 									<TableCell className="text-muted-foreground">
 										{formatDate(tenant.invitedDate)}
@@ -326,7 +280,6 @@ export function LeaseTenantsList({ leaseId, isDraft }: LeaseTenantListProps) {
 					</TableBody>
 				</Table>
 			</div>
-		</TooltipProvider>
 	)
 
 	return (

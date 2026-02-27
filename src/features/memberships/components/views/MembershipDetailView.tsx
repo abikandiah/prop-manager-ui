@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
+import { useQueryClient } from '@tanstack/react-query'
 import {
 	Card,
 	CardContent,
@@ -12,13 +13,16 @@ import { Button } from '@abumble/design-system/components/Button'
 import { ConfirmDeleteDialog } from '@abumble/design-system/components/ConfirmDeleteDialog'
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
 import { useMembershipById, useDeleteMembership } from '@/features/memberships'
+import { useResendInvite } from '@/features/invites/hooks'
+import { membershipKeys } from '@/features/memberships/keys'
 import { useMemberScopesList } from '@/features/member-scopes/hooks'
 import { useQueryErrorToast } from '@/lib/hooks'
 import { config } from '@/config'
 import { DetailField } from '@/components/ui'
+import { InviteStatusBadge } from '@/components/InviteStatusBadge'
 import { formatDateTime } from '@/lib/format'
-import { Trash2 } from 'lucide-react'
-import type { Membership } from '@/domain/membership'
+import { InviteStatus } from '@/domain/membership'
+import { RotateCcw, Trash2 } from 'lucide-react'
 
 export interface MembershipDetailViewProps {
 	orgId: string
@@ -41,21 +45,50 @@ export function MembershipDetailView({
 		membershipId,
 	)
 	const deleteMembership = useDeleteMembership()
-	const [revokeOpen, setRevokeOpen] = useState(false)
+	const resendInvite = useResendInvite()
+	const queryClient = useQueryClient()
+	const [confirmOpen, setConfirmOpen] = useState(false)
+	const [confirmAction, setConfirmAction] = useState<'remove' | 'revoke' | null>(null)
 
 	useQueryErrorToast(isError, error, 'membership')
 
-	const handleRevoke = () => {
-		setRevokeOpen(false)
+	const canResend =
+		membership?.inviteStatus === InviteStatus.PENDING ||
+		membership?.inviteStatus === InviteStatus.EXPIRED
+	const canRevoke = canResend
+	const canRemove = !!membership?.userId
+
+	const handleResend = () => {
+		if (!membership?.inviteId) return
+		resendInvite.mutate(membership.inviteId, {
+			onSuccess: () => toast.success('Invitation resent'),
+			onSettled: () => {
+				queryClient.invalidateQueries({ queryKey: membershipKeys.list(orgId) })
+				queryClient.invalidateQueries({
+					queryKey: membershipKeys.detail(orgId, membershipId),
+				})
+			},
+		})
+	}
+
+	const handleConfirm = () => {
+		setConfirmOpen(false)
 		deleteMembership.mutate(
 			{ orgId, membershipId },
 			{
 				onSuccess: () => {
-					toast.success('Membership revoked')
+					toast.success(
+						confirmAction === 'remove' ? 'Member removed' : 'Invitation revoked',
+					)
 					navigate({ to: '/organization/members', search: { orgId } })
 				},
 			},
 		)
+	}
+
+	const openConfirm = (action: 'remove' | 'revoke') => {
+		setConfirmAction(action)
+		setConfirmOpen(true)
 	}
 
 	return (
@@ -76,27 +109,57 @@ export function MembershipDetailView({
 											'Pending Member'}
 									</CardTitle>
 									<div className="flex gap-2">
-										<MembershipStatusBadge membership={membership} />
+										<InviteStatusBadge
+											status={
+												membership.userId
+													? 'ACTIVE'
+													: (membership.inviteStatus ?? 'PENDING')
+											}
+											lastResentAt={membership.lastResentAt}
+											expiresAt={membership.expiresAt}
+										/>
 									</div>
 								</div>
-								<Button
-									variant="destructive"
-									onClick={() => setRevokeOpen(true)}
-									disabled={deleteMembership.isPending}
-								>
-									<Trash2 className="mr-2 h-4 w-4" />
-									Revoke Membership
-								</Button>
+								<div className="flex gap-2">
+									{canResend && membership.inviteId && (
+										<Button
+											variant="outline"
+											onClick={handleResend}
+											disabled={resendInvite.isPending}
+										>
+											<RotateCcw className="mr-2 h-4 w-4" />
+											Resend Invitation
+										</Button>
+									)}
+									{canRevoke && (
+										<Button
+											variant="destructive"
+											onClick={() => openConfirm('revoke')}
+											disabled={deleteMembership.isPending}
+										>
+											<Trash2 className="mr-2 h-4 w-4" />
+											Revoke Invitation
+										</Button>
+									)}
+									{canRemove && (
+										<Button
+											variant="destructive"
+											onClick={() => openConfirm('remove')}
+											disabled={deleteMembership.isPending}
+										>
+											<Trash2 className="mr-2 h-4 w-4" />
+											Remove Member
+										</Button>
+									)}
+								</div>
 							</CardHeader>
 							<CardContent className="grid gap-6 sm:grid-cols-2">
-								<DetailField
-									label="Email"
-									value={membership.userEmail || membership.inviteEmail}
-								/>
-								<DetailField
-									label="Joined"
-									value={formatDateTime(membership.createdAt)}
-								/>
+								<DetailField label="Email">
+									{membership.userEmail || membership.inviteEmail}
+								</DetailField>
+								<DetailField label="Joined">
+									{formatDateTime(membership.createdAt)}
+								</DetailField>
 							</CardContent>
 						</Card>
 					)}
@@ -138,32 +201,19 @@ export function MembershipDetailView({
 				</Card>
 			</div>
 			<ConfirmDeleteDialog
-				open={revokeOpen}
-				onOpenChange={setRevokeOpen}
-				title="Revoke membership?"
-				description="This will remove all access for this user. Any pending invite will also be cancelled."
-				onConfirm={handleRevoke}
+				open={confirmOpen}
+				onOpenChange={setConfirmOpen}
+				title={
+					confirmAction === 'remove' ? 'Remove member?' : 'Revoke invitation?'
+				}
+				description={
+					confirmAction === 'remove'
+						? `This will remove ${membership?.userName ?? membership?.userEmail} from the organization and revoke all their access.`
+						: `The invitation to ${membership?.inviteEmail} will be cancelled. You can re-invite them later.`
+				}
+				onConfirm={handleConfirm}
 				isPending={deleteMembership.isPending}
 			/>
 		</>
 	)
-}
-
-function MembershipStatusBadge({ membership }: { membership: Membership }) {
-	if (membership.userId) {
-		return <Badge variant="success">Active</Badge>
-	}
-
-	switch (membership.inviteStatus) {
-		case 'PENDING':
-			return <Badge variant="warning">Invited</Badge>
-		case 'EXPIRED':
-			return <Badge variant="destructive">Expired</Badge>
-		case 'REVOKED':
-			return <Badge variant="destructive">Revoked</Badge>
-		case 'ACCEPTED':
-			return <Badge variant="success">Accepted</Badge>
-		default:
-			return <Badge variant="outline">Pending</Badge>
-	}
 }

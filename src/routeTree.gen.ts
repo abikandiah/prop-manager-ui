@@ -12,27 +12,25 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as DevRouteRouteImport } from './routes/dev/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UnitsIndexRouteImport } from './routes/units/index'
-import { Route as TenantsIndexRouteImport } from './routes/tenants/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as PropsIndexRouteImport } from './routes/props/index'
 import { Route as ProfileIndexRouteImport } from './routes/profile/index'
 import { Route as MessagesIndexRouteImport } from './routes/messages/index'
 import { Route as DevIndexRouteImport } from './routes/dev/index'
 import { Route as UnitsUnitIdRouteImport } from './routes/units/$unitId'
-import { Route as TenantsTenantIdRouteImport } from './routes/tenants/$tenantId'
 import { Route as SettingsPermissionTemplatesRouteImport } from './routes/settings/permission-templates'
 import { Route as PublicTermsRouteImport } from './routes/public/terms'
 import { Route as PublicPrivacyRouteImport } from './routes/public/privacy'
-import { Route as OrganizationRolesRouteImport } from './routes/organization/roles'
-import { Route as OrganizationMembersRouteImport } from './routes/organization/members'
 import { Route as InviteTokenRouteImport } from './routes/invite/$token'
-import { Route as DevAuthRouteImport } from './routes/dev/auth'
 import { Route as PropsIdRouteRouteImport } from './routes/props/$id/route'
 import { Route as LeasesTemplatesRouteRouteImport } from './routes/leases/templates/route'
 import { Route as LeasesAgreementsRouteRouteImport } from './routes/leases/agreements/route'
 import { Route as PropsIdIndexRouteImport } from './routes/props/$id/index'
 import { Route as PeopleVendorsIndexRouteImport } from './routes/people/vendors/index'
+import { Route as PeopleTenantsIndexRouteImport } from './routes/people/tenants/index'
 import { Route as PeopleOwnersIndexRouteImport } from './routes/people/owners/index'
+import { Route as OrganizationRolesIndexRouteImport } from './routes/organization/roles/index'
+import { Route as OrganizationMembersIndexRouteImport } from './routes/organization/members/index'
 import { Route as MaintenanceWorkOrdersIndexRouteImport } from './routes/maintenance/work-orders/index'
 import { Route as MaintenanceRequestsIndexRouteImport } from './routes/maintenance/requests/index'
 import { Route as LeasesTemplatesIndexRouteImport } from './routes/leases/templates/index'
@@ -41,7 +39,8 @@ import { Route as LeasesAgreementsIndexRouteImport } from './routes/leases/agree
 import { Route as FinanceTransactionsIndexRouteImport } from './routes/finance/transactions/index'
 import { Route as FinanceReportsIndexRouteImport } from './routes/finance/reports/index'
 import { Route as FinanceInvoicesIndexRouteImport } from './routes/finance/invoices/index'
-import { Route as OrganizationMembersMembershipIdRouteImport } from './routes/organization/members.$membershipId'
+import { Route as PeopleTenantsTenantIdRouteImport } from './routes/people/tenants/$tenantId'
+import { Route as OrganizationMembersMembershipIdRouteImport } from './routes/organization/members/$membershipId'
 import { Route as LeasesTemplatesTemplateIdRouteImport } from './routes/leases/templates/$templateId'
 import { Route as LeasesAgreementsLeaseIdRouteImport } from './routes/leases/agreements/$leaseId'
 
@@ -58,11 +57,6 @@ const IndexRoute = IndexRouteImport.update({
 const UnitsIndexRoute = UnitsIndexRouteImport.update({
   id: '/units/',
   path: '/units/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TenantsIndexRoute = TenantsIndexRouteImport.update({
-  id: '/tenants/',
-  path: '/tenants/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsIndexRoute = SettingsIndexRouteImport.update({
@@ -95,11 +89,6 @@ const UnitsUnitIdRoute = UnitsUnitIdRouteImport.update({
   path: '/units/$unitId',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TenantsTenantIdRoute = TenantsTenantIdRouteImport.update({
-  id: '/tenants/$tenantId',
-  path: '/tenants/$tenantId',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const SettingsPermissionTemplatesRoute =
   SettingsPermissionTemplatesRouteImport.update({
     id: '/settings/permission-templates',
@@ -116,25 +105,10 @@ const PublicPrivacyRoute = PublicPrivacyRouteImport.update({
   path: '/public/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const OrganizationRolesRoute = OrganizationRolesRouteImport.update({
-  id: '/organization/roles',
-  path: '/organization/roles',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const OrganizationMembersRoute = OrganizationMembersRouteImport.update({
-  id: '/organization/members',
-  path: '/organization/members',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const InviteTokenRoute = InviteTokenRouteImport.update({
   id: '/invite/$token',
   path: '/invite/$token',
   getParentRoute: () => rootRouteImport,
-} as any)
-const DevAuthRoute = DevAuthRouteImport.update({
-  id: '/auth',
-  path: '/auth',
-  getParentRoute: () => DevRouteRoute,
 } as any)
 const PropsIdRouteRoute = PropsIdRouteRouteImport.update({
   id: '/props/$id',
@@ -161,11 +135,27 @@ const PeopleVendorsIndexRoute = PeopleVendorsIndexRouteImport.update({
   path: '/people/vendors/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PeopleTenantsIndexRoute = PeopleTenantsIndexRouteImport.update({
+  id: '/people/tenants/',
+  path: '/people/tenants/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PeopleOwnersIndexRoute = PeopleOwnersIndexRouteImport.update({
   id: '/people/owners/',
   path: '/people/owners/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OrganizationRolesIndexRoute = OrganizationRolesIndexRouteImport.update({
+  id: '/organization/roles/',
+  path: '/organization/roles/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OrganizationMembersIndexRoute =
+  OrganizationMembersIndexRouteImport.update({
+    id: '/organization/members/',
+    path: '/organization/members/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const MaintenanceWorkOrdersIndexRoute =
   MaintenanceWorkOrdersIndexRouteImport.update({
     id: '/maintenance/work-orders/',
@@ -209,11 +199,16 @@ const FinanceInvoicesIndexRoute = FinanceInvoicesIndexRouteImport.update({
   path: '/finance/invoices/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PeopleTenantsTenantIdRoute = PeopleTenantsTenantIdRouteImport.update({
+  id: '/people/tenants/$tenantId',
+  path: '/people/tenants/$tenantId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OrganizationMembersMembershipIdRoute =
   OrganizationMembersMembershipIdRouteImport.update({
-    id: '/$membershipId',
-    path: '/$membershipId',
-    getParentRoute: () => OrganizationMembersRoute,
+    id: '/organization/members/$membershipId',
+    path: '/organization/members/$membershipId',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const LeasesTemplatesTemplateIdRoute =
   LeasesTemplatesTemplateIdRouteImport.update({
@@ -233,25 +228,21 @@ export interface FileRoutesByFullPath {
   '/leases/agreements': typeof LeasesAgreementsRouteRouteWithChildren
   '/leases/templates': typeof LeasesTemplatesRouteRouteWithChildren
   '/props/$id': typeof PropsIdRouteRouteWithChildren
-  '/dev/auth': typeof DevAuthRoute
   '/invite/$token': typeof InviteTokenRoute
-  '/organization/members': typeof OrganizationMembersRouteWithChildren
-  '/organization/roles': typeof OrganizationRolesRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
   '/settings/permission-templates': typeof SettingsPermissionTemplatesRoute
-  '/tenants/$tenantId': typeof TenantsTenantIdRoute
   '/units/$unitId': typeof UnitsUnitIdRoute
   '/dev/': typeof DevIndexRoute
   '/messages/': typeof MessagesIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/props/': typeof PropsIndexRoute
   '/settings/': typeof SettingsIndexRoute
-  '/tenants/': typeof TenantsIndexRoute
   '/units/': typeof UnitsIndexRoute
   '/leases/agreements/$leaseId': typeof LeasesAgreementsLeaseIdRoute
   '/leases/templates/$templateId': typeof LeasesTemplatesTemplateIdRoute
   '/organization/members/$membershipId': typeof OrganizationMembersMembershipIdRoute
+  '/people/tenants/$tenantId': typeof PeopleTenantsTenantIdRoute
   '/finance/invoices/': typeof FinanceInvoicesIndexRoute
   '/finance/reports/': typeof FinanceReportsIndexRoute
   '/finance/transactions/': typeof FinanceTransactionsIndexRoute
@@ -260,31 +251,30 @@ export interface FileRoutesByFullPath {
   '/leases/templates/': typeof LeasesTemplatesIndexRoute
   '/maintenance/requests/': typeof MaintenanceRequestsIndexRoute
   '/maintenance/work-orders/': typeof MaintenanceWorkOrdersIndexRoute
+  '/organization/members/': typeof OrganizationMembersIndexRoute
+  '/organization/roles/': typeof OrganizationRolesIndexRoute
   '/people/owners/': typeof PeopleOwnersIndexRoute
+  '/people/tenants/': typeof PeopleTenantsIndexRoute
   '/people/vendors/': typeof PeopleVendorsIndexRoute
   '/props/$id/': typeof PropsIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/dev/auth': typeof DevAuthRoute
   '/invite/$token': typeof InviteTokenRoute
-  '/organization/members': typeof OrganizationMembersRouteWithChildren
-  '/organization/roles': typeof OrganizationRolesRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
   '/settings/permission-templates': typeof SettingsPermissionTemplatesRoute
-  '/tenants/$tenantId': typeof TenantsTenantIdRoute
   '/units/$unitId': typeof UnitsUnitIdRoute
   '/dev': typeof DevIndexRoute
   '/messages': typeof MessagesIndexRoute
   '/profile': typeof ProfileIndexRoute
   '/props': typeof PropsIndexRoute
   '/settings': typeof SettingsIndexRoute
-  '/tenants': typeof TenantsIndexRoute
   '/units': typeof UnitsIndexRoute
   '/leases/agreements/$leaseId': typeof LeasesAgreementsLeaseIdRoute
   '/leases/templates/$templateId': typeof LeasesTemplatesTemplateIdRoute
   '/organization/members/$membershipId': typeof OrganizationMembersMembershipIdRoute
+  '/people/tenants/$tenantId': typeof PeopleTenantsTenantIdRoute
   '/finance/invoices': typeof FinanceInvoicesIndexRoute
   '/finance/reports': typeof FinanceReportsIndexRoute
   '/finance/transactions': typeof FinanceTransactionsIndexRoute
@@ -293,7 +283,10 @@ export interface FileRoutesByTo {
   '/leases/templates': typeof LeasesTemplatesIndexRoute
   '/maintenance/requests': typeof MaintenanceRequestsIndexRoute
   '/maintenance/work-orders': typeof MaintenanceWorkOrdersIndexRoute
+  '/organization/members': typeof OrganizationMembersIndexRoute
+  '/organization/roles': typeof OrganizationRolesIndexRoute
   '/people/owners': typeof PeopleOwnersIndexRoute
+  '/people/tenants': typeof PeopleTenantsIndexRoute
   '/people/vendors': typeof PeopleVendorsIndexRoute
   '/props/$id': typeof PropsIdIndexRoute
 }
@@ -304,25 +297,21 @@ export interface FileRoutesById {
   '/leases/agreements': typeof LeasesAgreementsRouteRouteWithChildren
   '/leases/templates': typeof LeasesTemplatesRouteRouteWithChildren
   '/props/$id': typeof PropsIdRouteRouteWithChildren
-  '/dev/auth': typeof DevAuthRoute
   '/invite/$token': typeof InviteTokenRoute
-  '/organization/members': typeof OrganizationMembersRouteWithChildren
-  '/organization/roles': typeof OrganizationRolesRoute
   '/public/privacy': typeof PublicPrivacyRoute
   '/public/terms': typeof PublicTermsRoute
   '/settings/permission-templates': typeof SettingsPermissionTemplatesRoute
-  '/tenants/$tenantId': typeof TenantsTenantIdRoute
   '/units/$unitId': typeof UnitsUnitIdRoute
   '/dev/': typeof DevIndexRoute
   '/messages/': typeof MessagesIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/props/': typeof PropsIndexRoute
   '/settings/': typeof SettingsIndexRoute
-  '/tenants/': typeof TenantsIndexRoute
   '/units/': typeof UnitsIndexRoute
   '/leases/agreements/$leaseId': typeof LeasesAgreementsLeaseIdRoute
   '/leases/templates/$templateId': typeof LeasesTemplatesTemplateIdRoute
   '/organization/members/$membershipId': typeof OrganizationMembersMembershipIdRoute
+  '/people/tenants/$tenantId': typeof PeopleTenantsTenantIdRoute
   '/finance/invoices/': typeof FinanceInvoicesIndexRoute
   '/finance/reports/': typeof FinanceReportsIndexRoute
   '/finance/transactions/': typeof FinanceTransactionsIndexRoute
@@ -331,7 +320,10 @@ export interface FileRoutesById {
   '/leases/templates/': typeof LeasesTemplatesIndexRoute
   '/maintenance/requests/': typeof MaintenanceRequestsIndexRoute
   '/maintenance/work-orders/': typeof MaintenanceWorkOrdersIndexRoute
+  '/organization/members/': typeof OrganizationMembersIndexRoute
+  '/organization/roles/': typeof OrganizationRolesIndexRoute
   '/people/owners/': typeof PeopleOwnersIndexRoute
+  '/people/tenants/': typeof PeopleTenantsIndexRoute
   '/people/vendors/': typeof PeopleVendorsIndexRoute
   '/props/$id/': typeof PropsIdIndexRoute
 }
@@ -343,25 +335,21 @@ export interface FileRouteTypes {
     | '/leases/agreements'
     | '/leases/templates'
     | '/props/$id'
-    | '/dev/auth'
     | '/invite/$token'
-    | '/organization/members'
-    | '/organization/roles'
     | '/public/privacy'
     | '/public/terms'
     | '/settings/permission-templates'
-    | '/tenants/$tenantId'
     | '/units/$unitId'
     | '/dev/'
     | '/messages/'
     | '/profile/'
     | '/props/'
     | '/settings/'
-    | '/tenants/'
     | '/units/'
     | '/leases/agreements/$leaseId'
     | '/leases/templates/$templateId'
     | '/organization/members/$membershipId'
+    | '/people/tenants/$tenantId'
     | '/finance/invoices/'
     | '/finance/reports/'
     | '/finance/transactions/'
@@ -370,31 +358,30 @@ export interface FileRouteTypes {
     | '/leases/templates/'
     | '/maintenance/requests/'
     | '/maintenance/work-orders/'
+    | '/organization/members/'
+    | '/organization/roles/'
     | '/people/owners/'
+    | '/people/tenants/'
     | '/people/vendors/'
     | '/props/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/dev/auth'
     | '/invite/$token'
-    | '/organization/members'
-    | '/organization/roles'
     | '/public/privacy'
     | '/public/terms'
     | '/settings/permission-templates'
-    | '/tenants/$tenantId'
     | '/units/$unitId'
     | '/dev'
     | '/messages'
     | '/profile'
     | '/props'
     | '/settings'
-    | '/tenants'
     | '/units'
     | '/leases/agreements/$leaseId'
     | '/leases/templates/$templateId'
     | '/organization/members/$membershipId'
+    | '/people/tenants/$tenantId'
     | '/finance/invoices'
     | '/finance/reports'
     | '/finance/transactions'
@@ -403,7 +390,10 @@ export interface FileRouteTypes {
     | '/leases/templates'
     | '/maintenance/requests'
     | '/maintenance/work-orders'
+    | '/organization/members'
+    | '/organization/roles'
     | '/people/owners'
+    | '/people/tenants'
     | '/people/vendors'
     | '/props/$id'
   id:
@@ -413,25 +403,21 @@ export interface FileRouteTypes {
     | '/leases/agreements'
     | '/leases/templates'
     | '/props/$id'
-    | '/dev/auth'
     | '/invite/$token'
-    | '/organization/members'
-    | '/organization/roles'
     | '/public/privacy'
     | '/public/terms'
     | '/settings/permission-templates'
-    | '/tenants/$tenantId'
     | '/units/$unitId'
     | '/dev/'
     | '/messages/'
     | '/profile/'
     | '/props/'
     | '/settings/'
-    | '/tenants/'
     | '/units/'
     | '/leases/agreements/$leaseId'
     | '/leases/templates/$templateId'
     | '/organization/members/$membershipId'
+    | '/people/tenants/$tenantId'
     | '/finance/invoices/'
     | '/finance/reports/'
     | '/finance/transactions/'
@@ -440,7 +426,10 @@ export interface FileRouteTypes {
     | '/leases/templates/'
     | '/maintenance/requests/'
     | '/maintenance/work-orders/'
+    | '/organization/members/'
+    | '/organization/roles/'
     | '/people/owners/'
+    | '/people/tenants/'
     | '/people/vendors/'
     | '/props/$id/'
   fileRoutesById: FileRoutesById
@@ -452,26 +441,27 @@ export interface RootRouteChildren {
   LeasesTemplatesRouteRoute: typeof LeasesTemplatesRouteRouteWithChildren
   PropsIdRouteRoute: typeof PropsIdRouteRouteWithChildren
   InviteTokenRoute: typeof InviteTokenRoute
-  OrganizationMembersRoute: typeof OrganizationMembersRouteWithChildren
-  OrganizationRolesRoute: typeof OrganizationRolesRoute
   PublicPrivacyRoute: typeof PublicPrivacyRoute
   PublicTermsRoute: typeof PublicTermsRoute
   SettingsPermissionTemplatesRoute: typeof SettingsPermissionTemplatesRoute
-  TenantsTenantIdRoute: typeof TenantsTenantIdRoute
   UnitsUnitIdRoute: typeof UnitsUnitIdRoute
   MessagesIndexRoute: typeof MessagesIndexRoute
   ProfileIndexRoute: typeof ProfileIndexRoute
   PropsIndexRoute: typeof PropsIndexRoute
   SettingsIndexRoute: typeof SettingsIndexRoute
-  TenantsIndexRoute: typeof TenantsIndexRoute
   UnitsIndexRoute: typeof UnitsIndexRoute
+  OrganizationMembersMembershipIdRoute: typeof OrganizationMembersMembershipIdRoute
+  PeopleTenantsTenantIdRoute: typeof PeopleTenantsTenantIdRoute
   FinanceInvoicesIndexRoute: typeof FinanceInvoicesIndexRoute
   FinanceReportsIndexRoute: typeof FinanceReportsIndexRoute
   FinanceTransactionsIndexRoute: typeof FinanceTransactionsIndexRoute
   LeasesApplicationsIndexRoute: typeof LeasesApplicationsIndexRoute
   MaintenanceRequestsIndexRoute: typeof MaintenanceRequestsIndexRoute
   MaintenanceWorkOrdersIndexRoute: typeof MaintenanceWorkOrdersIndexRoute
+  OrganizationMembersIndexRoute: typeof OrganizationMembersIndexRoute
+  OrganizationRolesIndexRoute: typeof OrganizationRolesIndexRoute
   PeopleOwnersIndexRoute: typeof PeopleOwnersIndexRoute
+  PeopleTenantsIndexRoute: typeof PeopleTenantsIndexRoute
   PeopleVendorsIndexRoute: typeof PeopleVendorsIndexRoute
 }
 
@@ -496,13 +486,6 @@ declare module '@tanstack/react-router' {
       path: '/units'
       fullPath: '/units/'
       preLoaderRoute: typeof UnitsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tenants/': {
-      id: '/tenants/'
-      path: '/tenants'
-      fullPath: '/tenants/'
-      preLoaderRoute: typeof TenantsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings/': {
@@ -547,13 +530,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof UnitsUnitIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tenants/$tenantId': {
-      id: '/tenants/$tenantId'
-      path: '/tenants/$tenantId'
-      fullPath: '/tenants/$tenantId'
-      preLoaderRoute: typeof TenantsTenantIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/settings/permission-templates': {
       id: '/settings/permission-templates'
       path: '/settings/permission-templates'
@@ -575,33 +551,12 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PublicPrivacyRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/organization/roles': {
-      id: '/organization/roles'
-      path: '/organization/roles'
-      fullPath: '/organization/roles'
-      preLoaderRoute: typeof OrganizationRolesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/organization/members': {
-      id: '/organization/members'
-      path: '/organization/members'
-      fullPath: '/organization/members'
-      preLoaderRoute: typeof OrganizationMembersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/invite/$token': {
       id: '/invite/$token'
       path: '/invite/$token'
       fullPath: '/invite/$token'
       preLoaderRoute: typeof InviteTokenRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/dev/auth': {
-      id: '/dev/auth'
-      path: '/auth'
-      fullPath: '/dev/auth'
-      preLoaderRoute: typeof DevAuthRouteImport
-      parentRoute: typeof DevRouteRoute
     }
     '/props/$id': {
       id: '/props/$id'
@@ -638,11 +593,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PeopleVendorsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/people/tenants/': {
+      id: '/people/tenants/'
+      path: '/people/tenants'
+      fullPath: '/people/tenants/'
+      preLoaderRoute: typeof PeopleTenantsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/people/owners/': {
       id: '/people/owners/'
       path: '/people/owners'
       fullPath: '/people/owners/'
       preLoaderRoute: typeof PeopleOwnersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/organization/roles/': {
+      id: '/organization/roles/'
+      path: '/organization/roles'
+      fullPath: '/organization/roles/'
+      preLoaderRoute: typeof OrganizationRolesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/organization/members/': {
+      id: '/organization/members/'
+      path: '/organization/members'
+      fullPath: '/organization/members/'
+      preLoaderRoute: typeof OrganizationMembersIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/maintenance/work-orders/': {
@@ -701,12 +677,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof FinanceInvoicesIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/people/tenants/$tenantId': {
+      id: '/people/tenants/$tenantId'
+      path: '/people/tenants/$tenantId'
+      fullPath: '/people/tenants/$tenantId'
+      preLoaderRoute: typeof PeopleTenantsTenantIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/organization/members/$membershipId': {
       id: '/organization/members/$membershipId'
-      path: '/$membershipId'
+      path: '/organization/members/$membershipId'
       fullPath: '/organization/members/$membershipId'
       preLoaderRoute: typeof OrganizationMembersMembershipIdRouteImport
-      parentRoute: typeof OrganizationMembersRoute
+      parentRoute: typeof rootRouteImport
     }
     '/leases/templates/$templateId': {
       id: '/leases/templates/$templateId'
@@ -726,12 +709,10 @@ declare module '@tanstack/react-router' {
 }
 
 interface DevRouteRouteChildren {
-  DevAuthRoute: typeof DevAuthRoute
   DevIndexRoute: typeof DevIndexRoute
 }
 
 const DevRouteRouteChildren: DevRouteRouteChildren = {
-  DevAuthRoute: DevAuthRoute,
   DevIndexRoute: DevIndexRoute,
 }
 
@@ -779,17 +760,6 @@ const PropsIdRouteRouteWithChildren = PropsIdRouteRoute._addFileChildren(
   PropsIdRouteRouteChildren,
 )
 
-interface OrganizationMembersRouteChildren {
-  OrganizationMembersMembershipIdRoute: typeof OrganizationMembersMembershipIdRoute
-}
-
-const OrganizationMembersRouteChildren: OrganizationMembersRouteChildren = {
-  OrganizationMembersMembershipIdRoute: OrganizationMembersMembershipIdRoute,
-}
-
-const OrganizationMembersRouteWithChildren =
-  OrganizationMembersRoute._addFileChildren(OrganizationMembersRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DevRouteRoute: DevRouteRouteWithChildren,
@@ -797,26 +767,27 @@ const rootRouteChildren: RootRouteChildren = {
   LeasesTemplatesRouteRoute: LeasesTemplatesRouteRouteWithChildren,
   PropsIdRouteRoute: PropsIdRouteRouteWithChildren,
   InviteTokenRoute: InviteTokenRoute,
-  OrganizationMembersRoute: OrganizationMembersRouteWithChildren,
-  OrganizationRolesRoute: OrganizationRolesRoute,
   PublicPrivacyRoute: PublicPrivacyRoute,
   PublicTermsRoute: PublicTermsRoute,
   SettingsPermissionTemplatesRoute: SettingsPermissionTemplatesRoute,
-  TenantsTenantIdRoute: TenantsTenantIdRoute,
   UnitsUnitIdRoute: UnitsUnitIdRoute,
   MessagesIndexRoute: MessagesIndexRoute,
   ProfileIndexRoute: ProfileIndexRoute,
   PropsIndexRoute: PropsIndexRoute,
   SettingsIndexRoute: SettingsIndexRoute,
-  TenantsIndexRoute: TenantsIndexRoute,
   UnitsIndexRoute: UnitsIndexRoute,
+  OrganizationMembersMembershipIdRoute: OrganizationMembersMembershipIdRoute,
+  PeopleTenantsTenantIdRoute: PeopleTenantsTenantIdRoute,
   FinanceInvoicesIndexRoute: FinanceInvoicesIndexRoute,
   FinanceReportsIndexRoute: FinanceReportsIndexRoute,
   FinanceTransactionsIndexRoute: FinanceTransactionsIndexRoute,
   LeasesApplicationsIndexRoute: LeasesApplicationsIndexRoute,
   MaintenanceRequestsIndexRoute: MaintenanceRequestsIndexRoute,
   MaintenanceWorkOrdersIndexRoute: MaintenanceWorkOrdersIndexRoute,
+  OrganizationMembersIndexRoute: OrganizationMembersIndexRoute,
+  OrganizationRolesIndexRoute: OrganizationRolesIndexRoute,
   PeopleOwnersIndexRoute: PeopleOwnersIndexRoute,
+  PeopleTenantsIndexRoute: PeopleTenantsIndexRoute,
   PeopleVendorsIndexRoute: PeopleVendorsIndexRoute,
 }
 export const routeTree = rootRouteImport

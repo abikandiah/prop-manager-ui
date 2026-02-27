@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { invitesApi } from './api'
 import { stableRequestId } from '@/lib/offline-types'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
@@ -34,7 +34,6 @@ export function useResendInvite() {
 }
 
 export function useRevokeInvite() {
-	const queryClient = useQueryClient()
 	return useMutation({
 		mutationKey: ['revokeInvite'],
 		networkMode: 'online',
@@ -42,9 +41,6 @@ export function useRevokeInvite() {
 			const requestId = stableRequestId(['revokeInvite'], id)
 			return invitesApi.revoke(id, { [IDEMPOTENCY_HEADER]: requestId })
 		},
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: ['invites'] })
-			queryClient.invalidateQueries({ queryKey: ['memberships'] })
-		},
+		// No onSuccess/onSettled — callers own their invalidation.
 	})
 }

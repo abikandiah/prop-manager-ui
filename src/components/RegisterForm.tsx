@@ -2,18 +2,16 @@ import { api, getDevToken } from '@/api/client'
 import { DevAuthForm } from '@/components/DevAuthForm'
 import { TextLink } from '@/components/ui'
 import { config } from '@/config'
-import type { User } from '@/contexts/auth'
+import { useAuth, type User } from '@/contexts/auth'
 import { Button } from '@abumble/design-system/components/Button'
 import { Checkbox } from '@abumble/design-system/components/Checkbox'
 import { useMutation } from '@tanstack/react-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
-interface RegisterFormProps {
-	onSuccess: () => void | Promise<unknown>
-}
+export function RegisterForm() {
+	const { refreshUser } = useAuth()
 
-export function RegisterForm({ onSuccess }: RegisterFormProps) {
 	const [agreedToTermsAndPrivacy, setAgreedToTermsAndPrivacy] = useState(false)
 	const [hasDevToken, setHasDevToken] = useState(() => !!getDevToken())
 
@@ -21,11 +19,16 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
 
 	const acceptTermsMutation = useMutation({
 		mutationFn: () => api.patch<User>('/me', { termsAccepted: true }),
-		onSuccess: () => {
+		onSuccess: async () => {
 			toast.success('Terms accepted. Welcome!')
-			onSuccess()
+			refreshUser()
 		},
 	})
+
+	const onDevAuthSuccess = () => {
+		setHasDevToken(true)
+		refreshUser()
+	}
 
 	const handleSubmit = (e: React.SyntheticEvent<HTMLFormElement>) => {
 		e.preventDefault()
@@ -39,12 +42,7 @@ export function RegisterForm({ onSuccess }: RegisterFormProps) {
 	}
 
 	if (isDevNoToken) {
-		return (
-			<DevAuthForm
-				onSuccess={() => setHasDevToken(true)}
-				wrappedInCard={false}
-			/>
-		)
+		return <DevAuthForm onSuccess={onDevAuthSuccess} wrappedInCard={false} />
 	}
 
 	return (

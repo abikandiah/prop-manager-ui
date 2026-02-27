@@ -4,12 +4,9 @@ import {
 	CardContent,
 	CardHeader,
 } from '@abumble/design-system/components/Card'
-import { useAuth } from '@/contexts/auth'
 import { RegisterForm } from '@/components/RegisterForm'
 
 export const Register = () => {
-	const { refetchUser } = useAuth()
-
 	return (
 		<div className="flex flex-1 flex-col justify-center items-center px-4 py-8 gap-6">
 			<MessageBanner
@@ -30,7 +27,7 @@ export const Register = () => {
 					</p>
 				</CardHeader>
 				<CardContent>
-					<RegisterForm onSuccess={refetchUser} />
+					<RegisterForm />
 				</CardContent>
 			</Card>
 		</div>

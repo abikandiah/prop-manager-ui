@@ -10,7 +10,7 @@ import { Link, createFileRoute } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 
-export const Route = createFileRoute('/tenants/$tenantId')({
+export const Route = createFileRoute('/people/tenants/$tenantId')({
 	component: TenantDetailPage,
 })
 
@@ -102,7 +102,7 @@ function TenantDetailPage() {
 						{tenant.notes && (
 							<div className="md:col-span-2 border-t pt-4">
 								<DetailField
-									label="Notes"
+									label='Notes'
 									valueClassName="text-foreground whitespace-pre-wrap leading-relaxed"
 								>
 									{tenant.notes}

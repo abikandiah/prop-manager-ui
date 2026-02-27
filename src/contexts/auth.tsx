@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react'
+import { createContext, useCallback, useContext } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
 import { api, clearDevToken } from '@/api/client'
@@ -20,29 +20,41 @@ interface AuthContextType {
 	isLoadingUser: boolean
 	isUserDefined: boolean
 	logout: () => Promise<void>
-	refetchUser: () => Promise<unknown>
+	refreshUser: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const queryClient = useQueryClient()
-	const {
-		data: user,
-		isLoading,
-		refetch,
-	} = useQuery({
+	const { data: user, isLoading } = useQuery({
 		queryKey: ['me'],
 		queryFn: async () => {
 			const { data } = await api.get<User>('/me')
+			console.log(data)
 			return data
 		},
 		staleTime: Infinity,
 	})
 
-	const logout = async () => {
+	// Create a stable reference to a refresh function
+	const refreshUser = useCallback(async () => {
+		await queryClient.invalidateQueries({ queryKey: ['me'] })
+	}, [queryClient])
+
+	const logout = useCallback(async () => {
+		let logoutUrl: string | undefined
+
+		try {
+			// Call backend logout endpoint while we still have the token
+			const { data } = await api.post<{ logoutUrl?: string }>('/logout')
+			logoutUrl = data.logoutUrl
+		} catch (error) {
+			console.error('[Auth] Backend logout failed:', error)
+		}
+
 		if (user?.id) {
-			console.log('[Auth] Logging out user:', user.id)
+			console.log('[Auth] Clearing local DB for user:', user.id)
 			await clearUserDb(user.id)
 		}
 
@@ -53,25 +65,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
 		queryClient.clear()
 
-		try {
-			// Call backend logout endpoint to get optional OIDC redirect URL
-			const { data } = await api.post<{ logoutUrl?: string }>('/logout')
-
-			if (data.logoutUrl) {
-				window.location.href = data.logoutUrl
-				return
-			}
-		} catch (error) {
-			console.error('[Auth] Backend logout failed:', error)
-		}
-
-		// Fallback redirect to home
-		window.location.href = '/'
-	}
-
-	const refetchUser = async () => {
-		return refetch()
-	}
+		// Redirect to logout URL from OIDC provider or fallback to home
+		window.location.href = logoutUrl || '/'
+	}, [user?.id, queryClient])
 
 	return (
 		<AuthContext.Provider
@@ -80,7 +76,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 				isLoadingUser: isLoading,
 				isUserDefined: !!user,
 				logout,
-				refetchUser,
+				refreshUser,
 			}}
 		>
 			{children}

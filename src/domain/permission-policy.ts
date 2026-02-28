@@ -13,7 +13,6 @@ export interface PermissionPolicy {
 
 export interface CreatePermissionPolicyPayload {
 	name: string
-	orgId?: string | null
 	permissions: Record<string, string>
 }
 

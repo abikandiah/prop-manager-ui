@@ -56,10 +56,9 @@ export function useCreatePermissionPolicy() {
 				[IDEMPOTENCY_HEADER]: requestId,
 			})
 		},
-		onSettled: (_data, _err, payload) => {
-			const orgId = payload.orgId ?? activeOrgId!
+		onSettled: () => {
 			queryClient.invalidateQueries({
-				queryKey: permissionPolicyKeys.list(orgId),
+				queryKey: permissionPolicyKeys.list(activeOrgId!),
 			})
 		},
 	})
@@ -113,13 +112,12 @@ export function useUpdatePermissionPolicy() {
 				)
 			}
 		},
-		onSettled: (data, _err, { id }) => {
+		onSettled: (_data, _err, { id }) => {
 			queryClient.invalidateQueries({
 				queryKey: permissionPolicyKeys.detail(activeOrgId!, id),
 			})
-			const orgId = data?.orgId ?? activeOrgId!
 			queryClient.invalidateQueries({
-				queryKey: permissionPolicyKeys.list(orgId),
+				queryKey: permissionPolicyKeys.list(activeOrgId!),
 			})
 		},
 	})

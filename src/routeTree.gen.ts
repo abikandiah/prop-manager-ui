@@ -46,772 +46,772 @@ import { Route as LeasesTemplatesTemplateIdRouteImport } from './routes/leases/t
 import { Route as LeasesAgreementsLeaseIdRouteImport } from './routes/leases/agreements/$leaseId'
 
 const DevRouteRoute = DevRouteRouteImport.update({
-  id: '/dev',
-  path: '/dev',
-  getParentRoute: () => rootRouteImport,
+	id: '/dev',
+	path: '/dev',
+	getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
+	id: '/',
+	path: '/',
+	getParentRoute: () => rootRouteImport,
 } as any)
 const UnitsIndexRoute = UnitsIndexRouteImport.update({
-  id: '/units/',
-  path: '/units/',
-  getParentRoute: () => rootRouteImport,
+	id: '/units/',
+	path: '/units/',
+	getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsIndexRoute = SettingsIndexRouteImport.update({
-  id: '/settings/',
-  path: '/settings/',
-  getParentRoute: () => rootRouteImport,
+	id: '/settings/',
+	path: '/settings/',
+	getParentRoute: () => rootRouteImport,
 } as any)
 const PropsIndexRoute = PropsIndexRouteImport.update({
-  id: '/props/',
-  path: '/props/',
-  getParentRoute: () => rootRouteImport,
+	id: '/props/',
+	path: '/props/',
+	getParentRoute: () => rootRouteImport,
 } as any)
 const ProfileIndexRoute = ProfileIndexRouteImport.update({
-  id: '/profile/',
-  path: '/profile/',
-  getParentRoute: () => rootRouteImport,
+	id: '/profile/',
+	path: '/profile/',
+	getParentRoute: () => rootRouteImport,
 } as any)
 const MessagesIndexRoute = MessagesIndexRouteImport.update({
-  id: '/messages/',
-  path: '/messages/',
-  getParentRoute: () => rootRouteImport,
+	id: '/messages/',
+	path: '/messages/',
+	getParentRoute: () => rootRouteImport,
 } as any)
 const DevIndexRoute = DevIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DevRouteRoute,
+	id: '/',
+	path: '/',
+	getParentRoute: () => DevRouteRoute,
 } as any)
 const UnitsUnitIdRoute = UnitsUnitIdRouteImport.update({
-  id: '/units/$unitId',
-  path: '/units/$unitId',
-  getParentRoute: () => rootRouteImport,
+	id: '/units/$unitId',
+	path: '/units/$unitId',
+	getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsPermissionTemplatesRoute =
-  SettingsPermissionTemplatesRouteImport.update({
-    id: '/settings/permission-templates',
-    path: '/settings/permission-templates',
-    getParentRoute: () => rootRouteImport,
-  } as any)
+	SettingsPermissionTemplatesRouteImport.update({
+		id: '/settings/permission-templates',
+		path: '/settings/permission-templates',
+		getParentRoute: () => rootRouteImport,
+	} as any)
 const SettingsPermissionPoliciesRoute =
-  SettingsPermissionPoliciesRouteImport.update({
-    id: '/settings/permission-policies',
-    path: '/settings/permission-policies',
-    getParentRoute: () => rootRouteImport,
-  } as any)
+	SettingsPermissionPoliciesRouteImport.update({
+		id: '/settings/permission-policies',
+		path: '/settings/permission-policies',
+		getParentRoute: () => rootRouteImport,
+	} as any)
 const PublicTermsRoute = PublicTermsRouteImport.update({
-  id: '/public/terms',
-  path: '/public/terms',
-  getParentRoute: () => rootRouteImport,
+	id: '/public/terms',
+	path: '/public/terms',
+	getParentRoute: () => rootRouteImport,
 } as any)
 const PublicPrivacyRoute = PublicPrivacyRouteImport.update({
-  id: '/public/privacy',
-  path: '/public/privacy',
-  getParentRoute: () => rootRouteImport,
+	id: '/public/privacy',
+	path: '/public/privacy',
+	getParentRoute: () => rootRouteImport,
 } as any)
 const InviteTokenRoute = InviteTokenRouteImport.update({
-  id: '/invite/$token',
-  path: '/invite/$token',
-  getParentRoute: () => rootRouteImport,
+	id: '/invite/$token',
+	path: '/invite/$token',
+	getParentRoute: () => rootRouteImport,
 } as any)
 const PropsIdRouteRoute = PropsIdRouteRouteImport.update({
-  id: '/props/$id',
-  path: '/props/$id',
-  getParentRoute: () => rootRouteImport,
+	id: '/props/$id',
+	path: '/props/$id',
+	getParentRoute: () => rootRouteImport,
 } as any)
 const LeasesTemplatesRouteRoute = LeasesTemplatesRouteRouteImport.update({
-  id: '/leases/templates',
-  path: '/leases/templates',
-  getParentRoute: () => rootRouteImport,
+	id: '/leases/templates',
+	path: '/leases/templates',
+	getParentRoute: () => rootRouteImport,
 } as any)
 const LeasesAgreementsRouteRoute = LeasesAgreementsRouteRouteImport.update({
-  id: '/leases/agreements',
-  path: '/leases/agreements',
-  getParentRoute: () => rootRouteImport,
+	id: '/leases/agreements',
+	path: '/leases/agreements',
+	getParentRoute: () => rootRouteImport,
 } as any)
 const PropsIdIndexRoute = PropsIdIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => PropsIdRouteRoute,
+	id: '/',
+	path: '/',
+	getParentRoute: () => PropsIdRouteRoute,
 } as any)
 const PeopleVendorsIndexRoute = PeopleVendorsIndexRouteImport.update({
-  id: '/people/vendors/',
-  path: '/people/vendors/',
-  getParentRoute: () => rootRouteImport,
+	id: '/people/vendors/',
+	path: '/people/vendors/',
+	getParentRoute: () => rootRouteImport,
 } as any)
 const PeopleTenantsIndexRoute = PeopleTenantsIndexRouteImport.update({
-  id: '/people/tenants/',
-  path: '/people/tenants/',
-  getParentRoute: () => rootRouteImport,
+	id: '/people/tenants/',
+	path: '/people/tenants/',
+	getParentRoute: () => rootRouteImport,
 } as any)
 const PeopleOwnersIndexRoute = PeopleOwnersIndexRouteImport.update({
-  id: '/people/owners/',
-  path: '/people/owners/',
-  getParentRoute: () => rootRouteImport,
+	id: '/people/owners/',
+	path: '/people/owners/',
+	getParentRoute: () => rootRouteImport,
 } as any)
 const OrganizationRolesIndexRoute = OrganizationRolesIndexRouteImport.update({
-  id: '/organization/roles/',
-  path: '/organization/roles/',
-  getParentRoute: () => rootRouteImport,
+	id: '/organization/roles/',
+	path: '/organization/roles/',
+	getParentRoute: () => rootRouteImport,
 } as any)
 const OrganizationMembersIndexRoute =
-  OrganizationMembersIndexRouteImport.update({
-    id: '/organization/members/',
-    path: '/organization/members/',
-    getParentRoute: () => rootRouteImport,
-  } as any)
+	OrganizationMembersIndexRouteImport.update({
+		id: '/organization/members/',
+		path: '/organization/members/',
+		getParentRoute: () => rootRouteImport,
+	} as any)
 const MaintenanceWorkOrdersIndexRoute =
-  MaintenanceWorkOrdersIndexRouteImport.update({
-    id: '/maintenance/work-orders/',
-    path: '/maintenance/work-orders/',
-    getParentRoute: () => rootRouteImport,
-  } as any)
+	MaintenanceWorkOrdersIndexRouteImport.update({
+		id: '/maintenance/work-orders/',
+		path: '/maintenance/work-orders/',
+		getParentRoute: () => rootRouteImport,
+	} as any)
 const MaintenanceRequestsIndexRoute =
-  MaintenanceRequestsIndexRouteImport.update({
-    id: '/maintenance/requests/',
-    path: '/maintenance/requests/',
-    getParentRoute: () => rootRouteImport,
-  } as any)
+	MaintenanceRequestsIndexRouteImport.update({
+		id: '/maintenance/requests/',
+		path: '/maintenance/requests/',
+		getParentRoute: () => rootRouteImport,
+	} as any)
 const LeasesTemplatesIndexRoute = LeasesTemplatesIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => LeasesTemplatesRouteRoute,
+	id: '/',
+	path: '/',
+	getParentRoute: () => LeasesTemplatesRouteRoute,
 } as any)
 const LeasesApplicationsIndexRoute = LeasesApplicationsIndexRouteImport.update({
-  id: '/leases/applications/',
-  path: '/leases/applications/',
-  getParentRoute: () => rootRouteImport,
+	id: '/leases/applications/',
+	path: '/leases/applications/',
+	getParentRoute: () => rootRouteImport,
 } as any)
 const LeasesAgreementsIndexRoute = LeasesAgreementsIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => LeasesAgreementsRouteRoute,
+	id: '/',
+	path: '/',
+	getParentRoute: () => LeasesAgreementsRouteRoute,
 } as any)
 const FinanceTransactionsIndexRoute =
-  FinanceTransactionsIndexRouteImport.update({
-    id: '/finance/transactions/',
-    path: '/finance/transactions/',
-    getParentRoute: () => rootRouteImport,
-  } as any)
+	FinanceTransactionsIndexRouteImport.update({
+		id: '/finance/transactions/',
+		path: '/finance/transactions/',
+		getParentRoute: () => rootRouteImport,
+	} as any)
 const FinanceReportsIndexRoute = FinanceReportsIndexRouteImport.update({
-  id: '/finance/reports/',
-  path: '/finance/reports/',
-  getParentRoute: () => rootRouteImport,
+	id: '/finance/reports/',
+	path: '/finance/reports/',
+	getParentRoute: () => rootRouteImport,
 } as any)
 const FinanceInvoicesIndexRoute = FinanceInvoicesIndexRouteImport.update({
-  id: '/finance/invoices/',
-  path: '/finance/invoices/',
-  getParentRoute: () => rootRouteImport,
+	id: '/finance/invoices/',
+	path: '/finance/invoices/',
+	getParentRoute: () => rootRouteImport,
 } as any)
 const PeopleTenantsTenantIdRoute = PeopleTenantsTenantIdRouteImport.update({
-  id: '/people/tenants/$tenantId',
-  path: '/people/tenants/$tenantId',
-  getParentRoute: () => rootRouteImport,
+	id: '/people/tenants/$tenantId',
+	path: '/people/tenants/$tenantId',
+	getParentRoute: () => rootRouteImport,
 } as any)
 const OrganizationMembersMembershipIdRoute =
-  OrganizationMembersMembershipIdRouteImport.update({
-    id: '/organization/members/$membershipId',
-    path: '/organization/members/$membershipId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
+	OrganizationMembersMembershipIdRouteImport.update({
+		id: '/organization/members/$membershipId',
+		path: '/organization/members/$membershipId',
+		getParentRoute: () => rootRouteImport,
+	} as any)
 const LeasesTemplatesTemplateIdRoute =
-  LeasesTemplatesTemplateIdRouteImport.update({
-    id: '/$templateId',
-    path: '/$templateId',
-    getParentRoute: () => LeasesTemplatesRouteRoute,
-  } as any)
+	LeasesTemplatesTemplateIdRouteImport.update({
+		id: '/$templateId',
+		path: '/$templateId',
+		getParentRoute: () => LeasesTemplatesRouteRoute,
+	} as any)
 const LeasesAgreementsLeaseIdRoute = LeasesAgreementsLeaseIdRouteImport.update({
-  id: '/$leaseId',
-  path: '/$leaseId',
-  getParentRoute: () => LeasesAgreementsRouteRoute,
+	id: '/$leaseId',
+	path: '/$leaseId',
+	getParentRoute: () => LeasesAgreementsRouteRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/dev': typeof DevRouteRouteWithChildren
-  '/leases/agreements': typeof LeasesAgreementsRouteRouteWithChildren
-  '/leases/templates': typeof LeasesTemplatesRouteRouteWithChildren
-  '/props/$id': typeof PropsIdRouteRouteWithChildren
-  '/invite/$token': typeof InviteTokenRoute
-  '/public/privacy': typeof PublicPrivacyRoute
-  '/public/terms': typeof PublicTermsRoute
-  '/settings/permission-policies': typeof SettingsPermissionPoliciesRoute
-  '/settings/permission-templates': typeof SettingsPermissionTemplatesRoute
-  '/units/$unitId': typeof UnitsUnitIdRoute
-  '/dev/': typeof DevIndexRoute
-  '/messages/': typeof MessagesIndexRoute
-  '/profile/': typeof ProfileIndexRoute
-  '/props/': typeof PropsIndexRoute
-  '/settings/': typeof SettingsIndexRoute
-  '/units/': typeof UnitsIndexRoute
-  '/leases/agreements/$leaseId': typeof LeasesAgreementsLeaseIdRoute
-  '/leases/templates/$templateId': typeof LeasesTemplatesTemplateIdRoute
-  '/organization/members/$membershipId': typeof OrganizationMembersMembershipIdRoute
-  '/people/tenants/$tenantId': typeof PeopleTenantsTenantIdRoute
-  '/finance/invoices/': typeof FinanceInvoicesIndexRoute
-  '/finance/reports/': typeof FinanceReportsIndexRoute
-  '/finance/transactions/': typeof FinanceTransactionsIndexRoute
-  '/leases/agreements/': typeof LeasesAgreementsIndexRoute
-  '/leases/applications/': typeof LeasesApplicationsIndexRoute
-  '/leases/templates/': typeof LeasesTemplatesIndexRoute
-  '/maintenance/requests/': typeof MaintenanceRequestsIndexRoute
-  '/maintenance/work-orders/': typeof MaintenanceWorkOrdersIndexRoute
-  '/organization/members/': typeof OrganizationMembersIndexRoute
-  '/organization/roles/': typeof OrganizationRolesIndexRoute
-  '/people/owners/': typeof PeopleOwnersIndexRoute
-  '/people/tenants/': typeof PeopleTenantsIndexRoute
-  '/people/vendors/': typeof PeopleVendorsIndexRoute
-  '/props/$id/': typeof PropsIdIndexRoute
+	'/': typeof IndexRoute
+	'/dev': typeof DevRouteRouteWithChildren
+	'/leases/agreements': typeof LeasesAgreementsRouteRouteWithChildren
+	'/leases/templates': typeof LeasesTemplatesRouteRouteWithChildren
+	'/props/$id': typeof PropsIdRouteRouteWithChildren
+	'/invite/$token': typeof InviteTokenRoute
+	'/public/privacy': typeof PublicPrivacyRoute
+	'/public/terms': typeof PublicTermsRoute
+	'/settings/permission-policies': typeof SettingsPermissionPoliciesRoute
+	'/settings/permission-templates': typeof SettingsPermissionTemplatesRoute
+	'/units/$unitId': typeof UnitsUnitIdRoute
+	'/dev/': typeof DevIndexRoute
+	'/messages/': typeof MessagesIndexRoute
+	'/profile/': typeof ProfileIndexRoute
+	'/props/': typeof PropsIndexRoute
+	'/settings/': typeof SettingsIndexRoute
+	'/units/': typeof UnitsIndexRoute
+	'/leases/agreements/$leaseId': typeof LeasesAgreementsLeaseIdRoute
+	'/leases/templates/$templateId': typeof LeasesTemplatesTemplateIdRoute
+	'/organization/members/$membershipId': typeof OrganizationMembersMembershipIdRoute
+	'/people/tenants/$tenantId': typeof PeopleTenantsTenantIdRoute
+	'/finance/invoices/': typeof FinanceInvoicesIndexRoute
+	'/finance/reports/': typeof FinanceReportsIndexRoute
+	'/finance/transactions/': typeof FinanceTransactionsIndexRoute
+	'/leases/agreements/': typeof LeasesAgreementsIndexRoute
+	'/leases/applications/': typeof LeasesApplicationsIndexRoute
+	'/leases/templates/': typeof LeasesTemplatesIndexRoute
+	'/maintenance/requests/': typeof MaintenanceRequestsIndexRoute
+	'/maintenance/work-orders/': typeof MaintenanceWorkOrdersIndexRoute
+	'/organization/members/': typeof OrganizationMembersIndexRoute
+	'/organization/roles/': typeof OrganizationRolesIndexRoute
+	'/people/owners/': typeof PeopleOwnersIndexRoute
+	'/people/tenants/': typeof PeopleTenantsIndexRoute
+	'/people/vendors/': typeof PeopleVendorsIndexRoute
+	'/props/$id/': typeof PropsIdIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/invite/$token': typeof InviteTokenRoute
-  '/public/privacy': typeof PublicPrivacyRoute
-  '/public/terms': typeof PublicTermsRoute
-  '/settings/permission-policies': typeof SettingsPermissionPoliciesRoute
-  '/settings/permission-templates': typeof SettingsPermissionTemplatesRoute
-  '/units/$unitId': typeof UnitsUnitIdRoute
-  '/dev': typeof DevIndexRoute
-  '/messages': typeof MessagesIndexRoute
-  '/profile': typeof ProfileIndexRoute
-  '/props': typeof PropsIndexRoute
-  '/settings': typeof SettingsIndexRoute
-  '/units': typeof UnitsIndexRoute
-  '/leases/agreements/$leaseId': typeof LeasesAgreementsLeaseIdRoute
-  '/leases/templates/$templateId': typeof LeasesTemplatesTemplateIdRoute
-  '/organization/members/$membershipId': typeof OrganizationMembersMembershipIdRoute
-  '/people/tenants/$tenantId': typeof PeopleTenantsTenantIdRoute
-  '/finance/invoices': typeof FinanceInvoicesIndexRoute
-  '/finance/reports': typeof FinanceReportsIndexRoute
-  '/finance/transactions': typeof FinanceTransactionsIndexRoute
-  '/leases/agreements': typeof LeasesAgreementsIndexRoute
-  '/leases/applications': typeof LeasesApplicationsIndexRoute
-  '/leases/templates': typeof LeasesTemplatesIndexRoute
-  '/maintenance/requests': typeof MaintenanceRequestsIndexRoute
-  '/maintenance/work-orders': typeof MaintenanceWorkOrdersIndexRoute
-  '/organization/members': typeof OrganizationMembersIndexRoute
-  '/organization/roles': typeof OrganizationRolesIndexRoute
-  '/people/owners': typeof PeopleOwnersIndexRoute
-  '/people/tenants': typeof PeopleTenantsIndexRoute
-  '/people/vendors': typeof PeopleVendorsIndexRoute
-  '/props/$id': typeof PropsIdIndexRoute
+	'/': typeof IndexRoute
+	'/invite/$token': typeof InviteTokenRoute
+	'/public/privacy': typeof PublicPrivacyRoute
+	'/public/terms': typeof PublicTermsRoute
+	'/settings/permission-policies': typeof SettingsPermissionPoliciesRoute
+	'/settings/permission-templates': typeof SettingsPermissionTemplatesRoute
+	'/units/$unitId': typeof UnitsUnitIdRoute
+	'/dev': typeof DevIndexRoute
+	'/messages': typeof MessagesIndexRoute
+	'/profile': typeof ProfileIndexRoute
+	'/props': typeof PropsIndexRoute
+	'/settings': typeof SettingsIndexRoute
+	'/units': typeof UnitsIndexRoute
+	'/leases/agreements/$leaseId': typeof LeasesAgreementsLeaseIdRoute
+	'/leases/templates/$templateId': typeof LeasesTemplatesTemplateIdRoute
+	'/organization/members/$membershipId': typeof OrganizationMembersMembershipIdRoute
+	'/people/tenants/$tenantId': typeof PeopleTenantsTenantIdRoute
+	'/finance/invoices': typeof FinanceInvoicesIndexRoute
+	'/finance/reports': typeof FinanceReportsIndexRoute
+	'/finance/transactions': typeof FinanceTransactionsIndexRoute
+	'/leases/agreements': typeof LeasesAgreementsIndexRoute
+	'/leases/applications': typeof LeasesApplicationsIndexRoute
+	'/leases/templates': typeof LeasesTemplatesIndexRoute
+	'/maintenance/requests': typeof MaintenanceRequestsIndexRoute
+	'/maintenance/work-orders': typeof MaintenanceWorkOrdersIndexRoute
+	'/organization/members': typeof OrganizationMembersIndexRoute
+	'/organization/roles': typeof OrganizationRolesIndexRoute
+	'/people/owners': typeof PeopleOwnersIndexRoute
+	'/people/tenants': typeof PeopleTenantsIndexRoute
+	'/people/vendors': typeof PeopleVendorsIndexRoute
+	'/props/$id': typeof PropsIdIndexRoute
 }
 export interface FileRoutesById {
-  __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/dev': typeof DevRouteRouteWithChildren
-  '/leases/agreements': typeof LeasesAgreementsRouteRouteWithChildren
-  '/leases/templates': typeof LeasesTemplatesRouteRouteWithChildren
-  '/props/$id': typeof PropsIdRouteRouteWithChildren
-  '/invite/$token': typeof InviteTokenRoute
-  '/public/privacy': typeof PublicPrivacyRoute
-  '/public/terms': typeof PublicTermsRoute
-  '/settings/permission-policies': typeof SettingsPermissionPoliciesRoute
-  '/settings/permission-templates': typeof SettingsPermissionTemplatesRoute
-  '/units/$unitId': typeof UnitsUnitIdRoute
-  '/dev/': typeof DevIndexRoute
-  '/messages/': typeof MessagesIndexRoute
-  '/profile/': typeof ProfileIndexRoute
-  '/props/': typeof PropsIndexRoute
-  '/settings/': typeof SettingsIndexRoute
-  '/units/': typeof UnitsIndexRoute
-  '/leases/agreements/$leaseId': typeof LeasesAgreementsLeaseIdRoute
-  '/leases/templates/$templateId': typeof LeasesTemplatesTemplateIdRoute
-  '/organization/members/$membershipId': typeof OrganizationMembersMembershipIdRoute
-  '/people/tenants/$tenantId': typeof PeopleTenantsTenantIdRoute
-  '/finance/invoices/': typeof FinanceInvoicesIndexRoute
-  '/finance/reports/': typeof FinanceReportsIndexRoute
-  '/finance/transactions/': typeof FinanceTransactionsIndexRoute
-  '/leases/agreements/': typeof LeasesAgreementsIndexRoute
-  '/leases/applications/': typeof LeasesApplicationsIndexRoute
-  '/leases/templates/': typeof LeasesTemplatesIndexRoute
-  '/maintenance/requests/': typeof MaintenanceRequestsIndexRoute
-  '/maintenance/work-orders/': typeof MaintenanceWorkOrdersIndexRoute
-  '/organization/members/': typeof OrganizationMembersIndexRoute
-  '/organization/roles/': typeof OrganizationRolesIndexRoute
-  '/people/owners/': typeof PeopleOwnersIndexRoute
-  '/people/tenants/': typeof PeopleTenantsIndexRoute
-  '/people/vendors/': typeof PeopleVendorsIndexRoute
-  '/props/$id/': typeof PropsIdIndexRoute
+	__root__: typeof rootRouteImport
+	'/': typeof IndexRoute
+	'/dev': typeof DevRouteRouteWithChildren
+	'/leases/agreements': typeof LeasesAgreementsRouteRouteWithChildren
+	'/leases/templates': typeof LeasesTemplatesRouteRouteWithChildren
+	'/props/$id': typeof PropsIdRouteRouteWithChildren
+	'/invite/$token': typeof InviteTokenRoute
+	'/public/privacy': typeof PublicPrivacyRoute
+	'/public/terms': typeof PublicTermsRoute
+	'/settings/permission-policies': typeof SettingsPermissionPoliciesRoute
+	'/settings/permission-templates': typeof SettingsPermissionTemplatesRoute
+	'/units/$unitId': typeof UnitsUnitIdRoute
+	'/dev/': typeof DevIndexRoute
+	'/messages/': typeof MessagesIndexRoute
+	'/profile/': typeof ProfileIndexRoute
+	'/props/': typeof PropsIndexRoute
+	'/settings/': typeof SettingsIndexRoute
+	'/units/': typeof UnitsIndexRoute
+	'/leases/agreements/$leaseId': typeof LeasesAgreementsLeaseIdRoute
+	'/leases/templates/$templateId': typeof LeasesTemplatesTemplateIdRoute
+	'/organization/members/$membershipId': typeof OrganizationMembersMembershipIdRoute
+	'/people/tenants/$tenantId': typeof PeopleTenantsTenantIdRoute
+	'/finance/invoices/': typeof FinanceInvoicesIndexRoute
+	'/finance/reports/': typeof FinanceReportsIndexRoute
+	'/finance/transactions/': typeof FinanceTransactionsIndexRoute
+	'/leases/agreements/': typeof LeasesAgreementsIndexRoute
+	'/leases/applications/': typeof LeasesApplicationsIndexRoute
+	'/leases/templates/': typeof LeasesTemplatesIndexRoute
+	'/maintenance/requests/': typeof MaintenanceRequestsIndexRoute
+	'/maintenance/work-orders/': typeof MaintenanceWorkOrdersIndexRoute
+	'/organization/members/': typeof OrganizationMembersIndexRoute
+	'/organization/roles/': typeof OrganizationRolesIndexRoute
+	'/people/owners/': typeof PeopleOwnersIndexRoute
+	'/people/tenants/': typeof PeopleTenantsIndexRoute
+	'/people/vendors/': typeof PeopleVendorsIndexRoute
+	'/props/$id/': typeof PropsIdIndexRoute
 }
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/dev'
-    | '/leases/agreements'
-    | '/leases/templates'
-    | '/props/$id'
-    | '/invite/$token'
-    | '/public/privacy'
-    | '/public/terms'
-    | '/settings/permission-policies'
-    | '/settings/permission-templates'
-    | '/units/$unitId'
-    | '/dev/'
-    | '/messages/'
-    | '/profile/'
-    | '/props/'
-    | '/settings/'
-    | '/units/'
-    | '/leases/agreements/$leaseId'
-    | '/leases/templates/$templateId'
-    | '/organization/members/$membershipId'
-    | '/people/tenants/$tenantId'
-    | '/finance/invoices/'
-    | '/finance/reports/'
-    | '/finance/transactions/'
-    | '/leases/agreements/'
-    | '/leases/applications/'
-    | '/leases/templates/'
-    | '/maintenance/requests/'
-    | '/maintenance/work-orders/'
-    | '/organization/members/'
-    | '/organization/roles/'
-    | '/people/owners/'
-    | '/people/tenants/'
-    | '/people/vendors/'
-    | '/props/$id/'
-  fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/invite/$token'
-    | '/public/privacy'
-    | '/public/terms'
-    | '/settings/permission-policies'
-    | '/settings/permission-templates'
-    | '/units/$unitId'
-    | '/dev'
-    | '/messages'
-    | '/profile'
-    | '/props'
-    | '/settings'
-    | '/units'
-    | '/leases/agreements/$leaseId'
-    | '/leases/templates/$templateId'
-    | '/organization/members/$membershipId'
-    | '/people/tenants/$tenantId'
-    | '/finance/invoices'
-    | '/finance/reports'
-    | '/finance/transactions'
-    | '/leases/agreements'
-    | '/leases/applications'
-    | '/leases/templates'
-    | '/maintenance/requests'
-    | '/maintenance/work-orders'
-    | '/organization/members'
-    | '/organization/roles'
-    | '/people/owners'
-    | '/people/tenants'
-    | '/people/vendors'
-    | '/props/$id'
-  id:
-    | '__root__'
-    | '/'
-    | '/dev'
-    | '/leases/agreements'
-    | '/leases/templates'
-    | '/props/$id'
-    | '/invite/$token'
-    | '/public/privacy'
-    | '/public/terms'
-    | '/settings/permission-policies'
-    | '/settings/permission-templates'
-    | '/units/$unitId'
-    | '/dev/'
-    | '/messages/'
-    | '/profile/'
-    | '/props/'
-    | '/settings/'
-    | '/units/'
-    | '/leases/agreements/$leaseId'
-    | '/leases/templates/$templateId'
-    | '/organization/members/$membershipId'
-    | '/people/tenants/$tenantId'
-    | '/finance/invoices/'
-    | '/finance/reports/'
-    | '/finance/transactions/'
-    | '/leases/agreements/'
-    | '/leases/applications/'
-    | '/leases/templates/'
-    | '/maintenance/requests/'
-    | '/maintenance/work-orders/'
-    | '/organization/members/'
-    | '/organization/roles/'
-    | '/people/owners/'
-    | '/people/tenants/'
-    | '/people/vendors/'
-    | '/props/$id/'
-  fileRoutesById: FileRoutesById
+	fileRoutesByFullPath: FileRoutesByFullPath
+	fullPaths:
+		| '/'
+		| '/dev'
+		| '/leases/agreements'
+		| '/leases/templates'
+		| '/props/$id'
+		| '/invite/$token'
+		| '/public/privacy'
+		| '/public/terms'
+		| '/settings/permission-policies'
+		| '/settings/permission-templates'
+		| '/units/$unitId'
+		| '/dev/'
+		| '/messages/'
+		| '/profile/'
+		| '/props/'
+		| '/settings/'
+		| '/units/'
+		| '/leases/agreements/$leaseId'
+		| '/leases/templates/$templateId'
+		| '/organization/members/$membershipId'
+		| '/people/tenants/$tenantId'
+		| '/finance/invoices/'
+		| '/finance/reports/'
+		| '/finance/transactions/'
+		| '/leases/agreements/'
+		| '/leases/applications/'
+		| '/leases/templates/'
+		| '/maintenance/requests/'
+		| '/maintenance/work-orders/'
+		| '/organization/members/'
+		| '/organization/roles/'
+		| '/people/owners/'
+		| '/people/tenants/'
+		| '/people/vendors/'
+		| '/props/$id/'
+	fileRoutesByTo: FileRoutesByTo
+	to:
+		| '/'
+		| '/invite/$token'
+		| '/public/privacy'
+		| '/public/terms'
+		| '/settings/permission-policies'
+		| '/settings/permission-templates'
+		| '/units/$unitId'
+		| '/dev'
+		| '/messages'
+		| '/profile'
+		| '/props'
+		| '/settings'
+		| '/units'
+		| '/leases/agreements/$leaseId'
+		| '/leases/templates/$templateId'
+		| '/organization/members/$membershipId'
+		| '/people/tenants/$tenantId'
+		| '/finance/invoices'
+		| '/finance/reports'
+		| '/finance/transactions'
+		| '/leases/agreements'
+		| '/leases/applications'
+		| '/leases/templates'
+		| '/maintenance/requests'
+		| '/maintenance/work-orders'
+		| '/organization/members'
+		| '/organization/roles'
+		| '/people/owners'
+		| '/people/tenants'
+		| '/people/vendors'
+		| '/props/$id'
+	id:
+		| '__root__'
+		| '/'
+		| '/dev'
+		| '/leases/agreements'
+		| '/leases/templates'
+		| '/props/$id'
+		| '/invite/$token'
+		| '/public/privacy'
+		| '/public/terms'
+		| '/settings/permission-policies'
+		| '/settings/permission-templates'
+		| '/units/$unitId'
+		| '/dev/'
+		| '/messages/'
+		| '/profile/'
+		| '/props/'
+		| '/settings/'
+		| '/units/'
+		| '/leases/agreements/$leaseId'
+		| '/leases/templates/$templateId'
+		| '/organization/members/$membershipId'
+		| '/people/tenants/$tenantId'
+		| '/finance/invoices/'
+		| '/finance/reports/'
+		| '/finance/transactions/'
+		| '/leases/agreements/'
+		| '/leases/applications/'
+		| '/leases/templates/'
+		| '/maintenance/requests/'
+		| '/maintenance/work-orders/'
+		| '/organization/members/'
+		| '/organization/roles/'
+		| '/people/owners/'
+		| '/people/tenants/'
+		| '/people/vendors/'
+		| '/props/$id/'
+	fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  DevRouteRoute: typeof DevRouteRouteWithChildren
-  LeasesAgreementsRouteRoute: typeof LeasesAgreementsRouteRouteWithChildren
-  LeasesTemplatesRouteRoute: typeof LeasesTemplatesRouteRouteWithChildren
-  PropsIdRouteRoute: typeof PropsIdRouteRouteWithChildren
-  InviteTokenRoute: typeof InviteTokenRoute
-  PublicPrivacyRoute: typeof PublicPrivacyRoute
-  PublicTermsRoute: typeof PublicTermsRoute
-  SettingsPermissionPoliciesRoute: typeof SettingsPermissionPoliciesRoute
-  SettingsPermissionTemplatesRoute: typeof SettingsPermissionTemplatesRoute
-  UnitsUnitIdRoute: typeof UnitsUnitIdRoute
-  MessagesIndexRoute: typeof MessagesIndexRoute
-  ProfileIndexRoute: typeof ProfileIndexRoute
-  PropsIndexRoute: typeof PropsIndexRoute
-  SettingsIndexRoute: typeof SettingsIndexRoute
-  UnitsIndexRoute: typeof UnitsIndexRoute
-  OrganizationMembersMembershipIdRoute: typeof OrganizationMembersMembershipIdRoute
-  PeopleTenantsTenantIdRoute: typeof PeopleTenantsTenantIdRoute
-  FinanceInvoicesIndexRoute: typeof FinanceInvoicesIndexRoute
-  FinanceReportsIndexRoute: typeof FinanceReportsIndexRoute
-  FinanceTransactionsIndexRoute: typeof FinanceTransactionsIndexRoute
-  LeasesApplicationsIndexRoute: typeof LeasesApplicationsIndexRoute
-  MaintenanceRequestsIndexRoute: typeof MaintenanceRequestsIndexRoute
-  MaintenanceWorkOrdersIndexRoute: typeof MaintenanceWorkOrdersIndexRoute
-  OrganizationMembersIndexRoute: typeof OrganizationMembersIndexRoute
-  OrganizationRolesIndexRoute: typeof OrganizationRolesIndexRoute
-  PeopleOwnersIndexRoute: typeof PeopleOwnersIndexRoute
-  PeopleTenantsIndexRoute: typeof PeopleTenantsIndexRoute
-  PeopleVendorsIndexRoute: typeof PeopleVendorsIndexRoute
+	IndexRoute: typeof IndexRoute
+	DevRouteRoute: typeof DevRouteRouteWithChildren
+	LeasesAgreementsRouteRoute: typeof LeasesAgreementsRouteRouteWithChildren
+	LeasesTemplatesRouteRoute: typeof LeasesTemplatesRouteRouteWithChildren
+	PropsIdRouteRoute: typeof PropsIdRouteRouteWithChildren
+	InviteTokenRoute: typeof InviteTokenRoute
+	PublicPrivacyRoute: typeof PublicPrivacyRoute
+	PublicTermsRoute: typeof PublicTermsRoute
+	SettingsPermissionPoliciesRoute: typeof SettingsPermissionPoliciesRoute
+	SettingsPermissionTemplatesRoute: typeof SettingsPermissionTemplatesRoute
+	UnitsUnitIdRoute: typeof UnitsUnitIdRoute
+	MessagesIndexRoute: typeof MessagesIndexRoute
+	ProfileIndexRoute: typeof ProfileIndexRoute
+	PropsIndexRoute: typeof PropsIndexRoute
+	SettingsIndexRoute: typeof SettingsIndexRoute
+	UnitsIndexRoute: typeof UnitsIndexRoute
+	OrganizationMembersMembershipIdRoute: typeof OrganizationMembersMembershipIdRoute
+	PeopleTenantsTenantIdRoute: typeof PeopleTenantsTenantIdRoute
+	FinanceInvoicesIndexRoute: typeof FinanceInvoicesIndexRoute
+	FinanceReportsIndexRoute: typeof FinanceReportsIndexRoute
+	FinanceTransactionsIndexRoute: typeof FinanceTransactionsIndexRoute
+	LeasesApplicationsIndexRoute: typeof LeasesApplicationsIndexRoute
+	MaintenanceRequestsIndexRoute: typeof MaintenanceRequestsIndexRoute
+	MaintenanceWorkOrdersIndexRoute: typeof MaintenanceWorkOrdersIndexRoute
+	OrganizationMembersIndexRoute: typeof OrganizationMembersIndexRoute
+	OrganizationRolesIndexRoute: typeof OrganizationRolesIndexRoute
+	PeopleOwnersIndexRoute: typeof PeopleOwnersIndexRoute
+	PeopleTenantsIndexRoute: typeof PeopleTenantsIndexRoute
+	PeopleVendorsIndexRoute: typeof PeopleVendorsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
-  interface FileRoutesByPath {
-    '/dev': {
-      id: '/dev'
-      path: '/dev'
-      fullPath: '/dev'
-      preLoaderRoute: typeof DevRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/units/': {
-      id: '/units/'
-      path: '/units'
-      fullPath: '/units/'
-      preLoaderRoute: typeof UnitsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings/': {
-      id: '/settings/'
-      path: '/settings'
-      fullPath: '/settings/'
-      preLoaderRoute: typeof SettingsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/props/': {
-      id: '/props/'
-      path: '/props'
-      fullPath: '/props/'
-      preLoaderRoute: typeof PropsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/profile/': {
-      id: '/profile/'
-      path: '/profile'
-      fullPath: '/profile/'
-      preLoaderRoute: typeof ProfileIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/messages/': {
-      id: '/messages/'
-      path: '/messages'
-      fullPath: '/messages/'
-      preLoaderRoute: typeof MessagesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dev/': {
-      id: '/dev/'
-      path: '/'
-      fullPath: '/dev/'
-      preLoaderRoute: typeof DevIndexRouteImport
-      parentRoute: typeof DevRouteRoute
-    }
-    '/units/$unitId': {
-      id: '/units/$unitId'
-      path: '/units/$unitId'
-      fullPath: '/units/$unitId'
-      preLoaderRoute: typeof UnitsUnitIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings/permission-templates': {
-      id: '/settings/permission-templates'
-      path: '/settings/permission-templates'
-      fullPath: '/settings/permission-templates'
-      preLoaderRoute: typeof SettingsPermissionTemplatesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/settings/permission-policies': {
-      id: '/settings/permission-policies'
-      path: '/settings/permission-policies'
-      fullPath: '/settings/permission-policies'
-      preLoaderRoute: typeof SettingsPermissionPoliciesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/public/terms': {
-      id: '/public/terms'
-      path: '/public/terms'
-      fullPath: '/public/terms'
-      preLoaderRoute: typeof PublicTermsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/public/privacy': {
-      id: '/public/privacy'
-      path: '/public/privacy'
-      fullPath: '/public/privacy'
-      preLoaderRoute: typeof PublicPrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/invite/$token': {
-      id: '/invite/$token'
-      path: '/invite/$token'
-      fullPath: '/invite/$token'
-      preLoaderRoute: typeof InviteTokenRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/props/$id': {
-      id: '/props/$id'
-      path: '/props/$id'
-      fullPath: '/props/$id'
-      preLoaderRoute: typeof PropsIdRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/leases/templates': {
-      id: '/leases/templates'
-      path: '/leases/templates'
-      fullPath: '/leases/templates'
-      preLoaderRoute: typeof LeasesTemplatesRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/leases/agreements': {
-      id: '/leases/agreements'
-      path: '/leases/agreements'
-      fullPath: '/leases/agreements'
-      preLoaderRoute: typeof LeasesAgreementsRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/props/$id/': {
-      id: '/props/$id/'
-      path: '/'
-      fullPath: '/props/$id/'
-      preLoaderRoute: typeof PropsIdIndexRouteImport
-      parentRoute: typeof PropsIdRouteRoute
-    }
-    '/people/vendors/': {
-      id: '/people/vendors/'
-      path: '/people/vendors'
-      fullPath: '/people/vendors/'
-      preLoaderRoute: typeof PeopleVendorsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/people/tenants/': {
-      id: '/people/tenants/'
-      path: '/people/tenants'
-      fullPath: '/people/tenants/'
-      preLoaderRoute: typeof PeopleTenantsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/people/owners/': {
-      id: '/people/owners/'
-      path: '/people/owners'
-      fullPath: '/people/owners/'
-      preLoaderRoute: typeof PeopleOwnersIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/organization/roles/': {
-      id: '/organization/roles/'
-      path: '/organization/roles'
-      fullPath: '/organization/roles/'
-      preLoaderRoute: typeof OrganizationRolesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/organization/members/': {
-      id: '/organization/members/'
-      path: '/organization/members'
-      fullPath: '/organization/members/'
-      preLoaderRoute: typeof OrganizationMembersIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/maintenance/work-orders/': {
-      id: '/maintenance/work-orders/'
-      path: '/maintenance/work-orders'
-      fullPath: '/maintenance/work-orders/'
-      preLoaderRoute: typeof MaintenanceWorkOrdersIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/maintenance/requests/': {
-      id: '/maintenance/requests/'
-      path: '/maintenance/requests'
-      fullPath: '/maintenance/requests/'
-      preLoaderRoute: typeof MaintenanceRequestsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/leases/templates/': {
-      id: '/leases/templates/'
-      path: '/'
-      fullPath: '/leases/templates/'
-      preLoaderRoute: typeof LeasesTemplatesIndexRouteImport
-      parentRoute: typeof LeasesTemplatesRouteRoute
-    }
-    '/leases/applications/': {
-      id: '/leases/applications/'
-      path: '/leases/applications'
-      fullPath: '/leases/applications/'
-      preLoaderRoute: typeof LeasesApplicationsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/leases/agreements/': {
-      id: '/leases/agreements/'
-      path: '/'
-      fullPath: '/leases/agreements/'
-      preLoaderRoute: typeof LeasesAgreementsIndexRouteImport
-      parentRoute: typeof LeasesAgreementsRouteRoute
-    }
-    '/finance/transactions/': {
-      id: '/finance/transactions/'
-      path: '/finance/transactions'
-      fullPath: '/finance/transactions/'
-      preLoaderRoute: typeof FinanceTransactionsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/finance/reports/': {
-      id: '/finance/reports/'
-      path: '/finance/reports'
-      fullPath: '/finance/reports/'
-      preLoaderRoute: typeof FinanceReportsIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/finance/invoices/': {
-      id: '/finance/invoices/'
-      path: '/finance/invoices'
-      fullPath: '/finance/invoices/'
-      preLoaderRoute: typeof FinanceInvoicesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/people/tenants/$tenantId': {
-      id: '/people/tenants/$tenantId'
-      path: '/people/tenants/$tenantId'
-      fullPath: '/people/tenants/$tenantId'
-      preLoaderRoute: typeof PeopleTenantsTenantIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/organization/members/$membershipId': {
-      id: '/organization/members/$membershipId'
-      path: '/organization/members/$membershipId'
-      fullPath: '/organization/members/$membershipId'
-      preLoaderRoute: typeof OrganizationMembersMembershipIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/leases/templates/$templateId': {
-      id: '/leases/templates/$templateId'
-      path: '/$templateId'
-      fullPath: '/leases/templates/$templateId'
-      preLoaderRoute: typeof LeasesTemplatesTemplateIdRouteImport
-      parentRoute: typeof LeasesTemplatesRouteRoute
-    }
-    '/leases/agreements/$leaseId': {
-      id: '/leases/agreements/$leaseId'
-      path: '/$leaseId'
-      fullPath: '/leases/agreements/$leaseId'
-      preLoaderRoute: typeof LeasesAgreementsLeaseIdRouteImport
-      parentRoute: typeof LeasesAgreementsRouteRoute
-    }
-  }
+	interface FileRoutesByPath {
+		'/dev': {
+			id: '/dev'
+			path: '/dev'
+			fullPath: '/dev'
+			preLoaderRoute: typeof DevRouteRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/': {
+			id: '/'
+			path: '/'
+			fullPath: '/'
+			preLoaderRoute: typeof IndexRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/units/': {
+			id: '/units/'
+			path: '/units'
+			fullPath: '/units/'
+			preLoaderRoute: typeof UnitsIndexRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/settings/': {
+			id: '/settings/'
+			path: '/settings'
+			fullPath: '/settings/'
+			preLoaderRoute: typeof SettingsIndexRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/props/': {
+			id: '/props/'
+			path: '/props'
+			fullPath: '/props/'
+			preLoaderRoute: typeof PropsIndexRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/profile/': {
+			id: '/profile/'
+			path: '/profile'
+			fullPath: '/profile/'
+			preLoaderRoute: typeof ProfileIndexRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/messages/': {
+			id: '/messages/'
+			path: '/messages'
+			fullPath: '/messages/'
+			preLoaderRoute: typeof MessagesIndexRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/dev/': {
+			id: '/dev/'
+			path: '/'
+			fullPath: '/dev/'
+			preLoaderRoute: typeof DevIndexRouteImport
+			parentRoute: typeof DevRouteRoute
+		}
+		'/units/$unitId': {
+			id: '/units/$unitId'
+			path: '/units/$unitId'
+			fullPath: '/units/$unitId'
+			preLoaderRoute: typeof UnitsUnitIdRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/settings/permission-templates': {
+			id: '/settings/permission-templates'
+			path: '/settings/permission-templates'
+			fullPath: '/settings/permission-templates'
+			preLoaderRoute: typeof SettingsPermissionTemplatesRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/settings/permission-policies': {
+			id: '/settings/permission-policies'
+			path: '/settings/permission-policies'
+			fullPath: '/settings/permission-policies'
+			preLoaderRoute: typeof SettingsPermissionPoliciesRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/public/terms': {
+			id: '/public/terms'
+			path: '/public/terms'
+			fullPath: '/public/terms'
+			preLoaderRoute: typeof PublicTermsRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/public/privacy': {
+			id: '/public/privacy'
+			path: '/public/privacy'
+			fullPath: '/public/privacy'
+			preLoaderRoute: typeof PublicPrivacyRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/invite/$token': {
+			id: '/invite/$token'
+			path: '/invite/$token'
+			fullPath: '/invite/$token'
+			preLoaderRoute: typeof InviteTokenRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/props/$id': {
+			id: '/props/$id'
+			path: '/props/$id'
+			fullPath: '/props/$id'
+			preLoaderRoute: typeof PropsIdRouteRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/leases/templates': {
+			id: '/leases/templates'
+			path: '/leases/templates'
+			fullPath: '/leases/templates'
+			preLoaderRoute: typeof LeasesTemplatesRouteRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/leases/agreements': {
+			id: '/leases/agreements'
+			path: '/leases/agreements'
+			fullPath: '/leases/agreements'
+			preLoaderRoute: typeof LeasesAgreementsRouteRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/props/$id/': {
+			id: '/props/$id/'
+			path: '/'
+			fullPath: '/props/$id/'
+			preLoaderRoute: typeof PropsIdIndexRouteImport
+			parentRoute: typeof PropsIdRouteRoute
+		}
+		'/people/vendors/': {
+			id: '/people/vendors/'
+			path: '/people/vendors'
+			fullPath: '/people/vendors/'
+			preLoaderRoute: typeof PeopleVendorsIndexRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/people/tenants/': {
+			id: '/people/tenants/'
+			path: '/people/tenants'
+			fullPath: '/people/tenants/'
+			preLoaderRoute: typeof PeopleTenantsIndexRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/people/owners/': {
+			id: '/people/owners/'
+			path: '/people/owners'
+			fullPath: '/people/owners/'
+			preLoaderRoute: typeof PeopleOwnersIndexRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/organization/roles/': {
+			id: '/organization/roles/'
+			path: '/organization/roles'
+			fullPath: '/organization/roles/'
+			preLoaderRoute: typeof OrganizationRolesIndexRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/organization/members/': {
+			id: '/organization/members/'
+			path: '/organization/members'
+			fullPath: '/organization/members/'
+			preLoaderRoute: typeof OrganizationMembersIndexRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/maintenance/work-orders/': {
+			id: '/maintenance/work-orders/'
+			path: '/maintenance/work-orders'
+			fullPath: '/maintenance/work-orders/'
+			preLoaderRoute: typeof MaintenanceWorkOrdersIndexRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/maintenance/requests/': {
+			id: '/maintenance/requests/'
+			path: '/maintenance/requests'
+			fullPath: '/maintenance/requests/'
+			preLoaderRoute: typeof MaintenanceRequestsIndexRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/leases/templates/': {
+			id: '/leases/templates/'
+			path: '/'
+			fullPath: '/leases/templates/'
+			preLoaderRoute: typeof LeasesTemplatesIndexRouteImport
+			parentRoute: typeof LeasesTemplatesRouteRoute
+		}
+		'/leases/applications/': {
+			id: '/leases/applications/'
+			path: '/leases/applications'
+			fullPath: '/leases/applications/'
+			preLoaderRoute: typeof LeasesApplicationsIndexRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/leases/agreements/': {
+			id: '/leases/agreements/'
+			path: '/'
+			fullPath: '/leases/agreements/'
+			preLoaderRoute: typeof LeasesAgreementsIndexRouteImport
+			parentRoute: typeof LeasesAgreementsRouteRoute
+		}
+		'/finance/transactions/': {
+			id: '/finance/transactions/'
+			path: '/finance/transactions'
+			fullPath: '/finance/transactions/'
+			preLoaderRoute: typeof FinanceTransactionsIndexRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/finance/reports/': {
+			id: '/finance/reports/'
+			path: '/finance/reports'
+			fullPath: '/finance/reports/'
+			preLoaderRoute: typeof FinanceReportsIndexRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/finance/invoices/': {
+			id: '/finance/invoices/'
+			path: '/finance/invoices'
+			fullPath: '/finance/invoices/'
+			preLoaderRoute: typeof FinanceInvoicesIndexRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/people/tenants/$tenantId': {
+			id: '/people/tenants/$tenantId'
+			path: '/people/tenants/$tenantId'
+			fullPath: '/people/tenants/$tenantId'
+			preLoaderRoute: typeof PeopleTenantsTenantIdRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/organization/members/$membershipId': {
+			id: '/organization/members/$membershipId'
+			path: '/organization/members/$membershipId'
+			fullPath: '/organization/members/$membershipId'
+			preLoaderRoute: typeof OrganizationMembersMembershipIdRouteImport
+			parentRoute: typeof rootRouteImport
+		}
+		'/leases/templates/$templateId': {
+			id: '/leases/templates/$templateId'
+			path: '/$templateId'
+			fullPath: '/leases/templates/$templateId'
+			preLoaderRoute: typeof LeasesTemplatesTemplateIdRouteImport
+			parentRoute: typeof LeasesTemplatesRouteRoute
+		}
+		'/leases/agreements/$leaseId': {
+			id: '/leases/agreements/$leaseId'
+			path: '/$leaseId'
+			fullPath: '/leases/agreements/$leaseId'
+			preLoaderRoute: typeof LeasesAgreementsLeaseIdRouteImport
+			parentRoute: typeof LeasesAgreementsRouteRoute
+		}
+	}
 }
 
 interface DevRouteRouteChildren {
-  DevIndexRoute: typeof DevIndexRoute
+	DevIndexRoute: typeof DevIndexRoute
 }
 
 const DevRouteRouteChildren: DevRouteRouteChildren = {
-  DevIndexRoute: DevIndexRoute,
+	DevIndexRoute: DevIndexRoute,
 }
 
 const DevRouteRouteWithChildren = DevRouteRoute._addFileChildren(
-  DevRouteRouteChildren,
+	DevRouteRouteChildren,
 )
 
 interface LeasesAgreementsRouteRouteChildren {
-  LeasesAgreementsLeaseIdRoute: typeof LeasesAgreementsLeaseIdRoute
-  LeasesAgreementsIndexRoute: typeof LeasesAgreementsIndexRoute
+	LeasesAgreementsLeaseIdRoute: typeof LeasesAgreementsLeaseIdRoute
+	LeasesAgreementsIndexRoute: typeof LeasesAgreementsIndexRoute
 }
 
 const LeasesAgreementsRouteRouteChildren: LeasesAgreementsRouteRouteChildren = {
-  LeasesAgreementsLeaseIdRoute: LeasesAgreementsLeaseIdRoute,
-  LeasesAgreementsIndexRoute: LeasesAgreementsIndexRoute,
+	LeasesAgreementsLeaseIdRoute: LeasesAgreementsLeaseIdRoute,
+	LeasesAgreementsIndexRoute: LeasesAgreementsIndexRoute,
 }
 
 const LeasesAgreementsRouteRouteWithChildren =
-  LeasesAgreementsRouteRoute._addFileChildren(
-    LeasesAgreementsRouteRouteChildren,
-  )
+	LeasesAgreementsRouteRoute._addFileChildren(
+		LeasesAgreementsRouteRouteChildren,
+	)
 
 interface LeasesTemplatesRouteRouteChildren {
-  LeasesTemplatesTemplateIdRoute: typeof LeasesTemplatesTemplateIdRoute
-  LeasesTemplatesIndexRoute: typeof LeasesTemplatesIndexRoute
+	LeasesTemplatesTemplateIdRoute: typeof LeasesTemplatesTemplateIdRoute
+	LeasesTemplatesIndexRoute: typeof LeasesTemplatesIndexRoute
 }
 
 const LeasesTemplatesRouteRouteChildren: LeasesTemplatesRouteRouteChildren = {
-  LeasesTemplatesTemplateIdRoute: LeasesTemplatesTemplateIdRoute,
-  LeasesTemplatesIndexRoute: LeasesTemplatesIndexRoute,
+	LeasesTemplatesTemplateIdRoute: LeasesTemplatesTemplateIdRoute,
+	LeasesTemplatesIndexRoute: LeasesTemplatesIndexRoute,
 }
 
 const LeasesTemplatesRouteRouteWithChildren =
-  LeasesTemplatesRouteRoute._addFileChildren(LeasesTemplatesRouteRouteChildren)
+	LeasesTemplatesRouteRoute._addFileChildren(LeasesTemplatesRouteRouteChildren)
 
 interface PropsIdRouteRouteChildren {
-  PropsIdIndexRoute: typeof PropsIdIndexRoute
+	PropsIdIndexRoute: typeof PropsIdIndexRoute
 }
 
 const PropsIdRouteRouteChildren: PropsIdRouteRouteChildren = {
-  PropsIdIndexRoute: PropsIdIndexRoute,
+	PropsIdIndexRoute: PropsIdIndexRoute,
 }
 
 const PropsIdRouteRouteWithChildren = PropsIdRouteRoute._addFileChildren(
-  PropsIdRouteRouteChildren,
+	PropsIdRouteRouteChildren,
 )
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  DevRouteRoute: DevRouteRouteWithChildren,
-  LeasesAgreementsRouteRoute: LeasesAgreementsRouteRouteWithChildren,
-  LeasesTemplatesRouteRoute: LeasesTemplatesRouteRouteWithChildren,
-  PropsIdRouteRoute: PropsIdRouteRouteWithChildren,
-  InviteTokenRoute: InviteTokenRoute,
-  PublicPrivacyRoute: PublicPrivacyRoute,
-  PublicTermsRoute: PublicTermsRoute,
-  SettingsPermissionPoliciesRoute: SettingsPermissionPoliciesRoute,
-  SettingsPermissionTemplatesRoute: SettingsPermissionTemplatesRoute,
-  UnitsUnitIdRoute: UnitsUnitIdRoute,
-  MessagesIndexRoute: MessagesIndexRoute,
-  ProfileIndexRoute: ProfileIndexRoute,
-  PropsIndexRoute: PropsIndexRoute,
-  SettingsIndexRoute: SettingsIndexRoute,
-  UnitsIndexRoute: UnitsIndexRoute,
-  OrganizationMembersMembershipIdRoute: OrganizationMembersMembershipIdRoute,
-  PeopleTenantsTenantIdRoute: PeopleTenantsTenantIdRoute,
-  FinanceInvoicesIndexRoute: FinanceInvoicesIndexRoute,
-  FinanceReportsIndexRoute: FinanceReportsIndexRoute,
-  FinanceTransactionsIndexRoute: FinanceTransactionsIndexRoute,
-  LeasesApplicationsIndexRoute: LeasesApplicationsIndexRoute,
-  MaintenanceRequestsIndexRoute: MaintenanceRequestsIndexRoute,
-  MaintenanceWorkOrdersIndexRoute: MaintenanceWorkOrdersIndexRoute,
-  OrganizationMembersIndexRoute: OrganizationMembersIndexRoute,
-  OrganizationRolesIndexRoute: OrganizationRolesIndexRoute,
-  PeopleOwnersIndexRoute: PeopleOwnersIndexRoute,
-  PeopleTenantsIndexRoute: PeopleTenantsIndexRoute,
-  PeopleVendorsIndexRoute: PeopleVendorsIndexRoute,
+	IndexRoute: IndexRoute,
+	DevRouteRoute: DevRouteRouteWithChildren,
+	LeasesAgreementsRouteRoute: LeasesAgreementsRouteRouteWithChildren,
+	LeasesTemplatesRouteRoute: LeasesTemplatesRouteRouteWithChildren,
+	PropsIdRouteRoute: PropsIdRouteRouteWithChildren,
+	InviteTokenRoute: InviteTokenRoute,
+	PublicPrivacyRoute: PublicPrivacyRoute,
+	PublicTermsRoute: PublicTermsRoute,
+	SettingsPermissionPoliciesRoute: SettingsPermissionPoliciesRoute,
+	SettingsPermissionTemplatesRoute: SettingsPermissionTemplatesRoute,
+	UnitsUnitIdRoute: UnitsUnitIdRoute,
+	MessagesIndexRoute: MessagesIndexRoute,
+	ProfileIndexRoute: ProfileIndexRoute,
+	PropsIndexRoute: PropsIndexRoute,
+	SettingsIndexRoute: SettingsIndexRoute,
+	UnitsIndexRoute: UnitsIndexRoute,
+	OrganizationMembersMembershipIdRoute: OrganizationMembersMembershipIdRoute,
+	PeopleTenantsTenantIdRoute: PeopleTenantsTenantIdRoute,
+	FinanceInvoicesIndexRoute: FinanceInvoicesIndexRoute,
+	FinanceReportsIndexRoute: FinanceReportsIndexRoute,
+	FinanceTransactionsIndexRoute: FinanceTransactionsIndexRoute,
+	LeasesApplicationsIndexRoute: LeasesApplicationsIndexRoute,
+	MaintenanceRequestsIndexRoute: MaintenanceRequestsIndexRoute,
+	MaintenanceWorkOrdersIndexRoute: MaintenanceWorkOrdersIndexRoute,
+	OrganizationMembersIndexRoute: OrganizationMembersIndexRoute,
+	OrganizationRolesIndexRoute: OrganizationRolesIndexRoute,
+	PeopleOwnersIndexRoute: PeopleOwnersIndexRoute,
+	PeopleTenantsIndexRoute: PeopleTenantsIndexRoute,
+	PeopleVendorsIndexRoute: PeopleVendorsIndexRoute,
 }
 export const routeTree = rootRouteImport
-  ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+	._addFileChildren(rootRouteChildren)
+	._addFileTypes<FileRouteTypes>()

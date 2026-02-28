@@ -7,7 +7,10 @@ import { Check } from 'lucide-react'
 import { Button } from '@abumble/design-system/components/Button'
 import { DialogFooter } from '@abumble/design-system/components/Dialog'
 import { FieldError } from '@/components/ui/FieldError'
-import { type AssignmentConfigValue, ResourceType } from '@/domain/policy-assignment'
+import {
+	type AssignmentConfigValue,
+	ResourceType,
+} from '@/domain/policy-assignment'
 import { useCreatePolicyAssignment } from '../../hooks'
 import { AssignmentConfigurator } from '../AssignmentConfigurator'
 

@@ -18,7 +18,10 @@ import { FieldError } from '@/components/ui/FieldError'
 import { RequiredMark } from '@/components/ui'
 import { useInviteMember } from '@/features/memberships'
 import { AssignmentConfigurator } from '@/features/policy-assignments/components/AssignmentConfigurator'
-import { type AssignmentConfigValue, ResourceType } from '@/domain/policy-assignment'
+import {
+	type AssignmentConfigValue,
+	ResourceType,
+} from '@/domain/policy-assignment'
 
 // ---------- Schema ----------
 

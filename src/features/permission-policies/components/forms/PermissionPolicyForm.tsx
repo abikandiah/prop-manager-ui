@@ -100,7 +100,6 @@ export function PermissionPolicyForm({
 				createPolicy.mutate(
 					{
 						name: values.name.trim(),
-						orgId: orgId ?? null,
 						permissions: values.permissions,
 					},
 					{

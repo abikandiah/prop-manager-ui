@@ -76,15 +76,9 @@ function Root() {
 			<div className="layout-header-full flex min-h-screen w-full flex-col">
 				<Header />
 
-				<main className="flex flex-col mt-14 p-6 flex-1">
+				<main className="flex flex-col mt-14 p-6 min-h-[75vh]">
 					{/* Background Element */}
-					<div className="absolute inset-0 z-0 pointer-events-none">
-						{/* Option A: A subtle radial gradient to draw eyes to the center */}
-						<div
-							className="absolute inset-0 bg-[radial-gradient(#e5e7eb_1px,transparent_1px)] bg-size-[24px_24px]
-						 mask-[radial-gradient(ellipse_50%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-40"
-						/>
-					</div>
+					<div className="app-center-background-image"></div>
 
 					<OfflineWarningBanner />
 					{altContent}

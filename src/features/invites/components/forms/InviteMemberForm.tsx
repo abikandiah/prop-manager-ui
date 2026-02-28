@@ -18,12 +18,12 @@ import { FieldError } from '@/components/ui/FieldError'
 import { RequiredMark } from '@/components/ui'
 import { useInviteMember } from '@/features/memberships'
 import { AssignmentConfigurator } from '@/features/policy-assignments/components/AssignmentConfigurator'
-import type { AssignmentConfigValue, ResourceType } from '@/domain/policy-assignment'
+import { type AssignmentConfigValue, ResourceType } from '@/domain/policy-assignment'
 
 // ---------- Schema ----------
 
 const assignmentConfigSchema = z.object({
-	resourceType: z.enum(['ORG', 'PROPERTY', 'UNIT']),
+	resourceType: z.nativeEnum(ResourceType),
 	resourceId: z.string(),
 	usePolicy: z.boolean(),
 	policyId: z.string().optional(),
@@ -43,7 +43,7 @@ function deriveAssignmentLabel(
 	config: AssignmentConfigValue,
 	index: number,
 ): string {
-	if (config.resourceType === 'ORG') return 'Organization'
+	if (config.resourceType === ResourceType.ORG) return 'Organization'
 	return `Assignment ${index + 1}`
 }
 
@@ -90,7 +90,9 @@ export function InviteMemberForm({
 			const assignments = values.assignments
 				.map((config) => {
 					const resourceId =
-						config.resourceType === 'ORG' ? orgId : config.resourceId.trim()
+						config.resourceType === ResourceType.ORG
+							? orgId
+							: config.resourceId.trim()
 					return {
 						resourceType: config.resourceType,
 						resourceId,
@@ -178,18 +180,34 @@ export function InviteMemberForm({
 											<AssignmentConfigurator
 												orgId={orgId}
 												value={{
-													resourceType: configValue.resourceType as ResourceType,
+													resourceType:
+														configValue.resourceType as ResourceType,
 													resourceId: configValue.resourceId,
 													usePolicy: configValue.usePolicy,
 													policyId: configValue.policyId,
 													overrides: configValue.overrides,
 												}}
 												onChange={(next) => {
-													setValue(`assignments.${index}.resourceType`, next.resourceType)
-													setValue(`assignments.${index}.resourceId`, next.resourceId)
-													setValue(`assignments.${index}.usePolicy`, next.usePolicy)
-													setValue(`assignments.${index}.policyId`, next.policyId)
-													setValue(`assignments.${index}.overrides`, next.overrides)
+													setValue(
+														`assignments.${index}.resourceType`,
+														next.resourceType,
+													)
+													setValue(
+														`assignments.${index}.resourceId`,
+														next.resourceId,
+													)
+													setValue(
+														`assignments.${index}.usePolicy`,
+														next.usePolicy,
+													)
+													setValue(
+														`assignments.${index}.policyId`,
+														next.policyId,
+													)
+													setValue(
+														`assignments.${index}.overrides`,
+														next.overrides,
+													)
 												}}
 											/>
 										</AccordionContent>
@@ -206,7 +224,7 @@ export function InviteMemberForm({
 					size="sm"
 					onClick={() =>
 						append({
-							resourceType: 'PROPERTY',
+							resourceType: ResourceType.PROPERTY,
 							resourceId: '',
 							usePolicy: true,
 							policyId: undefined,

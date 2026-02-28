@@ -1,4 +1,8 @@
-export type ResourceType = 'ORG' | 'PROPERTY' | 'UNIT'
+export enum ResourceType {
+	ORG = 'ORG',
+	PROPERTY = 'PROPERTY',
+	UNIT = 'UNIT',
+}
 
 export interface PolicyAssignment {
 	id: string

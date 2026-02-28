@@ -131,7 +131,9 @@ export function PermissionPolicyForm({
 			</div>
 
 			<div className="space-y-2">
-				<Label>Permissions <RequiredMark /></Label>
+				<Label>
+					Permissions <RequiredMark />
+				</Label>
 				<Controller
 					name="permissions"
 					control={control}

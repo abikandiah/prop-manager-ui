@@ -33,6 +33,7 @@ import { DetailField } from '@/components/ui'
 import { InviteStatusBadge } from '@/components/InviteStatusBadge'
 import { formatDateTime } from '@/lib/format'
 import { InviteStatus } from '@/domain/membership'
+import { ResourceType } from '@/domain/policy-assignment'
 
 export interface MembershipDetailViewProps {
 	orgId: string
@@ -123,12 +124,12 @@ export function MembershipDetailView({
 		setConfirmOpen(true)
 	}
 
-	const resolveResourceName = (type: string, id: string) => {
-		if (type === 'ORG') return 'Organization Root'
-		if (type === 'PROPERTY') {
+	const resolveResourceName = (type: ResourceType, id: string) => {
+		if (type === ResourceType.ORG) return 'Organization Root'
+		if (type === ResourceType.PROPERTY) {
 			return props?.find((p) => p.id === id)?.legalName ?? id
 		}
-		if (type === 'UNIT') {
+		if (type === ResourceType.UNIT) {
 			return units?.find((u) => u.id === id)?.unitNumber ?? id
 		}
 		return id

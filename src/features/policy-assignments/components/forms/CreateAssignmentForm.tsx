@@ -7,7 +7,7 @@ import { Check } from 'lucide-react'
 import { Button } from '@abumble/design-system/components/Button'
 import { DialogFooter } from '@abumble/design-system/components/Dialog'
 import { FieldError } from '@/components/ui/FieldError'
-import type { AssignmentConfigValue, ResourceType } from '@/domain/policy-assignment'
+import { type AssignmentConfigValue, ResourceType } from '@/domain/policy-assignment'
 import { useCreatePolicyAssignment } from '../../hooks'
 import { AssignmentConfigurator } from '../AssignmentConfigurator'
 
@@ -15,7 +15,7 @@ import { AssignmentConfigurator } from '../AssignmentConfigurator'
 
 const assignmentSchema = z
 	.object({
-		resourceType: z.enum(['ORG', 'PROPERTY', 'UNIT']),
+		resourceType: z.nativeEnum(ResourceType),
 		resourceId: z.string().min(1, 'Resource is required'),
 		usePolicy: z.boolean(),
 		policyId: z.string().optional(),
@@ -61,7 +61,7 @@ export function CreateAssignmentForm({
 	} = useForm<CreateAssignmentFormValues>({
 		resolver: standardSchemaResolver(assignmentSchema),
 		defaultValues: {
-			resourceType: 'PROPERTY',
+			resourceType: ResourceType.PROPERTY,
 			resourceId: '',
 			usePolicy: true,
 			policyId: undefined,
@@ -72,7 +72,7 @@ export function CreateAssignmentForm({
 
 	const formValues = watch()
 	const configValue: AssignmentConfigValue = {
-		resourceType: formValues.resourceType as ResourceType,
+		resourceType: formValues.resourceType,
 		resourceId: formValues.resourceId,
 		usePolicy: formValues.usePolicy,
 		policyId: formValues.policyId,
@@ -90,7 +90,7 @@ export function CreateAssignmentForm({
 	const onSubmit = useCallback(
 		(values: CreateAssignmentFormValues) => {
 			const resourceId =
-				values.resourceType === 'ORG' ? orgId : values.resourceId
+				values.resourceType === ResourceType.ORG ? orgId : values.resourceId
 
 			createAssignment.mutate(
 				{

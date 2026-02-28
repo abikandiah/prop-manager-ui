@@ -1,19 +1,13 @@
 import { api, setDevToken } from '@/api/client'
+import { FormActions, FormCard } from '@/components/ui/FormCard'
 import { Button } from '@abumble/design-system/components/Button'
-import {
-	Card,
-	CardContent,
-	CardHeader,
-} from '@abumble/design-system/components/Card'
 import { Input } from '@abumble/design-system/components/Input'
 import { Label } from '@abumble/design-system/components/Label'
 import { useState } from 'react'
 import { toast } from 'sonner'
 
 interface DevAuthFormProps {
-	/** Called after successful login (e.g. to re-render parent or navigate). */
 	onSuccess?: () => void
-	/** If true, render inside a Card; if false, only the form (for embedding). */
 	wrappedInCard?: boolean
 }
 
@@ -80,29 +74,19 @@ export function DevAuthForm({
 					required
 				/>
 			</div>
-			<Button
-				type="submit"
-				className="w-full h-11 mt-2 font-medium"
-				disabled={loading || !email.trim() || !password}
-			>
-				{loading ? 'Logging in...' : 'Login'}
-			</Button>
+			<FormActions>
+				<Button type="submit" disabled={loading || !email.trim() || !password}>
+					{loading ? 'Logging in...' : 'Login'}
+				</Button>
+			</FormActions>
 		</form>
 	)
 
 	if (!wrappedInCard) return form
 
 	return (
-		<Card className="w-full max-w-md">
-			<CardHeader className="pb-4">
-				<h2 className="text-2xl font-semibold tracking-tight text-foreground">
-					Login
-				</h2>
-				<p className="text-sm text-muted-foreground">
-					Enter your dev credentials
-				</p>
-			</CardHeader>
-			<CardContent className="grid gap-6">{form}</CardContent>
-		</Card>
+		<FormCard title="Login" description="Enter your dev credentials">
+			{form}
+		</FormCard>
 	)
 }

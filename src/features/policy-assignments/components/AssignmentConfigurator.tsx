@@ -6,6 +6,7 @@ import { PermissionPolicySelect } from '@/features/permission-policies/component
 import { usePropsList } from '@/features/props'
 import { useUnitsList } from '@/features/units'
 import type { AssignmentConfigValue } from '@/domain/policy-assignment'
+import { ResourceType } from '@/domain/policy-assignment'
 
 export interface AssignmentConfiguratorProps {
 	orgId: string
@@ -31,11 +32,11 @@ export function AssignmentConfigurator({
 	const { data: props } = usePropsList()
 	const { data: units } = useUnitsList()
 
-	const handleResourceTypeChange = (type: AssignmentConfigValue['resourceType']) => {
+	const handleResourceTypeChange = (type: ResourceType) => {
 		onChange({
 			...value,
 			resourceType: type,
-			resourceId: type === 'ORG' ? orgId : '',
+			resourceId: type === ResourceType.ORG ? orgId : '',
 		})
 	}
 
@@ -47,20 +48,18 @@ export function AssignmentConfigurator({
 				<Select
 					value={value.resourceType}
 					onChange={(e) =>
-						handleResourceTypeChange(
-							e.target.value as AssignmentConfigValue['resourceType'],
-						)
+						handleResourceTypeChange(e.target.value as ResourceType)
 					}
 				>
-					<option value="ORG">Organization</option>
-					<option value="PROPERTY">Property</option>
-					<option value="UNIT">Unit</option>
+					<option value={ResourceType.ORG}>Organization</option>
+					<option value={ResourceType.PROPERTY}>Property</option>
+					<option value={ResourceType.UNIT}>Unit</option>
 				</Select>
 				<FieldError message={errors?.resourceType?.message} />
 			</div>
 
 			{/* Resource picker — hidden for ORG (auto-set to orgId) */}
-			{value.resourceType === 'PROPERTY' && (
+			{value.resourceType === ResourceType.PROPERTY && (
 				<div className="space-y-2">
 					<Label>Property</Label>
 					<Select
@@ -78,7 +77,7 @@ export function AssignmentConfigurator({
 				</div>
 			)}
 
-			{value.resourceType === 'UNIT' && (
+			{value.resourceType === ResourceType.UNIT && (
 				<div className="space-y-2">
 					<Label>Unit</Label>
 					<Select
@@ -125,7 +124,9 @@ export function AssignmentConfigurator({
 						<PermissionPolicySelect
 							orgId={orgId}
 							value={value.policyId ?? ''}
-							onChange={(id) => onChange({ ...value, policyId: id || undefined })}
+							onChange={(id) =>
+								onChange({ ...value, policyId: id || undefined })
+							}
 						/>
 					</div>
 				) : (

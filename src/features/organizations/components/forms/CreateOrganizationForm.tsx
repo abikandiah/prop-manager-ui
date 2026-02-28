@@ -9,6 +9,7 @@ import { Input } from '@abumble/design-system/components/Input'
 import { Label } from '@abumble/design-system/components/Label'
 import { FieldError } from '@/components/ui/FieldError'
 import { RequiredMark } from '@/components/ui'
+import { FormActions } from '@/components/ui/FormCard'
 import { useCreateOrganization } from '@/features/organizations'
 
 const createOrganizationSchema = z.object({
@@ -77,20 +78,18 @@ export function CreateOrganizationForm({
 				<FieldError message={errors.name?.message} />
 			</div>
 
-			<Button
-				type="submit"
-				className="w-full"
-				disabled={createOrganization.isPending}
-			>
-				{createOrganization.isPending ? (
-					'Creating…'
-				) : (
-					<>
-						<Building2 className="h-4 w-4" />
-						Create organization
-					</>
-				)}
-			</Button>
+			<FormActions>
+				<Button type="submit" disabled={createOrganization.isPending}>
+					{createOrganization.isPending ? (
+						'Creating…'
+					) : (
+						<>
+							<Building2 className="h-4 w-4" />
+							Create organization
+						</>
+					)}
+				</Button>
+			</FormActions>
 		</form>
 	)
 }

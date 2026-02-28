@@ -242,20 +242,11 @@ function InviteActionCard({
 	const isLease = targetType === TargetType.LEASE
 
 	if (!user) {
+		const description = isLease
+			? 'Register to accept this invite and access your lease.'
+			: `Register to accept this invite and join ${organizationName}.`
 		return (
-			<Card>
-				<CardHeader>
-					<CardTitle className="text-base">Create your account</CardTitle>
-					<p className="text-sm text-muted-foreground">
-						{isLease
-							? 'Register to accept this invite and access your lease.'
-							: `Register to accept this invite and join ${organizationName}.`}
-					</p>
-				</CardHeader>
-				<CardContent>
-					<RegisterForm />
-				</CardContent>
-			</Card>
+			<RegisterForm title="Create your account" description={description} />
 		)
 	}
 

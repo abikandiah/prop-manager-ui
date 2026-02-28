@@ -17,10 +17,7 @@ import { TableSkeleton, EntityActions } from '@/components/ui'
 import { config } from '@/config'
 import { formatDate } from '@/lib/format'
 import { useAuth } from '@/contexts/auth'
-import {
-	useDeletePermissionPolicy,
-	usePermissionPolicies,
-} from '../../hooks'
+import { useDeletePermissionPolicy, usePermissionPolicies } from '../../hooks'
 import { PermissionPolicyForm } from '../forms/PermissionPolicyForm'
 import { FORM_DIALOG_CLASS } from '@/lib/dialog'
 
@@ -29,7 +26,9 @@ export interface PermissionPoliciesTableViewProps {
 }
 
 /** Summarises flat permissions as a short human-readable string, e.g. "l:rcud · m:r". */
-function formatPermissions(permissions: PermissionPolicy['permissions']): string {
+function formatPermissions(
+	permissions: PermissionPolicy['permissions'],
+): string {
 	const entries = Object.entries(permissions).filter(([, v]) => v)
 	if (entries.length === 0) return '—'
 	return entries.map(([k, v]) => `${k}:${v}`).join(' · ')
@@ -175,9 +174,7 @@ export function PermissionPoliciesTableView({
 											</TableCell>
 											<TableCell>
 												<EntityActions
-													onEdit={
-														canMutate ? () => setEditing(policy) : false
-													}
+													onEdit={canMutate ? () => setEditing(policy) : false}
 													onDelete={() => handleDelete(policy)}
 													isDeletePending={deletePolicy.isPending}
 													disableDelete={!canMutate}

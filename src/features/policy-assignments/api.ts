@@ -66,10 +66,9 @@ class PolicyAssignmentsApi {
 		assignmentId: string,
 		headers?: Record<string, string>,
 	): Promise<void> {
-		await api.delete(
-			`${this.endpoint(orgId, membershipId)}/${assignmentId}`,
-			{ headers },
-		)
+		await api.delete(`${this.endpoint(orgId, membershipId)}/${assignmentId}`, {
+			headers,
+		})
 	}
 }
 

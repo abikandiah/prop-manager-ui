@@ -1,3 +1,5 @@
+import { ResourceType } from '@/domain/policy-assignment'
+
 /**
  * Bitwise action flags for permission checks.
  * Combine with bitwise OR to represent multiple permissions.
@@ -38,7 +40,7 @@ export function hasAccess(userMask: number, requiredAction: number): boolean {
  */
 export type AccessEntry = {
 	orgId: string
-	scopeType: 'ORG' | 'PROPERTY' | 'UNIT'
+	scopeType: ResourceType
 	scopeId: string
 	permissions: Record<string, number>
 }
@@ -75,7 +77,7 @@ export function usePermissions(): AccessEntry[] {
  * @param access - Access entries returned by usePermissions()
  * @param action - The action flag to test (from Actions)
  * @param domain - The permission domain key (from PermissionDomains)
- * @param scopeType - The scope type to match ('ORG' | 'PROPERTY' | 'UNIT')
+ * @param scopeType - The scope type to match (from ResourceType)
  * @param scopeId - The scope ID to match
  * @returns true if a matching entry exists and grants the required action for the domain
  */
@@ -83,7 +85,7 @@ export function can(
 	access: AccessEntry[],
 	action: number,
 	domain: string,
-	scopeType: string,
+	scopeType: ResourceType,
 	scopeId: string,
 ): boolean {
 	if (access.length === 0) return false

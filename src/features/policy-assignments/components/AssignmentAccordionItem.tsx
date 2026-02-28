@@ -124,10 +124,7 @@ export function AssignmentAccordionItem({
 						isSaving={updateAssignment.isPending}
 					/>
 				) : (
-					<PermissionMatrixEditor
-						value={effectivePermissions}
-						readOnly
-					/>
+					<PermissionMatrixEditor value={effectivePermissions} readOnly />
 				)}
 			</AccordionContent>
 		</AccordionItem>
@@ -184,7 +181,13 @@ function EditAssignmentInline({
 				permissions.
 			</p>
 			<div className="flex gap-2 justify-end">
-				<Button type="button" variant="outline" size="sm" onClick={onCancel} disabled={isSaving}>
+				<Button
+					type="button"
+					variant="outline"
+					size="sm"
+					onClick={onCancel}
+					disabled={isSaving}
+				>
 					Close
 				</Button>
 			</div>

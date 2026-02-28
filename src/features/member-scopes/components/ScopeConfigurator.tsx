@@ -28,7 +28,10 @@ import {
 import { usePropsList } from '@/features/props'
 import { useUnitsList } from '@/features/units'
 import type { ScopeConfigValue, ScopeType } from '@/domain/member-scope'
-import { getTemplatePermissions, normalizePermString } from '@/features/member-scopes/utils'
+import {
+	getTemplatePermissions,
+	normalizePermString,
+} from '@/features/member-scopes/utils'
 
 export interface ScopeConfiguratorProps {
 	orgId: string
@@ -76,7 +79,10 @@ export function ScopeConfigurator({
 		const merged = { ...globalInheritedPermissions }
 		Object.entries(local).forEach(([domain, actions]) => {
 			const current = merged[domain] ?? ''
-			const unique = actions.split('').filter((a) => !current.includes(a)).join('')
+			const unique = actions
+				.split('')
+				.filter((a) => !current.includes(a))
+				.join('')
 			merged[domain] = normalizePermString(current + unique)
 		})
 		return merged
@@ -133,7 +139,9 @@ export function ScopeConfigurator({
 			{/* Resource Selection */}
 			<div className="grid gap-4 sm:grid-cols-2">
 				<div className="space-y-2">
-					<Label>Scope Level <RequiredMark /></Label>
+					<Label>
+						Scope Level <RequiredMark />
+					</Label>
 					<Select
 						value={value.scopeType}
 						onChange={(e) => handleTypeChange(e.target.value as ScopeType)}
@@ -149,7 +157,8 @@ export function ScopeConfigurator({
 				{value.scopeType !== 'ORG' && (
 					<div className="space-y-2">
 						<Label>
-							{value.scopeType === 'PROPERTY' ? 'Property' : 'Unit'} <RequiredMark />
+							{value.scopeType === 'PROPERTY' ? 'Property' : 'Unit'}{' '}
+							<RequiredMark />
 						</Label>
 						{value.scopeType === 'PROPERTY' ? (
 							<Select
@@ -157,15 +166,18 @@ export function ScopeConfigurator({
 								onChange={(e) => handleResourceChange(e.target.value)}
 								disabled={lockedResource || propsLoading}
 							>
-								{propsLoading
-									? <option>Loading…</option>
-									: <>
-											<option value="">Select a property...</option>
-											{props?.map((p) => (
-												<option key={p.id} value={p.id}>{p.legalName}</option>
-											))}
-										</>
-								}
+								{propsLoading ? (
+									<option>Loading…</option>
+								) : (
+									<>
+										<option value="">Select a property...</option>
+										{props?.map((p) => (
+											<option key={p.id} value={p.id}>
+												{p.legalName}
+											</option>
+										))}
+									</>
+								)}
 							</Select>
 						) : (
 							<Popover open={unitComboOpen} onOpenChange={setUnitComboOpen}>
@@ -180,7 +192,8 @@ export function ScopeConfigurator({
 									>
 										{unitsLoading
 											? 'Loading…'
-											: (units?.find((u) => u.id === value.scopeId)?.unitNumber ?? 'Select a unit...')}
+											: (units?.find((u) => u.id === value.scopeId)
+													?.unitNumber ?? 'Select a unit...')}
 										<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
 									</Button>
 								</PopoverTrigger>
@@ -190,7 +203,10 @@ export function ScopeConfigurator({
 										<CommandList>
 											<CommandEmpty>No units found.</CommandEmpty>
 											{unitsByProperty.map((group) => (
-												<CommandGroup key={group.propId} heading={group.propName}>
+												<CommandGroup
+													key={group.propId}
+													heading={group.propName}
+												>
 													{group.units.map((u) => (
 														<CommandItem
 															key={u.id}
@@ -200,7 +216,14 @@ export function ScopeConfigurator({
 																setUnitComboOpen(false)
 															}}
 														>
-															<Check className={cn('mr-2 h-4 w-4', value.scopeId === u.id ? 'opacity-100' : 'opacity-0')} />
+															<Check
+																className={cn(
+																	'mr-2 h-4 w-4',
+																	value.scopeId === u.id
+																		? 'opacity-100'
+																		: 'opacity-0',
+																)}
+															/>
 															{u.unitNumber}
 														</CommandItem>
 													))}
@@ -236,7 +259,9 @@ export function ScopeConfigurator({
 			{/* Template Selection — only reachable when template mode is available and active */}
 			{!hideTemplateMode && value.useTemplate ? (
 				<div className="space-y-2">
-					<Label>Select Role <RequiredMark /></Label>
+					<Label>
+						Select Role <RequiredMark />
+					</Label>
 					<PermissionTemplateSelect
 						id="template-select"
 						orgId={orgId}
@@ -262,7 +287,9 @@ export function ScopeConfigurator({
 			) : (
 				/* Manual Permissions */
 				<div className="space-y-2">
-					<Label>Define Permissions <RequiredMark /></Label>
+					<Label>
+						Define Permissions <RequiredMark />
+					</Label>
 					<PermissionMatrixEditor
 						value={value.permissions}
 						onChange={handlePermissionsChange}

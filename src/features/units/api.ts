@@ -9,9 +9,9 @@ class UnitsApi extends BaseService<Unit, CreateUnitPayload, UpdateUnitPayload> {
 		super(ENDPOINT)
 	}
 
-	async listByPropId(propId: string): Promise<Array<Unit>> {
+	override async list(propId?: string): Promise<Array<Unit>> {
 		const res = await api.get<Array<Unit>>(this.endpoint, {
-			params: { propId },
+			params: propId ? { propId } : {},
 		})
 		return res.data
 	}

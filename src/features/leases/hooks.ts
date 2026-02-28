@@ -586,7 +586,6 @@ export function useInviteLeaseTenants() {
 	})
 }
 
-
 export type RemoveLeaseTenantVariables = {
 	leaseId: string
 	leaseTenantId: string

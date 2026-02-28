@@ -27,10 +27,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useOrganization } from '@/contexts/organization'
 import { useResendInvite } from '@/features/invites/hooks'
 import { leaseTenantKeys } from '@/features/leases/keys'
-import {
-	useLeaseTenants,
-	useRemoveLeaseTenant,
-} from '@/features/leases/hooks'
+import { useLeaseTenants, useRemoveLeaseTenant } from '@/features/leases/hooks'
 import { InviteTenantsForm } from '../forms/InviteTenantsForm'
 
 // ---------- Badge helpers ----------
@@ -211,76 +208,76 @@ export function LeaseTenantsList({ leaseId, isDraft }: LeaseTenantListProps) {
 
 	const tableContent = (
 		<div className="rounded-lg border bg-card overflow-hidden">
-				{/* Card header */}
-				<div className="flex items-center justify-between px-5 py-4">
-					<p className={DETAIL_LABEL_CLASS}>Tenants</p>
-					{isDraft && (
-						<Button variant="outline" size="sm" onClick={inviteDialog.open}>
-							<UserPlus className="size-4" />
-							Invite tenants
-						</Button>
-					)}
-				</div>
+			{/* Card header */}
+			<div className="flex items-center justify-between px-5 py-4">
+				<p className={DETAIL_LABEL_CLASS}>Tenants</p>
+				{isDraft && (
+					<Button variant="outline" size="sm" onClick={inviteDialog.open}>
+						<UserPlus className="size-4" />
+						Invite tenants
+					</Button>
+				)}
+			</div>
 
-				{/* Table */}
-				<Table className="[&_th:first-child]:pl-5 [&_td:first-child]:pl-5 [&_th:last-child]:pr-5 [&_td:last-child]:pr-5">
-					<TableHeader>
+			{/* Table */}
+			<Table className="[&_th:first-child]:pl-5 [&_td:first-child]:pl-5 [&_th:last-child]:pr-5 [&_td:last-child]:pr-5">
+				<TableHeader>
+					<TableRow>
+						<TableHead>Email</TableHead>
+						<TableHead>Role</TableHead>
+						<TableHead>Status</TableHead>
+						<TableHead>Invited</TableHead>
+						{hasActions && <TableHead className="w-12" />}
+					</TableRow>
+				</TableHeader>
+				<TableBody>
+					{tenants.length === 0 ? (
 						<TableRow>
-							<TableHead>Email</TableHead>
-							<TableHead>Role</TableHead>
-							<TableHead>Status</TableHead>
-							<TableHead>Invited</TableHead>
-							{hasActions && <TableHead className="w-12" />}
+							<TableCell
+								colSpan={totalCols}
+								className="h-20 text-center text-muted-foreground"
+							>
+								{isDraft
+									? 'No tenants yet. Use "Invite tenants" to add people to this lease.'
+									: 'No tenants on this lease.'}
+							</TableCell>
 						</TableRow>
-					</TableHeader>
-					<TableBody>
-						{tenants.length === 0 ? (
-							<TableRow>
-								<TableCell
-									colSpan={totalCols}
-									className="h-20 text-center text-muted-foreground"
-								>
-									{isDraft
-										? 'No tenants yet. Use "Invite tenants" to add people to this lease.'
-										: 'No tenants on this lease.'}
+					) : (
+						tenants.map((tenant) => (
+							<TableRow key={tenant.id}>
+								<TableCell className="font-medium">{tenant.email}</TableCell>
+								<TableCell>
+									<Badge variant={roleVariant(tenant.role)}>
+										{formatEnumLabel(tenant.role)}
+									</Badge>
 								</TableCell>
-							</TableRow>
-						) : (
-							tenants.map((tenant) => (
-								<TableRow key={tenant.id}>
-									<TableCell className="font-medium">{tenant.email}</TableCell>
+								<TableCell>
+									<InviteStatusBadge
+										status={tenant.status === 'INVITED' ? 'PENDING' : 'ACTIVE'}
+										lastResentAt={tenant.lastResentAt}
+										expiresAt={tenant.expiresAt}
+										emailStatus={tenant.emailStatus}
+										emailError={tenant.emailError}
+									/>
+								</TableCell>
+								<TableCell className="text-muted-foreground">
+									{formatDate(tenant.invitedDate)}
+								</TableCell>
+								{hasActions && (
 									<TableCell>
-										<Badge variant={roleVariant(tenant.role)}>
-											{formatEnumLabel(tenant.role)}
-										</Badge>
-									</TableCell>
-									<TableCell>
-										<InviteStatusBadge
-											status={tenant.status === 'INVITED' ? 'PENDING' : 'ACTIVE'}
-											lastResentAt={tenant.lastResentAt}
-											expiresAt={tenant.expiresAt}
-											emailStatus={tenant.emailStatus}
-											emailError={tenant.emailError}
+										<TenantRowActions
+											tenant={tenant}
+											leaseId={leaseId}
+											isDraft={isDraft}
 										/>
 									</TableCell>
-									<TableCell className="text-muted-foreground">
-										{formatDate(tenant.invitedDate)}
-									</TableCell>
-									{hasActions && (
-										<TableCell>
-											<TenantRowActions
-												tenant={tenant}
-												leaseId={leaseId}
-												isDraft={isDraft}
-											/>
-										</TableCell>
-									)}
-								</TableRow>
-							))
-						)}
-					</TableBody>
-				</Table>
-			</div>
+								)}
+							</TableRow>
+						))
+					)}
+				</TableBody>
+			</Table>
+		</div>
 	)
 
 	return (

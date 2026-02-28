@@ -68,9 +68,11 @@ export function MembershipDetailView({
 	const resendInvite = useResendInvite()
 	const revokeInvite = useRevokeInvite()
 	const queryClient = useQueryClient()
-	
+
 	const [confirmOpen, setConfirmOpen] = useState(false)
-	const [confirmAction, setConfirmAction] = useState<'remove' | 'revoke' | null>(null)
+	const [confirmAction, setConfirmAction] = useState<
+		'remove' | 'revoke' | null
+	>(null)
 	const [addScopeOpen, setAddScopeOpen] = useState(false)
 	const [editingScopeId, setEditingScopeId] = useState<string | null>(null)
 
@@ -101,8 +103,12 @@ export function MembershipDetailView({
 			revokeInvite.mutate(membership.inviteId, {
 				onSuccess: () => toast.success('Invitation revoked'),
 				onSettled: () => {
-					queryClient.invalidateQueries({ queryKey: membershipKeys.detail(orgId, membershipId) })
-					queryClient.invalidateQueries({ queryKey: membershipKeys.list(orgId) })
+					queryClient.invalidateQueries({
+						queryKey: membershipKeys.detail(orgId, membershipId),
+					})
+					queryClient.invalidateQueries({
+						queryKey: membershipKeys.list(orgId),
+					})
 				},
 			})
 		} else {
@@ -229,9 +235,10 @@ export function MembershipDetailView({
 							) : (
 								<Accordion type="multiple" className="w-full">
 									{scopes.map((scope) => {
-										const inherited = template?.items.find(
-											(i) => i.scopeType === scope.scopeType,
-										)?.permissions ?? {}
+										const inherited =
+											template?.items.find(
+												(i) => i.scopeType === scope.scopeType,
+											)?.permissions ?? {}
 
 										return (
 											<ScopeAccordionItem

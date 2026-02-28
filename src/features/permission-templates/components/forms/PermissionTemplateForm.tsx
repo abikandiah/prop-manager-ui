@@ -244,7 +244,8 @@ export function PermissionTemplateForm({
 					</AccordionTrigger>
 					<AccordionContent className="pt-0 pb-4 px-1">
 						<p className="text-sm text-muted-foreground mb-3">
-							Applied per property when a binding scope row exists for that property.
+							Applied per property when a binding scope row exists for that
+							property.
 						</p>
 						<Controller
 							name="propertyPermissions"

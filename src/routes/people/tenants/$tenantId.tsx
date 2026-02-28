@@ -102,7 +102,7 @@ function TenantDetailPage() {
 						{tenant.notes && (
 							<div className="md:col-span-2 border-t pt-4">
 								<DetailField
-									label='Notes'
+									label="Notes"
 									valueClassName="text-foreground whitespace-pre-wrap leading-relaxed"
 								>
 									{tenant.notes}

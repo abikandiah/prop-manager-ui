@@ -15,10 +15,13 @@ export const scopeConfigSchema = z
 			path: ['scopeId'],
 		},
 	)
-	.refine((data) => !data.useTemplate || (data.templateId?.trim().length ?? 0) > 0, {
-		message: 'Select a template',
-		path: ['templateId'],
-	})
+	.refine(
+		(data) => !data.useTemplate || (data.templateId?.trim().length ?? 0) > 0,
+		{
+			message: 'Select a template',
+			path: ['templateId'],
+		},
+	)
 	.refine(
 		(data) =>
 			data.useTemplate ||

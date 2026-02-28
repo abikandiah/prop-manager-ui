@@ -193,17 +193,14 @@ export function LeaseTemplateFormWizard({
 					},
 				)
 			} else {
-				createTemplateRef.current.mutate(
-					payloadFields,
-					{
-						onSuccess: () => {
-							toast.success('Template created')
-							reset(defaultValues)
-							setStep(1)
-							onSuccess?.()
-						},
+				createTemplateRef.current.mutate(payloadFields, {
+					onSuccess: () => {
+						toast.success('Template created')
+						reset(defaultValues)
+						setStep(1)
+						onSuccess?.()
 					},
-				)
+				})
 			}
 		},
 		[isEdit, initialTemplate, onSuccess, reset, setStep],

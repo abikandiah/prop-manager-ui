@@ -64,9 +64,7 @@ export function InviteStatusBadge({
 				<Tooltip>
 					<TooltipTrigger asChild>{badge}</TooltipTrigger>
 					<TooltipContent className="space-y-0.5">
-						{lastResentAt && (
-							<p>Last resent: {formatDateTime(lastResentAt)}</p>
-						)}
+						{lastResentAt && <p>Last resent: {formatDateTime(lastResentAt)}</p>}
 						{expiresAt && <p>Expires: {formatDateTime(expiresAt)}</p>}
 					</TooltipContent>
 				</Tooltip>

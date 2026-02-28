@@ -15,7 +15,10 @@ import { ConfirmDeleteDialog } from '@abumble/design-system/components/ConfirmDe
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
 import { useQueryClient } from '@tanstack/react-query'
 import { useResendInvite } from '@/features/invites/hooks'
-import { useMembershipsList, useDeleteMembership } from '@/features/memberships/hooks'
+import {
+	useMembershipsList,
+	useDeleteMembership,
+} from '@/features/memberships/hooks'
 import { membershipKeys } from '@/features/memberships/keys'
 import { useQueryErrorToast } from '@/lib/hooks'
 import { config } from '@/config'
@@ -58,12 +61,22 @@ export function MembershipsTableView({ orgId }: MembershipsTableViewProps) {
 						isLoading={isLoading}
 						delayMs={config.loadingFallbackDelayMs}
 						fallback={
-						<TableSkeleton
-							headers={['Member', 'Status', 'Joined/Invited', ...(hasActions ? [''] : [])]}
-							columnWidths={['w-48', 'w-24', 'w-32', ...(hasActions ? [''] : [])]}
-							rows={5}
-						/>
-					}
+							<TableSkeleton
+								headers={[
+									'Member',
+									'Status',
+									'Joined/Invited',
+									...(hasActions ? [''] : []),
+								]}
+								columnWidths={[
+									'w-48',
+									'w-24',
+									'w-32',
+									...(hasActions ? [''] : []),
+								]}
+								rows={5}
+							/>
+						}
 					>
 						{!members || members.length === 0 ? (
 							<TableRow>
@@ -119,9 +132,7 @@ export function MembershipsTableView({ orgId }: MembershipsTableViewProps) {
 									<TableCell>
 										<InviteStatusBadge
 											status={
-												m.userId
-													? 'ACTIVE'
-													: (m.inviteStatus ?? 'PENDING')
+												m.userId ? 'ACTIVE' : (m.inviteStatus ?? 'PENDING')
 											}
 											lastResentAt={m.lastResentAt}
 											expiresAt={m.expiresAt}

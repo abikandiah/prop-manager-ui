@@ -30,7 +30,10 @@ class InvitesApi {
 	/**
 	 * Accept an invitation.
 	 */
-	async accept(token: string, headers?: Record<string, string>): Promise<Invite> {
+	async accept(
+		token: string,
+		headers?: Record<string, string>,
+	): Promise<Invite> {
 		const res = await api.post<Invite>(`invites/${token}/accept`, undefined, {
 			headers,
 		})

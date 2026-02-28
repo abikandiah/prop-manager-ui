@@ -11,7 +11,10 @@ import { generateId, nowIso } from '@/lib/util'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
 
 /** Payload for create without id — the hook generates it. */
-export type CreateMemberScopePayloadWithoutId = Omit<CreateMemberScopePayload, 'id'>
+export type CreateMemberScopePayloadWithoutId = Omit<
+	CreateMemberScopePayload,
+	'id'
+>
 
 // --- Queries ---
 
@@ -62,7 +65,9 @@ export function useCreateMemberScope() {
 			})
 		},
 		onMutate: async ({ orgId, membershipId, payload }) => {
-			await queryClient.cancelQueries({ queryKey: memberScopeKeys.list(orgId, membershipId) })
+			await queryClient.cancelQueries({
+				queryKey: memberScopeKeys.list(orgId, membershipId),
+			})
 			const previous = queryClient.getQueryData<MemberScope[]>(
 				memberScopeKeys.list(orgId, membershipId),
 			)
@@ -78,13 +83,17 @@ export function useCreateMemberScope() {
 			}
 			queryClient.setQueryData(
 				memberScopeKeys.list(orgId, membershipId),
-				(old: MemberScope[] | undefined) => old ? [...old, optimistic] : [optimistic],
+				(old: MemberScope[] | undefined) =>
+					old ? [...old, optimistic] : [optimistic],
 			)
 			return { previous }
 		},
 		onError: (_err, { orgId, membershipId }, context) => {
 			if (context?.previous) {
-				queryClient.setQueryData(memberScopeKeys.list(orgId, membershipId), context.previous)
+				queryClient.setQueryData(
+					memberScopeKeys.list(orgId, membershipId),
+					context.previous,
+				)
 			}
 		},
 		onSettled: (_data, _err, { orgId, membershipId }) => {
@@ -97,13 +106,29 @@ export function useCreateMemberScope() {
 	return {
 		...mutation,
 		mutate: (
-			args: { orgId: string; membershipId: string; payload: CreateMemberScopePayloadWithoutId },
+			args: {
+				orgId: string
+				membershipId: string
+				payload: CreateMemberScopePayloadWithoutId
+			},
 			options?: Parameters<typeof mutation.mutate>[1],
-		) => mutation.mutate({ ...args, payload: { ...args.payload, id: generateId() } }, options),
+		) =>
+			mutation.mutate(
+				{ ...args, payload: { ...args.payload, id: generateId() } },
+				options,
+			),
 		mutateAsync: (
-			args: { orgId: string; membershipId: string; payload: CreateMemberScopePayloadWithoutId },
+			args: {
+				orgId: string
+				membershipId: string
+				payload: CreateMemberScopePayloadWithoutId
+			},
 			options?: Parameters<typeof mutation.mutateAsync>[1],
-		) => mutation.mutateAsync({ ...args, payload: { ...args.payload, id: generateId() } }, options),
+		) =>
+			mutation.mutateAsync(
+				{ ...args, payload: { ...args.payload, id: generateId() } },
+				options,
+			),
 	}
 }
 

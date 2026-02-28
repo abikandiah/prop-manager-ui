@@ -129,7 +129,7 @@ export function useUnitsByPropId(propId: string | null) {
 	const { activeOrgId } = useOrganization()
 	return useQuery({
 		queryKey: unitKeys.list(activeOrgId!, propId),
-		queryFn: () => unitsApi.listByPropId(propId!),
+		queryFn: () => unitsApi.list(propId!),
 		enabled: !!activeOrgId && propId != null,
 	})
 }

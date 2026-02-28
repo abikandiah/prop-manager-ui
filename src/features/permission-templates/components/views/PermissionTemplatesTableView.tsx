@@ -184,7 +184,9 @@ export function PermissionTemplatesTableView({
 											</TableCell>
 											<TableCell>
 												<EntityActions
-													onEdit={canMutate ? () => setEditing(template) : false}
+													onEdit={
+														canMutate ? () => setEditing(template) : false
+													}
 													onDelete={() => handleDelete(template)}
 													isDeletePending={deleteTemplate.isPending}
 													disableDelete={!canMutate}
@@ -197,8 +199,7 @@ export function PermissionTemplatesTableView({
 																	{
 																		label: 'Duplicate',
 																		icon: <Copy className="size-4 shrink-0" />,
-																		onClick: () =>
-																			setDuplicating(template),
+																		onClick: () => setDuplicating(template),
 																	},
 																]
 															: []

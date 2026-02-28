@@ -48,7 +48,8 @@ function deriveScopeLabel(scope: ScopeConfigValue, index: number): string {
 
 function describeTemplateCoverage(scopeTypes: ScopeType[]): string {
 	const nonOrg = scopeTypes.filter((t) => t !== 'ORG')
-	if (nonOrg.length === 0) return 'Applies to the whole organization — no resource selection needed.'
+	if (nonOrg.length === 0)
+		return 'Applies to the whole organization — no resource selection needed.'
 	const labels = nonOrg.map((t) => (t === 'PROPERTY' ? 'properties' : 'units'))
 	return `Select the ${labels.join(' and ')} this role should apply to.`
 }
@@ -206,10 +207,13 @@ export function InviteMemberForm({
 					<p className="text-xs text-muted-foreground">
 						{describeTemplateCoverage(templateScopeTypes)}
 					</p>
-				) : allTemplates && (
-					<p className="text-xs text-muted-foreground">
-						No role selected — use custom scopes below to grant specific permissions.
-					</p>
+				) : (
+					allTemplates && (
+						<p className="text-xs text-muted-foreground">
+							No role selected — use custom scopes below to grant specific
+							permissions.
+						</p>
+					)
 				)}
 			</div>
 
@@ -268,9 +272,11 @@ export function InviteMemberForm({
 														onChange={onChange}
 														hideTemplateMode
 														errors={{
-															scopeType: errors.customScopes?.[index]?.scopeType,
+															scopeType:
+																errors.customScopes?.[index]?.scopeType,
 															scopeId: errors.customScopes?.[index]?.scopeId,
-															permissions: errors.customScopes?.[index]?.permissions,
+															permissions:
+																errors.customScopes?.[index]?.permissions,
 														}}
 													/>
 												)}

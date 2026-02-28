@@ -10,7 +10,10 @@ import { Button } from '@abumble/design-system/components/Button'
 import { Badge } from '@abumble/design-system/components/Badge'
 import { ConfirmDeleteDialog } from '@abumble/design-system/components/ConfirmDeleteDialog'
 import { PermissionMatrixEditor } from '@/features/permission-templates'
-import { useUpdateMemberScope, useDeleteMemberScope } from '@/features/member-scopes/hooks'
+import {
+	useUpdateMemberScope,
+	useDeleteMemberScope,
+} from '@/features/member-scopes/hooks'
 import type { MemberScope } from '@/domain/member-scope'
 
 export interface ScopeAccordionItemProps {
@@ -43,9 +46,9 @@ export function ScopeAccordionItem({
 	const [deleteOpen, setDeleteOpen] = useState(false)
 
 	// Editing state — simple permissions map, no ScopeConfigValue needed
-	const [editPermissions, setEditPermissions] = useState<Record<string, string>>(
-		scope.permissions,
-	)
+	const [editPermissions, setEditPermissions] = useState<
+		Record<string, string>
+	>(scope.permissions)
 
 	// Reset to server state whenever edit mode opens
 	useEffect(() => {
@@ -100,7 +103,10 @@ export function ScopeAccordionItem({
 						</div>
 
 						{!isEditing && (
-							<div className="flex items-center gap-1" onClick={(e) => e.stopPropagation()}>
+							<div
+								className="flex items-center gap-1"
+								onClick={(e) => e.stopPropagation()}
+							>
 								<Button
 									variant="ghost"
 									size="icon"

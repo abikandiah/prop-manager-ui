@@ -13,5 +13,7 @@ export function getTemplatePermissions(
 	scopeType: ScopeType,
 ): Record<string, string> {
 	if (!template) return {}
-	return template.items.find((i) => i.scopeType === scopeType)?.permissions ?? {}
+	return (
+		template.items.find((i) => i.scopeType === scopeType)?.permissions ?? {}
+	)
 }

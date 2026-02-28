@@ -232,7 +232,8 @@ export function TemplateScopeBindings({
 							{unitIds.map((id) => {
 								const unit = units?.find((u) => u.id === id)
 								const propName = unit
-									? (props?.find((p) => p.id === unit.propertyId)?.legalName ?? '')
+									? (props?.find((p) => p.id === unit.propertyId)?.legalName ??
+										'')
 									: ''
 								return (
 									<li
@@ -241,7 +242,9 @@ export function TemplateScopeBindings({
 									>
 										{unit?.unitNumber ?? id}
 										{propName && (
-											<span className="ml-1 text-muted-foreground">· {propName}</span>
+											<span className="ml-1 text-muted-foreground">
+												· {propName}
+											</span>
 										)}
 									</li>
 								)

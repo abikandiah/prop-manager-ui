@@ -1,10 +1,7 @@
 import type { LateFeeType, Lease } from '@/domain/lease'
 import { useLeaseTemplateDetail } from '@/features/lease-templates'
 import { useCreateLease, useUpdateLease } from '@/features/leases/hooks'
-import {
-	parseFloatOrUndefined,
-	parseIntOrUndefined,
-} from '@/lib/util'
+import { parseFloatOrUndefined, parseIntOrUndefined } from '@/lib/util'
 import { Button } from '@abumble/design-system/components/Button'
 import { DialogFooter } from '@abumble/design-system/components/Dialog'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'

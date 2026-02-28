@@ -231,7 +231,7 @@ export function useCreateProp() {
 
 - `networkMode: 'online'` on **all** mutations.
 - `stableRequestId()` + `IDEMPOTENCY_HEADER` on every mutation call.
-- **Hook-level ID generation**: Wrap the mutation to call `generateId()` automatically. The form should pass the payload *without* an ID.
+- **Hook-level ID generation**: Wrap the mutation to call `generateId()` automatically. The form should pass the payload _without_ an ID.
 - Use `payload.id` in `onMutate` (the hook already injected it).
 - Rollback in `onError`, invalidate in `onSettled`.
 

@@ -138,7 +138,9 @@ export function CreateScopeForm({
 					payload: {
 						scopeType: values.scopeType as ScopeType,
 						scopeId: resolvedScopeId,
-						permissions: values.customizePermissions ? values.permissions : undefined,
+						permissions: values.customizePermissions
+							? values.permissions
+							: undefined,
 					},
 				},
 				{
@@ -295,7 +297,9 @@ export function CreateScopeForm({
 								checked={field.value}
 								onChange={(e) => field.onChange(e.target.checked)}
 							/>
-							<span className="text-sm">Override permissions for this scope</span>
+							<span className="text-sm">
+								Override permissions for this scope
+							</span>
 						</label>
 					)}
 				/>
@@ -314,7 +318,10 @@ export function CreateScopeForm({
 							)}
 						/>
 						<FieldError
-							message={(errors.permissions as { message?: string } | undefined)?.message}
+							message={
+								(errors.permissions as { message?: string } | undefined)
+									?.message
+							}
 						/>
 					</div>
 				)}

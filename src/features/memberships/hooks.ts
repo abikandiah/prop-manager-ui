@@ -9,7 +9,7 @@ import {
 } from '@/domain/membership'
 import { stableRequestId } from '@/lib/offline-types'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
-import { nowIso } from '@/lib/util'
+import { generateId, nowIso } from '@/lib/util'
 
 // --- Queries ---
 
@@ -56,11 +56,12 @@ export function useInviteMember() {
 				membershipKeys.list(orgId),
 			)
 			const optimistic: Membership = {
-				id: 'optimistic-invite',
+				id: generateId(),
 				userId: null,
 				userName: null,
 				userEmail: null,
 				organizationId: orgId,
+				membershipTemplateId: payload.templateId ?? null,
 				inviteId: null,
 				inviteEmail: payload.email,
 				inviteStatus: InviteStatus.PENDING,

@@ -11,6 +11,7 @@ export interface Membership {
 	userName: string | null
 	userEmail: string | null
 	organizationId: string
+	membershipTemplateId: string | null
 	inviteId: string | null
 	inviteEmail: string | null
 	inviteStatus: InviteStatus | null

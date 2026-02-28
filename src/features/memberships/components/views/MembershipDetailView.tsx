@@ -8,21 +8,32 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@abumble/design-system/components/Card'
-import { Badge } from '@abumble/design-system/components/Badge'
 import { Button } from '@abumble/design-system/components/Button'
 import { ConfirmDeleteDialog } from '@abumble/design-system/components/ConfirmDeleteDialog'
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+} from '@abumble/design-system/components/Dialog'
+import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion'
+import { Plus, RotateCcw, Trash2 } from 'lucide-react'
 import { useMembershipById, useDeleteMembership } from '@/features/memberships'
-import { useResendInvite } from '@/features/invites/hooks'
+import { useResendInvite, useRevokeInvite } from '@/features/invites/hooks'
 import { membershipKeys } from '@/features/memberships/keys'
 import { useMemberScopesList } from '@/features/member-scopes/hooks'
+import { CreateScopeForm } from '@/features/member-scopes/components/forms'
+import { ScopeAccordionItem } from '@/features/member-scopes/components/ScopeAccordionItem'
+import { usePropsList } from '@/features/props'
+import { useUnitsList } from '@/features/units'
+import { usePermissionTemplateDetail } from '@/features/permission-templates'
 import { useQueryErrorToast } from '@/lib/hooks'
 import { config } from '@/config'
 import { DetailField } from '@/components/ui'
 import { InviteStatusBadge } from '@/components/InviteStatusBadge'
 import { formatDateTime } from '@/lib/format'
 import { InviteStatus } from '@/domain/membership'
-import { RotateCcw, Trash2 } from 'lucide-react'
 
 export interface MembershipDetailViewProps {
 	orgId: string
@@ -44,11 +55,24 @@ export function MembershipDetailView({
 		orgId,
 		membershipId,
 	)
+	// Fetch resources for name resolution
+	const { data: props } = usePropsList()
+	const { data: units } = useUnitsList()
+
+	// Fetch main template to show inherited permissions
+	const { data: template } = usePermissionTemplateDetail(
+		membership?.membershipTemplateId ?? null,
+	)
+
 	const deleteMembership = useDeleteMembership()
 	const resendInvite = useResendInvite()
+	const revokeInvite = useRevokeInvite()
 	const queryClient = useQueryClient()
+	
 	const [confirmOpen, setConfirmOpen] = useState(false)
 	const [confirmAction, setConfirmAction] = useState<'remove' | 'revoke' | null>(null)
+	const [addScopeOpen, setAddScopeOpen] = useState(false)
+	const [editingScopeId, setEditingScopeId] = useState<string | null>(null)
 
 	useQueryErrorToast(isError, error, 'membership')
 
@@ -73,22 +97,41 @@ export function MembershipDetailView({
 
 	const handleConfirm = () => {
 		setConfirmOpen(false)
-		deleteMembership.mutate(
-			{ orgId, membershipId },
-			{
-				onSuccess: () => {
-					toast.success(
-						confirmAction === 'remove' ? 'Member removed' : 'Invitation revoked',
-					)
-					navigate({ to: '/organization/members', search: { orgId } })
+		if (confirmAction === 'revoke' && membership?.inviteId) {
+			revokeInvite.mutate(membership.inviteId, {
+				onSuccess: () => toast.success('Invitation revoked'),
+				onSettled: () => {
+					queryClient.invalidateQueries({ queryKey: membershipKeys.detail(orgId, membershipId) })
+					queryClient.invalidateQueries({ queryKey: membershipKeys.list(orgId) })
 				},
-			},
-		)
+			})
+		} else {
+			deleteMembership.mutate(
+				{ orgId, membershipId },
+				{
+					onSuccess: () => {
+						toast.success('Member removed')
+						navigate({ to: '/organization/members', search: { orgId } })
+					},
+				},
+			)
+		}
 	}
 
 	const openConfirm = (action: 'remove' | 'revoke') => {
 		setConfirmAction(action)
 		setConfirmOpen(true)
+	}
+
+	const resolveResourceName = (type: string, id: string) => {
+		if (type === 'ORG') return 'Organization Root'
+		if (type === 'PROPERTY') {
+			return props?.find((p) => p.id === id)?.legalName ?? id
+		}
+		if (type === 'UNIT') {
+			return units?.find((u) => u.id === id)?.unitNumber ?? id
+		}
+		return id
 	}
 
 	return (
@@ -135,7 +178,7 @@ export function MembershipDetailView({
 										<Button
 											variant="destructive"
 											onClick={() => openConfirm('revoke')}
-											disabled={deleteMembership.isPending}
+											disabled={revokeInvite.isPending}
 										>
 											<Trash2 className="mr-2 h-4 w-4" />
 											Revoke Invitation
@@ -166,8 +209,12 @@ export function MembershipDetailView({
 				</DelayedLoadingFallback>
 
 				<Card>
-					<CardHeader>
+					<CardHeader className="flex flex-row items-center justify-between">
 						<CardTitle>Permissions & Scopes</CardTitle>
+						<Button size="sm" onClick={() => setAddScopeOpen(true)}>
+							<Plus className="mr-2 h-4 w-4" />
+							Add Scope
+						</Button>
 					</CardHeader>
 					<CardContent>
 						<DelayedLoadingFallback
@@ -180,26 +227,37 @@ export function MembershipDetailView({
 									This member has no active permissions.
 								</p>
 							) : (
-								<div className="space-y-4">
-									{scopes.map((scope) => (
-										<div key={scope.id} className="rounded-lg border p-4">
-											<div className="flex items-center justify-between mb-2">
-												<span className="font-semibold text-sm">
-													{scope.scopeType} Scope
-												</span>
-												<Badge variant="outline">{scope.scopeId}</Badge>
-											</div>
-											<pre className="text-xs bg-muted p-2 rounded overflow-x-auto">
-												{JSON.stringify(scope.permissions, null, 2)}
-											</pre>
-										</div>
-									))}
-								</div>
+								<Accordion type="multiple" className="w-full">
+									{scopes.map((scope) => {
+										const inherited = template?.items.find(
+											(i) => i.scopeType === scope.scopeType,
+										)?.permissions ?? {}
+
+										return (
+											<ScopeAccordionItem
+												key={scope.id}
+												orgId={orgId}
+												membershipId={membershipId}
+												scope={scope}
+												resourceName={resolveResourceName(
+													scope.scopeType,
+													scope.scopeId,
+												)}
+												inheritedPermissions={inherited}
+												isEditing={editingScopeId === scope.id}
+												onEdit={() => setEditingScopeId(scope.id)}
+												onCancelEdit={() => setEditingScopeId(null)}
+												onSaveSuccess={() => setEditingScopeId(null)}
+											/>
+										)
+									})}
+								</Accordion>
 							)}
 						</DelayedLoadingFallback>
 					</CardContent>
 				</Card>
 			</div>
+
 			<ConfirmDeleteDialog
 				open={confirmOpen}
 				onOpenChange={setConfirmOpen}
@@ -212,8 +270,22 @@ export function MembershipDetailView({
 						: `The invitation to ${membership?.inviteEmail} will be cancelled. You can re-invite them later.`
 				}
 				onConfirm={handleConfirm}
-				isPending={deleteMembership.isPending}
+				isPending={deleteMembership.isPending || revokeInvite.isPending}
 			/>
+
+			<Dialog open={addScopeOpen} onOpenChange={setAddScopeOpen}>
+				<DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-lg max-h-[90vh] overflow-y-auto">
+					<DialogHeader>
+						<DialogTitle>Add Scope</DialogTitle>
+					</DialogHeader>
+					<CreateScopeForm
+						orgId={orgId}
+						membershipId={membershipId}
+						onSuccess={() => setAddScopeOpen(false)}
+						onCancel={() => setAddScopeOpen(false)}
+					/>
+				</DialogContent>
+			</Dialog>
 		</>
 	)
 }

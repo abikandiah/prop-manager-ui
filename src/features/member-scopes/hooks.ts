@@ -61,6 +61,32 @@ export function useCreateMemberScope() {
 				[IDEMPOTENCY_HEADER]: requestId,
 			})
 		},
+		onMutate: async ({ orgId, membershipId, payload }) => {
+			await queryClient.cancelQueries({ queryKey: memberScopeKeys.list(orgId, membershipId) })
+			const previous = queryClient.getQueryData<MemberScope[]>(
+				memberScopeKeys.list(orgId, membershipId),
+			)
+			const optimistic: MemberScope = {
+				id: payload.id,
+				scopeType: payload.scopeType,
+				scopeId: payload.scopeId,
+				permissions: payload.permissions ?? {},
+				membershipId,
+				version: 0,
+				createdAt: nowIso(),
+				updatedAt: nowIso(),
+			}
+			queryClient.setQueryData(
+				memberScopeKeys.list(orgId, membershipId),
+				(old: MemberScope[] | undefined) => old ? [...old, optimistic] : [optimistic],
+			)
+			return { previous }
+		},
+		onError: (_err, { orgId, membershipId }, context) => {
+			if (context?.previous) {
+				queryClient.setQueryData(memberScopeKeys.list(orgId, membershipId), context.previous)
+			}
+		},
 		onSettled: (_data, _err, { orgId, membershipId }) => {
 			queryClient.invalidateQueries({
 				queryKey: memberScopeKeys.list(orgId, membershipId),

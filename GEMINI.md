@@ -175,62 +175,63 @@ export function usePropById(id: string) {
 ### Mutation Hooks with Optimistic Updates (`hooks.ts`)
 
 ```typescript
+/** Payload for create without id — hook adds it before calling the API. */
+export type CreatePropPayloadWithoutId = Omit<CreatePropPayload, 'id'>
+
 export function useCreateProp() {
 	const queryClient = useQueryClient()
-	return useMutation({
+	const { activeOrgId } = useOrganization()
+
+	const mutation = useMutation({
 		mutationKey: ['createProp'],
-		networkMode: 'online', // Pause offline, auto-resume on reconnect
+		networkMode: 'online',
 		mutationFn: (payload: CreatePropPayload) => {
 			const requestId = stableRequestId(['createProp'], payload)
 			return propsApi.create(payload, { [IDEMPOTENCY_HEADER]: requestId })
 		},
-		onMutate: async (payload) => {
-			await queryClient.cancelQueries({ queryKey: propKeys.list() })
-			const previous = queryClient.getQueryData<Prop[]>(propKeys.list())
-			// Use payload.id — client pre-generated the ID
-			const optimistic: Prop = {
-				...payload,
-				version: 0,
-				createdAt: new Date().toISOString(),
-				updatedAt: new Date().toISOString(),
-			}
-			queryClient.setQueryData(propKeys.list(), (old: Prop[] | undefined) =>
-				old ? [...old, optimistic] : [optimistic],
+		onMutate: async (payload: CreatePropPayload) => {
+			await queryClient.cancelQueries({ queryKey: propKeys.list(activeOrgId!) })
+			const previousProps = queryClient.getQueryData<Array<Prop>>(
+				propKeys.list(activeOrgId!),
 			)
-			return { previous }
+			const optimistic = applyCreate(queryClient, payload, activeOrgId!)
+			return { previousProps, optimisticId: optimistic.id }
 		},
-		onError: (_err, _payload, context) => {
-			if (context?.previous)
-				queryClient.setQueryData(propKeys.list(), context.previous)
-		},
-		onSuccess: () => {
-			queryClient.invalidateQueries({ queryKey: propKeys.all })
-		},
+		// ... onError, onSuccess
 	})
+
+	return {
+		...mutation,
+		mutate: (
+			payload: CreatePropPayloadWithoutId,
+			options?: Parameters<typeof mutation.mutate>[1],
+		) => mutation.mutate({ ...payload, id: generateId() }, options),
+		mutateAsync: (
+			payload: CreatePropPayloadWithoutId,
+			options?: Parameters<typeof mutation.mutateAsync>[1],
+		) => mutation.mutateAsync({ ...payload, id: generateId() }, options),
+	}
 }
 ```
 
 **Key rules:**
 
-- `networkMode: 'online'` on **all** mutations
-- `stableRequestId()` + `IDEMPOTENCY_HEADER` on every mutation call
-- Call `generateId()` **before** building the payload (in the form component's submit handler)
-- Use `payload.id` in `onMutate` (not `generateId()`) — the ID is already in the payload
-- Rollback in `onError`, invalidate in `onSuccess` (or `onSettled` for always-invalidate)
+- `networkMode: 'online'` on **all** mutations.
+- `stableRequestId()` + `IDEMPOTENCY_HEADER` on every mutation call.
+- **Hook-level ID generation**: Wrap the mutation to call `generateId()` automatically. The form should pass the payload *without* an ID.
+- Use `payload.id` in `onMutate` (the hook already injected it).
+- Rollback in `onError`, invalidate in `onSettled`.
 
 ### ID Generation
 
 ```typescript
-import { generateId } from '@/lib'
-
-// In form submit handler or buildCreatePayload()
+// In form submit handler — no need to call generateId() manually
 function handleSubmit(values: FormValues) {
-	const payload: CreatePropPayload = {
-		id: generateId(), // Real UUID sent to backend — NOT a temporary ID
+	const payload: CreatePropPayloadWithoutId = {
 		legalName: values.legalName,
 		// ...
 	}
-	createProp(payload)
+	createProp(payload) // Hook adds the ID
 }
 ```
 

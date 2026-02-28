@@ -2,7 +2,6 @@ import type { LateFeeType, Lease } from '@/domain/lease'
 import { useLeaseTemplateDetail } from '@/features/lease-templates'
 import { useCreateLease, useUpdateLease } from '@/features/leases/hooks'
 import {
-	generateId,
 	parseFloatOrUndefined,
 	parseIntOrUndefined,
 } from '@/lib/util'
@@ -282,7 +281,6 @@ export function LeaseAgreementFormWizard({
 			} else {
 				createLease.mutate(
 					{
-						id: generateId(),
 						leaseTemplateId: values.leaseTemplateId,
 						propertyId: values.propertyId,
 						unitId: values.unitId,

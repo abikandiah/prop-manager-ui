@@ -5,9 +5,16 @@ import { z } from 'zod'
 import { toast } from 'sonner'
 import { Check } from 'lucide-react'
 import { Button } from '@abumble/design-system/components/Button'
+import { Badge } from '@abumble/design-system/components/Badge'
 import { DialogFooter } from '@abumble/design-system/components/Dialog'
 import { Input } from '@abumble/design-system/components/Input'
 import { Label } from '@abumble/design-system/components/Label'
+import {
+	Accordion,
+	AccordionItem,
+	AccordionTrigger,
+	AccordionContent,
+} from '@/components/ui/accordion'
 import type {
 	MembershipTemplateItem,
 	PermissionTemplate,
@@ -76,6 +83,10 @@ function formValuesToItems(
 	return items
 }
 
+function countPermissions(perms: Record<string, string>) {
+	return Object.values(perms).reduce((acc, val) => acc + val.length, 0)
+}
+
 // ---------- Props ----------
 
 export interface PermissionTemplateFormProps {
@@ -115,6 +126,7 @@ export function PermissionTemplateForm({
 		register,
 		control,
 		handleSubmit,
+		watch,
 		formState: { errors },
 	} = useForm<PermissionTemplateFormValues>({
 		resolver: standardSchemaResolver(permissionTemplateSchema),
@@ -124,6 +136,10 @@ export function PermissionTemplateForm({
 		},
 		mode: 'onTouched',
 	})
+
+	const orgPerms = watch('orgPermissions')
+	const propPerms = watch('propertyPermissions')
+	const unitPerms = watch('unitPermissions')
 
 	const onSubmit = useCallback(
 		(values: PermissionTemplateFormValues) => {
@@ -179,60 +195,98 @@ export function PermissionTemplateForm({
 				<FieldError message={errors.name?.message} />
 			</div>
 
-			<div className="space-y-2">
-				<Label>Organization-level permissions</Label>
-				<p className="text-sm text-muted-foreground">
-					Granted automatically to all holders — no resource binding needed.
-				</p>
-				<Controller
-					name="orgPermissions"
-					control={control}
-					render={({ field }) => (
-						<PermissionMatrixEditor
-							value={field.value}
-							onChange={field.onChange}
+			<Accordion
+				type="multiple"
+				defaultValue={['org']}
+				className="w-full space-y-2"
+			>
+				<AccordionItem value="org" className="border rounded-md px-2">
+					<AccordionTrigger className="hover:no-underline py-2">
+						<div className="flex items-center gap-2">
+							<span>Organization-level permissions</span>
+							{countPermissions(orgPerms) > 0 && (
+								<Badge variant="secondary" className="text-xs h-5 px-1.5">
+									{countPermissions(orgPerms)}
+								</Badge>
+							)}
+						</div>
+					</AccordionTrigger>
+					<AccordionContent className="pt-0 pb-4 px-1">
+						<p className="text-sm text-muted-foreground mb-3">
+							Granted automatically to all holders — no resource binding needed.
+						</p>
+						<Controller
+							name="orgPermissions"
+							control={control}
+							render={({ field }) => (
+								<PermissionMatrixEditor
+									value={field.value}
+									onChange={field.onChange}
+								/>
+							)}
 						/>
-					)}
-				/>
-				<FieldError
-					message={errors.orgPermissions?.message as string | undefined}
-				/>
-			</div>
+						<FieldError
+							message={errors.orgPermissions?.message as string | undefined}
+						/>
+					</AccordionContent>
+				</AccordionItem>
 
-			<div className="space-y-2">
-				<Label>Property-level permissions</Label>
-				<p className="text-sm text-muted-foreground">
-					Applied per property when a binding scope row exists for that
-					property.
-				</p>
-				<Controller
-					name="propertyPermissions"
-					control={control}
-					render={({ field }) => (
-						<PermissionMatrixEditor
-							value={field.value}
-							onChange={field.onChange}
+				<AccordionItem value="prop" className="border rounded-md px-2">
+					<AccordionTrigger className="hover:no-underline py-2">
+						<div className="flex items-center gap-2">
+							<span>Property-level permissions</span>
+							{countPermissions(propPerms) > 0 && (
+								<Badge variant="secondary" className="text-xs h-5 px-1.5">
+									{countPermissions(propPerms)}
+								</Badge>
+							)}
+						</div>
+					</AccordionTrigger>
+					<AccordionContent className="pt-0 pb-4 px-1">
+						<p className="text-sm text-muted-foreground mb-3">
+							Applied per property when a binding scope row exists for that property.
+						</p>
+						<Controller
+							name="propertyPermissions"
+							control={control}
+							render={({ field }) => (
+								<PermissionMatrixEditor
+									value={field.value}
+									onChange={field.onChange}
+								/>
+							)}
 						/>
-					)}
-				/>
-			</div>
+					</AccordionContent>
+				</AccordionItem>
 
-			<div className="space-y-2">
-				<Label>Unit-level permissions</Label>
-				<p className="text-sm text-muted-foreground">
-					Applied per unit when a binding scope row exists for that unit.
-				</p>
-				<Controller
-					name="unitPermissions"
-					control={control}
-					render={({ field }) => (
-						<PermissionMatrixEditor
-							value={field.value}
-							onChange={field.onChange}
+				<AccordionItem value="unit" className="border rounded-md px-2">
+					<AccordionTrigger className="hover:no-underline py-2">
+						<div className="flex items-center gap-2">
+							<span>Unit-level permissions</span>
+							{countPermissions(unitPerms) > 0 && (
+								<Badge variant="secondary" className="text-xs h-5 px-1.5">
+									{countPermissions(unitPerms)}
+								</Badge>
+							)}
+						</div>
+					</AccordionTrigger>
+					<AccordionContent className="pt-0 pb-4 px-1">
+						<p className="text-sm text-muted-foreground mb-3">
+							Applied per unit when a binding scope row exists for that unit.
+						</p>
+						<Controller
+							name="unitPermissions"
+							control={control}
+							render={({ field }) => (
+								<PermissionMatrixEditor
+									value={field.value}
+									onChange={field.onChange}
+								/>
+							)}
 						/>
-					)}
-				/>
-			</div>
+					</AccordionContent>
+				</AccordionItem>
+			</Accordion>
 
 			<DialogFooter className="gap-2">
 				{onCancel && (

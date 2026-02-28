@@ -1,5 +1,6 @@
 import { cn } from '@abumble/design-system/utils'
 import { Checkbox } from '@abumble/design-system/components/Checkbox'
+import { normalizePermString } from '@/features/member-scopes/utils'
 
 const DOMAINS = [
 	{ key: 'o', label: 'Organization' },
@@ -18,19 +19,23 @@ const ACTIONS = [
 ] as const
 
 export interface PermissionMatrixEditorProps {
+	/** Custom/Explicit permissions (the value being edited). */
 	value: Record<string, string>
 	onChange?: (value: Record<string, string>) => void
+	/** Base permissions from a template. These are displayed as checked & disabled (additive). */
+	inheritedPermissions?: Record<string, string>
 	/** When true, all checkboxes are disabled and the grid is display-only. */
 	readOnly?: boolean
 }
 
 /**
- * Renders a 4×4 grid of checkboxes for editing or previewing domain/action permissions.
+ * Renders a 4×6 grid of checkboxes for editing or previewing domain/action permissions.
  * `value` is a map of domain key → action letters (e.g. { l: 'rcud', m: 'r' }).
  */
 export function PermissionMatrixEditor({
 	value,
 	onChange,
+	inheritedPermissions = {},
 	readOnly = false,
 }: PermissionMatrixEditorProps) {
 	const handleToggle = (
@@ -39,12 +44,22 @@ export function PermissionMatrixEditor({
 		checked: boolean,
 	) => {
 		if (readOnly || !onChange) return
+
+		// Cannot toggle off inherited permissions
+		const isInherited = (inheritedPermissions[domainKey] ?? '').includes(
+			actionKey,
+		)
+		if (isInherited) return
+
 		const current = value[domainKey] ?? ''
-		const updated = checked
-			? current.includes(actionKey)
-				? current
-				: current + actionKey
-			: current.replace(actionKey, '')
+		const updated = normalizePermString(
+			checked
+				? current.includes(actionKey)
+					? current
+					: current + actionKey
+				: current.replace(actionKey, ''),
+		)
+
 		const next = { ...value }
 		if (updated) {
 			next[domainKey] = updated
@@ -54,58 +69,82 @@ export function PermissionMatrixEditor({
 		onChange(next)
 	}
 
+	const hasInheritance = Object.keys(inheritedPermissions).length > 0
+
 	return (
-		<div
-			className={cn(
-				'rounded border overflow-hidden text-sm',
-				readOnly && 'opacity-75',
-			)}
-		>
-			<table className="w-full">
-				<thead>
-					<tr className="bg-muted/50">
-						<th className="text-left px-3 py-2 font-medium text-muted-foreground">
-							Domain
-						</th>
-						{ACTIONS.map((a) => (
-							<th
-								key={a.key}
-								className="px-3 py-2 text-center font-medium text-muted-foreground w-20"
-							>
-								{a.label}
+		<div className="space-y-2">
+			<div
+				className={cn(
+					'rounded border overflow-hidden text-sm',
+					readOnly && 'opacity-75',
+				)}
+			>
+				<table className="w-full">
+					<thead>
+						<tr className="bg-muted/50">
+							<th className="text-left px-3 py-2 font-medium text-muted-foreground">
+								Domain
 							</th>
-						))}
-					</tr>
-				</thead>
-				<tbody>
-					{DOMAINS.map((domain, i) => (
-						<tr
-							key={domain.key}
-							className={cn(
-								i % 2 === 0 ? 'bg-background' : 'bg-muted/20',
-								'border-t',
-							)}
-						>
-							<td className="px-3 py-2 font-medium">{domain.label}</td>
-							{ACTIONS.map((action) => {
-								const checked = (value[domain.key] ?? '').includes(action.key)
-								return (
-									<td key={action.key} className="px-3 py-2 text-center">
-										<Checkbox
-											checked={checked}
-											onCheckedChange={(c) =>
-												handleToggle(domain.key, action.key, c === true)
-											}
-											disabled={readOnly}
-											aria-label={`${domain.label} ${action.label}`}
-										/>
-									</td>
-								)
-							})}
+							{ACTIONS.map((a) => (
+								<th
+									key={a.key}
+									className="px-3 py-2 text-center font-medium text-muted-foreground w-20"
+								>
+									{a.label}
+								</th>
+							))}
 						</tr>
-					))}
-				</tbody>
-			</table>
+					</thead>
+					<tbody>
+						{DOMAINS.map((domain, i) => (
+							<tr
+								key={domain.key}
+								className={cn(
+									i % 2 === 0 ? 'bg-background' : 'bg-muted/20',
+									'border-t',
+								)}
+							>
+								<td className="px-3 py-2 font-medium">{domain.label}</td>
+								{ACTIONS.map((action) => {
+									const isExplicit = (value[domain.key] ?? '').includes(
+										action.key,
+									)
+									const isInherited = (
+										inheritedPermissions[domain.key] ?? ''
+									).includes(action.key)
+									const checked = isExplicit || isInherited
+
+									return (
+										<td key={action.key} className="px-3 py-2 text-center">
+											<Checkbox
+												checked={checked}
+												onCheckedChange={(c) =>
+													handleToggle(domain.key, action.key, c === true)
+												}
+												disabled={readOnly || isInherited}
+												aria-label={`${domain.label} ${action.label}`}
+												className={cn(
+													isInherited &&
+														'data-[state=checked]:bg-muted-foreground data-[state=checked]:text-muted opacity-70',
+												)}
+											/>
+										</td>
+									)
+								})}
+							</tr>
+						))}
+					</tbody>
+				</table>
+			</div>
+			{hasInheritance && !readOnly && (
+				<p className="text-xs text-muted-foreground flex items-center gap-2">
+					<span className="block w-3 h-3 bg-muted-foreground rounded-sm opacity-70" />
+					<span>
+						Gray items are inherited from the selected role and cannot be
+						removed.
+					</span>
+				</p>
+			)}
 		</div>
 	)
 }

@@ -7,7 +7,7 @@ import type {
 	UpdateLeaseTemplatePayload,
 } from '@/domain/lease-template'
 import { stableRequestId } from '@/lib/offline-types'
-import { nowIso } from '@/lib/util'
+import { generateId, nowIso } from '@/lib/util'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
 import { useOrganization } from '@/contexts/organization'
 
@@ -136,11 +136,17 @@ export function useLeaseTemplateDetail(
 
 // --- Mutations ---
 
+/** Payload for create without id — hook adds it before calling the API. */
+export type CreateLeaseTemplatePayloadWithoutId = Omit<
+	CreateLeaseTemplatePayload,
+	'id'
+>
+
 export function useCreateLeaseTemplate() {
 	const queryClient = useQueryClient()
 	const { activeOrgId } = useOrganization()
 
-	return useMutation({
+	const mutation = useMutation({
 		mutationKey: ['createLeaseTemplate'],
 		networkMode: 'online',
 		mutationFn: (payload: CreateLeaseTemplatePayload) => {
@@ -159,14 +165,13 @@ export function useCreateLeaseTemplate() {
 			const optimistic = applyCreate(queryClient, payload, activeOrgId!)
 			return { previousTemplates, optimisticId: optimistic.id }
 		},
-		onError: (err, _, context) => {
+		onError: (_err, _, context) => {
 			if (context?.previousTemplates) {
 				queryClient.setQueryData(
 					leaseTemplateKeys.list(activeOrgId!),
 					context.previousTemplates,
 				)
 			}
-			console.error('[Mutation] Create lease template failed:', err)
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({
@@ -174,6 +179,18 @@ export function useCreateLeaseTemplate() {
 			})
 		},
 	})
+
+	return {
+		...mutation,
+		mutate: (
+			payload: CreateLeaseTemplatePayloadWithoutId,
+			options?: Parameters<typeof mutation.mutate>[1],
+		) => mutation.mutate({ ...payload, id: generateId() }, options),
+		mutateAsync: (
+			payload: CreateLeaseTemplatePayloadWithoutId,
+			options?: Parameters<typeof mutation.mutateAsync>[1],
+		) => mutation.mutateAsync({ ...payload, id: generateId() }, options),
+	}
 }
 
 export function useUpdateLeaseTemplate() {

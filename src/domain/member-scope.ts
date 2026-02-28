@@ -1,5 +1,14 @@
 export type ScopeType = 'ORG' | 'PROPERTY' | 'UNIT'
 
+/** UI shape for defining a single scope during creation (invite form, add-scope dialog). */
+export type ScopeConfigValue = {
+	scopeType: ScopeType
+	scopeId: string
+	useTemplate: boolean
+	templateId?: string
+	permissions: Record<string, string>
+}
+
 export interface MemberScope {
 	id: string
 	membershipId: string

@@ -5,7 +5,6 @@ import {
 	useUpdateLeaseTemplate,
 } from '@/features/lease-templates/hooks'
 import {
-	generateId,
 	parseFloatOrUndefined,
 	parseIntOrUndefined,
 	trimOrUndefined,
@@ -195,7 +194,7 @@ export function LeaseTemplateFormWizard({
 				)
 			} else {
 				createTemplateRef.current.mutate(
-					{ id: generateId(), ...payloadFields },
+					payloadFields,
 					{
 						onSuccess: () => {
 							toast.success('Template created')

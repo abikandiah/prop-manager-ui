@@ -6,6 +6,7 @@ import type {
 	Lease,
 	UpdateLeasePayload,
 } from '@/domain/lease'
+import { generateId } from '@/lib/util'
 import { LeaseStatus } from '@/domain/lease'
 import type {
 	InviteLeaseTenantPayload,
@@ -225,11 +226,14 @@ export function useLeaseDetail(id: string | null) {
 
 // --- Mutations ---
 
+/** Payload for create without id — hook adds it before calling the API. */
+export type CreateLeasePayloadWithoutId = Omit<CreateLeasePayload, 'id'>
+
 export function useCreateLease() {
 	const queryClient = useQueryClient()
 	const { activeOrgId } = useOrganization()
 
-	return useMutation({
+	const mutation = useMutation({
 		mutationKey: ['createLease'],
 		networkMode: 'online',
 		mutationFn: (payload: CreateLeasePayload) => {
@@ -281,6 +285,18 @@ export function useCreateLease() {
 			queryClient.invalidateQueries({ queryKey: leaseKeys.all(activeOrgId!) })
 		},
 	})
+
+	return {
+		...mutation,
+		mutate: (
+			payload: CreateLeasePayloadWithoutId,
+			options?: Parameters<typeof mutation.mutate>[1],
+		) => mutation.mutate({ ...payload, id: generateId() }, options),
+		mutateAsync: (
+			payload: CreateLeasePayloadWithoutId,
+			options?: Parameters<typeof mutation.mutateAsync>[1],
+		) => mutation.mutateAsync({ ...payload, id: generateId() }, options),
+	}
 }
 
 export type UpdateLeaseVariables = {

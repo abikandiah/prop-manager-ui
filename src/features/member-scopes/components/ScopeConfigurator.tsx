@@ -44,6 +44,12 @@ export interface ScopeConfiguratorProps {
 	lockedResource?: boolean
 	/** Baseline permissions from the membership's primary template/role. */
 	globalInheritedPermissions?: Record<string, string>
+	/**
+	 * When true, hides the "Use Role / Template" toggle and always shows the
+	 * permissions editor. Use this in contexts where template selection has
+	 * already happened at a higher level (e.g. the invite form's custom scopes).
+	 */
+	hideTemplateMode?: boolean
 }
 
 export function ScopeConfigurator({
@@ -53,6 +59,7 @@ export function ScopeConfigurator({
 	errors,
 	lockedResource = false,
 	globalInheritedPermissions = {},
+	hideTemplateMode = false,
 }: ScopeConfiguratorProps) {
 	const { data: props, isLoading: propsLoading } = usePropsList()
 	const { data: units, isLoading: unitsLoading } = useUnitsList()
@@ -209,23 +216,25 @@ export function ScopeConfigurator({
 				)}
 			</div>
 
-			{/* Configuration Mode Toggle */}
-			<div className="space-y-3">
-				<Label>Access Configuration</Label>
-				<Tabs
-					value={value.useTemplate ? 'template' : 'manual'}
-					onValueChange={handleModeChange}
-					className="w-full"
-				>
-					<TabsList className="grid w-full grid-cols-2">
-						<TabsTrigger value="template">Use Role / Template</TabsTrigger>
-						<TabsTrigger value="manual">Custom Permissions</TabsTrigger>
-					</TabsList>
-				</Tabs>
-			</div>
+			{/* Configuration Mode Toggle — hidden when caller has already handled template selection */}
+			{!hideTemplateMode && (
+				<div className="space-y-3">
+					<Label>Access Configuration</Label>
+					<Tabs
+						value={value.useTemplate ? 'template' : 'manual'}
+						onValueChange={handleModeChange}
+						className="w-full"
+					>
+						<TabsList className="grid w-full grid-cols-2">
+							<TabsTrigger value="template">Use Role / Template</TabsTrigger>
+							<TabsTrigger value="manual">Custom Permissions</TabsTrigger>
+						</TabsList>
+					</Tabs>
+				</div>
+			)}
 
-			{/* Template Selection */}
-			{value.useTemplate ? (
+			{/* Template Selection — only reachable when template mode is available and active */}
+			{!hideTemplateMode && value.useTemplate ? (
 				<div className="space-y-2">
 					<Label>Select Role <RequiredMark /></Label>
 					<PermissionTemplateSelect

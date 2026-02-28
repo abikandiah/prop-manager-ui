@@ -17,7 +17,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from '@abumble/design-system/components/Dialog'
-import { Accordion, AccordionItem, AccordionTrigger, AccordionContent } from '@/components/ui/accordion'
+import { Accordion } from '@/components/ui/accordion'
 import { Plus, RotateCcw, Trash2 } from 'lucide-react'
 import { useMembershipById, useDeleteMembership } from '@/features/memberships'
 import { useResendInvite, useRevokeInvite } from '@/features/invites/hooks'

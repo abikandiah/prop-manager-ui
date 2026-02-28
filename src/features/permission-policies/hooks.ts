@@ -1,11 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { permissionTemplateKeys } from './keys'
-import { permissionTemplatesApi } from './api'
+import { permissionPolicyKeys } from './keys'
+import { permissionPoliciesApi } from './api'
 import type {
-	CreatePermissionTemplatePayload,
-	PermissionTemplate,
-	UpdatePermissionTemplatePayload,
-} from '@/domain/permission-template'
+	CreatePermissionPolicyPayload,
+	PermissionPolicy,
+	UpdatePermissionPolicyPayload,
+} from '@/domain/permission-policy'
 import { stableRequestId } from '@/lib/offline-types'
 import { nowIso } from '@/lib/util'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
@@ -14,17 +14,17 @@ import { useOrganization } from '@/contexts/organization'
 // --- Queries ---
 
 /**
- * Fetch system templates plus org-scoped templates for the given org.
- * Returns them sorted: system templates first, then org templates, both alphabetically.
+ * Fetch system policies plus org-scoped policies for the given org.
+ * Returns them sorted: system policies first, then org policies, both alphabetically.
  */
-export function usePermissionTemplates(orgId: string) {
+export function usePermissionPolicies(orgId: string) {
 	return useQuery({
-		queryKey: permissionTemplateKeys.list(orgId),
-		queryFn: () => permissionTemplatesApi.listByOrg(orgId),
+		queryKey: permissionPolicyKeys.list(orgId),
+		queryFn: () => permissionPoliciesApi.listByOrg(orgId),
 		enabled: !!orgId,
 		select: (data) =>
 			[...data].sort((a, b) => {
-				// System templates (orgId = null) before org templates
+				// System policies (orgId = null) before org policies
 				if (a.orgId === null && b.orgId !== null) return -1
 				if (a.orgId !== null && b.orgId === null) return 1
 				return a.name.localeCompare(b.name)
@@ -32,69 +32,69 @@ export function usePermissionTemplates(orgId: string) {
 	})
 }
 
-export function usePermissionTemplateDetail(id: string | null) {
+export function usePermissionPolicyDetail(id: string | null) {
 	const { activeOrgId } = useOrganization()
 	return useQuery({
-		queryKey: permissionTemplateKeys.detail(activeOrgId!, id!),
-		queryFn: () => permissionTemplatesApi.getById(id!),
+		queryKey: permissionPolicyKeys.detail(activeOrgId!, id!),
+		queryFn: () => permissionPoliciesApi.getById(id!),
 		enabled: !!activeOrgId && id != null,
 	})
 }
 
 // --- Mutations ---
 
-export function useCreatePermissionTemplate() {
+export function useCreatePermissionPolicy() {
 	const queryClient = useQueryClient()
 	const { activeOrgId } = useOrganization()
 
 	return useMutation({
-		mutationKey: ['createPermissionTemplate'],
+		mutationKey: ['createPermissionPolicy'],
 		networkMode: 'online',
-		mutationFn: (payload: CreatePermissionTemplatePayload) => {
-			const requestId = stableRequestId(['createPermissionTemplate'], payload)
-			return permissionTemplatesApi.create(payload, {
+		mutationFn: (payload: CreatePermissionPolicyPayload) => {
+			const requestId = stableRequestId(['createPermissionPolicy'], payload)
+			return permissionPoliciesApi.create(payload, {
 				[IDEMPOTENCY_HEADER]: requestId,
 			})
 		},
 		onSettled: (_data, _err, payload) => {
 			const orgId = payload.orgId ?? activeOrgId!
 			queryClient.invalidateQueries({
-				queryKey: permissionTemplateKeys.list(orgId),
+				queryKey: permissionPolicyKeys.list(orgId),
 			})
 		},
 	})
 }
 
-export function useUpdatePermissionTemplate() {
+export function useUpdatePermissionPolicy() {
 	const queryClient = useQueryClient()
 	const { activeOrgId } = useOrganization()
 
 	return useMutation({
-		mutationKey: ['updatePermissionTemplate'],
+		mutationKey: ['updatePermissionPolicy'],
 		networkMode: 'online',
 		mutationFn: ({
 			id,
 			payload,
 		}: {
 			id: string
-			payload: UpdatePermissionTemplatePayload
+			payload: UpdatePermissionPolicyPayload
 		}) => {
 			const variables = { id, payload }
-			const requestId = stableRequestId(['updatePermissionTemplate'], variables)
-			return permissionTemplatesApi.update(id, payload, {
+			const requestId = stableRequestId(['updatePermissionPolicy'], variables)
+			return permissionPoliciesApi.update(id, payload, {
 				[IDEMPOTENCY_HEADER]: requestId,
 			})
 		},
 		onMutate: async ({ id, payload }) => {
 			await queryClient.cancelQueries({
-				queryKey: permissionTemplateKeys.all(activeOrgId!),
+				queryKey: permissionPolicyKeys.all(activeOrgId!),
 			})
-			const previous = queryClient.getQueryData<PermissionTemplate>(
-				permissionTemplateKeys.detail(activeOrgId!, id),
+			const previous = queryClient.getQueryData<PermissionPolicy>(
+				permissionPolicyKeys.detail(activeOrgId!, id),
 			)
 			if (previous) {
 				queryClient.setQueryData(
-					permissionTemplateKeys.detail(activeOrgId!, id),
+					permissionPolicyKeys.detail(activeOrgId!, id),
 					{
 						...previous,
 						...payload,
@@ -108,39 +108,39 @@ export function useUpdatePermissionTemplate() {
 		onError: (_err, { id }, context) => {
 			if (context?.previous) {
 				queryClient.setQueryData(
-					permissionTemplateKeys.detail(activeOrgId!, id),
+					permissionPolicyKeys.detail(activeOrgId!, id),
 					context.previous,
 				)
 			}
 		},
 		onSettled: (data, _err, { id }) => {
 			queryClient.invalidateQueries({
-				queryKey: permissionTemplateKeys.detail(activeOrgId!, id),
+				queryKey: permissionPolicyKeys.detail(activeOrgId!, id),
 			})
 			const orgId = data?.orgId ?? activeOrgId!
 			queryClient.invalidateQueries({
-				queryKey: permissionTemplateKeys.list(orgId),
+				queryKey: permissionPolicyKeys.list(orgId),
 			})
 		},
 	})
 }
 
-export function useDeletePermissionTemplate() {
+export function useDeletePermissionPolicy() {
 	const queryClient = useQueryClient()
 	const { activeOrgId } = useOrganization()
 
 	return useMutation({
-		mutationKey: ['deletePermissionTemplate'],
+		mutationKey: ['deletePermissionPolicy'],
 		networkMode: 'online',
 		mutationFn: (id: string) => {
-			const requestId = stableRequestId(['deletePermissionTemplate'], id)
-			return permissionTemplatesApi.delete(id, {
+			const requestId = stableRequestId(['deletePermissionPolicy'], id)
+			return permissionPoliciesApi.delete(id, {
 				[IDEMPOTENCY_HEADER]: requestId,
 			})
 		},
 		onSettled: () => {
 			queryClient.invalidateQueries({
-				queryKey: permissionTemplateKeys.all(activeOrgId!),
+				queryKey: permissionPolicyKeys.all(activeOrgId!),
 			})
 		},
 	})

@@ -10,8 +10,8 @@ export const Register = () => {
 	return (
 		<div className="flex flex-1 flex-col justify-center items-center px-4 py-8 gap-6">
 			<MessageBanner
-				type="note"
-				message="This is a development-only environment. This application is not intended for business or commercial use. No warranty, uptime guarantees, 
+				type="warning"
+				message="This is a development sandbox. This application is not intended for business or commercial use. No warranty, uptime guarantees, 
 				or technical support are provided. Use at your own risk."
 				className="w-full max-w-md rounded"
 			/>

@@ -1,5 +1,0 @@
-export * from './components'
-export * from './hooks'
-export { memberScopesApi } from './api'
-export { memberScopeKeys } from './keys'
-export type { ScopeConfigValue } from '@/domain/member-scope'

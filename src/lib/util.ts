@@ -4,6 +4,9 @@ export function nowIso(): string {
 	return new Date().toISOString()
 }
 
+/** Sorts permission action characters to produce a canonical form (e.g. "rc" → "cr"). */
+export const normalizePermString = (s: string) => s.split('').sort().join('')
+
 /**
  * Generate a client-side UUID v7 for new entities.
  * UUID v7 is time-sortable and monotonically increasing, matching the backend's

@@ -1,5 +1,5 @@
-import { useCallback, useMemo } from 'react'
-import { useForm, Controller, useFieldArray } from 'react-hook-form'
+import { useCallback } from 'react'
+import { useForm, useFieldArray } from 'react-hook-form'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { z } from 'zod'
 import { toast } from 'sonner'
@@ -16,42 +16,35 @@ import {
 } from '@/components/ui/accordion'
 import { FieldError } from '@/components/ui/FieldError'
 import { RequiredMark } from '@/components/ui'
-import {
-	PermissionTemplateSelect,
-	usePermissionTemplates,
-} from '@/features/permission-templates'
 import { useInviteMember } from '@/features/memberships'
-import { ScopeConfigurator } from '@/features/member-scopes/components/ScopeConfigurator'
-import { TemplateScopeBindings } from '@/features/member-scopes/components/TemplateScopeBindings'
-import { scopeConfigSchema } from '@/features/member-scopes/schemas'
-import { getTemplatePermissions } from '@/features/member-scopes/utils'
-import type { ScopeConfigValue, ScopeType } from '@/domain/member-scope'
+import { AssignmentConfigurator } from '@/features/policy-assignments/components/AssignmentConfigurator'
+import type { AssignmentConfigValue, ResourceType } from '@/domain/policy-assignment'
 
 // ---------- Schema ----------
 
+const assignmentConfigSchema = z.object({
+	resourceType: z.enum(['ORG', 'PROPERTY', 'UNIT']),
+	resourceId: z.string(),
+	usePolicy: z.boolean(),
+	policyId: z.string().optional(),
+	overrides: z.record(z.string(), z.string()),
+})
+
 const inviteSchema = z.object({
 	email: z.string().email('Invalid email address'),
-	templateId: z.string().optional(),
-	propertyIds: z.array(z.string()),
-	unitIds: z.array(z.string()),
-	customScopes: z.array(scopeConfigSchema),
+	assignments: z.array(assignmentConfigSchema),
 })
 
 type InviteFormValues = z.infer<typeof inviteSchema>
 
 // ---------- Helpers ----------
 
-function deriveScopeLabel(scope: ScopeConfigValue, index: number): string {
-	if (scope.scopeType === 'ORG') return 'Organization'
-	return `Custom scope ${index + 1}`
-}
-
-function describeTemplateCoverage(scopeTypes: ScopeType[]): string {
-	const nonOrg = scopeTypes.filter((t) => t !== 'ORG')
-	if (nonOrg.length === 0)
-		return 'Applies to the whole organization — no resource selection needed.'
-	const labels = nonOrg.map((t) => (t === 'PROPERTY' ? 'properties' : 'units'))
-	return `Select the ${labels.join(' and ')} this role should apply to.`
+function deriveAssignmentLabel(
+	config: AssignmentConfigValue,
+	index: number,
+): string {
+	if (config.resourceType === 'ORG') return 'Organization'
+	return `Assignment ${index + 1}`
 }
 
 // ---------- Props ----------
@@ -70,7 +63,6 @@ export function InviteMemberForm({
 	onCancel,
 }: InviteMemberFormProps) {
 	const inviteMember = useInviteMember()
-	const { data: allTemplates } = usePermissionTemplates(orgId)
 
 	const {
 		register,
@@ -83,77 +75,43 @@ export function InviteMemberForm({
 		resolver: standardSchemaResolver(inviteSchema),
 		defaultValues: {
 			email: '',
-			templateId: '',
-			propertyIds: [],
-			unitIds: [],
-			customScopes: [],
+			assignments: [],
 		},
 		mode: 'onTouched',
 	})
 
 	const { fields, append, remove } = useFieldArray({
 		control,
-		name: 'customScopes',
+		name: 'assignments',
 	})
-
-	const watchedTemplateId = watch('templateId')
-	const watchedPropertyIds = watch('propertyIds')
-	const watchedUnitIds = watch('unitIds')
-
-	// Derive the selected template and which scope types it covers
-	const selectedTemplate = useMemo(
-		() => allTemplates?.find((t) => t.id === watchedTemplateId),
-		[allTemplates, watchedTemplateId],
-	)
-	const templateScopeTypes: ScopeType[] = useMemo(
-		() => selectedTemplate?.items.map((i) => i.scopeType) ?? [],
-		[selectedTemplate],
-	)
 
 	const onSubmit = useCallback(
 		(values: InviteFormValues) => {
-			// Build initial scope rows from resource bindings (pure binding — no custom permissions)
-			const bindingScopes = [
-				...values.propertyIds.map((id) => ({
-					scopeType: 'PROPERTY' as const,
-					scopeId: id,
-				})),
-				...values.unitIds.map((id) => ({
-					scopeType: 'UNIT' as const,
-					scopeId: id,
-				})),
-			]
-
-			// Resolve custom scopes — flatten template references into permissions
-			const customScopeRows = values.customScopes.map((scope) => {
-				const resolvedScopeId =
-					scope.scopeType === 'ORG' ? orgId : scope.scopeId.trim()
-
-				if (scope.useTemplate && scope.templateId) {
-					const tmpl = allTemplates?.find((t) => t.id === scope.templateId)
+			const assignments = values.assignments
+				.map((config) => {
+					const resourceId =
+						config.resourceType === 'ORG' ? orgId : config.resourceId.trim()
 					return {
-						scopeType: scope.scopeType,
-						scopeId: resolvedScopeId,
-						permissions: getTemplatePermissions(tmpl, scope.scopeType),
+						resourceType: config.resourceType,
+						resourceId,
+						policyId: config.usePolicy ? config.policyId : null,
+						overrides: !config.usePolicy ? config.overrides : null,
 					}
-				}
-
-				return {
-					scopeType: scope.scopeType,
-					scopeId: resolvedScopeId,
-					permissions: scope.permissions,
-				}
-			})
-
-			const initialScopes = [...bindingScopes, ...customScopeRows]
+				})
+				.filter(
+					(a) =>
+						a.resourceId &&
+						(a.policyId ||
+							(a.overrides &&
+								Object.values(a.overrides).some((v) => v.trim() !== ''))),
+				)
 
 			inviteMember.mutate(
 				{
 					orgId,
 					payload: {
 						email: values.email,
-						templateId: values.templateId || undefined,
-						initialScopes: initialScopes.length > 0 ? initialScopes : undefined,
+						assignments: assignments.length > 0 ? assignments : undefined,
 					},
 				},
 				{
@@ -164,7 +122,7 @@ export function InviteMemberForm({
 				},
 			)
 		},
-		[orgId, inviteMember, onSuccess, allTemplates],
+		[orgId, inviteMember, onSuccess],
 	)
 
 	return (
@@ -183,59 +141,14 @@ export function InviteMemberForm({
 				<FieldError message={errors.email?.message} />
 			</div>
 
-			{/* Role / Template */}
-			<div className="space-y-2">
-				<Label htmlFor="template-select">Role</Label>
-				<Controller
-					name="templateId"
-					control={control}
-					render={({ field }) => (
-						<PermissionTemplateSelect
-							id="template-select"
-							orgId={orgId}
-							value={field.value ?? ''}
-							onChange={(id) => {
-								field.onChange(id)
-								// Clear resource bindings when the template changes
-								setValue('propertyIds', [])
-								setValue('unitIds', [])
-							}}
-						/>
-					)}
-				/>
-				{selectedTemplate ? (
-					<p className="text-xs text-muted-foreground">
-						{describeTemplateCoverage(templateScopeTypes)}
-					</p>
-				) : (
-					allTemplates && (
-						<p className="text-xs text-muted-foreground">
-							No role selected — use custom scopes below to grant specific
-							permissions.
-						</p>
-					)
-				)}
-			</div>
-
-			{/* Resource bindings — only shown when the template requires non-ORG scope types */}
-			{selectedTemplate && templateScopeTypes.some((t) => t !== 'ORG') && (
-				<TemplateScopeBindings
-					templateScopeTypes={templateScopeTypes}
-					propertyIds={watchedPropertyIds}
-					unitIds={watchedUnitIds}
-					onPropertyIdsChange={(ids) => setValue('propertyIds', ids)}
-					onUnitIdsChange={(ids) => setValue('unitIds', ids)}
-				/>
-			)}
-
-			{/* Custom scopes */}
+			{/* Assignments */}
 			<div className="space-y-3">
 				{fields.length > 0 && (
 					<>
-						<Label>Custom scopes</Label>
+						<Label>Permission assignments</Label>
 						<Accordion type="multiple" className="w-full space-y-2">
 							{fields.map((field, index) => {
-								const scopeValue = watch(`customScopes.${index}`)
+								const configValue = watch(`assignments.${index}`)
 								return (
 									<AccordionItem
 										key={field.id}
@@ -245,7 +158,7 @@ export function InviteMemberForm({
 										<AccordionTrigger className="hover:no-underline py-2">
 											<div className="flex flex-1 items-center justify-between mr-4">
 												<span className="font-medium text-sm">
-													{deriveScopeLabel(scopeValue, index)}
+													{deriveAssignmentLabel(configValue, index)}
 												</span>
 												<div onClick={(e) => e.stopPropagation()}>
 													<Button
@@ -256,30 +169,28 @@ export function InviteMemberForm({
 														onClick={() => remove(index)}
 													>
 														<Trash2 className="h-4 w-4" />
-														<span className="sr-only">Remove scope</span>
+														<span className="sr-only">Remove assignment</span>
 													</Button>
 												</div>
 											</div>
 										</AccordionTrigger>
 										<AccordionContent className="pt-0 pb-4 px-2">
-											<Controller
-												name={`customScopes.${index}`}
-												control={control}
-												render={({ field: { value, onChange } }) => (
-													<ScopeConfigurator
-														orgId={orgId}
-														value={value}
-														onChange={onChange}
-														hideTemplateMode
-														errors={{
-															scopeType:
-																errors.customScopes?.[index]?.scopeType,
-															scopeId: errors.customScopes?.[index]?.scopeId,
-															permissions:
-																errors.customScopes?.[index]?.permissions,
-														}}
-													/>
-												)}
+											<AssignmentConfigurator
+												orgId={orgId}
+												value={{
+													resourceType: configValue.resourceType as ResourceType,
+													resourceId: configValue.resourceId,
+													usePolicy: configValue.usePolicy,
+													policyId: configValue.policyId,
+													overrides: configValue.overrides,
+												}}
+												onChange={(next) => {
+													setValue(`assignments.${index}.resourceType`, next.resourceType)
+													setValue(`assignments.${index}.resourceId`, next.resourceId)
+													setValue(`assignments.${index}.usePolicy`, next.usePolicy)
+													setValue(`assignments.${index}.policyId`, next.policyId)
+													setValue(`assignments.${index}.overrides`, next.overrides)
+												}}
 											/>
 										</AccordionContent>
 									</AccordionItem>
@@ -295,15 +206,16 @@ export function InviteMemberForm({
 					size="sm"
 					onClick={() =>
 						append({
-							scopeType: 'PROPERTY',
-							scopeId: '',
-							useTemplate: false,
-							permissions: {},
+							resourceType: 'PROPERTY',
+							resourceId: '',
+							usePolicy: true,
+							policyId: undefined,
+							overrides: {},
 						})
 					}
 				>
 					<Plus className="mr-2 h-4 w-4" />
-					Add custom scope
+					Add assignment
 				</Button>
 			</div>
 

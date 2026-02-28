@@ -12,51 +12,42 @@ import {
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
 import { FormDialog } from '@abumble/design-system/components/Dialog'
 import { Badge } from '@abumble/design-system/components/Badge'
-import type { PermissionTemplate } from '@/domain/permission-template'
+import type { PermissionPolicy } from '@/domain/permission-policy'
 import { TableSkeleton, EntityActions } from '@/components/ui'
 import { config } from '@/config'
 import { formatDate } from '@/lib/format'
 import { useAuth } from '@/contexts/auth'
 import {
-	useDeletePermissionTemplate,
-	usePermissionTemplates,
+	useDeletePermissionPolicy,
+	usePermissionPolicies,
 } from '../../hooks'
-import { PermissionTemplateForm } from '../forms/PermissionTemplateForm'
+import { PermissionPolicyForm } from '../forms/PermissionPolicyForm'
 import { FORM_DIALOG_CLASS } from '@/lib/dialog'
 
-export interface PermissionTemplatesTableViewProps {
+export interface PermissionPoliciesTableViewProps {
 	orgId: string
 }
 
-/** Summarises template items as a short human-readable string, e.g. "ORG: l:rcud · PROPERTY: m:r". */
-function formatItems(items: PermissionTemplate['items']): string {
-	if (!items || items.length === 0) return '—'
-	return items
-		.map((item) => {
-			const perms = Object.entries(item.permissions)
-				.filter(([, v]) => v)
-				.map(([k, v]) => `${k}:${v}`)
-				.join(' ')
-			return `${item.scopeType}: ${perms}`
-		})
-		.join(' · ')
+/** Summarises flat permissions as a short human-readable string, e.g. "l:rcud · m:r". */
+function formatPermissions(permissions: PermissionPolicy['permissions']): string {
+	const entries = Object.entries(permissions).filter(([, v]) => v)
+	if (entries.length === 0) return '—'
+	return entries.map(([k, v]) => `${k}:${v}`).join(' · ')
 }
 
-export function PermissionTemplatesTableView({
+export function PermissionPoliciesTableView({
 	orgId,
-}: PermissionTemplatesTableViewProps) {
+}: PermissionPoliciesTableViewProps) {
 	const { user } = useAuth()
 	const {
-		data: templates,
+		data: policies,
 		isLoading,
 		isError,
 		error,
-	} = usePermissionTemplates(orgId)
-	const deleteTemplate = useDeletePermissionTemplate()
-	const [editing, setEditing] = useState<PermissionTemplate | null>(null)
-	const [duplicating, setDuplicating] = useState<PermissionTemplate | null>(
-		null,
-	)
+	} = usePermissionPolicies(orgId)
+	const deletePolicy = useDeletePermissionPolicy()
+	const [editing, setEditing] = useState<PermissionPolicy | null>(null)
+	const [duplicating, setDuplicating] = useState<PermissionPolicy | null>(null)
 
 	const isGlobalAdmin = user?.roles?.includes('ROLE_ADMIN') ?? false
 
@@ -64,14 +55,14 @@ export function PermissionTemplatesTableView({
 	if (isError && error !== lastErrorRef.current) {
 		lastErrorRef.current = error
 		toast.error(
-			`Error loading templates: ${(error as Error).message ?? 'Unknown'}`,
+			`Error loading policies: ${(error as Error).message ?? 'Unknown'}`,
 		)
 	}
 	if (!isError) lastErrorRef.current = null
 
-	const handleDelete = (template: PermissionTemplate) => {
-		deleteTemplate.mutate(template.id, {
-			onSuccess: () => toast.success(`Template "${template.name}" deleted`),
+	const handleDelete = (policy: PermissionPolicy) => {
+		deletePolicy.mutate(policy.id, {
+			onSuccess: () => toast.success(`Policy "${policy.name}" deleted`),
 		})
 	}
 
@@ -89,14 +80,14 @@ export function PermissionTemplatesTableView({
 				onOpenChange={(open) => {
 					if (!open) setEditing(null)
 				}}
-				title="Edit template"
-				description="Update the template name or permissions."
+				title="Edit policy"
+				description="Update the policy name or permissions."
 				className={FORM_DIALOG_CLASS}
 			>
 				{editing && (
-					<PermissionTemplateForm
+					<PermissionPolicyForm
 						orgId={editing.orgId}
-						initialTemplate={editing}
+						initialPolicy={editing}
 						onSuccess={() => setEditing(null)}
 						onCancel={() => setEditing(null)}
 						submitLabel="Save changes"
@@ -109,16 +100,16 @@ export function PermissionTemplatesTableView({
 				onOpenChange={(open) => {
 					if (!open) setDuplicating(null)
 				}}
-				title="Duplicate template"
-				description="Create a copy of this system template for your organization."
+				title="Duplicate policy"
+				description="Create a copy of this system policy for your organization."
 				className={FORM_DIALOG_CLASS}
 			>
 				{duplicating && (
-					<PermissionTemplateForm
+					<PermissionPolicyForm
 						orgId={orgId}
 						prefill={{
 							name: `Copy of ${duplicating.name}`,
-							items: structuredClone(duplicating.items),
+							permissions: structuredClone(duplicating.permissions),
 						}}
 						onSuccess={() => setDuplicating(null)}
 						onCancel={() => setDuplicating(null)}
@@ -144,24 +135,24 @@ export function PermissionTemplatesTableView({
 							</TableRow>
 						</TableHeader>
 						<TableBody>
-							{!templates || templates.length === 0 ? (
+							{!policies || policies.length === 0 ? (
 								<TableRow>
 									<TableCell
 										colSpan={5}
 										className="h-24 text-center text-muted-foreground"
 									>
-										No templates yet. Create one above.
+										No policies yet. Create one above.
 									</TableCell>
 								</TableRow>
 							) : (
-								templates.map((template) => {
-									const isSystem = template.orgId === null
+								policies.map((policy) => {
+									const isSystem = policy.orgId === null
 									const canMutate = !isSystem || isGlobalAdmin
 									return (
-										<TableRow key={template.id}>
+										<TableRow key={policy.id}>
 											<TableCell className="font-medium">
 												<span className="flex items-center gap-2">
-													{template.name}
+													{policy.name}
 													{isSystem && (
 														<Badge
 															variant="secondary"
@@ -177,21 +168,21 @@ export function PermissionTemplatesTableView({
 												{isSystem ? 'System' : 'Organization'}
 											</TableCell>
 											<TableCell className="text-muted-foreground text-sm font-mono">
-												{formatItems(template.items)}
+												{formatPermissions(policy.permissions)}
 											</TableCell>
 											<TableCell className="text-muted-foreground">
-												{formatDate(template.createdAt)}
+												{formatDate(policy.createdAt)}
 											</TableCell>
 											<TableCell>
 												<EntityActions
 													onEdit={
-														canMutate ? () => setEditing(template) : false
+														canMutate ? () => setEditing(policy) : false
 													}
-													onDelete={() => handleDelete(template)}
-													isDeletePending={deleteTemplate.isPending}
+													onDelete={() => handleDelete(policy)}
+													isDeletePending={deletePolicy.isPending}
 													disableDelete={!canMutate}
-													deleteTitle={`Delete "${template.name}"?`}
-													deleteDescription="This template will be permanently removed. Scopes that used it will keep their current permissions."
+													deleteTitle={`Delete "${policy.name}"?`}
+													deleteDescription="This policy will be permanently removed. Assignments that used it will keep their current permissions."
 													stopTriggerPropagation
 													additionalItems={
 														isSystem
@@ -199,7 +190,7 @@ export function PermissionTemplatesTableView({
 																	{
 																		label: 'Duplicate',
 																		icon: <Copy className="size-4 shrink-0" />,
-																		onClick: () => setDuplicating(template),
+																		onClick: () => setDuplicating(policy),
 																	},
 																]
 															: []

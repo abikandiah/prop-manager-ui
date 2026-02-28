@@ -1,3 +1,5 @@
+import type { ResourceType } from './policy-assignment'
+
 export enum InviteStatus {
 	PENDING = 'PENDING',
 	ACCEPTED = 'ACCEPTED',
@@ -11,7 +13,6 @@ export interface Membership {
 	userName: string | null
 	userEmail: string | null
 	organizationId: string
-	membershipTemplateId: string | null
 	inviteId: string | null
 	inviteEmail: string | null
 	inviteStatus: InviteStatus | null
@@ -29,14 +30,12 @@ export interface CreateMembershipPayload {
 
 export interface InviteMemberPayload {
 	email: string
-	/** Optional template to link to the membership. Template items resolve live at JWT hydration. */
-	templateId?: string
-	/** Binding scope rows. For ORG-only templates, omit or leave empty. For PROPERTY/UNIT templates,
-	 *  include one row per resource (empty permissions = pure binding row). */
-	initialScopes?: Array<{
-		scopeType: 'ORG' | 'PROPERTY' | 'UNIT'
-		scopeId: string
-		permissions?: Record<string, string>
+	/** Direct policy assignments to create alongside the membership. */
+	assignments?: Array<{
+		resourceType: ResourceType
+		resourceId: string
+		policyId?: string | null
+		overrides?: Record<string, string> | null
 	}>
 }
 

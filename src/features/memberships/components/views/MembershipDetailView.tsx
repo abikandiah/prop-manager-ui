@@ -22,12 +22,11 @@ import { Plus, RotateCcw, Trash2 } from 'lucide-react'
 import { useMembershipById, useDeleteMembership } from '@/features/memberships'
 import { useResendInvite, useRevokeInvite } from '@/features/invites/hooks'
 import { membershipKeys } from '@/features/memberships/keys'
-import { useMemberScopesList } from '@/features/member-scopes/hooks'
-import { CreateScopeForm } from '@/features/member-scopes/components/forms'
-import { ScopeAccordionItem } from '@/features/member-scopes/components/ScopeAccordionItem'
+import { usePolicyAssignmentsList } from '@/features/policy-assignments/hooks'
+import { CreateAssignmentForm } from '@/features/policy-assignments/components/forms'
+import { AssignmentAccordionItem } from '@/features/policy-assignments/components/AssignmentAccordionItem'
 import { usePropsList } from '@/features/props'
 import { useUnitsList } from '@/features/units'
-import { usePermissionTemplateDetail } from '@/features/permission-templates'
 import { useQueryErrorToast } from '@/lib/hooks'
 import { config } from '@/config'
 import { DetailField } from '@/components/ui'
@@ -51,18 +50,11 @@ export function MembershipDetailView({
 		isError,
 		error,
 	} = useMembershipById(orgId, membershipId)
-	const { data: scopes, isLoading: isLoadingScopes } = useMemberScopesList(
-		orgId,
-		membershipId,
-	)
+	const { data: assignments, isLoading: isLoadingAssignments } =
+		usePolicyAssignmentsList(orgId, membershipId)
 	// Fetch resources for name resolution
 	const { data: props } = usePropsList()
 	const { data: units } = useUnitsList()
-
-	// Fetch main template to show inherited permissions
-	const { data: template } = usePermissionTemplateDetail(
-		membership?.membershipTemplateId ?? null,
-	)
 
 	const deleteMembership = useDeleteMembership()
 	const resendInvite = useResendInvite()
@@ -73,8 +65,10 @@ export function MembershipDetailView({
 	const [confirmAction, setConfirmAction] = useState<
 		'remove' | 'revoke' | null
 	>(null)
-	const [addScopeOpen, setAddScopeOpen] = useState(false)
-	const [editingScopeId, setEditingScopeId] = useState<string | null>(null)
+	const [addAssignmentOpen, setAddAssignmentOpen] = useState(false)
+	const [editingAssignmentId, setEditingAssignmentId] = useState<string | null>(
+		null,
+	)
 
 	useQueryErrorToast(isError, error, 'membership')
 
@@ -216,48 +210,40 @@ export function MembershipDetailView({
 
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between">
-						<CardTitle>Permissions & Scopes</CardTitle>
-						<Button size="sm" onClick={() => setAddScopeOpen(true)}>
+						<CardTitle>Permissions & Assignments</CardTitle>
+						<Button size="sm" onClick={() => setAddAssignmentOpen(true)}>
 							<Plus className="mr-2 h-4 w-4" />
-							Add Scope
+							Add Assignment
 						</Button>
 					</CardHeader>
 					<CardContent>
 						<DelayedLoadingFallback
-							isLoading={isLoadingScopes}
+							isLoading={isLoadingAssignments}
 							delayMs={config.loadingFallbackDelayMs}
 							fallback={<div className="h-24 animate-pulse rounded bg-muted" />}
 						>
-							{!scopes || scopes.length === 0 ? (
+							{!assignments || assignments.length === 0 ? (
 								<p className="text-sm text-muted-foreground">
 									This member has no active permissions.
 								</p>
 							) : (
 								<Accordion type="multiple" className="w-full">
-									{scopes.map((scope) => {
-										const inherited =
-											template?.items.find(
-												(i) => i.scopeType === scope.scopeType,
-											)?.permissions ?? {}
-
-										return (
-											<ScopeAccordionItem
-												key={scope.id}
-												orgId={orgId}
-												membershipId={membershipId}
-												scope={scope}
-												resourceName={resolveResourceName(
-													scope.scopeType,
-													scope.scopeId,
-												)}
-												inheritedPermissions={inherited}
-												isEditing={editingScopeId === scope.id}
-												onEdit={() => setEditingScopeId(scope.id)}
-												onCancelEdit={() => setEditingScopeId(null)}
-												onSaveSuccess={() => setEditingScopeId(null)}
-											/>
-										)
-									})}
+									{assignments.map((assignment) => (
+										<AssignmentAccordionItem
+											key={assignment.id}
+											orgId={orgId}
+											membershipId={membershipId}
+											assignment={assignment}
+											resourceName={resolveResourceName(
+												assignment.resourceType,
+												assignment.resourceId,
+											)}
+											isEditing={editingAssignmentId === assignment.id}
+											onEdit={() => setEditingAssignmentId(assignment.id)}
+											onCancelEdit={() => setEditingAssignmentId(null)}
+											onSaveSuccess={() => setEditingAssignmentId(null)}
+										/>
+									))}
 								</Accordion>
 							)}
 						</DelayedLoadingFallback>
@@ -280,16 +266,16 @@ export function MembershipDetailView({
 				isPending={deleteMembership.isPending || revokeInvite.isPending}
 			/>
 
-			<Dialog open={addScopeOpen} onOpenChange={setAddScopeOpen}>
+			<Dialog open={addAssignmentOpen} onOpenChange={setAddAssignmentOpen}>
 				<DialogContent className="max-w-[calc(100vw-2rem)] sm:max-w-lg max-h-[90vh] overflow-y-auto">
 					<DialogHeader>
-						<DialogTitle>Add Scope</DialogTitle>
+						<DialogTitle>Add Assignment</DialogTitle>
 					</DialogHeader>
-					<CreateScopeForm
+					<CreateAssignmentForm
 						orgId={orgId}
 						membershipId={membershipId}
-						onSuccess={() => setAddScopeOpen(false)}
-						onCancel={() => setAddScopeOpen(false)}
+						onSuccess={() => setAddAssignmentOpen(false)}
+						onCancel={() => setAddAssignmentOpen(false)}
 					/>
 				</DialogContent>
 			</Dialog>

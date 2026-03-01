@@ -1,4 +1,3 @@
-import { useRef } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import {
@@ -18,6 +17,7 @@ import { useDeleteUnit, useUnitsByPropId, useUnitsList } from '@/features/units'
 import { config } from '@/config'
 import { formatCurrency, formatEnumLabel } from '@/lib/format'
 import { FORM_DIALOG_CLASS, useEditDialogState } from '@/lib/dialog'
+import { useQueryErrorToast } from '@/lib/hooks'
 
 function UnitRowActions({ unit, onEdit }: { unit: Unit; onEdit: () => void }) {
 	const deleteUnit = useDeleteUnit()
@@ -68,13 +68,7 @@ export function UnitsTableView({ propId }: UnitsTableViewProps) {
 		})
 	}
 
-	// Show error toast once per error instance, not on every re-render
-	const lastErrorRef = useRef<unknown>(null)
-	if (isError && error !== lastErrorRef.current) {
-		lastErrorRef.current = error
-		toast.error(`Error loading units: ${error.message || 'Unknown'}`)
-	}
-	if (!isError) lastErrorRef.current = null
+	useQueryErrorToast(isError, error, 'units')
 
 	const skeletonTable = (
 		<TableSkeleton

@@ -1,6 +1,4 @@
-import { useRef } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { toast } from 'sonner'
 import {
 	Table,
 	TableBody,
@@ -13,17 +11,13 @@ import { DelayedLoadingFallback } from '@abumble/design-system/components/Delaye
 import { TableSkeleton } from '@/components/ui'
 import { useTenantsList } from '@/features/tenants/hooks'
 import { config } from '@/config'
+import { useQueryErrorToast } from '@/lib/hooks'
 
 export function TenantsTableView() {
 	const navigate = useNavigate()
 	const { data: tenants, isLoading, isError, error } = useTenantsList()
 
-	const lastErrorRef = useRef<unknown>(null)
-	if (isError && error !== lastErrorRef.current) {
-		lastErrorRef.current = error
-		toast.error(`Error loading tenants: ${error.message || 'Unknown'}`)
-	}
-	if (!isError) lastErrorRef.current = null
+	useQueryErrorToast(isError, error as Error, 'tenants')
 
 	const skeletonTable = (
 		<TableSkeleton

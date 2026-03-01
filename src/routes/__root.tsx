@@ -3,7 +3,7 @@ import Footer from '@/components/Footer'
 import Header from '@/components/Header'
 import { OnboardingPage } from '@/components/OnboardingPage'
 import { Register } from '@/components/Register'
-import { LoadingScreen } from '@/components/ui'
+import { BannerBackgroundImage, LoadingScreen } from '@/components/ui'
 import { config } from '@/config'
 import { useAuth } from '@/contexts/auth'
 import { useNetwork } from '@/contexts/network'
@@ -24,17 +24,14 @@ export const Route = createRootRoute({
 })
 
 function Root() {
-	const { user, isLoadingUser, isUserDefined } = useAuth()
+	const { user, isLoadingUser } = useAuth()
 	const { organizations } = useOrganization()
 	const location = useLocation()
-	const isPublic = location.pathname.startsWith('/public')
 
 	// Paths that bypass auth and org guards — rendered as plain outlet (no sidebar)
-	const isUnguarded =
-		isPublic ||
-		location.pathname.startsWith('/dev') ||
-		location.pathname.startsWith('/invite')
-
+	const isUnguarded = ['/public', '/dev', '/invite'].some((path) =>
+		location.pathname.startsWith(path),
+	)
 	if (!config.constructionDisabled) {
 		return (
 			<div className="flex flex-col h-full">
@@ -45,11 +42,6 @@ function Root() {
 			</div>
 		)
 	}
-
-	const needsOnboarding =
-		isUserDefined && user?.termsAccepted && organizations.length === 0
-
-	const needsTermsAcceptance = isUserDefined && user && !user.termsAccepted
 
 	let altContent = null
 
@@ -65,30 +57,57 @@ function Root() {
 				{null}
 			</DelayedLoadingFallback>
 		)
-	} else if (!isUserDefined || needsTermsAcceptance) {
-		altContent = <Register />
-	} else if (needsOnboarding) {
-		altContent = <OnboardingPage />
+	}
+
+	if (altContent != null) {
+		altContent = (
+			<main className="flex flex-col mt-14 p-6 min-h-[75vh]">
+				<OfflineWarningBanner />
+				{altContent}
+			</main>
+		)
+	} else if (!user?.termsAccepted || organizations.length === 0) {
+		altContent = <OnboardingFlow />
 	}
 
 	if (altContent != null) {
 		return (
-			<div className="layout-header-full flex min-h-screen w-full flex-col">
+			<div className="flex min-h-screen w-full flex-col bg-background text-foreground">
 				<Header />
-
-				<main className="flex flex-col mt-14 p-6 min-h-[75vh]">
-					{/* Background Element */}
-					<div className="app-center-background-image"></div>
-
-					<OfflineWarningBanner />
-					{altContent}
-				</main>
+				{altContent}
 				<Footer />
 			</div>
 		)
 	}
 
 	return <DashboardHome />
+}
+
+function OnboardingFlow() {
+	const { user, isUserDefined } = useAuth()
+	const { organizations } = useOrganization()
+
+	let content = null
+	if (!isUserDefined || !user?.termsAccepted) {
+		content = <Register />
+	} else if (organizations.length === 0) {
+		content = <OnboardingPage />
+	}
+
+	return (
+		<main className="flex flex-1 flex-col">
+			<BannerBackgroundImage>
+				<div className="app-center-background-image" />
+			</BannerBackgroundImage>
+
+			<div className="flex-1 flex flex-col items-center justify-start pt-12 p-6">
+				<div className="w-full max-w-md space-y-8">
+					<OfflineWarningBanner />
+					{content}
+				</div>
+			</div>
+		</main>
+	)
 }
 
 function DashboardHome() {

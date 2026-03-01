@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 import { Copy, Shield } from 'lucide-react'
 import {
@@ -20,6 +20,7 @@ import { useAuth } from '@/contexts/auth'
 import { useDeletePermissionPolicy, usePermissionPolicies } from '../../hooks'
 import { PermissionPolicyForm } from '../forms/PermissionPolicyForm'
 import { FORM_DIALOG_CLASS } from '@/lib/dialog'
+import { useQueryErrorToast } from '@/lib/hooks'
 
 export interface PermissionPoliciesTableViewProps {
 	orgId: string
@@ -50,14 +51,7 @@ export function PermissionPoliciesTableView({
 
 	const isGlobalAdmin = user?.roles?.includes('ROLE_ADMIN') ?? false
 
-	const lastErrorRef = useRef<unknown>(null)
-	if (isError && error !== lastErrorRef.current) {
-		lastErrorRef.current = error
-		toast.error(
-			`Error loading policies: ${(error as Error).message ?? 'Unknown'}`,
-		)
-	}
-	if (!isError) lastErrorRef.current = null
+	useQueryErrorToast(isError, error as Error, 'policies')
 
 	const handleDelete = (policy: PermissionPolicy) => {
 		deletePolicy.mutate(policy.id, {

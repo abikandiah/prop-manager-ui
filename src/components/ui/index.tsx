@@ -67,6 +67,25 @@ export function LoadingScreen() {
 	)
 }
 
+export function BannerBackgroundImage({
+	className,
+	children,
+	...props
+}: {
+	className?: string
+	children: React.ReactNode
+}) {
+	return (
+		<div
+			className={cn(className, 'relative h-64 w-full overflow-hidden')}
+			{...props}
+		>
+			{children}
+			<div className="absolute inset-0 bg-linear-to-b from-slate-900/20 via-transparent to-white dark:to-background" />
+		</div>
+	)
+}
+
 export function TextLink({ className, ...props }: LinkComponentProps) {
 	return <Link {...props} className={cn('text-link', className)} />
 }

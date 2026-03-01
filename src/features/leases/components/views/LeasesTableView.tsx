@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { FORM_DIALOG_CLASS_WIDE, useEditDialogState } from '@/lib/dialog'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
@@ -25,6 +25,7 @@ import {
 } from '@/features/leases'
 import { config } from '@/config'
 import { formatCurrency, formatDate, formatEnumLabel } from '@/lib/format'
+import { useQueryErrorToast } from '@/lib/hooks'
 
 function statusVariant(status: LeaseStatus) {
 	switch (status) {
@@ -110,13 +111,7 @@ export function LeasesTableView({
 		setWizardStep(2)
 	}
 
-	// Show error toast once per error instance, not on every re-render
-	const lastErrorRef = useRef<unknown>(null)
-	if (raw.isError && raw.error !== lastErrorRef.current) {
-		lastErrorRef.current = raw.error
-		toast.error(`Error loading leases: ${raw.error?.message || 'Unknown'}`)
-	}
-	if (!raw.isError) lastErrorRef.current = null
+	useQueryErrorToast(raw.isError, raw.error as Error, 'leases')
 
 	const handleRowClick = (lease: Lease) => {
 		navigate({

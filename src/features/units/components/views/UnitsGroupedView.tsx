@@ -22,6 +22,7 @@ import { config } from '@/config'
 import { formatCurrency, formatEnumLabel } from '@/lib/format'
 import { FORM_DIALOG_CLASS, useEditDialogState } from '@/lib/dialog'
 import type { Prop } from '@/domain/property'
+import { useQueryErrorToast } from '@/lib/hooks'
 
 interface UnitGroup {
 	propId: string
@@ -197,13 +198,7 @@ export function UnitsGroupedView() {
 		navigate({ to: '/units/$unitId', params: { unitId: unit.id } })
 	}
 
-	// Show error toast once per error instance, not on every re-render
-	const lastErrorRef = useRef<unknown>(null)
-	if (isError && error !== lastErrorRef.current) {
-		lastErrorRef.current = error
-		toast.error(`Error loading units: ${error.message || 'Unknown'}`)
-	}
-	if (!isError) lastErrorRef.current = null
+	useQueryErrorToast(isError, error, 'units')
 
 	const skeletonTable = (
 		<TableSkeleton

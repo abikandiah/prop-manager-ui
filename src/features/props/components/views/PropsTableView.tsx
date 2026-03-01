@@ -1,7 +1,5 @@
-import { useRef } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { cn } from '@abumble/design-system/utils'
-import { toast } from 'sonner'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import {
 	Table,
@@ -15,19 +13,14 @@ import { DelayedLoadingFallback } from '@abumble/design-system/components/Delaye
 import { useCreateProp, usePropsList } from '@/features/props'
 import { config } from '@/config'
 import { formatAddress, formatEnumLabel } from '@/lib/format'
+import { useQueryErrorToast } from '@/lib/hooks'
 
 export function PropsTableView() {
 	const navigate = useNavigate()
 	const { data: props, isLoading, isError, error } = usePropsList()
 	const createProp = useCreateProp()
 
-	// Show error toast once per error instance, not on every re-render
-	const lastErrorRef = useRef<unknown>(null)
-	if (isError && error !== lastErrorRef.current) {
-		lastErrorRef.current = error
-		toast.error(`Error loading properties: ${error.message || 'Unknown'}`)
-	}
-	if (!isError) lastErrorRef.current = null
+	useQueryErrorToast(isError, error, 'properties')
 
 	return (
 		<div className="rounded border bg-card overflow-hidden">

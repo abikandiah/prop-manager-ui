@@ -12,7 +12,7 @@
 		"check": "prettier --write . && eslint --fix"
 	},
 	"dependencies": {
-		"@abumble/design-system": "^0.0.30",
+		"@abumble/design-system": "^0.0.31",
 		"@hookform/resolvers": "^5.2.2",
 		"@tailwindcss/typography": "^0.5.19",
 		"@tanstack/react-devtools": "^0.7.11",

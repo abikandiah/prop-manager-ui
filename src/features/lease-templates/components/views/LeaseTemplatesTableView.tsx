@@ -1,6 +1,4 @@
-import { useRef } from 'react'
 import { useNavigate } from '@tanstack/react-router'
-import { toast } from 'sonner'
 import { cn } from '@abumble/design-system/utils'
 import {
 	Table,
@@ -19,6 +17,7 @@ import {
 import { TableSkeleton } from '@/components/ui'
 import { config } from '@/config'
 import { formatDate, formatEnumLabel } from '@/lib/format'
+import { useQueryErrorToast } from '@/lib/hooks'
 
 export interface LeaseTemplatesTableViewProps {
 	activeOnly?: boolean
@@ -28,15 +27,15 @@ export function LeaseTemplatesTableView({
 	activeOnly = false,
 }: LeaseTemplatesTableViewProps) {
 	const navigate = useNavigate()
-	const allTemplates = useLeaseTemplatesList()
-	const activeTemplates = useLeaseTemplatesActive()
+	const all = useLeaseTemplatesList()
+	const active = useLeaseTemplatesActive()
 
 	const {
 		data: templates,
 		isLoading,
 		isError,
 		error,
-	} = activeOnly ? activeTemplates : allTemplates
+	} = activeOnly ? active : all
 
 	const handleRowClick = (template: LeaseTemplate) => {
 		navigate({
@@ -45,13 +44,7 @@ export function LeaseTemplatesTableView({
 		})
 	}
 
-	// Show error toast once per error instance, not on every re-render
-	const lastErrorRef = useRef<unknown>(null)
-	if (isError && error !== lastErrorRef.current) {
-		lastErrorRef.current = error
-		toast.error(`Error loading templates: ${error.message || 'Unknown'}`)
-	}
-	if (!isError) lastErrorRef.current = null
+	useQueryErrorToast(isError, error as Error, 'templates')
 
 	const skeletonTable = (
 		<TableSkeleton

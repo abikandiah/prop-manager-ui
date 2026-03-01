@@ -66,3 +66,11 @@
 .prose.prose-sm > *:last-child {
 	margin-bottom: 0;
 }
+
+:root {
+	--card: oklch(1 0 0 / 0.75);
+}
+
+.dark {
+	--card: oklch(0.23 0.02 260 / 0.75);
+}

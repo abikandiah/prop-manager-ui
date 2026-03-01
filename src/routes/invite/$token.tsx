@@ -1,6 +1,7 @@
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
 import { RegisterForm } from '@/components/RegisterForm'
 import { DetailField, TextLink } from '@/components/ui'
+import { FormActions, FormCard } from '@/components/ui/FormCard'
 import { config } from '@/config'
 import type { User } from '@/contexts/auth'
 import { useAuth } from '@/contexts/auth'
@@ -14,12 +15,6 @@ import {
 } from '@/features/invites/types'
 import { formatCurrency, formatDate, formatDateTime } from '@/lib/format'
 import { Button } from '@abumble/design-system/components/Button'
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from '@abumble/design-system/components/Card'
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
@@ -204,17 +199,15 @@ function InvitePageContent({
 
 			{/* Action card — centered below details */}
 			<div className="flex justify-center mt-8">
-				<div className="w-full max-w-md">
-					<InviteActionCard
-						status={status}
-						targetType={targetType}
-						organizationName={membershipSnapshot?.organizationName}
-						user={user}
-						expiresAt={expiresAt}
-						onAccept={onAccept}
-						isAccepting={isAccepting}
-					/>
-				</div>
+				<InviteActionCard
+					status={status}
+					targetType={targetType}
+					organizationName={membershipSnapshot?.organizationName}
+					user={user}
+					expiresAt={expiresAt}
+					onAccept={onAccept}
+					isAccepting={isAccepting}
+				/>
 			</div>
 		</div>
 	)
@@ -255,50 +248,47 @@ function InviteActionCard({
 	const isExpired = status === InviteStatus.EXPIRED
 	const isAccepted = status === InviteStatus.ACCEPTED
 
+	const title = canAccept
+		? 'Accept your invite'
+		: isRevoked
+			? 'Invite revoked'
+			: isExpired
+				? 'Invite expired'
+				: 'Invite accepted'
+
+	const description = (
+		<span
+			{...(canAccept
+				? {}
+				: { role: 'status' as const, 'aria-live': 'polite' as const })}
+		>
+			{canAccept ? (
+				<>
+					{isLease
+						? 'Accept the invite to join this lease as a tenant. You will be able to discuss and review the lease with property management.'
+						: `Accept the invite to join ${organizationName} as a member.`}
+					<br />
+					<br />
+					This invite expires {formatDateTime(expiresAt)}
+				</>
+			) : (
+				<>
+					{isRevoked && 'This invite is no longer valid and cannot be accepted.'}
+					{isExpired && `This invite expired on ${formatDateTime(expiresAt)}.`}
+					{isAccepted &&
+						(isLease
+							? "You've already accepted this invite and have access to the lease."
+							: "You've already accepted this invite and have access to the organization.")}
+				</>
+			)}
+		</span>
+	)
+
 	return (
-		<Card>
-			<CardHeader>
-				<CardTitle className="text-base">
-					{canAccept
-						? 'Accept your invite'
-						: isRevoked
-							? 'Invite revoked'
-							: isExpired
-								? 'Invite expired'
-								: 'Invite accepted'}
-				</CardTitle>
-				<p
-					className="text-sm text-muted-foreground"
-					{...(canAccept
-						? {}
-						: { role: 'status' as const, 'aria-live': 'polite' as const })}
-				>
-					{canAccept ? (
-						<>
-							{isLease
-								? 'Accept the invite to join this lease as a tenant. You will be able to discuss and review the lease with property management.'
-								: `Accept the invite to join ${organizationName} as a member.`}
-							<br />
-							<br />
-							This invite expires {formatDateTime(expiresAt)}.
-						</>
-					) : (
-						<>
-							{isRevoked &&
-								'This invite is no longer valid and cannot be accepted.'}
-							{isExpired &&
-								`This invite expired on ${formatDateTime(expiresAt)}.`}
-							{isAccepted &&
-								(isLease
-									? "You've already accepted this invite and have access to the lease."
-									: "You've already accepted this invite and have access to the organization.")}
-						</>
-					)}
-				</p>
-			</CardHeader>
-			<CardContent className="flex flex-col items-center gap-3">
-				{canAccept && (
-					<>
+		<FormCard title={title} description={description}>
+			{canAccept && (
+				<div className="space-y-3">
+					<FormActions fullWidth>
 						<Button
 							className="w-full"
 							onClick={onAccept}
@@ -307,15 +297,15 @@ function InviteActionCard({
 						>
 							{isAccepting ? 'Joining...' : 'Accept Invite'}
 						</Button>
-						{isLease && (
-							<p className="text-xs text-muted-foreground text-center">
-								* Accepting this invite is not the same as signing the lease.
-							</p>
-						)}
-					</>
-				)}
-			</CardContent>
-		</Card>
+					</FormActions>
+					{isLease && (
+						<p className="text-xs text-muted-foreground text-center">
+							* Accepting this invite is not the same as signing the lease.
+						</p>
+					)}
+				</div>
+			)}
+		</FormCard>
 	)
 }
 
@@ -355,11 +345,13 @@ function InvitePageSkeleton() {
 
 			{/* Action card skeleton — centered */}
 			<div className="flex justify-center">
-				<div className="w-full max-w-md rounded-lg border bg-card px-5 py-4 flex flex-col gap-3">
-					<Skeleton className="h-5 w-36" />
-					<Skeleton className="h-3.5 w-full" />
-					<Skeleton className="h-3.5 w-3/4" />
-					<Skeleton className="h-9 w-full mt-2" />
+				<div className="w-full max-w-md rounded-lg border bg-card px-6 py-8 flex flex-col gap-6">
+					<div className="space-y-2">
+						<Skeleton className="h-8 w-48" />
+						<Skeleton className="h-4 w-full" />
+						<Skeleton className="h-4 w-3/4" />
+					</div>
+					<Skeleton className="h-10 w-full" />
 				</div>
 			</div>
 		</div>

@@ -6,8 +6,8 @@ export const Register = () => {
 		<div className="flex flex-1 flex-col items-center justify-center gap-8">
 			<MessageBanner
 				type="info"
-				message="This is a sandbox environment. This application is not intended for business or commercial use. No warranty, uptime guarantees, 
-				or technical support are provided. Use at your own risk."
+				message="This is a sandbox environment. It is not intended for business or commercial use. No warranty, uptime guarantees, 
+				or technical support are provided."
 				className="w-full max-w-md rounded"
 			/>
 

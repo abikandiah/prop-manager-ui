@@ -8,13 +8,9 @@ import { toast } from 'sonner'
 
 interface DevAuthFormProps {
 	onSuccess?: () => void
-	wrappedInCard?: boolean
 }
 
-export function DevAuthForm({
-	onSuccess,
-	wrappedInCard = true,
-}: DevAuthFormProps) {
+export function DevAuthForm({ onSuccess }: DevAuthFormProps) {
 	const [email, setEmail] = useState('')
 	const [password, setPassword] = useState('')
 	const [loading, setLoading] = useState(false)
@@ -81,8 +77,6 @@ export function DevAuthForm({
 			</FormActions>
 		</form>
 	)
-
-	if (!wrappedInCard) return form
 
 	return (
 		<FormCard title="Login" description="Enter your dev credentials">

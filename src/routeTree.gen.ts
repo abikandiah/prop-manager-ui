@@ -9,14 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as DevRouteRouteImport } from './routes/dev/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as UnitsIndexRouteImport } from './routes/units/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as PropsIndexRouteImport } from './routes/props/index'
 import { Route as ProfileIndexRouteImport } from './routes/profile/index'
 import { Route as MessagesIndexRouteImport } from './routes/messages/index'
-import { Route as DevIndexRouteImport } from './routes/dev/index'
 import { Route as UnitsUnitIdRouteImport } from './routes/units/$unitId'
 import { Route as SettingsPermissionTemplatesRouteImport } from './routes/settings/permission-templates'
 import { Route as SettingsPermissionPoliciesRouteImport } from './routes/settings/permission-policies'
@@ -45,11 +43,6 @@ import { Route as OrganizationMembersMembershipIdRouteImport } from './routes/or
 import { Route as LeasesTemplatesTemplateIdRouteImport } from './routes/leases/templates/$templateId'
 import { Route as LeasesAgreementsLeaseIdRouteImport } from './routes/leases/agreements/$leaseId'
 
-const DevRouteRoute = DevRouteRouteImport.update({
-  id: '/dev',
-  path: '/dev',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -79,11 +72,6 @@ const MessagesIndexRoute = MessagesIndexRouteImport.update({
   id: '/messages/',
   path: '/messages/',
   getParentRoute: () => rootRouteImport,
-} as any)
-const DevIndexRoute = DevIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => DevRouteRoute,
 } as any)
 const UnitsUnitIdRoute = UnitsUnitIdRouteImport.update({
   id: '/units/$unitId',
@@ -231,7 +219,6 @@ const LeasesAgreementsLeaseIdRoute = LeasesAgreementsLeaseIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/dev': typeof DevRouteRouteWithChildren
   '/leases/agreements': typeof LeasesAgreementsRouteRouteWithChildren
   '/leases/templates': typeof LeasesTemplatesRouteRouteWithChildren
   '/props/$id': typeof PropsIdRouteRouteWithChildren
@@ -241,7 +228,6 @@ export interface FileRoutesByFullPath {
   '/settings/permission-policies': typeof SettingsPermissionPoliciesRoute
   '/settings/permission-templates': typeof SettingsPermissionTemplatesRoute
   '/units/$unitId': typeof UnitsUnitIdRoute
-  '/dev/': typeof DevIndexRoute
   '/messages/': typeof MessagesIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/props/': typeof PropsIndexRoute
@@ -274,7 +260,6 @@ export interface FileRoutesByTo {
   '/settings/permission-policies': typeof SettingsPermissionPoliciesRoute
   '/settings/permission-templates': typeof SettingsPermissionTemplatesRoute
   '/units/$unitId': typeof UnitsUnitIdRoute
-  '/dev': typeof DevIndexRoute
   '/messages': typeof MessagesIndexRoute
   '/profile': typeof ProfileIndexRoute
   '/props': typeof PropsIndexRoute
@@ -302,7 +287,6 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/dev': typeof DevRouteRouteWithChildren
   '/leases/agreements': typeof LeasesAgreementsRouteRouteWithChildren
   '/leases/templates': typeof LeasesTemplatesRouteRouteWithChildren
   '/props/$id': typeof PropsIdRouteRouteWithChildren
@@ -312,7 +296,6 @@ export interface FileRoutesById {
   '/settings/permission-policies': typeof SettingsPermissionPoliciesRoute
   '/settings/permission-templates': typeof SettingsPermissionTemplatesRoute
   '/units/$unitId': typeof UnitsUnitIdRoute
-  '/dev/': typeof DevIndexRoute
   '/messages/': typeof MessagesIndexRoute
   '/profile/': typeof ProfileIndexRoute
   '/props/': typeof PropsIndexRoute
@@ -341,7 +324,6 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/dev'
     | '/leases/agreements'
     | '/leases/templates'
     | '/props/$id'
@@ -351,7 +333,6 @@ export interface FileRouteTypes {
     | '/settings/permission-policies'
     | '/settings/permission-templates'
     | '/units/$unitId'
-    | '/dev/'
     | '/messages/'
     | '/profile/'
     | '/props/'
@@ -384,7 +365,6 @@ export interface FileRouteTypes {
     | '/settings/permission-policies'
     | '/settings/permission-templates'
     | '/units/$unitId'
-    | '/dev'
     | '/messages'
     | '/profile'
     | '/props'
@@ -411,7 +391,6 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/dev'
     | '/leases/agreements'
     | '/leases/templates'
     | '/props/$id'
@@ -421,7 +400,6 @@ export interface FileRouteTypes {
     | '/settings/permission-policies'
     | '/settings/permission-templates'
     | '/units/$unitId'
-    | '/dev/'
     | '/messages/'
     | '/profile/'
     | '/props/'
@@ -449,7 +427,6 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  DevRouteRoute: typeof DevRouteRouteWithChildren
   LeasesAgreementsRouteRoute: typeof LeasesAgreementsRouteRouteWithChildren
   LeasesTemplatesRouteRoute: typeof LeasesTemplatesRouteRouteWithChildren
   PropsIdRouteRoute: typeof PropsIdRouteRouteWithChildren
@@ -481,13 +458,6 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/dev': {
-      id: '/dev'
-      path: '/dev'
-      fullPath: '/dev'
-      preLoaderRoute: typeof DevRouteRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -529,13 +499,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/messages/'
       preLoaderRoute: typeof MessagesIndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/dev/': {
-      id: '/dev/'
-      path: '/'
-      fullPath: '/dev/'
-      preLoaderRoute: typeof DevIndexRouteImport
-      parentRoute: typeof DevRouteRoute
     }
     '/units/$unitId': {
       id: '/units/$unitId'
@@ -729,18 +692,6 @@ declare module '@tanstack/react-router' {
   }
 }
 
-interface DevRouteRouteChildren {
-  DevIndexRoute: typeof DevIndexRoute
-}
-
-const DevRouteRouteChildren: DevRouteRouteChildren = {
-  DevIndexRoute: DevIndexRoute,
-}
-
-const DevRouteRouteWithChildren = DevRouteRoute._addFileChildren(
-  DevRouteRouteChildren,
-)
-
 interface LeasesAgreementsRouteRouteChildren {
   LeasesAgreementsLeaseIdRoute: typeof LeasesAgreementsLeaseIdRoute
   LeasesAgreementsIndexRoute: typeof LeasesAgreementsIndexRoute
@@ -783,7 +734,6 @@ const PropsIdRouteRouteWithChildren = PropsIdRouteRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  DevRouteRoute: DevRouteRouteWithChildren,
   LeasesAgreementsRouteRoute: LeasesAgreementsRouteRouteWithChildren,
   LeasesTemplatesRouteRoute: LeasesTemplatesRouteRouteWithChildren,
   PropsIdRouteRoute: PropsIdRouteRouteWithChildren,

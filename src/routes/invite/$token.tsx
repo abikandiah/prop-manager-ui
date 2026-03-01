@@ -1,5 +1,4 @@
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
-import { RegisterForm } from '@/components/RegisterForm'
 import { DetailField, TextLink } from '@/components/ui'
 import { FormActions, FormCard } from '@/components/ui/FormCard'
 import { config } from '@/config'
@@ -234,15 +233,6 @@ function InviteActionCard({
 }: InviteActionCardProps) {
 	const isLease = targetType === TargetType.LEASE
 
-	if (!user) {
-		const description = isLease
-			? 'Register to accept this invite and access your lease.'
-			: `Register to accept this invite and join ${organizationName}.`
-		return (
-			<RegisterForm title="Create your account" description={description} />
-		)
-	}
-
 	const canAccept = status === InviteStatus.PENDING
 	const isRevoked = status === InviteStatus.REVOKED
 	const isExpired = status === InviteStatus.EXPIRED
@@ -273,7 +263,8 @@ function InviteActionCard({
 				</>
 			) : (
 				<>
-					{isRevoked && 'This invite is no longer valid and cannot be accepted.'}
+					{isRevoked &&
+						'This invite is no longer valid and cannot be accepted.'}
 					{isExpired && `This invite expired on ${formatDateTime(expiresAt)}.`}
 					{isAccepted &&
 						(isLease

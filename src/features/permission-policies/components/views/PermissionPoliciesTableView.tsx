@@ -26,11 +26,13 @@ export interface PermissionPoliciesTableViewProps {
 	orgId: string
 }
 
-/** Summarises flat permissions as a short human-readable string, e.g. "l:rcud · m:r". */
+/** Summarises flat permissions as a short human-readable string, e.g. "l:rcud · p:r". */
 function formatPermissions(
 	permissions: PermissionPolicy['permissions'],
 ): string {
-	const entries = Object.entries(permissions).filter(([, v]) => v)
+	const entries = Object.entries(permissions).filter(
+		([k, v]) => v && k !== 'm' && k !== 'f',
+	)
 	if (entries.length === 0) return '—'
 	return entries.map(([k, v]) => `${k}:${v}`).join(' · ')
 }

@@ -6,8 +6,6 @@ const DOMAINS = [
 	{ key: 'o', label: 'Organization' },
 	{ key: 'p', label: 'Portfolio' },
 	{ key: 'l', label: 'Leases' },
-	{ key: 'm', label: 'Maintenance' },
-	{ key: 'f', label: 'Finances' },
 	{ key: 't', label: 'Tenants' },
 ] as const
 

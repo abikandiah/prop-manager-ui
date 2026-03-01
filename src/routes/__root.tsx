@@ -1,8 +1,10 @@
+import { getDevToken } from '@/api/client'
 import { AppSidebar } from '@/components/AppSidebar'
+import { DevAuthForm } from '@/components/DevAuthForm'
 import Footer from '@/components/Footer'
 import Header from '@/components/Header'
-import { OnboardingPage } from '@/components/OnboardingPage'
-import { Register } from '@/components/Register'
+import { OnboardingForm } from '@/components/OnboardingForm'
+import { RegisterForm } from '@/components/RegisterForm'
 import { BannerBackgroundImage, LoadingScreen } from '@/components/ui'
 import { config } from '@/config'
 import { useAuth } from '@/contexts/auth'
@@ -15,23 +17,21 @@ import {
 	SidebarProvider,
 } from '@abumble/design-system/components/Sidebar'
 import { UnderConstruction } from '@abumble/design-system/components/UnderConstruction'
-import { cn } from '@abumble/design-system/utils'
+import { cn, stringToBoolean } from '@abumble/design-system/utils'
 import { Outlet, createRootRoute, useLocation } from '@tanstack/react-router'
 import { ServerOff, WifiOff } from 'lucide-react'
+import type React from 'react'
+import { useState } from 'react'
 
 export const Route = createRootRoute({
 	component: Root,
 })
 
 function Root() {
-	const { user, isLoadingUser } = useAuth()
+	const { user, refreshUser, isLoadingUser } = useAuth()
 	const { organizations } = useOrganization()
 	const location = useLocation()
 
-	// Paths that bypass auth and org guards — rendered as plain outlet (no sidebar)
-	const isUnguarded = ['/public', '/dev', '/invite'].some((path) =>
-		location.pathname.startsWith(path),
-	)
 	if (!config.constructionDisabled) {
 		return (
 			<div className="flex flex-col h-full">
@@ -43,38 +43,75 @@ function Root() {
 		)
 	}
 
-	let altContent = null
-
-	if (isUnguarded) {
-		altContent = <Outlet />
-	} else if (isLoadingUser) {
-		altContent = (
-			<DelayedLoadingFallback
-				isLoading={isLoadingUser}
-				delayMs={config.loadingFallbackDelayMs}
-				fallback={<LoadingScreen />}
-			>
-				{null}
-			</DelayedLoadingFallback>
+	let main = null
+	if (isLoadingUser) {
+		main = (
+			<MainPage>
+				<DelayedLoadingFallback
+					isLoading={isLoadingUser}
+					delayMs={config.loadingFallbackDelayMs}
+					fallback={<LoadingScreen />}
+				>
+					{null}
+				</DelayedLoadingFallback>
+			</MainPage>
 		)
 	}
 
-	if (altContent != null) {
-		altContent = (
-			<main className="flex flex-col mt-14 p-6 min-h-[75vh]">
+	// Public
+	else if (location.pathname.startsWith('/public')) {
+		main = (
+			<MainPage>
+				<Outlet />
+			</MainPage>
+		)
+	}
+
+	// If requires devAuth
+	else if (config.isDevelopment && !getDevToken()) {
+		const onDevAuthSuccess = () => {
+			refreshUser()
+		}
+		main = (
+			<BannerLandingPage>
+				<DevAuthForm onSuccess={onDevAuthSuccess} />
+			</BannerLandingPage>
+		)
+	}
+
+	// Accept terms
+	else if (!user?.termsAccepted) {
+		main = (
+			<BannerLandingPage>
+				<RegisterForm />
+			</BannerLandingPage>
+		)
+	}
+
+	// Onboarding
+	else if (organizations.length === 0) {
+		main = (
+			<BannerLandingPage>
+				<OnboardingForm />
+			</BannerLandingPage>
+		)
+	}
+
+	// Invite
+	else if (location.pathname.startsWith('/invite')) {
+		main = (
+			<BannerLandingPage>
 				<OfflineWarningBanner />
-				{altContent}
-			</main>
+				<Outlet />
+			</BannerLandingPage>
 		)
-	} else if (!user?.termsAccepted || organizations.length === 0) {
-		altContent = <OnboardingFlow />
 	}
 
-	if (altContent != null) {
+	if (main != null) {
 		return (
 			<div className="flex min-h-screen w-full flex-col bg-background text-foreground">
 				<Header />
-				{altContent}
+				{main}
 				<Footer />
 			</div>
 		)
@@ -83,15 +120,25 @@ function Root() {
 	return <DashboardHome />
 }
 
-function OnboardingFlow() {
-	const { user, isUserDefined } = useAuth()
-	const { organizations } = useOrganization()
+function MainPage({ children }: { children: React.ReactNode }) {
+	return (
+		<main className="flex flex-col mt-14 p-6 min-h-screen">
+			<OfflineWarningBanner />
+			{children}
+		</main>
+	)
+}
 
-	let content = null
-	if (!isUserDefined || !user?.termsAccepted) {
-		content = <Register />
-	} else if (organizations.length === 0) {
-		content = <OnboardingPage />
+const DISCLAIMER_DISMISSED_KEY = 'prop_mange_disclaimer_dismissed'
+
+function BannerLandingPage({ children }: { children: React.ReactNode }) {
+	const [dismissed, setDismissed] = useState(
+		stringToBoolean(localStorage.getItem(DISCLAIMER_DISMISSED_KEY)),
+	)
+
+	function onDisclaimerDismiss() {
+		localStorage.setItem(DISCLAIMER_DISMISSED_KEY, true.toString())
+		setDismissed(true)
 	}
 
 	return (
@@ -100,10 +147,22 @@ function OnboardingFlow() {
 				<div className="app-center-background-image" />
 			</BannerBackgroundImage>
 
-			<div className="flex-1 flex flex-col items-center justify-start pt-12 p-6">
-				<div className="w-full max-w-md space-y-8">
+			<div className="flex-1 flex flex-col items-center justify-start pt-16 p-6">
+				<div className="w-full max-w-md space-y-4">
 					<OfflineWarningBanner />
-					{content}
+
+					{!dismissed && (
+						<MessageBanner
+							type="info"
+							message="This is a sandbox environment. It is not intended for business or commercial use. No warranty, uptime guarantees, 
+									or technical support are provided."
+							className="w-full max-w-md rounded"
+							onClose={onDisclaimerDismiss}
+							hideIcon
+						/>
+					)}
+
+					{children}
 				</div>
 			</div>
 		</main>

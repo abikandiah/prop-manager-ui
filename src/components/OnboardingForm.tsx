@@ -1,7 +1,7 @@
 import { CreateOrganizationForm } from '@/features/organizations'
 import { FormCard } from '@/components/ui/FormCard'
 
-export function OnboardingPage() {
+export function OnboardingForm() {
 	return (
 		<div className="flex flex-1 flex-col items-center justify-center gap-8">
 			<FormCard

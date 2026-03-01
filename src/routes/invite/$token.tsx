@@ -14,39 +14,52 @@ import {
 } from '@/features/invites/types'
 import { formatCurrency, formatDate, formatDateTime } from '@/lib/format'
 import { Button } from '@abumble/design-system/components/Button'
+import { MessageBanner } from '@abumble/design-system/components/Banner'
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router'
 import { Building2, Home } from 'lucide-react'
-import { toast } from 'sonner'
+import * as React from 'react'
 
 export const Route = createFileRoute('/invite/$token')({
 	component: InviteAcceptPage,
 })
 
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+const STATUS_TITLE: Record<InviteStatus, string> = {
+	[InviteStatus.PENDING]: 'Accept your invite',
+	[InviteStatus.REVOKED]: 'Invite revoked',
+	[InviteStatus.EXPIRED]: 'Invite expired',
+	[InviteStatus.ACCEPTED]: 'Invite accepted',
+}
+
+function formatPropertyAddress(property: LeaseInvitePreview['property']): string {
+	return [
+		property.addressLine1,
+		property.addressLine2,
+		`${property.city}, ${property.stateProvinceRegion} ${property.postalCode}`,
+	]
+		.filter(Boolean)
+		.join(', ')
+}
+
+function matchesMaskedEmail(email: string, mask: string): boolean {
+	if (email.length !== mask.length) return false
+	return Array.from(mask).every((char, i) => char === '*' || char === email[i])
+}
+
+// ─── Route component ──────────────────────────────────────────────────────────
+
 function InviteAcceptPage() {
 	const { token } = Route.useParams()
 	const { user, isLoadingUser } = useAuth()
-	const navigate = useNavigate()
 
 	const { data: preview, isLoading, isError } = useInvitePreview(token)
 	const acceptInvite = useAcceptInvite()
 
 	const handleAccept = () => {
-		acceptInvite.mutate(token, {
-			onSuccess: (data) => {
-				if (data.targetType === TargetType.LEASE) {
-					toast.success("You've joined the lease!")
-					navigate({
-						to: '/leases/agreements/$leaseId',
-						params: { leaseId: data.targetId },
-					})
-				} else {
-					toast.success("You've joined the organization!")
-					navigate({ to: '/' })
-				}
-			},
-		})
+		acceptInvite.mutate(token)
 	}
 
 	const isPageLoading = isLoading || isLoadingUser
@@ -79,6 +92,8 @@ function InviteAcceptPage() {
 	)
 }
 
+// ─── Page content ─────────────────────────────────────────────────────────────
+
 interface InvitePageContentProps {
 	preview: InvitePreviewResponse
 	user: User | null
@@ -92,21 +107,13 @@ function InvitePageContent({
 	onAccept,
 	isAccepting,
 }: InvitePageContentProps) {
-	const {
-		maskedEmail,
-		expiresAt,
-		invitedByName,
-		status,
-		targetType,
-		preview: snapshot,
-	} = preview
+	const { maskedEmail, expiresAt, invitedByName, status, targetType, preview: snapshot } =
+		preview
 
 	const isPending = status === InviteStatus.PENDING
 	const isLease = targetType === TargetType.LEASE
 	const leaseSnapshot = isLease ? (snapshot as LeaseInvitePreview) : null
-	const membershipSnapshot = !isLease
-		? (snapshot as MembershipInvitePreview)
-		: null
+	const membershipSnapshot = !isLease ? (snapshot as MembershipInvitePreview) : null
 
 	return (
 		<div className="flex flex-col gap-6">
@@ -128,15 +135,7 @@ function InvitePageContent({
 						{leaseSnapshot.property.addressLine1 && (
 							<>
 								<span>·</span>
-								<span>
-									{[
-										leaseSnapshot.property.addressLine1,
-										leaseSnapshot.property.addressLine2,
-										`${leaseSnapshot.property.city}, ${leaseSnapshot.property.stateProvinceRegion} ${leaseSnapshot.property.postalCode}`,
-									]
-										.filter(Boolean)
-										.join(', ')}
-								</span>
+								<span>{formatPropertyAddress(leaseSnapshot.property)}</span>
 							</>
 						)}
 					</div>
@@ -149,24 +148,20 @@ function InvitePageContent({
 				)}
 			</div>
 
-			{/* Detail sections — only when invite is pending */}
+			{/* Detail cards — only shown when invite is still pending */}
 			{isPending && isLease && leaseSnapshot && (
 				<div className="flex flex-col gap-4">
-					{/* Unit */}
-					<div className="rounded-lg border bg-card px-5 py-4">
+					<DetailCard>
 						<div className="grid gap-4 sm:grid-cols-2">
 							<DetailField label="Unit">
 								{leaseSnapshot.unit.unitNumber}
-								{leaseSnapshot.unit.unitType
-									? ` · ${leaseSnapshot.unit.unitType}`
-									: ''}
+								{leaseSnapshot.unit.unitType ? ` · ${leaseSnapshot.unit.unitType}` : ''}
 							</DetailField>
 							<DetailField label="Sent to">{maskedEmail}</DetailField>
 						</div>
-					</div>
+					</DetailCard>
 
-					{/* Lease terms */}
-					<div className="rounded-lg border bg-card px-5 py-4">
+					<DetailCard>
 						<div className="grid gap-4 sm:grid-cols-3">
 							<DetailField
 								label="Monthly Rent"
@@ -181,28 +176,27 @@ function InvitePageContent({
 								{formatDate(leaseSnapshot.lease.endDate)}
 							</DetailField>
 						</div>
-					</div>
+					</DetailCard>
 				</div>
 			)}
 
 			{isPending && !isLease && membershipSnapshot && (
-				<div className="rounded-lg border bg-card px-5 py-4">
+				<DetailCard>
 					<div className="grid gap-4 sm:grid-cols-2">
-						<DetailField label="Organization">
-							{membershipSnapshot.organizationName}
-						</DetailField>
+						<DetailField label="Organization">{membershipSnapshot.organizationName}</DetailField>
 						<DetailField label="Sent to">{maskedEmail}</DetailField>
 					</div>
-				</div>
+				</DetailCard>
 			)}
 
-			{/* Action card — centered below details */}
+			{/* Action card */}
 			<div className="flex justify-center mt-8">
 				<InviteActionCard
 					status={status}
 					targetType={targetType}
 					organizationName={membershipSnapshot?.organizationName}
 					user={user}
+					maskedEmail={maskedEmail}
 					expiresAt={expiresAt}
 					onAccept={onAccept}
 					isAccepting={isAccepting}
@@ -212,11 +206,20 @@ function InvitePageContent({
 	)
 }
 
+// ─── Shared detail card wrapper ───────────────────────────────────────────────
+
+function DetailCard({ children }: { children: React.ReactNode }) {
+	return <div className="rounded-lg border bg-card px-5 py-4">{children}</div>
+}
+
+// ─── Action card ──────────────────────────────────────────────────────────────
+
 interface InviteActionCardProps {
 	status: InviteStatus
 	targetType: TargetType
 	organizationName?: string
 	user: User | null
+	maskedEmail: string
 	expiresAt: string
 	onAccept: () => void
 	isAccepting: boolean
@@ -226,68 +229,59 @@ function InviteActionCard({
 	status,
 	targetType,
 	organizationName,
+	user,
+	maskedEmail,
 	expiresAt,
 	onAccept,
 	isAccepting,
 }: InviteActionCardProps) {
 	const isLease = targetType === TargetType.LEASE
-
 	const canAccept = status === InviteStatus.PENDING
-	const isRevoked = status === InviteStatus.REVOKED
-	const isExpired = status === InviteStatus.EXPIRED
-	const isAccepted = status === InviteStatus.ACCEPTED
 
-	const title = canAccept
-		? 'Accept your invite'
-		: isRevoked
-			? 'Invite revoked'
-			: isExpired
-				? 'Invite expired'
-				: 'Invite accepted'
-
-	const description = (
-		<span
-			{...(canAccept
-				? {}
-				: { role: 'status' as const, 'aria-live': 'polite' as const })}
-		>
-			{canAccept ? (
-				<>
-					{isLease
-						? 'Accept the invite to join this lease as a tenant. You will be able to discuss and review the lease with property management.'
-						: `Accept the invite to join ${organizationName} as a member.`}
-					<br />
-					<br />
-					This invite expires {formatDateTime(expiresAt)}
-				</>
-			) : (
-				<>
-					{isRevoked &&
-						'This invite is no longer valid and cannot be accepted.'}
-					{isExpired && `This invite expired on ${formatDateTime(expiresAt)}.`}
-					{isAccepted && 'This invite has already been accepted.'}
-				</>
-			)}
-		</span>
-	)
+	const emailMatches = React.useMemo(() => {
+		if (!user || !maskedEmail) return true
+		return matchesMaskedEmail(user.email.toLowerCase(), maskedEmail.toLowerCase())
+	}, [user, maskedEmail])
 
 	return (
-		<FormCard title={title} description={description}>
+		<FormCard
+			title={STATUS_TITLE[status]}
+			description={
+				<ActionCardDescription
+					status={status}
+					targetType={targetType}
+					organizationName={organizationName}
+					expiresAt={expiresAt}
+				/>
+			}
+		>
 			{canAccept && (
-				<div className="space-y-3">
+				<div className="space-y-4">
+					{user && (
+						<MessageBanner
+							type={emailMatches ? 'info' : 'warning'}
+							message={
+								<div className="flex-1 min-w-0 text-left">
+									<p className="font-medium truncate">Accepting as {user.email}</p>
+									{!emailMatches && (
+										<p className="mt-0.5 opacity-80">
+											Warning: This invite was sent to {maskedEmail}
+										</p>
+									)}
+								</div>
+							}
+						/>
+					)}
+
 					<FormActions fullWidth>
-						<Button
-							className="w-full"
-							onClick={onAccept}
-							disabled={isAccepting}
-							aria-busy={isAccepting}
-						>
+						<Button onClick={onAccept} disabled={isAccepting} aria-busy={isAccepting}>
 							{isAccepting ? 'Joining...' : 'Accept Invite'}
 						</Button>
 					</FormActions>
+
 					{isLease && (
 						<p className="text-xs text-muted-foreground text-center">
-							* Accepting this invite is not the same as signing the lease.
+							Accepting this invite is not the same as signing the lease.
 						</p>
 					)}
 				</div>
@@ -296,17 +290,60 @@ function InviteActionCard({
 	)
 }
 
+// ─── Action card description ──────────────────────────────────────────────────
+
+interface ActionCardDescriptionProps {
+	status: InviteStatus
+	targetType: TargetType
+	organizationName?: string
+	expiresAt: string
+}
+
+function ActionCardDescription({
+	status,
+	targetType,
+	organizationName,
+	expiresAt,
+}: ActionCardDescriptionProps) {
+	const isLease = targetType === TargetType.LEASE
+
+	if (status === InviteStatus.PENDING) {
+		return (
+			<div>
+				<p>
+					{isLease
+						? 'Accept the invite to join this lease as a tenant. You will be able to discuss and review the lease with property management.'
+						: `Accept the invite to join ${organizationName} as a member.`}
+				</p>
+				<p className="mt-3">This invite expires {formatDateTime(expiresAt)}</p>
+			</div>
+		)
+	}
+
+	return (
+		<span role="status" aria-live="polite">
+			{status === InviteStatus.REVOKED &&
+				'This invite is no longer valid and cannot be accepted.'}
+			{status === InviteStatus.EXPIRED &&
+				`This invite expired on ${formatDateTime(expiresAt)}.`}
+			{status === InviteStatus.ACCEPTED && 'This invite has already been accepted.'}
+		</span>
+	)
+}
+
+// ─── Loading skeleton ─────────────────────────────────────────────────────────
+
 function InvitePageSkeleton() {
 	return (
 		<div className="flex flex-col gap-6">
-			{/* Header skeleton */}
+			{/* Header */}
 			<div className="flex flex-col gap-2">
 				<Skeleton className="h-3.5 w-36" />
 				<Skeleton className="h-8 w-80" />
 				<Skeleton className="h-3.5 w-56" />
 			</div>
 
-			{/* Detail skeletons */}
+			{/* Detail cards */}
 			<div className="flex flex-col gap-4">
 				<div className="rounded-lg border bg-card px-5 py-4">
 					<div className="grid gap-4 sm:grid-cols-2">
@@ -330,8 +367,8 @@ function InvitePageSkeleton() {
 				</div>
 			</div>
 
-			{/* Action card skeleton — centered */}
-			<div className="flex justify-center">
+			{/* Action card */}
+			<div className="flex justify-center mt-8">
 				<div className="w-full max-w-md rounded-lg border bg-card px-6 py-8 flex flex-col gap-6">
 					<div className="space-y-2">
 						<Skeleton className="h-8 w-48" />

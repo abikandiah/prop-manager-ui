@@ -147,7 +147,7 @@ function BannerLandingPage({ children }: { children: React.ReactNode }) {
 				<div className="app-center-background-image" />
 			</BannerBackgroundImage>
 
-			<div className="flex-1 flex flex-col items-center justify-start pt-12 p-6">
+			<div className="flex-1 flex flex-col items-center justify-start mt-12 p-6">
 				<div className="w-full max-w-md space-y-4">
 					<OfflineWarningBanner />
 

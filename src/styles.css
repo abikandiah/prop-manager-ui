@@ -30,11 +30,6 @@
 	margin-bottom: 0.2em;
 }
 
-/* Ensure DialogContent has a reasonable max-width by default */
-[data-slot='dialog-content'] {
-	@apply max-w-[calc(100vw-2rem)] sm:max-w-lg;
-}
-
 .prose.prose-sm h2 {
 	margin-top: 1.25em;
 	margin-bottom: 0.375em;

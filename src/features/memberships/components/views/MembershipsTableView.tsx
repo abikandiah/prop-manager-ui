@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { Send, Trash2 } from 'lucide-react'
+import { Badge } from '@abumble/design-system/components/Badge'
 import {
 	Table,
 	TableBody,
@@ -51,7 +52,9 @@ export function MembershipsTableView({ orgId }: MembershipsTableViewProps) {
 				<TableHeader>
 					<TableRow>
 						<TableHead>Member</TableHead>
+						<TableHead>Role</TableHead>
 						<TableHead>Status</TableHead>
+						<TableHead>Last Active</TableHead>
 						<TableHead>Joined/Invited</TableHead>
 						{hasActions && <TableHead className="w-12" />}
 					</TableRow>
@@ -64,13 +67,17 @@ export function MembershipsTableView({ orgId }: MembershipsTableViewProps) {
 							<TableSkeleton
 								headers={[
 									'Member',
+									'Role',
 									'Status',
+									'Last Active',
 									'Joined/Invited',
 									...(hasActions ? [''] : []),
 								]}
 								columnWidths={[
 									'w-48',
 									'w-24',
+									'w-24',
+									'w-32',
 									'w-32',
 									...(hasActions ? [''] : []),
 								]}
@@ -81,7 +88,7 @@ export function MembershipsTableView({ orgId }: MembershipsTableViewProps) {
 						{!members || members.length === 0 ? (
 							<TableRow>
 								<TableCell
-									colSpan={hasActions ? 4 : 3}
+									colSpan={hasActions ? 6 : 5}
 									className="h-24 text-center text-muted-foreground"
 								>
 									No team members found. Invite someone above.
@@ -130,6 +137,13 @@ export function MembershipsTableView({ orgId }: MembershipsTableViewProps) {
 										</div>
 									</TableCell>
 									<TableCell>
+										{m.orgPolicyName ? (
+											<Badge variant="secondary">{m.orgPolicyName}</Badge>
+										) : (
+											<span className="text-muted-foreground">—</span>
+										)}
+									</TableCell>
+									<TableCell>
 										<InviteStatusBadge
 											status={
 												m.userId ? 'ACTIVE' : (m.inviteStatus ?? 'PENDING')
@@ -137,6 +151,9 @@ export function MembershipsTableView({ orgId }: MembershipsTableViewProps) {
 											lastResentAt={m.lastResentAt}
 											expiresAt={m.expiresAt}
 										/>
+									</TableCell>
+									<TableCell className="text-muted-foreground">
+										{m.userLastLoggedInAt ? formatDateTime(m.userLastLoggedInAt) : '—'}
 									</TableCell>
 									<TableCell className="text-muted-foreground">
 										{formatDateTime(m.createdAt)}

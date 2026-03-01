@@ -12,10 +12,12 @@ export interface Membership {
 	userId: string | null
 	userName: string | null
 	userEmail: string | null
+	userLastLoggedInAt: string | null
 	organizationId: string
 	inviteId: string | null
 	inviteEmail: string | null
 	inviteStatus: InviteStatus | null
+	orgPolicyName: string | null
 	lastResentAt: string | null
 	expiresAt: string | null
 	version: number

@@ -1,7 +1,11 @@
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { invitesApi } from './api'
 import { stableRequestId } from '@/lib/offline-types'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
+import { useNavigate } from '@tanstack/react-router'
+import { toast } from 'sonner'
+import { TargetType } from './types'
+import { useAuth } from '@/contexts/auth'
 
 export function useInvitePreview(token: string) {
 	return useQuery({
@@ -13,10 +17,32 @@ export function useInvitePreview(token: string) {
 }
 
 export function useAcceptInvite() {
+	const navigate = useNavigate()
+	const queryClient = useQueryClient()
+	const { refreshUser } = useAuth()
+
 	return useMutation({
 		mutationKey: ['acceptInvite'],
 		networkMode: 'online',
 		mutationFn: (token: string) => invitesApi.accept(token),
+		onSuccess: (data, token) => {
+			// Refresh user, clear cached org data
+			refreshUser()
+			queryClient.invalidateQueries({ queryKey: ['org'] })
+			queryClient.invalidateQueries({ queryKey: ['invitePreview', token] })
+
+			// Navigate and notify
+			if (data.targetType === TargetType.LEASE) {
+				toast.success("You've joined the lease!")
+				navigate({
+					to: '/leases/agreements/$leaseId',
+					params: { leaseId: data.targetId },
+				})
+			} else {
+				toast.success("You've joined the organization!")
+				navigate({ to: '/' })
+			}
+		},
 	})
 }
 

@@ -48,7 +48,7 @@ function Root() {
 		main = (
 			<MainPage>
 				<DelayedLoadingFallback
-					isLoading={isLoadingUser}
+					isLoading={true || isLoadingUser}
 					delayMs={config.loadingFallbackDelayMs}
 					fallback={<LoadingScreen />}
 				>
@@ -88,21 +88,21 @@ function Root() {
 		)
 	}
 
-	// Onboarding
-	else if (organizations.length === 0) {
-		main = (
-			<BannerLandingPage>
-				<OnboardingForm />
-			</BannerLandingPage>
-		)
-	}
-
 	// Invite
 	else if (location.pathname.startsWith('/invite')) {
 		main = (
 			<BannerLandingPage>
 				<OfflineWarningBanner />
 				<Outlet />
+			</BannerLandingPage>
+		)
+	}
+
+	// Onboarding
+	else if (organizations.length === 0) {
+		main = (
+			<BannerLandingPage>
+				<OnboardingForm />
 			</BannerLandingPage>
 		)
 	}
@@ -122,7 +122,7 @@ function Root() {
 
 function MainPage({ children }: { children: React.ReactNode }) {
 	return (
-		<main className="flex flex-col mt-14 p-6 min-h-screen">
+		<main className="flex flex-col mt-14 p-6 min-h-[75vh]">
 			<OfflineWarningBanner />
 			{children}
 		</main>
@@ -147,7 +147,7 @@ function BannerLandingPage({ children }: { children: React.ReactNode }) {
 				<div className="app-center-background-image" />
 			</BannerBackgroundImage>
 
-			<div className="flex-1 flex flex-col items-center justify-start pt-16 p-6">
+			<div className="flex-1 flex flex-col items-center justify-start pt-12 p-6">
 				<div className="w-full max-w-md space-y-4">
 					<OfflineWarningBanner />
 

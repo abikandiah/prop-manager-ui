@@ -63,8 +63,8 @@ export function PermissionPoliciesTableView({
 
 	const skeletonTable = (
 		<TableSkeleton
-			headers={['Name', 'Scope', 'Permissions', 'Created']}
-			columnWidths={['w-48', 'w-24', 'w-64', 'w-24']}
+			headers={['Name', 'Permissions', 'Created']}
+			columnWidths={['w-64', 'w-64', 'w-32']}
 		/>
 	)
 
@@ -123,7 +123,6 @@ export function PermissionPoliciesTableView({
 						<TableHeader>
 							<TableRow>
 								<TableHead>Name</TableHead>
-								<TableHead>Scope</TableHead>
 								<TableHead>Permissions</TableHead>
 								<TableHead>Created</TableHead>
 								<TableHead className="w-10" />
@@ -133,7 +132,7 @@ export function PermissionPoliciesTableView({
 							{!policies || policies.length === 0 ? (
 								<TableRow>
 									<TableCell
-										colSpan={5}
+										colSpan={4}
 										className="h-24 text-center text-muted-foreground"
 									>
 										No policies yet. Create one above.
@@ -158,9 +157,6 @@ export function PermissionPoliciesTableView({
 														</Badge>
 													)}
 												</span>
-											</TableCell>
-											<TableCell className="text-muted-foreground text-sm">
-												{isSystem ? 'System' : 'Organization'}
 											</TableCell>
 											<TableCell className="text-muted-foreground text-sm font-mono">
 												{formatPermissions(policy.permissions)}

@@ -52,7 +52,7 @@ function InviteAcceptPage() {
 	const isPageLoading = isLoading || isLoadingUser
 
 	return (
-		<div className="flex flex-1 flex-col px-4 py-8 sm:px-6 lg:px-8">
+		<div className="flex flex-1 flex-col">
 			<div className="mx-auto w-full max-w-5xl">
 				<DelayedLoadingFallback
 					isLoading={isPageLoading}
@@ -226,7 +226,6 @@ function InviteActionCard({
 	status,
 	targetType,
 	organizationName,
-	user,
 	expiresAt,
 	onAccept,
 	isAccepting,
@@ -266,10 +265,7 @@ function InviteActionCard({
 					{isRevoked &&
 						'This invite is no longer valid and cannot be accepted.'}
 					{isExpired && `This invite expired on ${formatDateTime(expiresAt)}.`}
-					{isAccepted &&
-						(isLease
-							? "You've already accepted this invite and have access to the lease."
-							: "You've already accepted this invite and have access to the organization.")}
+					{isAccepted && 'This invite has already been accepted.'}
 				</>
 			)}
 		</span>

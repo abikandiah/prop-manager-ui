@@ -149,13 +149,13 @@ const TemplateParametersStepComponent = function TemplateParametersStep() {
 				</p>
 
 				{customParams.length === 0 ? (
-					<div className="border border-dashed rounded-lg p-8 text-center">
+					<div className="border border-dashed rounded p-8 text-center">
 						<p className="text-sm text-muted-foreground">
 							No custom parameters yet. Click "Add Parameter" to create one.
 						</p>
 					</div>
 				) : (
-					<div className="border rounded-lg overflow-hidden">
+					<div className="border rounded overflow-hidden">
 						<table className="w-full">
 							<thead className="bg-muted/50">
 								<tr>
@@ -205,7 +205,7 @@ const TemplateParametersStepComponent = function TemplateParametersStep() {
 							These parameters are automatically filled when creating a lease
 							agreement and cannot be modified.
 						</p>
-						<div className="border rounded-lg overflow-hidden">
+						<div className="border rounded overflow-hidden">
 							<table className="w-full">
 								<thead className="bg-muted/50">
 									<tr>

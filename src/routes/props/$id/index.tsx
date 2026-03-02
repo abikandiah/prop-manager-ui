@@ -68,7 +68,7 @@ function PropLayout() {
 			<div className="grid gap-4 lg:grid-cols-[1fr_260px]">
 				<div className="flex flex-col gap-4">
 					{[3, 2].map((count, si) => (
-						<div key={si} className="rounded-lg border bg-card px-5 py-4">
+						<div key={si} className="rounded border bg-card px-5 py-4">
 							<div className="grid gap-4 sm:grid-cols-2">
 								{Array.from({ length: count }).map((_, i) => (
 									<div key={i} className="space-y-2">
@@ -80,7 +80,7 @@ function PropLayout() {
 						</div>
 					))}
 				</div>
-				<div className="rounded-lg border bg-card px-5 py-4">
+				<div className="rounded border bg-card px-5 py-4">
 					<div className="flex flex-col gap-4">
 						{[1, 2, 3].map((i) => (
 							<div key={i} className="space-y-2">
@@ -149,7 +149,7 @@ function PropLayout() {
 						{/* Left: main detail sections */}
 						<div className="flex flex-col gap-4">
 							{/* Primary Info & Details */}
-							<div className="rounded-lg border bg-card px-5 py-4">
+							<div className="rounded border bg-card px-5 py-4">
 								<div className="grid gap-4 sm:grid-cols-2">
 									<DetailField
 										label="Legal Name"
@@ -178,7 +178,7 @@ function PropLayout() {
 							</div>
 
 							{/* Location */}
-							<div className="rounded-lg border bg-card px-5 py-4">
+							<div className="rounded border bg-card px-5 py-4">
 								<DetailField label="Location">
 									<AddressDisplay
 										address={prop.address}
@@ -189,7 +189,7 @@ function PropLayout() {
 
 							{/* Description — conditional */}
 							{prop.description && (
-								<div className="rounded-lg border bg-card px-5 py-4">
+								<div className="rounded border bg-card px-5 py-4">
 									<DetailField
 										label="Description"
 										valueClassName="text-foreground whitespace-pre-wrap leading-relaxed"
@@ -202,7 +202,7 @@ function PropLayout() {
 
 						{/* Right: metadata sidebar */}
 						<div className="flex flex-col gap-4">
-							<div className="rounded-lg border bg-card px-5 py-4">
+							<div className="rounded border bg-card px-5 py-4">
 								<div className="flex flex-col gap-4">
 									<DetailField label="Version">v{prop.version}</DetailField>
 									<DetailField label="Created">

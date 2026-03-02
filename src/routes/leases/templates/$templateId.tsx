@@ -98,7 +98,7 @@ function LeaseTemplateDetailPage() {
 			<div className="grid gap-4 lg:grid-cols-[1fr_260px]">
 				<div className="flex flex-col gap-4">
 					{[3, 3].map((count, si) => (
-						<div key={si} className="rounded-lg border bg-card px-5 py-4">
+						<div key={si} className="rounded border bg-card px-5 py-4">
 							<div className="grid gap-4 sm:grid-cols-2">
 								{Array.from({ length: count }).map((_, i) => (
 									<div key={i} className="space-y-2">
@@ -110,7 +110,7 @@ function LeaseTemplateDetailPage() {
 						</div>
 					))}
 				</div>
-				<div className="rounded-lg border bg-card px-5 py-4">
+				<div className="rounded border bg-card px-5 py-4">
 					<div className="flex flex-col gap-4">
 						{[1, 2, 3].map((i) => (
 							<div key={i} className="space-y-2">
@@ -172,7 +172,7 @@ function LeaseTemplateDetailPage() {
 						{/* Left: main detail sections */}
 						<div className="flex flex-col gap-4">
 							{/* Template Info */}
-							<div className="rounded-lg border bg-card px-5 py-4">
+							<div className="rounded border bg-card px-5 py-4">
 								<div className="grid gap-4 sm:grid-cols-2">
 									<DetailField
 										label="Template Name"
@@ -187,7 +187,7 @@ function LeaseTemplateDetailPage() {
 							</div>
 
 							{/* Default Terms */}
-							<div className="rounded-lg border bg-card px-5 py-4">
+							<div className="rounded border bg-card px-5 py-4">
 								<div className="grid gap-4 sm:grid-cols-3">
 									<DetailField label="Default Late Fee Type">
 										{template.defaultLateFeeType
@@ -211,7 +211,7 @@ function LeaseTemplateDetailPage() {
 
 							{/* Template Parameters — conditional */}
 							{Object.keys(template.templateParameters).length > 0 && (
-								<div className="rounded-lg border bg-card px-5 py-4">
+								<div className="rounded border bg-card px-5 py-4">
 									<p className={`${DETAIL_LABEL_CLASS} mb-3`}>Parameters</p>
 									<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 										{Object.entries(template.templateParameters).map(
@@ -238,7 +238,7 @@ function LeaseTemplateDetailPage() {
 
 						{/* Right: metadata sidebar */}
 						<div className="flex flex-col gap-4">
-							<div className="rounded-lg border bg-card px-5 py-4">
+							<div className="rounded border bg-card px-5 py-4">
 								<div className="flex flex-col gap-4">
 									<DetailField label="Version">v{template.version}</DetailField>
 									<DetailField label="Created">
@@ -253,7 +253,7 @@ function LeaseTemplateDetailPage() {
 					</div>
 
 					{/* Template Content — full width */}
-					<div className="rounded-lg bg-card px-5 py-4">
+					<div className="rounded bg-card px-5 py-4">
 						<div className="prose prose-sm dark:prose-invert max-w-none">
 							<ReactMarkdown>{template.templateMarkdown}</ReactMarkdown>
 						</div>

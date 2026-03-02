@@ -79,7 +79,7 @@ function UnitDetailPage() {
 			<div className="grid gap-4 lg:grid-cols-[1fr_260px]">
 				<div className="flex flex-col gap-4">
 					{[3, 3].map((count, si) => (
-						<div key={si} className="rounded-lg border bg-card px-5 py-4">
+						<div key={si} className="rounded border bg-card px-5 py-4">
 							<div className="grid gap-4 sm:grid-cols-3">
 								{Array.from({ length: count }).map((_, i) => (
 									<div key={i} className="space-y-2">
@@ -91,7 +91,7 @@ function UnitDetailPage() {
 						</div>
 					))}
 				</div>
-				<div className="rounded-lg border bg-card px-5 py-4">
+				<div className="rounded border bg-card px-5 py-4">
 					<div className="flex flex-col gap-4">
 						{[1, 2, 3].map((i) => (
 							<div key={i} className="space-y-2">
@@ -145,7 +145,7 @@ function UnitDetailPage() {
 						{/* Left: main detail sections */}
 						<div className="flex flex-col gap-4">
 							{/* Primary Info & Specs */}
-							<div className="rounded-lg border bg-card px-5 py-4">
+							<div className="rounded border bg-card px-5 py-4">
 								<div className="grid gap-4 sm:grid-cols-3">
 									<DetailField
 										label="Unit Number"
@@ -182,7 +182,7 @@ function UnitDetailPage() {
 							</div>
 
 							{/* Features */}
-							<div className="rounded-lg border bg-card px-5 py-4">
+							<div className="rounded border bg-card px-5 py-4">
 								<DetailField label="Features">
 									<div className="flex flex-wrap gap-2">
 										{[
@@ -212,7 +212,7 @@ function UnitDetailPage() {
 
 							{/* Description — conditional */}
 							{unit.description && (
-								<div className="rounded-lg border bg-card px-5 py-4">
+								<div className="rounded border bg-card px-5 py-4">
 									<DetailField
 										label="Description"
 										valueClassName="text-foreground whitespace-pre-wrap leading-relaxed"
@@ -225,7 +225,7 @@ function UnitDetailPage() {
 
 						{/* Right: metadata sidebar */}
 						<div className="flex flex-col gap-4">
-							<div className="rounded-lg border bg-card px-5 py-4">
+							<div className="rounded border bg-card px-5 py-4">
 								<div className="flex flex-col gap-4">
 									<DetailField label="Version">v{unit.version}</DetailField>
 									<DetailField label="Created">

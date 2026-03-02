@@ -218,7 +218,7 @@ function InvitePageContent({
 // ─── Shared detail card wrapper ───────────────────────────────────────────────
 
 function DetailCard({ children }: { children: React.ReactNode }) {
-	return <div className="rounded-lg border bg-card px-5 py-4">{children}</div>
+	return <div className="rounded border bg-card px-5 py-4">{children}</div>
 }
 
 // ─── Action card ──────────────────────────────────────────────────────────────
@@ -350,7 +350,7 @@ function InvitePageSkeleton() {
 
 			{/* Detail cards */}
 			<div className="flex flex-col gap-4">
-				<div className="rounded-lg border bg-card px-5 py-4">
+				<div className="rounded border bg-card px-5 py-4">
 					<div className="grid gap-4 sm:grid-cols-2">
 						{Array.from({ length: 2 }).map((_, i) => (
 							<div key={i} className="space-y-2">
@@ -360,7 +360,7 @@ function InvitePageSkeleton() {
 						))}
 					</div>
 				</div>
-				<div className="rounded-lg border bg-card px-5 py-4">
+				<div className="rounded border bg-card px-5 py-4">
 					<div className="grid gap-4 sm:grid-cols-3">
 						{Array.from({ length: 3 }).map((_, i) => (
 							<div key={i} className="space-y-2">
@@ -374,7 +374,7 @@ function InvitePageSkeleton() {
 
 			{/* Action card */}
 			<div className="flex justify-center mt-8">
-				<div className="w-full max-w-md rounded-lg border bg-card px-6 py-8 flex flex-col gap-6">
+				<div className="w-full max-w-md rounded border bg-card px-6 py-8 flex flex-col gap-6">
 					<div className="space-y-2">
 						<Skeleton className="h-8 w-48" />
 						<Skeleton className="h-4 w-full" />

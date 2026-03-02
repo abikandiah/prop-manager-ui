@@ -40,7 +40,7 @@ function roleVariant(role: LeaseTenant['role']) {
 
 function TenantsSkeleton({ showActions }: { showActions: boolean }) {
 	return (
-		<div className="rounded-lg border bg-card overflow-hidden">
+		<div className="rounded border bg-card overflow-hidden">
 			<div className="flex items-center justify-between px-5 py-4">
 				<p className={DETAIL_LABEL_CLASS}>Tenants</p>
 				{showActions && <Skeleton className="h-8 w-32" />}
@@ -207,7 +207,7 @@ export function LeaseTenantsList({ leaseId, isDraft }: LeaseTenantListProps) {
 	const totalCols = hasActions ? TABLE_COLS_WITH_ACTIONS : TABLE_COLS_BASE
 
 	const tableContent = (
-		<div className="rounded-lg border bg-card overflow-hidden">
+		<div className="rounded border bg-card overflow-hidden">
 			{/* Card header */}
 			<div className="flex items-center justify-between px-5 py-4">
 				<p className={DETAIL_LABEL_CLASS}>Tenants</p>

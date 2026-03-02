@@ -88,7 +88,7 @@ export function InviteTenantsForm({
 		<form onSubmit={handleSubmit(onSubmit)} noValidate>
 			<div className="space-y-4 mt-4">
 				{/* Table */}
-				<div className="rounded-lg border overflow-hidden">
+				<div className="rounded border overflow-hidden">
 					{/* Header */}
 					<div className="grid grid-cols-[1fr_148px_36px] gap-3 border-b bg-muted/50 px-3 py-2">
 						<p className="text-xs font-medium text-muted-foreground">Email</p>

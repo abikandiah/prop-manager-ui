@@ -41,7 +41,9 @@ const assignmentConfigSchema = z.object({
 
 const inviteSchema = z.object({
 	email: z.string().email('Invalid email address'),
-	assignments: z.array(assignmentConfigSchema),
+	assignments: z
+		.array(assignmentConfigSchema)
+		.min(1, 'Add at least one permission assignment'),
 })
 
 type InviteFormValues = z.infer<typeof inviteSchema>
@@ -106,6 +108,7 @@ export function InviteMemberForm({
 		control,
 		watch,
 		setValue,
+		setError,
 		handleSubmit,
 		formState: { errors },
 	} = useForm<InviteFormValues>({
@@ -164,6 +167,14 @@ export function InviteMemberForm({
 							(a.overrides &&
 								Object.values(a.overrides).some((v) => v.trim() !== ''))),
 				)
+
+			if (assignments.length === 0) {
+				setError('assignments', {
+					type: 'manual',
+					message: 'Complete at least one permission assignment before sending',
+				})
+				return
+			}
 
 			inviteMember.mutate(
 				{
@@ -306,6 +317,8 @@ export function InviteMemberForm({
 						<Plus className="mr-2 h-4 w-4" />
 						Add assignment
 					</Button>
+					{/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+					<FieldError message={(errors.assignments as any)?.root?.message ?? (errors.assignments as any)?.message} />
 				</div>
 			</div>
 

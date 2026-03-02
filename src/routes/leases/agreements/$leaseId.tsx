@@ -115,7 +115,7 @@ function LeaseDetailPage() {
 			<div className="grid gap-4 lg:grid-cols-[1fr_260px]">
 				<div className="flex flex-col gap-4">
 					{[3, 3, 3].map((count, si) => (
-						<div key={si} className="rounded-lg border bg-card px-5 py-4">
+						<div key={si} className="rounded border bg-card px-5 py-4">
 							<Skeleton className="mb-4 h-3 w-32" />
 							<div className="grid gap-4 sm:grid-cols-2">
 								{Array.from({ length: count }).map((_, i) => (
@@ -128,7 +128,7 @@ function LeaseDetailPage() {
 						</div>
 					))}
 				</div>
-				<div className="rounded-lg border bg-card px-5 py-4">
+				<div className="rounded border bg-card px-5 py-4">
 					<Skeleton className="mb-4 h-3 w-24" />
 					<div className="flex flex-col gap-4">
 						{[1, 2, 3].map((i) => (
@@ -206,7 +206,7 @@ function LeaseDetailPage() {
 						{/* Left: main detail sections */}
 						<div className="flex flex-col gap-4">
 							{/* Property & Unit */}
-							<div className="rounded-lg border bg-card px-5 py-4">
+							<div className="rounded border bg-card px-5 py-4">
 								<div className="grid gap-4 sm:grid-cols-2">
 									<DetailField label="Property">
 										{prop ? (
@@ -236,7 +236,7 @@ function LeaseDetailPage() {
 							</div>
 
 							{/* Lease Period, Financial Terms & Late Fees */}
-							<div className="rounded-lg border bg-card px-5 py-4">
+							<div className="rounded border bg-card px-5 py-4">
 								<div className="grid gap-4 sm:grid-cols-3">
 									<DetailField
 										label="Monthly Rent"
@@ -294,7 +294,7 @@ function LeaseDetailPage() {
 							{(lease.leaseTemplateName ||
 								(lease.templateParameters &&
 									Object.keys(lease.templateParameters).length > 0)) && (
-								<div className="rounded-lg border bg-card px-5 py-4">
+								<div className="rounded border bg-card px-5 py-4">
 									<DetailField label="Template">
 										{lease.leaseTemplateName || '—'}
 										{lease.leaseTemplateVersionTag && (
@@ -336,7 +336,7 @@ function LeaseDetailPage() {
 
 						{/* Right: metadata sidebar */}
 						<div className="flex flex-col gap-4">
-							<div className="rounded-lg border bg-card px-5 py-4">
+							<div className="rounded border bg-card px-5 py-4">
 								<div className="flex flex-col gap-4">
 									<DetailField label="Version">v{lease.version}</DetailField>
 									<DetailField label="Created">
@@ -352,7 +352,7 @@ function LeaseDetailPage() {
 
 					{/* Executed content markdown — full width */}
 					{lease.executedContentMarkdown && (
-						<div className="rounded-lg bg-card px-5 py-4">
+						<div className="rounded bg-card px-5 py-4">
 							<div className="prose prose-sm dark:prose-invert max-w-none">
 								<ReactMarkdown>{lease.executedContentMarkdown}</ReactMarkdown>
 							</div>

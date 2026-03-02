@@ -544,7 +544,7 @@ export function useDeleteProp() {
 
 ```typescript
 // ✅ Good: Tailwind utilities
-<div className="flex items-center gap-2 p-4 rounded-lg bg-card border border-border">
+<div className="flex items-center gap-2 p-4 rounded bg-card border border-border">
   <h2 className="text-lg font-semibold text-foreground">Title</h2>
   <p className="text-sm text-muted-foreground">Description</p>
 </div>
@@ -1073,7 +1073,7 @@ mutationFn: (payload: CreatePropPayload) => {
 
 ```typescript
 // ✅ Good
-<button className="bg-blue-500 px-4 py-2 rounded-lg">Click</button>
+<button className="bg-blue-500 px-4 py-2 rounded">Click</button>
 ```
 
 ### ❌ Don't Use `any` Types

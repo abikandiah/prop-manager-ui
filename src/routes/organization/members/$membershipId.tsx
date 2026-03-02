@@ -1,48 +1,25 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { z } from 'zod'
-import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
 import { MembershipDetailView } from '@/features/memberships'
-import { useAuth } from '@/contexts/auth'
-
-const searchSchema = z.object({
-	orgId: z.string().optional(),
-})
+import { useOrganization } from '@/contexts/organization'
+import { CenteredEmptyState } from '@/components/CenteredEmptyState'
 
 export const Route = createFileRoute('/organization/members/$membershipId')({
-	validateSearch: searchSchema,
 	component: RouteComponent,
 })
 
 function RouteComponent() {
 	const { membershipId } = Route.useParams()
-	const { orgId: searchOrgId } = Route.useSearch()
-	const { user } = useAuth()
+	const { activeOrgId } = useOrganization()
 
-	// Default to user's first organization if orgId not in search
-	const orgId = searchOrgId || user?.organizations?.[0]?.id
-
-	if (!orgId) {
+	if (!activeOrgId) {
 		return (
-			<>
-				<BannerHeader
-					title="Member Profile"
-					description="View and manage team member access."
-				/>
-				<p className="text-muted-foreground text-sm">
-					No organization selected.
-				</p>
-			</>
+			<CenteredEmptyState
+				title="No organization selected"
+				description="Select an organization to view this member."
+				action={null}
+			/>
 		)
 	}
 
-	return (
-		<>
-			<BannerHeader
-				title="Member Profile"
-				description="Manage this member's identity and organizational permissions."
-			/>
-
-			<MembershipDetailView orgId={orgId} membershipId={membershipId} />
-		</>
-	)
+	return <MembershipDetailView membershipId={membershipId} />
 }

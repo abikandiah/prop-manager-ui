@@ -3,7 +3,7 @@ import { useForm, useFieldArray } from 'react-hook-form'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { z } from 'zod'
 import { toast } from 'sonner'
-import { Send, Plus, Trash2, ChevronDown } from 'lucide-react'
+import { Send, Plus, Trash2 } from 'lucide-react'
 import { Button } from '@abumble/design-system/components/Button'
 import { DialogFooter } from '@abumble/design-system/components/Dialog'
 import { Input } from '@abumble/design-system/components/Input'
@@ -239,11 +239,7 @@ export function InviteMemberForm({
 											value={field.id}
 											className="border rounded bg-background px-2"
 										>
-											<AccordionTrigger
-												hideChevron
-												className="hover:no-underline py-2 gap-1.5 items-center"
-											>
-												<ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
+											<AccordionTrigger className="hover:no-underline py-2">
 												<span className="truncate flex-1 text-left">
 													{summaryLabel}
 												</span>
@@ -318,7 +314,12 @@ export function InviteMemberForm({
 						Add assignment
 					</Button>
 					{/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-					<FieldError message={(errors.assignments as any)?.root?.message ?? (errors.assignments as any)?.message} />
+					<FieldError
+						message={
+							(errors.assignments as any)?.root?.message ??
+							(errors.assignments as any)?.message
+						}
+					/>
 				</div>
 			</div>
 

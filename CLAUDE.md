@@ -292,6 +292,7 @@ import { cn } from '@abumble/design-system/utils'
 - **Form dialogs**: Always `className="max-w-[calc(100vw-2rem)] sm:max-w-2xl max-h-[90vh] overflow-y-auto"` on `DialogContent`
 - **No shadow overrides** on design-system components
 - **`cn()`** for all conditional className merges
+- **Accordion chevron position**: The chevron is always on the **left** — this is baked into `AccordionTrigger` by default. Just render children normally; placement and open/close animation are handled automatically. Use `hideChevron` only when no chevron is wanted at all.
 
 ### Copy & Tone
 

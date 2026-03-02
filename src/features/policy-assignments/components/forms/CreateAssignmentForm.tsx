@@ -1,16 +1,14 @@
-import { useCallback } from 'react'
-import { useForm } from 'react-hook-form'
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-import { z } from 'zod'
-import { toast } from 'sonner'
-import { Check } from 'lucide-react'
-import { Button } from '@abumble/design-system/components/Button'
-import { DialogFooter } from '@abumble/design-system/components/Dialog'
-import { FieldError } from '@/components/ui/FieldError'
+import { FieldError, FormFooter } from '@/components/ui'
 import {
 	type AssignmentConfigValue,
 	ResourceType,
 } from '@/domain/policy-assignment'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { Check } from 'lucide-react'
+import { useCallback } from 'react'
+import { useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
 import { useCreatePolicyAssignment } from '../../hooks'
 import { AssignmentConfigurator } from '../AssignmentConfigurator'
 
@@ -132,23 +130,17 @@ export function CreateAssignmentForm({
 			/>
 			<FieldError message={errors.policyId?.message} />
 
-			<DialogFooter className="gap-2">
-				{onCancel && (
-					<Button type="button" variant="outline" onClick={onCancel}>
-						Cancel
-					</Button>
-				)}
-				<Button type="submit" disabled={createAssignment.isPending}>
-					{createAssignment.isPending ? (
-						'Adding…'
-					) : (
-						<>
-							<Check className="h-4 w-4" />
-							Add assignment
-						</>
-					)}
-				</Button>
-			</DialogFooter>
+			<FormFooter
+				className="gap-2"
+				pending={createAssignment.isPending}
+				onCancel={onCancel}
+				submitLabel={
+					<>
+						<Check className="h-4 w-4" />
+						Add assignment
+					</>
+				}
+			/>
 		</form>
 	)
 }

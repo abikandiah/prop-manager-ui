@@ -7,6 +7,14 @@ export interface Organization {
 	updatedAt: string
 }
 
+/** Simplified organization returned in /me response. */
+export interface UserOrganization {
+	id: string
+	name: string
+	createdAt: string
+	updatedAt: string
+}
+
 export interface CreateOrganizationPayload {
 	id: string
 	name: string

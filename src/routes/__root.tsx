@@ -30,6 +30,7 @@ export const Route = createRootRoute({
 function Root() {
 	const { user, refreshUser, isLoadingUser } = useAuth()
 	const { organizations } = useOrganization()
+	const { isOnline } = useNetwork()
 	const location = useLocation()
 
 	if (!config.constructionDisabled) {
@@ -40,6 +41,17 @@ function Root() {
 				</div>
 				<Footer />
 			</div>
+		)
+	}
+
+	// Public
+	if (location.pathname.startsWith('/public')) {
+		return (
+			<SimpleHeaderFooter>
+				<MainPage>
+					<Outlet />
+				</MainPage>
+			</SimpleHeaderFooter>
 		)
 	}
 
@@ -56,15 +68,17 @@ function Root() {
 				</DelayedLoadingFallback>
 			</MainPage>
 		)
+	} else if (
+		user?.termsAccepted &&
+		organizations.length > 0 &&
+		!location.pathname.startsWith('/invite')
+	) {
+		return <DashboardHome />
 	}
 
-	// Public
-	else if (location.pathname.startsWith('/public')) {
-		main = (
-			<MainPage>
-				<Outlet />
-			</MainPage>
-		)
+	// Hide offline
+	else if (!isOnline) {
+		main = null
 	}
 
 	// If requires devAuth
@@ -107,17 +121,17 @@ function Root() {
 		)
 	}
 
-	if (main != null) {
-		return (
-			<div className="flex min-h-screen w-full flex-col bg-background text-foreground">
-				<Header />
-				{main}
-				<Footer />
-			</div>
-		)
-	}
+	return <SimpleHeaderFooter>{main}</SimpleHeaderFooter>
+}
 
-	return <DashboardHome />
+function SimpleHeaderFooter({ children }: { children: React.ReactNode }) {
+	return (
+		<div className="flex min-h-screen w-full flex-col bg-background text-foreground">
+			<Header />
+			{children}
+			<Footer />
+		</div>
+	)
 }
 
 function MainPage({ children }: { children: React.ReactNode }) {

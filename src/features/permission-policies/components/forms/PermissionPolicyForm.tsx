@@ -1,20 +1,17 @@
-import { useCallback } from 'react'
-import { useForm, Controller } from 'react-hook-form'
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-import { z } from 'zod'
-import { toast } from 'sonner'
-import { Check } from 'lucide-react'
-import { Button } from '@abumble/design-system/components/Button'
-import { DialogFooter } from '@abumble/design-system/components/Dialog'
-import { Input } from '@abumble/design-system/components/Input'
-import { Label } from '@abumble/design-system/components/Label'
+import { FieldError, FormFooter, RequiredMark } from '@/components/ui'
 import type { PermissionPolicy } from '@/domain/permission-policy'
-import { FieldError } from '@/components/ui/FieldError'
-import { RequiredMark } from '@/components/ui'
 import {
 	useCreatePermissionPolicy,
 	useUpdatePermissionPolicy,
 } from '@/features/permission-policies/hooks'
+import { Input } from '@abumble/design-system/components/Input'
+import { Label } from '@abumble/design-system/components/Label'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { Check } from 'lucide-react'
+import { useCallback } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
 import { PermissionMatrixEditor } from '../PermissionMatrixEditor'
 
 // ---------- Schema ----------
@@ -149,23 +146,17 @@ export function PermissionPolicyForm({
 				/>
 			</div>
 
-			<DialogFooter className="gap-2">
-				{onCancel && (
-					<Button type="button" variant="outline" onClick={onCancel}>
-						Cancel
-					</Button>
-				)}
-				<Button type="submit" disabled={pending}>
-					{pending ? (
-						'Saving…'
-					) : (
-						<>
-							<Check className="h-4 w-4" />
-							{submitLabel}
-						</>
-					)}
-				</Button>
-			</DialogFooter>
+			<FormFooter
+				className="gap-2"
+				pending={pending}
+				onCancel={onCancel}
+				submitLabel={
+					<>
+						<Check className="h-4 w-4" />
+						{submitLabel}
+					</>
+				}
+			/>
 		</form>
 	)
 }

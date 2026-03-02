@@ -1,6 +1,13 @@
-import { useState } from 'react'
-import { toast } from 'sonner'
-import { Copy, Shield } from 'lucide-react'
+import { EntityActions, TableSkeleton } from '@/components/ui'
+import { config } from '@/config'
+import { useAuth } from '@/contexts/auth'
+import type { PermissionPolicy } from '@/domain/permission-policy'
+import { FORM_DIALOG_CLASS } from '@/lib/dialog'
+import { formatDate } from '@/lib/format'
+import { useQueryErrorToast } from '@/lib/hooks'
+import { Badge } from '@abumble/design-system/components/Badge'
+import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
+import { FormDialog } from '@abumble/design-system/components/Dialog'
 import {
 	Table,
 	TableBody,
@@ -9,18 +16,11 @@ import {
 	TableHeader,
 	TableRow,
 } from '@abumble/design-system/components/Table'
-import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
-import { FormDialog } from '@abumble/design-system/components/Dialog'
-import { Badge } from '@abumble/design-system/components/Badge'
-import type { PermissionPolicy } from '@/domain/permission-policy'
-import { TableSkeleton, EntityActions } from '@/components/ui'
-import { config } from '@/config'
-import { formatDate } from '@/lib/format'
-import { useAuth } from '@/contexts/auth'
+import { Copy, Shield } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
 import { useDeletePermissionPolicy, usePermissionPolicies } from '../../hooks'
 import { PermissionPolicyForm } from '../forms/PermissionPolicyForm'
-import { FORM_DIALOG_CLASS } from '@/lib/dialog'
-import { useQueryErrorToast } from '@/lib/hooks'
 
 export interface PermissionPoliciesTableViewProps {
 	orgId: string
@@ -51,7 +51,8 @@ export function PermissionPoliciesTableView({
 	const [editing, setEditing] = useState<PermissionPolicy | null>(null)
 	const [duplicating, setDuplicating] = useState<PermissionPolicy | null>(null)
 
-	const isGlobalAdmin = user?.roles?.includes('ROLE_ADMIN') ?? false
+	// TODO: Replace with permission-based check once application access is implemented
+	const isGlobalAdmin = false
 
 	useQueryErrorToast(isError, error as Error, 'policies')
 

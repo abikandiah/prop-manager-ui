@@ -78,11 +78,19 @@ api.interceptors.response.use(
 		return response
 	},
 	(error) => {
-		// Handle 401 Unauthorized
-		if (error.response?.status === 401) {
+		const status = error.response?.status
+
+		if (status === 401) {
 			console.error('401 Unauthorized')
 			if (config.isDevelopment) {
 				clearDevToken()
+			}
+		}
+
+		// 4xx means server is responding, report request success
+		if (status >= 400 && status < 500) {
+			if (typeof (window as any).__reportRequestSuccess === 'function') {
+				;(window as any).__reportRequestSuccess()
 			}
 		}
 
@@ -92,7 +100,7 @@ api.interceptors.response.use(
 			!error.response || // Network error
 			error.code === 'ECONNABORTED' || // Timeout
 			error.code === 'ERR_NETWORK' || // Network error
-			(error.response?.status >= 500 && error.response?.status < 600) // 5xx errors
+			(status >= 500 && status < 600) // 5xx errors
 
 		if (shouldReport) {
 			if (typeof (window as any).__reportRequestFailure === 'function') {

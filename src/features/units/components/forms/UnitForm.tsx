@@ -3,14 +3,12 @@ import { Controller, useForm } from 'react-hook-form'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { z } from 'zod'
 import { toast } from 'sonner'
-import { Button } from '@abumble/design-system/components/Button'
 import { Input } from '@abumble/design-system/components/Input'
 import { Checkbox } from '@abumble/design-system/components/Checkbox'
-import { DialogFooter } from '@abumble/design-system/components/Dialog'
 import { Label } from '@abumble/design-system/components/Label'
 import { Select } from '@abumble/design-system/components/Select'
 import type { CreateUnitPayload, Unit, UpdateUnitPayload } from '@/domain/unit'
-import { FieldError } from '@/components/ui/FieldError'
+import { FieldError, FormFooter } from '@/components/ui'
 import { UNIT_STATUSES, UNIT_TYPES, UnitStatus, UnitType } from '@/domain/unit'
 import { useCreateUnit, useUpdateUnit } from '@/features/units/hooks'
 import { usePropsList } from '@/features/props'
@@ -395,16 +393,11 @@ export function UnitForm({
 				</div>
 			</div>
 
-			<DialogFooter>
-				{onCancel && (
-					<Button type="button" variant="outline" onClick={onCancel}>
-						Cancel
-					</Button>
-				)}
-				<Button type="submit" disabled={pending}>
-					{pending ? 'Saving…' : submitLabel}
-				</Button>
-			</DialogFooter>
+			<FormFooter
+				pending={pending}
+				onCancel={onCancel}
+				submitLabel={submitLabel}
+			/>
 		</form>
 	)
 }

@@ -1,21 +1,19 @@
-import { useEffect } from 'react'
-import { FormProvider, useForm } from 'react-hook-form'
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-import { z } from 'zod'
-import { useNavigate } from '@tanstack/react-router'
-import { Button } from '@abumble/design-system/components/Button'
-import { Input } from '@abumble/design-system/components/Input'
-import { toast } from 'sonner'
-import { DialogFooter } from '@abumble/design-system/components/Dialog'
-import { Label } from '@abumble/design-system/components/Label'
-import { Select } from '@abumble/design-system/components/Select'
-import { Textarea } from '@abumble/design-system/components/Textarea'
-import { AddressFormFields } from './AddressFormFields'
+import { FieldError, FormFooter } from '@/components/ui'
 import type { CreatePropPayload, Prop } from '@/domain/property'
-import { FieldError } from '@/components/ui/FieldError'
 import { PROPERTY_TYPES, PropertyType } from '@/domain/property'
 import { useCreateProp, useUpdateProp } from '@/features/props/hooks'
 import { formatEnumLabel } from '@/lib/format'
+import { Input } from '@abumble/design-system/components/Input'
+import { Label } from '@abumble/design-system/components/Label'
+import { Select } from '@abumble/design-system/components/Select'
+import { Textarea } from '@abumble/design-system/components/Textarea'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { useNavigate } from '@tanstack/react-router'
+import { useEffect } from 'react'
+import { FormProvider, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
+import { AddressFormFields } from './AddressFormFields'
 
 const MAX_YEAR_BUILT = new Date().getFullYear() + 1
 
@@ -123,7 +121,7 @@ export function PropsForm({
 		register,
 		handleSubmit,
 		reset,
-		formState: { errors, isValid },
+		formState: { errors },
 	} = form
 
 	// Sync form when the prop being edited changes
@@ -255,16 +253,11 @@ export function PropsForm({
 						maxLength={64}
 					/>
 				</div>
-				<DialogFooter>
-					{onCancel && (
-						<Button variant="outline" type="button" onClick={onCancel}>
-							Cancel
-						</Button>
-					)}
-					<Button type="submit" disabled={pending || !isValid}>
-						{pending ? (isEdit ? 'Updating…' : 'Creating…') : submitLabel}
-					</Button>
-				</DialogFooter>
+				<FormFooter
+					pending={pending}
+					onCancel={onCancel}
+					submitLabel={submitLabel}
+				/>
 			</form>
 		</FormProvider>
 	)

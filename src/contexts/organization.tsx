@@ -1,13 +1,13 @@
 import { setActiveOrgId } from '@/api/client'
-import type { Organization } from '@/domain/organization'
+import type { UserOrganization } from '@/domain/organization'
 import { createContext, useContext, useEffect } from 'react'
 import { useAuth } from './auth'
 
 interface OrganizationContextValue {
 	activeOrgId: string | null
-	activeOrg: Organization | null
+	activeOrg: UserOrganization | null
 	// User organizations
-	organizations: Organization[]
+	organizations: UserOrganization[]
 }
 
 const OrganizationContext = createContext<OrganizationContextValue | undefined>(
@@ -30,7 +30,7 @@ export function OrganizationProvider({
 	children: React.ReactNode
 }) {
 	const { user } = useAuth()
-	const organizations: Organization[] = user?.organizations ?? []
+	const organizations: UserOrganization[] = user?.organizations ?? []
 
 	// Phase 1: use the first org. Phase 5: read from URL search param.
 	const activeOrg = organizations[0] ?? null

@@ -1,33 +1,31 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { useForm, useFieldArray } from 'react-hook-form'
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-import { z } from 'zod'
-import { toast } from 'sonner'
-import { Send, Plus, Trash2 } from 'lucide-react'
-import { Button } from '@abumble/design-system/components/Button'
-import { DialogFooter } from '@abumble/design-system/components/Dialog'
-import { Input } from '@abumble/design-system/components/Input'
-import { Label } from '@abumble/design-system/components/Label'
+import { FieldError, FormFooter, RequiredMark } from '@/components/ui'
 import {
 	Accordion,
+	AccordionContent,
 	AccordionItem,
 	AccordionTrigger,
-	AccordionContent,
 } from '@/components/ui/accordion'
-import { FieldError } from '@/components/ui/FieldError'
-import { RequiredMark } from '@/components/ui'
-import { useInviteMember } from '@/features/memberships'
-import { usePropsList } from '@/features/props'
-import { useUnitsList } from '@/features/units'
-import { usePermissionPolicies } from '@/features/permission-policies/hooks'
-import { AssignmentConfigurator } from '@/features/policy-assignments/components/AssignmentConfigurator'
+import type { PermissionPolicy } from '@/domain/permission-policy'
 import {
 	type AssignmentConfigValue,
 	ResourceType,
 } from '@/domain/policy-assignment'
 import type { Prop } from '@/domain/property'
 import type { Unit } from '@/domain/unit'
-import type { PermissionPolicy } from '@/domain/permission-policy'
+import { useInviteMember } from '@/features/memberships'
+import { usePermissionPolicies } from '@/features/permission-policies/hooks'
+import { AssignmentConfigurator } from '@/features/policy-assignments/components/AssignmentConfigurator'
+import { usePropsList } from '@/features/props'
+import { useUnitsList } from '@/features/units'
+import { Button } from '@abumble/design-system/components/Button'
+import { Input } from '@abumble/design-system/components/Input'
+import { Label } from '@abumble/design-system/components/Label'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { Plus, Send, Trash2 } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
+import { z } from 'zod'
 
 // ---------- Schema ----------
 
@@ -323,23 +321,17 @@ export function InviteMemberForm({
 				</div>
 			</div>
 
-			<DialogFooter className="pt-3 pb-1 gap-2">
-				{onCancel && (
-					<Button type="button" variant="outline" onClick={onCancel}>
-						Cancel
-					</Button>
-				)}
-				<Button type="submit" disabled={inviteMember.isPending}>
-					{inviteMember.isPending ? (
-						'Sending…'
-					) : (
-						<>
-							<Send className="h-4 w-4" />
-							Send Invitation
-						</>
-					)}
-				</Button>
-			</DialogFooter>
+			<FormFooter
+				className="pt-3 pb-1 gap-2"
+				pending={inviteMember.isPending}
+				onCancel={onCancel}
+				submitLabel={
+					<>
+						<Send className="h-4 w-4" />
+						Send Invitation
+					</>
+				}
+			/>
 		</form>
 	)
 }

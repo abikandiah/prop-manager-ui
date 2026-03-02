@@ -1,41 +1,40 @@
-import { useState } from 'react'
-import { Link, useNavigate } from '@tanstack/react-router'
-import { toast } from 'sonner'
-import { useQueryClient } from '@tanstack/react-query'
-import { RotateCcw, UserMinus, Ban, Plus } from 'lucide-react'
+import { CenteredEmptyState } from '@/components/CenteredEmptyState'
+import { InviteStatusBadge } from '@/components/InviteStatusBadge'
+import { DetailField, TextLink } from '@/components/ui'
+import { Accordion } from '@/components/ui/accordion'
+import { config } from '@/config'
+import { useOrganization } from '@/contexts/organization'
+import { InviteStatus } from '@/domain/membership'
+import { ResourceType } from '@/domain/policy-assignment'
+import { useResendInvite, useRevokeInvite } from '@/features/invites/hooks'
+import { useDeleteMembership, useMembershipById } from '@/features/memberships'
+import { membershipKeys } from '@/features/memberships/keys'
+import { AssignmentAccordionItem } from '@/features/policy-assignments/components/AssignmentAccordionItem'
+import { CreateAssignmentForm } from '@/features/policy-assignments/components/forms'
+import { usePolicyAssignmentsList } from '@/features/policy-assignments/hooks'
+import { usePropsList } from '@/features/props'
+import { useUnitsList } from '@/features/units'
+import { FORM_DIALOG_CLASS } from '@/lib/dialog'
+import { formatDate, formatDateTime } from '@/lib/format'
+import { useQueryErrorToast } from '@/lib/hooks'
+import type { ActionItem } from '@abumble/design-system/components/ActionsPopover'
+import { ActionsPopover } from '@abumble/design-system/components/ActionsPopover'
 import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
 import { Button } from '@abumble/design-system/components/Button'
-import { ActionsPopover } from '@abumble/design-system/components/ActionsPopover'
-import type { ActionItem } from '@abumble/design-system/components/ActionsPopover'
 import { ConfirmDeleteDialog } from '@abumble/design-system/components/ConfirmDeleteDialog'
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
-import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import {
 	Dialog,
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
 } from '@abumble/design-system/components/Dialog'
-import { useMembershipById, useDeleteMembership } from '@/features/memberships'
-import { useResendInvite, useRevokeInvite } from '@/features/invites/hooks'
-import { membershipKeys } from '@/features/memberships/keys'
-import { usePolicyAssignmentsList } from '@/features/policy-assignments/hooks'
-import { CreateAssignmentForm } from '@/features/policy-assignments/components/forms'
-import { AssignmentAccordionItem } from '@/features/policy-assignments/components/AssignmentAccordionItem'
-import { Accordion } from '@/components/ui/accordion'
-import { usePropsList } from '@/features/props'
-import { useUnitsList } from '@/features/units'
-import { useOrganization } from '@/contexts/organization'
-import { useQueryErrorToast } from '@/lib/hooks'
-import { config } from '@/config'
-import { DetailField } from '@/components/ui'
-import { CenteredEmptyState } from '@/components/CenteredEmptyState'
-import { TextLink } from '@/components/ui'
-import { InviteStatusBadge } from '@/components/InviteStatusBadge'
-import { formatDate, formatDateTime } from '@/lib/format'
-import { InviteStatus } from '@/domain/membership'
-import { ResourceType } from '@/domain/policy-assignment'
-import { FORM_DIALOG_CLASS } from '@/lib/dialog'
+import { Skeleton } from '@abumble/design-system/components/Skeleton'
+import { useQueryClient } from '@tanstack/react-query'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { Ban, Plus, RotateCcw, UserMinus } from 'lucide-react'
+import { useState } from 'react'
+import { toast } from 'sonner'
 
 export interface MembershipDetailViewProps {
 	membershipId: string
@@ -186,7 +185,9 @@ const detailSkeleton = (
 
 // ---------- Main view ----------
 
-export function MembershipDetailView({ membershipId }: MembershipDetailViewProps) {
+export function MembershipDetailView({
+	membershipId,
+}: MembershipDetailViewProps) {
 	const { activeOrgId } = useOrganization()
 	const navigate = useNavigate()
 

@@ -1,17 +1,16 @@
-import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import { FieldError, FormFooter } from '@/components/ui'
+import { LEASE_TENANT_ROLES, LeaseTenantRole } from '@/domain/lease-tenant'
+import { useInviteLeaseTenants } from '@/features/leases/hooks'
+import { formatEnumLabel } from '@/lib/format'
 import { Button } from '@abumble/design-system/components/Button'
-import { DialogFooter } from '@abumble/design-system/components/Dialog'
 import { Input } from '@abumble/design-system/components/Input'
 import { Label } from '@abumble/design-system/components/Label'
 import { Select } from '@abumble/design-system/components/Select'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { Plus, Trash2 } from 'lucide-react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import { LEASE_TENANT_ROLES, LeaseTenantRole } from '@/domain/lease-tenant'
-import { FieldError } from '@/components/ui/FieldError'
-import { formatEnumLabel } from '@/lib/format'
-import { useInviteLeaseTenants } from '@/features/leases/hooks'
 
 // ---------- Schema ----------
 
@@ -174,23 +173,15 @@ export function InviteTenantsForm({
 					</div>
 				</div>
 
-				<DialogFooter>
-					<Button
-						type="button"
-						variant="outline"
-						onClick={onCancel}
-						disabled={isPending}
-					>
-						Cancel
-					</Button>
-					<Button type="submit" disabled={isPending}>
-						{isPending
-							? 'Sending…'
-							: fields.length === 1
-								? 'Send invite'
-								: `Send ${fields.length} invites`}
-					</Button>
-				</DialogFooter>
+				<FormFooter
+					pending={isPending}
+					onCancel={onCancel}
+					submitLabel={
+						fields.length === 1
+							? 'Send invite'
+							: `Send ${fields.length} invites`
+					}
+				/>
 			</div>
 		</form>
 	)

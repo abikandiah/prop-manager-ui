@@ -1,19 +1,22 @@
-import { useState } from 'react'
-import { toast } from 'sonner'
-import { Badge } from '@abumble/design-system/components/Badge'
-import { Button } from '@abumble/design-system/components/Button'
-import { FormDialog } from '@abumble/design-system/components/Dialog'
+import { EntityActions } from '@/components/ui'
 import {
 	AccordionContent,
 	AccordionItem,
 	AccordionTrigger,
 } from '@/components/ui/accordion'
-import { EntityActions } from '@/components/ui'
+import type {
+	PolicyAssignment,
+	UpdatePolicyAssignmentPayload,
+} from '@/domain/policy-assignment'
 import { PermissionMatrixEditor } from '@/features/permission-policies/components/PermissionMatrixEditor'
 import { usePermissionPolicies } from '@/features/permission-policies/hooks'
-import type { PolicyAssignment, UpdatePolicyAssignmentPayload } from '@/domain/policy-assignment'
-import { useUpdatePolicyAssignment, useDeletePolicyAssignment } from '../hooks'
 import { FORM_DIALOG_CLASS } from '@/lib/dialog'
+import { Badge } from '@abumble/design-system/components/Badge'
+import { Button } from '@abumble/design-system/components/Button'
+import { FormDialog } from '@abumble/design-system/components/Dialog'
+import { useState } from 'react'
+import { toast } from 'sonner'
+import { useDeletePolicyAssignment, useUpdatePolicyAssignment } from '../hooks'
 
 export interface AssignmentAccordionItemProps {
 	orgId: string
@@ -152,9 +155,7 @@ function EditCustomPermissionsForm({
 				<Button
 					type="button"
 					size="sm"
-					onClick={() =>
-						onSave({ overrides, version: assignment.version })
-					}
+					onClick={() => onSave({ overrides, version: assignment.version })}
 					disabled={isSaving}
 				>
 					{isSaving ? 'Saving…' : 'Save'}

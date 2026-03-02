@@ -1,7 +1,7 @@
 import { cn } from '@abumble/design-system/utils'
-import * as React from 'react'
-import { Link } from '@tanstack/react-router'
 import type { LinkComponentProps } from '@tanstack/react-router'
+import { Link } from '@tanstack/react-router'
+import * as React from 'react'
 
 export function Spinner({ className }: { className?: string }) {
 	return (
@@ -121,4 +121,7 @@ export function RequiredMark() {
 // Import design-system components directly from @abumble/design-system
 export * from './DetailField'
 export * from './EntityActions'
+export * from './FieldError'
+export * from './FormFooter'
 export * from './TableSkeleton'
+export * from './WizardFooter'

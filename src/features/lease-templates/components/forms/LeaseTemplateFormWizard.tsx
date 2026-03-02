@@ -1,3 +1,4 @@
+import { WizardFooter } from '@/components/ui'
 import type { LateFeeType } from '@/domain/lease'
 import type { LeaseTemplate } from '@/domain/lease-template'
 import {
@@ -9,10 +10,7 @@ import {
 	parseIntOrUndefined,
 	trimOrUndefined,
 } from '@/lib/util'
-import { Button } from '@abumble/design-system/components/Button'
-import { DialogFooter } from '@abumble/design-system/components/Dialog'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
 import { useCallback, useRef, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -214,47 +212,14 @@ export function LeaseTemplateFormWizard({
 				{step === 2 && <TemplateParametersStep />}
 				{step === 3 && <TemplateMarkdownStep />}
 
-				<DialogFooter className="gap-2">
-					{onCancel && (
-						<Button type="button" variant="outline" onClick={onCancel}>
-							Cancel
-						</Button>
-					)}
-
-					<div className="flex gap-2">
-						{(step === 2 || step === 3) && (
-							<Button
-								type="button"
-								variant="outline"
-								onClick={handleBack}
-								disabled={pending}
-							>
-								<ArrowLeft className="h-4 w-4" />
-								Back
-							</Button>
-						)}
-
-						{(step === 1 || step === 2) && (
-							<Button type="button" onClick={handleNext}>
-								Next
-								<ArrowRight className="h-4 w-4" />
-							</Button>
-						)}
-
-						{step === 3 && (
-							<Button type="submit" disabled={pending}>
-								{pending ? (
-									'Saving…'
-								) : (
-									<>
-										<Check className="h-4 w-4" />
-										{submitLabel}
-									</>
-								)}
-							</Button>
-						)}
-					</div>
-				</DialogFooter>
+				<WizardFooter
+					pending={pending}
+					onCancel={onCancel}
+					onBack={step === 2 || step === 3 ? handleBack : undefined}
+					onNext={step === 1 || step === 2 ? handleNext : undefined}
+					showSubmit={step === 3}
+					submitLabel={submitLabel}
+				/>
 			</form>
 		</FormProvider>
 	)

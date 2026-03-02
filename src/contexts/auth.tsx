@@ -1,19 +1,18 @@
-import { createContext, useCallback, useContext } from 'react'
+import { api, clearDevToken } from '@/api/client'
+import { config } from '@/config'
+import { clearUserDb } from '@/features/offline/db'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import type { ReactNode } from 'react'
-import { api, clearDevToken } from '@/api/client'
-import { clearUserDb } from '@/features/offline/db'
-import { config } from '@/config'
+import { createContext, useCallback, useContext } from 'react'
 
-import type { Organization } from '@/domain/organization'
+import type { UserOrganization } from '@/domain/organization'
 
 export interface User {
 	id: string
 	email: string
 	name: string
-	roles: string[]
 	termsAccepted: boolean
-	organizations: Organization[]
+	organizations: UserOrganization[]
 }
 
 interface AuthContextType {

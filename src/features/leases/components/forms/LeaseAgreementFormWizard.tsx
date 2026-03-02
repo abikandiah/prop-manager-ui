@@ -1,11 +1,9 @@
+import { WizardFooter } from '@/components/ui'
 import type { LateFeeType, Lease } from '@/domain/lease'
 import { useLeaseTemplateDetail } from '@/features/lease-templates'
 import { useCreateLease, useUpdateLease } from '@/features/leases/hooks'
 import { parseFloatOrUndefined, parseIntOrUndefined } from '@/lib/util'
-import { Button } from '@abumble/design-system/components/Button'
-import { DialogFooter } from '@abumble/design-system/components/Dialog'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { FormProvider, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -317,47 +315,15 @@ export function LeaseAgreementFormWizard({
 					/>
 				)}
 
-				<DialogFooter className="gap-2">
-					{onCancel && (
-						<Button type="button" variant="outline" onClick={onCancel}>
-							Cancel
-						</Button>
-					)}
-
-					<div className="flex gap-2">
-						{showBack && (
-							<Button
-								type="button"
-								variant="outline"
-								onClick={handleBack}
-								disabled={pending}
-							>
-								<ArrowLeft className="h-4 w-4" />
-								Back
-							</Button>
-						)}
-
-						{showNext && (
-							<Button type="button" onClick={handleNext} disabled={pending}>
-								Next
-								<ArrowRight className="h-4 w-4" />
-							</Button>
-						)}
-
-						{showSubmit && (
-							<Button type="submit" disabled={pending}>
-								{pending ? (
-									pendingLabel
-								) : (
-									<>
-										<Check className="h-4 w-4" />
-										{resolvedSubmitLabel}
-									</>
-								)}
-							</Button>
-						)}
-					</div>
-				</DialogFooter>
+				<WizardFooter
+					pending={pending}
+					onCancel={onCancel}
+					onBack={showBack ? handleBack : undefined}
+					onNext={showNext ? handleNext : undefined}
+					showSubmit={showSubmit}
+					submitLabel={resolvedSubmitLabel}
+					pendingLabel={pendingLabel}
+				/>
 			</form>
 		</FormProvider>
 	)

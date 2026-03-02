@@ -25,9 +25,9 @@ export function useAcceptInvite() {
 		mutationKey: ['acceptInvite'],
 		networkMode: 'online',
 		mutationFn: (token: string) => invitesApi.accept(token),
-		onSuccess: (data, token) => {
+		onSuccess: async (data, token) => {
 			// Refresh user, clear cached org data
-			refreshUser()
+			await refreshUser()
 			queryClient.invalidateQueries({ queryKey: ['org'] })
 			queryClient.invalidateQueries({ queryKey: ['invitePreview', token] })
 

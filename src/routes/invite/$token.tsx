@@ -13,8 +13,8 @@ import {
 	type MembershipInvitePreview,
 } from '@/features/invites/types'
 import { formatCurrency, formatDate, formatDateTime } from '@/lib/format'
-import { Button } from '@abumble/design-system/components/Button'
 import { MessageBanner } from '@abumble/design-system/components/Banner'
+import { Button } from '@abumble/design-system/components/Button'
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { createFileRoute } from '@tanstack/react-router'
@@ -34,7 +34,9 @@ const STATUS_TITLE: Record<InviteStatus, string> = {
 	[InviteStatus.ACCEPTED]: 'Invite accepted',
 }
 
-function formatPropertyAddress(property: LeaseInvitePreview['property']): string {
+function formatPropertyAddress(
+	property: LeaseInvitePreview['property'],
+): string {
 	return [
 		property.addressLine1,
 		property.addressLine2,
@@ -42,11 +44,6 @@ function formatPropertyAddress(property: LeaseInvitePreview['property']): string
 	]
 		.filter(Boolean)
 		.join(', ')
-}
-
-function matchesMaskedEmail(email: string, mask: string): boolean {
-	if (email.length !== mask.length) return false
-	return Array.from(mask).every((char, i) => char === '*' || char === email[i])
 }
 
 // ─── Route component ──────────────────────────────────────────────────────────
@@ -107,13 +104,21 @@ function InvitePageContent({
 	onAccept,
 	isAccepting,
 }: InvitePageContentProps) {
-	const { maskedEmail, expiresAt, invitedByName, status, targetType, preview: snapshot } =
-		preview
+	const {
+		maskedEmail,
+		expiresAt,
+		invitedByName,
+		status,
+		targetType,
+		preview: snapshot,
+	} = preview
 
 	const isPending = status === InviteStatus.PENDING
 	const isLease = targetType === TargetType.LEASE
 	const leaseSnapshot = isLease ? (snapshot as LeaseInvitePreview) : null
-	const membershipSnapshot = !isLease ? (snapshot as MembershipInvitePreview) : null
+	const membershipSnapshot = !isLease
+		? (snapshot as MembershipInvitePreview)
+		: null
 
 	return (
 		<div className="flex flex-col gap-6">
@@ -155,7 +160,9 @@ function InvitePageContent({
 						<div className="grid gap-4 sm:grid-cols-2">
 							<DetailField label="Unit">
 								{leaseSnapshot.unit.unitNumber}
-								{leaseSnapshot.unit.unitType ? ` · ${leaseSnapshot.unit.unitType}` : ''}
+								{leaseSnapshot.unit.unitType
+									? ` · ${leaseSnapshot.unit.unitType}`
+									: ''}
 							</DetailField>
 							<DetailField label="Sent to">{maskedEmail}</DetailField>
 						</div>
@@ -183,7 +190,9 @@ function InvitePageContent({
 			{isPending && !isLease && membershipSnapshot && (
 				<DetailCard>
 					<div className="grid gap-4 sm:grid-cols-2">
-						<DetailField label="Organization">{membershipSnapshot.organizationName}</DetailField>
+						<DetailField label="Organization">
+							{membershipSnapshot.organizationName}
+						</DetailField>
 						<DetailField label="Sent to">{maskedEmail}</DetailField>
 					</div>
 				</DetailCard>
@@ -230,18 +239,12 @@ function InviteActionCard({
 	targetType,
 	organizationName,
 	user,
-	maskedEmail,
 	expiresAt,
 	onAccept,
 	isAccepting,
 }: InviteActionCardProps) {
 	const isLease = targetType === TargetType.LEASE
 	const canAccept = status === InviteStatus.PENDING
-
-	const emailMatches = React.useMemo(() => {
-		if (!user || !maskedEmail) return true
-		return matchesMaskedEmail(user.email.toLowerCase(), maskedEmail.toLowerCase())
-	}, [user, maskedEmail])
 
 	return (
 		<FormCard
@@ -259,22 +262,23 @@ function InviteActionCard({
 				<div className="space-y-4">
 					{user && (
 						<MessageBanner
-							type={emailMatches ? 'info' : 'warning'}
+							type={'info'}
 							message={
 								<div className="flex-1 min-w-0 text-left">
-									<p className="font-medium truncate">Accepting as {user.email}</p>
-									{!emailMatches && (
-										<p className="mt-0.5 opacity-80">
-											Warning: This invite was sent to {maskedEmail}
-										</p>
-									)}
+									<p className="font-medium truncate">
+										Accepting as {user.email}
+									</p>
 								</div>
 							}
 						/>
 					)}
 
 					<FormActions fullWidth>
-						<Button onClick={onAccept} disabled={isAccepting} aria-busy={isAccepting}>
+						<Button
+							onClick={onAccept}
+							disabled={isAccepting}
+							aria-busy={isAccepting}
+						>
 							{isAccepting ? 'Joining...' : 'Accept Invite'}
 						</Button>
 					</FormActions>
@@ -326,7 +330,8 @@ function ActionCardDescription({
 				'This invite is no longer valid and cannot be accepted.'}
 			{status === InviteStatus.EXPIRED &&
 				`This invite expired on ${formatDateTime(expiresAt)}.`}
-			{status === InviteStatus.ACCEPTED && 'This invite has already been accepted.'}
+			{status === InviteStatus.ACCEPTED &&
+				'This invite has already been accepted.'}
 		</span>
 	)
 }

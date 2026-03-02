@@ -32,7 +32,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 		queryKey: ['me'],
 		queryFn: async () => {
 			const { data } = await api.get<User>('/me')
-			console.log(data)
 			return data
 		},
 		staleTime: Infinity,

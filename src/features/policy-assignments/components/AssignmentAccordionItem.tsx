@@ -67,7 +67,7 @@ export function AssignmentAccordionItem({
 		{}
 
 	return (
-		<AccordionItem value={assignment.id} className="border rounded-md px-2">
+		<AccordionItem value={assignment.id} className="border rounded px-2">
 			<AccordionTrigger className="hover:no-underline py-2">
 				<div className="flex flex-1 items-center justify-between mr-4">
 					<div className="flex items-center gap-2">

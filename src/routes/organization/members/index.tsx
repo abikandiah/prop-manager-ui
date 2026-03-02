@@ -9,7 +9,7 @@ import {
 } from '@abumble/design-system/components/Dialog'
 import { MembershipsTableView } from '@/features/memberships'
 import { InviteMemberForm } from '@/features/invites/components/forms/InviteMemberForm'
-import { FORM_DIALOG_CLASS, useDialogState } from '@/lib/dialog'
+import { FORM_DIALOG_CLASS_MEDIUM, useDialogState } from '@/lib/dialog'
 import { useAuth } from '@/contexts/auth'
 
 const searchSchema = z.object({
@@ -57,7 +57,7 @@ function RouteComponent() {
 					onOpenChange={dialog.setIsOpen}
 					title="Invite team member"
 					description="Send an invitation to join your organization."
-					className={FORM_DIALOG_CLASS}
+					className={FORM_DIALOG_CLASS_MEDIUM}
 					trigger={
 						<DialogTrigger asChild>
 							<Button>

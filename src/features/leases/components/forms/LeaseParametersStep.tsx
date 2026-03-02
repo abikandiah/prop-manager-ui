@@ -160,7 +160,7 @@ export function LeaseParametersStep({
 									return (
 										<div
 											key={key}
-											className="flex items-center justify-between rounded-md bg-muted/30 border px-3 py-2 gap-3"
+											className="flex items-center justify-between rounded bg-muted/30 border px-3 py-2 gap-3"
 										>
 											<span className="font-mono text-xs text-muted-foreground shrink-0">
 												{'{{'}
@@ -187,7 +187,7 @@ export function LeaseParametersStep({
 
 			<div className="space-y-2">
 				<div className="text-sm font-medium text-foreground">Lease preview</div>
-				<div className="rounded-md border bg-muted/20 p-4 h-[min(calc(100vh-22rem),28rem)] overflow-y-auto lg:h-full lg:max-h-[45vh]">
+				<div className="rounded border bg-muted/20 p-4 h-[min(calc(100vh-22rem),28rem)] overflow-y-auto lg:h-full lg:max-h-[45vh]">
 					<div className="prose prose-sm dark:prose-invert max-w-none">
 						<ReactMarkdown>{previewMarkdown}</ReactMarkdown>
 					</div>

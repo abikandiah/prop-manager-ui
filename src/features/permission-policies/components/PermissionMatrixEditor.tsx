@@ -10,10 +10,10 @@ const DOMAINS = [
 ] as const
 
 const ACTIONS = [
-	{ key: 'r', label: 'Read' },
-	{ key: 'c', label: 'Create' },
-	{ key: 'u', label: 'Update' },
-	{ key: 'd', label: 'Delete' },
+	{ key: 'r', label: 'Read', short: 'R' },
+	{ key: 'c', label: 'Create', short: 'C' },
+	{ key: 'u', label: 'Update', short: 'U' },
+	{ key: 'd', label: 'Delete', short: 'D' },
 ] as const
 
 export interface PermissionMatrixEditorProps {
@@ -27,6 +27,7 @@ export interface PermissionMatrixEditorProps {
 /**
  * Renders a 4×6 grid of checkboxes for editing or previewing domain/action permissions.
  * `value` is a map of domain key → action letters (e.g. { l: 'rcud', m: 'r' }).
+ * Clicking a domain label toggles all actions for that row.
  */
 export function PermissionMatrixEditor({
 	value,
@@ -58,6 +59,21 @@ export function PermissionMatrixEditor({
 		onChange(next)
 	}
 
+	const handleToggleAll = (domainKey: string) => {
+		if (readOnly || !onChange) return
+
+		const allChecked = ACTIONS.every((a) =>
+			(value[domainKey] ?? '').includes(a.key),
+		)
+		const next = { ...value }
+		if (allChecked) {
+			delete next[domainKey]
+		} else {
+			next[domainKey] = normalizePermString(ACTIONS.map((a) => a.key).join(''))
+		}
+		onChange(next)
+	}
+
 	return (
 		<div
 			className={cn(
@@ -74,9 +90,11 @@ export function PermissionMatrixEditor({
 						{ACTIONS.map((a) => (
 							<th
 								key={a.key}
-								className="px-3 py-2 text-center font-medium text-muted-foreground w-20"
+								className="px-2 py-2 text-center font-medium text-muted-foreground w-10"
 							>
-								{a.label}
+								<abbr title={a.label} className="no-underline cursor-default">
+									{a.short}
+								</abbr>
 							</th>
 						))}
 					</tr>
@@ -90,12 +108,26 @@ export function PermissionMatrixEditor({
 								'border-t',
 							)}
 						>
-							<td className="px-3 py-2 font-medium">{domain.label}</td>
+							<td className="px-3 py-2">
+								<button
+									type="button"
+									disabled={readOnly}
+									onClick={() => handleToggleAll(domain.key)}
+									title="Toggle all"
+									className={cn(
+										'font-medium text-left w-full',
+										!readOnly &&
+											'cursor-pointer hover:text-foreground transition-colors',
+									)}
+								>
+									{domain.label}
+								</button>
+							</td>
 							{ACTIONS.map((action) => {
 								const isChecked = (value[domain.key] ?? '').includes(action.key)
 
 								return (
-									<td key={action.key} className="px-3 py-2 text-center">
+									<td key={action.key} className="px-2 py-2 text-center">
 										<Checkbox
 											checked={isChecked}
 											onCheckedChange={(c) =>

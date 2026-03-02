@@ -21,7 +21,7 @@ const MAX_YEAR_BUILT = new Date().getFullYear() + 1
 
 const propFormSchema = z.object({
 	legalName: z.string().min(1, 'Property name is required').max(255),
-	propertyType: z.nativeEnum(PropertyType),
+	propertyType: z.enum(PropertyType),
 	description: z.string().max(2000).optional(),
 	address: z.object({
 		addressLine1: z.string().min(1, 'Street address is required'),
@@ -115,7 +115,8 @@ export function PropsForm({
 	const form = useForm<PropFormValues>({
 		resolver: standardSchemaResolver(propFormSchema),
 		defaultValues: initialProp ? propToFormValues(initialProp) : defaultValues,
-		mode: 'onChange',
+		mode: 'onSubmit',
+		reValidateMode: 'onChange',
 	})
 
 	const {

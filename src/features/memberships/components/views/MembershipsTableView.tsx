@@ -153,7 +153,9 @@ export function MembershipsTableView({ orgId }: MembershipsTableViewProps) {
 										/>
 									</TableCell>
 									<TableCell className="text-muted-foreground">
-										{m.userLastLoggedInAt ? formatDateTime(m.userLastLoggedInAt) : '—'}
+										{m.userLastLoggedInAt
+											? formatDateTime(m.userLastLoggedInAt)
+											: '—'}
 									</TableCell>
 									<TableCell className="text-muted-foreground">
 										{formatDateTime(m.createdAt)}

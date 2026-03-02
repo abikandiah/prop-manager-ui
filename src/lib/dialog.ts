@@ -3,6 +3,9 @@ import { useState } from 'react'
 /** className for standard-width form dialogs (sm:max-w-2xl). */
 export const FORM_DIALOG_CLASS = 'max-w-[calc(100vw-2rem)] sm:max-w-2xl'
 
+/** className for medium form dialogs, e.g. forms with 2-column sections (sm:max-w-3xl). */
+export const FORM_DIALOG_CLASS_MEDIUM = 'max-w-[calc(100vw-2rem)] sm:max-w-3xl'
+
 /** className for wide form dialogs, e.g. wizards (sm:max-w-5xl). */
 export const FORM_DIALOG_CLASS_WIDE = 'max-w-[calc(100vw-2rem)] sm:max-w-5xl'
 

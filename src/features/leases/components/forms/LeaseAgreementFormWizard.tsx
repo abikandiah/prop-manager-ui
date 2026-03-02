@@ -163,7 +163,8 @@ export function LeaseAgreementFormWizard({
 	const form = useForm<LeaseFormValues>({
 		resolver: standardSchemaResolver(leaseFormSchema),
 		defaultValues: isEdit ? leaseToFormValues(initialLease) : defaultValues,
-		mode: 'onTouched',
+		mode: 'onSubmit',
+		reValidateMode: 'onChange',
 	})
 
 	const { handleSubmit, trigger, watch, setValue, reset } = form

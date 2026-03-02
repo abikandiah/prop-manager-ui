@@ -40,7 +40,8 @@ export function CreateOrganizationForm({
 	} = useForm<CreateOrganizationFormValues>({
 		resolver: standardSchemaResolver(createOrganizationSchema),
 		defaultValues: { name: '' },
-		mode: 'onTouched',
+		mode: 'onSubmit',
+		reValidateMode: 'onChange',
 	})
 
 	const onSubmit = useCallback(

@@ -58,7 +58,8 @@ export function InviteTenantsForm({
 	} = useForm<InviteFormValues>({
 		resolver: standardSchemaResolver(inviteFormSchema),
 		defaultValues: { invites: [{ ...DEFAULT_ROW }] },
-		mode: 'onTouched',
+		mode: 'onSubmit',
+		reValidateMode: 'onChange',
 	})
 
 	const { fields, append, remove } = useFieldArray({

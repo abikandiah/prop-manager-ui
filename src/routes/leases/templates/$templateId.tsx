@@ -218,7 +218,7 @@ function LeaseTemplateDetailPage() {
 											([key, value]) => (
 												<div
 													key={key}
-													className="rounded-md border bg-muted/30 p-3"
+													className="rounded border bg-muted/30 p-3"
 												>
 													<p className="text-xs font-mono text-muted-foreground">
 														{'{{'}

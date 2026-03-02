@@ -63,7 +63,7 @@ export function LeaseTermsStep() {
 				<FieldError message={errors.securityDepositHeld?.message} />
 			</div>
 
-			<div className="rounded-md bg-muted/40 p-3 space-y-3">
+			<div className="rounded bg-muted/40 p-3 space-y-3">
 				<p className="text-xs font-medium text-muted-foreground">Late fee</p>
 				<div className="grid grid-cols-2 gap-4">
 					<div className="space-y-2">

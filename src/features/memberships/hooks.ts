@@ -69,6 +69,8 @@ export function useInviteMember() {
 				version: 0,
 				createdAt: nowIso(),
 				updatedAt: nowIso(),
+				userLastLoggedInAt: null,
+				orgPolicyName: null,
 			}
 			queryClient.setQueryData(
 				membershipKeys.list(orgId),

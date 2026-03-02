@@ -59,7 +59,7 @@ export function TenantsTableView() {
 									className="cursor-pointer hover:bg-muted/50"
 									onClick={() =>
 										navigate({
-											to: '/tenants/$tenantId',
+											to: '/people/tenants/$tenantId',
 											params: { tenantId: tenant.id },
 										})
 									}

@@ -18,7 +18,7 @@ import { AssignmentConfigurator } from '../AssignmentConfigurator'
 
 const assignmentSchema = z
 	.object({
-		resourceType: z.nativeEnum(ResourceType),
+		resourceType: z.enum(ResourceType),
 		resourceId: z.string().min(1, 'Resource is required'),
 		usePolicy: z.boolean(),
 		policyId: z.string().optional(),
@@ -70,7 +70,8 @@ export function CreateAssignmentForm({
 			policyId: undefined,
 			overrides: {},
 		},
-		mode: 'onTouched',
+		mode: 'onSubmit',
+		reValidateMode: 'onChange',
 	})
 
 	const formValues = watch()

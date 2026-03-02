@@ -17,29 +17,39 @@ function AccordionItem({
 	return (
 		<AccordionPrimitive.Item
 			data-slot="accordion-item"
-			className={cn('border-b last:border-b-0', className)}
+			className={cn(className)}
 			{...props}
 		/>
 	)
 }
 
+interface AccordionTriggerProps extends React.ComponentProps<
+	typeof AccordionPrimitive.Trigger
+> {
+	/** Hide the auto-appended chevron when you want to render your own inline. */
+	hideChevron?: boolean
+}
+
 function AccordionTrigger({
 	className,
 	children,
+	hideChevron = false,
 	...props
-}: React.ComponentProps<typeof AccordionPrimitive.Trigger>) {
+}: AccordionTriggerProps) {
 	return (
 		<AccordionPrimitive.Header className="flex">
 			<AccordionPrimitive.Trigger
 				data-slot="accordion-trigger"
 				className={cn(
-					'focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-start justify-between gap-4 rounded-md py-4 text-left text-sm font-medium transition-all outline-none hover:underline focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-180',
+					'focus-visible:border-ring focus-visible:ring-ring/50 flex flex-1 items-start justify-between gap-4 rounded py-4 text-left text-sm font-medium transition-all outline-none hover:underline focus-visible:ring-[3px] disabled:pointer-events-none disabled:opacity-50 [&[data-state=open]>svg]:rotate-180',
 					className,
 				)}
 				{...props}
 			>
 				{children}
-				<ChevronDownIcon className="text-muted-foreground pointer-events-none size-4 shrink-0 translate-y-0.5 transition-transform duration-200" />
+				{!hideChevron && (
+					<ChevronDownIcon className="text-muted-foreground pointer-events-none size-4 shrink-0 translate-y-0.5 transition-transform duration-200" />
+				)}
 			</AccordionPrimitive.Trigger>
 		</AccordionPrimitive.Header>
 	)

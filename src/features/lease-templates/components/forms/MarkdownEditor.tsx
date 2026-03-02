@@ -45,7 +45,7 @@ const PlaceholderButtons = memo(function PlaceholderButtons({
 	const hasCustomParams = customKeys.length > 0
 
 	return (
-		<div className="rounded-md border bg-muted/30 p-3 space-y-3">
+		<div className="rounded border bg-muted/30 p-3 space-y-3">
 			{/* Built-in Parameters */}
 			<div>
 				<p className="text-xs font-medium text-muted-foreground mb-2">
@@ -57,7 +57,7 @@ const PlaceholderButtons = memo(function PlaceholderButtons({
 							key={key}
 							type="button"
 							onClick={() => onInsert(key)}
-							className="inline-flex items-center rounded-md bg-background border px-2 py-1 text-xs font-mono hover:bg-accent hover:text-accent-foreground transition-colors"
+							className="inline-flex items-center rounded bg-background border px-2 py-1 text-xs font-mono hover:bg-accent hover:text-accent-foreground transition-colors"
 							title={description}
 						>
 							{'{{'}
@@ -80,7 +80,7 @@ const PlaceholderButtons = memo(function PlaceholderButtons({
 								key={key}
 								type="button"
 								onClick={() => onInsert(key)}
-								className="inline-flex items-center rounded-md bg-background border border-primary/50 px-2 py-1 text-xs font-mono hover:bg-accent hover:text-accent-foreground transition-colors"
+								className="inline-flex items-center rounded bg-background border border-primary/50 px-2 py-1 text-xs font-mono hover:bg-accent hover:text-accent-foreground transition-colors"
 								title={`Custom: ${customParameters[key] || 'No default value'}`}
 							>
 								{'{{'}
@@ -103,7 +103,7 @@ const ViewModeToggle = memo(function ViewModeToggle({
 	onModeChange: (mode: 'split' | 'edit' | 'preview') => void
 }) {
 	return (
-		<div className="flex rounded-md border bg-muted/50">
+		<div className="flex rounded border bg-muted/50">
 			<button
 				type="button"
 				onClick={() => onModeChange('edit')}
@@ -255,7 +255,7 @@ const MarkdownEditorComponent = function MarkdownEditor({
 							placeholder="Write your lease template in markdown...&#10;&#10;Example:&#10;# Lease Agreement&#10;&#10;This lease is between {{landlord_name}} and {{tenant_name}} for {{property_name}}, {{unit_number}}."
 							required
 							className={cn(
-								`flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none 
+								`flex w-full rounded border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none 
 								focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-mono resize-none`,
 								'min-h-[45vh] max-h-[45vh]',
 							)}
@@ -271,7 +271,7 @@ const MarkdownEditorComponent = function MarkdownEditor({
 						</p>
 						<div
 							className={cn(
-								'rounded-md border border-input bg-background px-4 py-3 overflow-auto',
+								'rounded border border-input bg-background px-4 py-3 overflow-auto',
 								'min-h-[45vh] max-h-[45vh]',
 							)}
 						>

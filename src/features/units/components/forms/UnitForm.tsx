@@ -37,8 +37,8 @@ const unitFormSchema = z.object({
 		.string()
 		.min(1, 'Unit number is required')
 		.max(64, 'Unit number is too long'),
-	unitType: z.nativeEnum(UnitType).or(z.literal('')),
-	status: z.nativeEnum(UnitStatus),
+	unitType: z.enum(UnitType).or(z.literal('')),
+	status: z.enum(UnitStatus),
 	description: z.string().max(2000).optional(),
 	rentAmount: optionalFloat,
 	securityDeposit: optionalFloat,
@@ -270,7 +270,7 @@ export function UnitForm({
 					placeholder="Notes about this unit"
 					maxLength={2000}
 					rows={3}
-					className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+					className="flex min-h-[80px] w-full rounded border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
 				/>
 			</div>
 			<div className="flex flex-col gap-2">

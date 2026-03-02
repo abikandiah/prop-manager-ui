@@ -128,7 +128,8 @@ export function LeaseTemplateFormWizard({
 		defaultValues: initialTemplate
 			? templateToFormValues(initialTemplate)
 			: defaultValues,
-		mode: 'onTouched',
+		mode: 'onSubmit',
+		reValidateMode: 'onChange',
 	})
 
 	const { handleSubmit, trigger, reset } = form

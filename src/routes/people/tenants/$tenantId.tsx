@@ -54,7 +54,7 @@ function TenantDetailPage() {
 							? error.message || 'Failed to load tenant'
 							: 'The tenant you were looking for was not found.'
 					}
-					action={<TextLink to="/tenants">Back to tenants</TextLink>}
+					action={<TextLink to="/people/tenants">Back to tenants</TextLink>}
 				/>
 			) : (
 				<div className="flex flex-col gap-6">

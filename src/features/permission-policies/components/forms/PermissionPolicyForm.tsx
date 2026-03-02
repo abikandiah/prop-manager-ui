@@ -74,7 +74,8 @@ export function PermissionPolicyForm({
 			name: initialPolicy?.name ?? prefill?.name ?? '',
 			permissions: initialPolicy?.permissions ?? prefill?.permissions ?? {},
 		},
-		mode: 'onTouched',
+		mode: 'onSubmit',
+		reValidateMode: 'onChange',
 	})
 
 	const onSubmit = useCallback(

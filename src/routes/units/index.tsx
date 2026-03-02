@@ -8,6 +8,7 @@ import {
 } from '@abumble/design-system/components/Dialog'
 import { UnitForm, UnitsGroupedView } from '@/features/units'
 import { FORM_DIALOG_CLASS, useDialogState } from '@/lib/dialog'
+import { PermissionGate } from '@/components/auth/PermissionGate'
 
 export const Route = createFileRoute('/units/')({
 	component: UnitsPage,
@@ -22,29 +23,31 @@ function UnitsPage() {
 				description="Manage all units across your properties. Add new units, update their status, or view details."
 			/>
 
-			<div>
-				<FormDialog
-					open={dialog.isOpen}
-					onOpenChange={dialog.setIsOpen}
-					title="Add unit"
-					description="Select a property and enter the unit details."
-					className={FORM_DIALOG_CLASS}
-					trigger={
-						<DialogTrigger asChild>
-							<Button>
-								<Plus className="size-4" />
-								Add unit
-							</Button>
-						</DialogTrigger>
-					}
-				>
-					<UnitForm
-						onSuccess={dialog.close}
-						onCancel={dialog.close}
-						submitLabel="Create Unit"
-					/>
-				</FormDialog>
-			</div>
+			<PermissionGate action="CREATE" domain="PORTFOLIO">
+				<div>
+					<FormDialog
+						open={dialog.isOpen}
+						onOpenChange={dialog.setIsOpen}
+						title="Add unit"
+						description="Select a property and enter the unit details."
+						className={FORM_DIALOG_CLASS}
+						trigger={
+							<DialogTrigger asChild>
+								<Button>
+									<Plus className="size-4" />
+									Add unit
+								</Button>
+							</DialogTrigger>
+						}
+					>
+						<UnitForm
+							onSuccess={dialog.close}
+							onCancel={dialog.close}
+							submitLabel="Create Unit"
+						/>
+					</FormDialog>
+				</div>
+			</PermissionGate>
 
 			<UnitsGroupedView />
 		</div>

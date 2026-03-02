@@ -9,6 +9,7 @@ import type {
 import { stableRequestId } from '@/lib/offline-types'
 import { generateId, nowIso } from '@/lib/util'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
+import { useAuth } from '@/contexts/auth'
 
 /** Payload for create without id — the hook generates it. */
 export type CreatePolicyAssignmentPayloadWithoutId = Omit<
@@ -43,6 +44,7 @@ export function usePolicyAssignmentDetail(
 
 export function useCreatePolicyAssignment() {
 	const queryClient = useQueryClient()
+	const { refreshUser } = useAuth()
 
 	const mutation = useMutation({
 		mutationKey: ['createPolicyAssignment'],
@@ -102,6 +104,7 @@ export function useCreatePolicyAssignment() {
 			queryClient.invalidateQueries({
 				queryKey: policyAssignmentKeys.list(orgId, membershipId),
 			})
+			refreshUser()
 		},
 	})
 
@@ -136,6 +139,7 @@ export function useCreatePolicyAssignment() {
 
 export function useUpdatePolicyAssignment() {
 	const queryClient = useQueryClient()
+	const { refreshUser } = useAuth()
 
 	return useMutation({
 		mutationKey: ['updatePolicyAssignment'],
@@ -204,12 +208,14 @@ export function useUpdatePolicyAssignment() {
 			queryClient.invalidateQueries({
 				queryKey: policyAssignmentKeys.list(orgId, membershipId),
 			})
+			refreshUser()
 		},
 	})
 }
 
 export function useDeletePolicyAssignment() {
 	const queryClient = useQueryClient()
+	const { refreshUser } = useAuth()
 
 	return useMutation({
 		mutationKey: ['deletePolicyAssignment'],
@@ -236,6 +242,7 @@ export function useDeletePolicyAssignment() {
 			queryClient.invalidateQueries({
 				queryKey: policyAssignmentKeys.list(orgId, membershipId),
 			})
+			refreshUser()
 		},
 	})
 }

@@ -10,6 +10,7 @@ import {
 import { stableRequestId } from '@/lib/offline-types'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
 import { generateId, nowIso } from '@/lib/util'
+import { useAuth } from '@/contexts/auth'
 
 // --- Queries ---
 
@@ -97,6 +98,7 @@ export function useInviteMember() {
 
 export function useUpdateMembership() {
 	const queryClient = useQueryClient()
+	const { refreshUser } = useAuth()
 	return useMutation({
 		mutationKey: ['updateMembership'],
 		networkMode: 'online',
@@ -127,12 +129,14 @@ export function useUpdateMembership() {
 					variables.membershipId,
 				),
 			})
+			refreshUser()
 		},
 	})
 }
 
 export function useDeleteMembership() {
 	const queryClient = useQueryClient()
+	const { refreshUser } = useAuth()
 	return useMutation({
 		mutationKey: ['deleteMembership'],
 		networkMode: 'online',
@@ -180,6 +184,7 @@ export function useDeleteMembership() {
 			queryClient.invalidateQueries({
 				queryKey: membershipKeys.list(variables.orgId),
 			})
+			refreshUser()
 		},
 	})
 }

@@ -18,14 +18,18 @@ import { config } from '@/config'
 import { formatCurrency, formatEnumLabel } from '@/lib/format'
 import { FORM_DIALOG_CLASS, useEditDialogState } from '@/lib/dialog'
 import { useQueryErrorToast } from '@/lib/hooks'
+import { ResourceType } from '@/domain/policy-assignment'
+import { useCan } from '@/lib/permissions'
 
 function UnitRowActions({ unit, onEdit }: { unit: Unit; onEdit: () => void }) {
 	const deleteUnit = useDeleteUnit()
+	const canUpdate = useCan('UPDATE', 'PORTFOLIO', ResourceType.PROPERTY, unit.propertyId)
+	const canDelete = useCan('DELETE', 'PORTFOLIO', ResourceType.PROPERTY, unit.propertyId)
 
 	return (
 		<EntityActions
 			label="Unit actions"
-			onEdit={onEdit}
+			onEdit={canUpdate ? onEdit : undefined}
 			onDelete={() => {
 				deleteUnit.mutate(
 					{ id: unit.id, propertyId: unit.propertyId },
@@ -34,6 +38,7 @@ function UnitRowActions({ unit, onEdit }: { unit: Unit; onEdit: () => void }) {
 					},
 				)
 			}}
+			disableDelete={!canDelete}
 			isDeletePending={deleteUnit.isPending}
 			deleteTitle="Delete unit?"
 			deleteDescription={

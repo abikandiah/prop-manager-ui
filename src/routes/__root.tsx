@@ -126,7 +126,7 @@ function Root() {
 
 function SimpleHeaderFooter({ children }: { children: React.ReactNode }) {
 	return (
-		<div className="flex min-h-screen w-full flex-col bg-background text-foreground">
+		<div className="flex min-h-screen w-full flex-col">
 			<Header />
 			{children}
 			<Footer />
@@ -186,7 +186,7 @@ function BannerLandingPage({ children }: { children: React.ReactNode }) {
 function DashboardHome() {
 	return (
 		<SidebarProvider>
-			<div className="layout-header-full flex min-h-screen w-full flex-col">
+			<div className="flex flex-col min-h-screen w-full">
 				<Header />
 				<div className="flex flex-1 min-w-0 mt-14">
 					<AppSidebar />

@@ -1,3 +1,6 @@
+import { useAuth } from '@/contexts/auth'
+import { AppRole } from '@/domain/user'
+import { useCan } from '@/lib/permissions'
 import {
 	Sidebar,
 	SidebarContent,
@@ -56,6 +59,11 @@ function SidebarNavLink({
 
 export function AppSidebar() {
 	const state = useSidebar()
+	const { user } = useAuth()
+	const roles = user?.roles ?? []
+	const isManagerOrAdmin =
+		roles.includes(AppRole.MANAGER) || roles.includes(AppRole.ADMIN)
+	const canReadLeases = useCan('READ', 'LEASES')
 
 	const closeMobileSidebar = useCallback(
 		function () {
@@ -82,64 +90,76 @@ export function AppSidebar() {
 									item={{ to: '/', label: 'Dashboard', icon: LayoutDashboard }}
 									onClick={closeMobileSidebar}
 								/>
-								<CollapsibleSidebarSection
-									title="Portfolio"
-									icon={Building2}
-									items={[
-										{ to: '/props', label: 'Properties', icon: Building2 },
-										{ to: '/units', label: 'Units', icon: LayoutGrid },
-									]}
-									onItemClick={closeMobileSidebar}
-								/>
-								<CollapsibleSidebarSection
-									title="People"
-									icon={Users}
-									items={[
-										{ to: '/people/tenants', label: 'Tenants', icon: Users },
-										{ to: '/people/owners', label: 'Owners', icon: UserCheck },
-										{ to: '/people/vendors', label: 'Vendors', icon: Store },
-									]}
-									onItemClick={closeMobileSidebar}
-								/>
-								<CollapsibleSidebarSection
-									title="Leasing"
-									icon={FileText}
-									items={[
-										{
-											to: '/leases/templates',
-											label: 'Templates',
-											icon: FileSignature,
-										},
-										{
-											to: '/leases/agreements',
-											label: 'Agreements',
-											icon: FileCheck,
-										},
-										// {
-										// 	to: '/leases/applications',
-										// 	label: 'Applications',
-										// 	icon: ClipboardList,
-										// },
-									]}
-									onItemClick={closeMobileSidebar}
-								/>
-								<CollapsibleSidebarSection
-									title="Team"
-									icon={UserCheck}
-									items={[
-										{
-											to: '/organization/members',
-											label: 'Members',
-											icon: Users,
-										},
-										{
-											to: '/organization/roles',
-											label: 'Roles',
-											icon: FileSignature,
-										},
-									]}
-									onItemClick={closeMobileSidebar}
-								/>
+								{isManagerOrAdmin && (
+									<CollapsibleSidebarSection
+										title="Portfolio"
+										icon={Building2}
+										items={[
+											{ to: '/props', label: 'Properties', icon: Building2 },
+											{ to: '/units', label: 'Units', icon: LayoutGrid },
+										]}
+										onItemClick={closeMobileSidebar}
+									/>
+								)}
+								{isManagerOrAdmin && (
+									<CollapsibleSidebarSection
+										title="People"
+										icon={Users}
+										items={[
+											{ to: '/people/tenants', label: 'Tenants', icon: Users },
+											{
+												to: '/people/owners',
+												label: 'Owners',
+												icon: UserCheck,
+											},
+											{ to: '/people/vendors', label: 'Vendors', icon: Store },
+										]}
+										onItemClick={closeMobileSidebar}
+									/>
+								)}
+								{canReadLeases && (
+									<CollapsibleSidebarSection
+										title="Leasing"
+										icon={FileText}
+										items={[
+											{
+												to: '/leases/templates',
+												label: 'Templates',
+												icon: FileSignature,
+											},
+											{
+												to: '/leases/agreements',
+												label: 'Agreements',
+												icon: FileCheck,
+											},
+											// {
+											// 	to: '/leases/applications',
+											// 	label: 'Applications',
+											// 	icon: ClipboardList,
+											// },
+										]}
+										onItemClick={closeMobileSidebar}
+									/>
+								)}
+								{isManagerOrAdmin && (
+									<CollapsibleSidebarSection
+										title="Team"
+										icon={UserCheck}
+										items={[
+											{
+												to: '/organization/members',
+												label: 'Members',
+												icon: Users,
+											},
+											{
+												to: '/organization/roles',
+												label: 'Roles',
+												icon: FileSignature,
+											},
+										]}
+										onItemClick={closeMobileSidebar}
+									/>
+								)}
 								{/* <CollapsibleSidebarSection
 									title="Maintenance"
 									icon={Wrench}

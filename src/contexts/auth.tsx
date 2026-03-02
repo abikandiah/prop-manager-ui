@@ -6,6 +6,8 @@ import type { ReactNode } from 'react'
 import { createContext, useCallback, useContext } from 'react'
 
 import type { UserOrganization } from '@/domain/organization'
+import { AppRole } from '@/domain/user'
+import type { AccessEntry } from '@/lib/permissions'
 
 export interface User {
 	id: string
@@ -13,6 +15,13 @@ export interface User {
 	name: string
 	termsAccepted: boolean
 	organizations: UserOrganization[]
+	roles: AppRole[]
+	access: AccessEntry[]
+}
+
+/** Raw shape returned by /api/me — `uiRoles` is mapped to `roles` on the way in. */
+interface RawUserResponse extends Omit<User, 'roles'> {
+	uiRoles: AppRole[]
 }
 
 interface AuthContextType {
@@ -29,11 +38,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 	const queryClient = useQueryClient()
 	const { data: user, isLoading } = useQuery({
 		queryKey: ['me'],
-		queryFn: async () => {
-			const { data } = await api.get<User>('/me')
-			return data
+		queryFn: async (): Promise<User> => {
+			const { data } = await api.get<RawUserResponse>('/me')
+			const { uiRoles, ...rest } = data
+			return { ...rest, roles: uiRoles ?? [] }
 		},
 		staleTime: Infinity,
+		refetchInterval: config.userRefetchIntervalMs,
 	})
 
 	// Create a stable reference to a refresh function

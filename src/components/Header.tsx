@@ -16,35 +16,38 @@ function Header() {
 	const { isUserDefined } = useAuth()
 
 	return (
-		<div className="h-14 shrink-0">
-			<header className="header">
-				<Link to={'/'} className="flex items-center gap-2">
-					<img className="h-8 w-8 shrink-0" src={bee} alt="Home Bee" />
-					<span className="app-title hidden text-foreground sm:inline">
-						PropMange
-					</span>
-				</Link>
+		<header className="header">
+			<Link to={'/'} className="flex items-center gap-2">
+				<img className="h-8 w-8 shrink-0" src={bee} alt="Home Bee" />
+				<span className="app-title hidden text-foreground sm:inline">
+					PropMange
+				</span>
+			</Link>
 
-				<div className="flex items-center gap-1 rounded-full">
-					<ThemeToggle />
+			<div className="flex items-center gap-1 rounded-full">
+				<ThemeToggle />
 
-					{isUserDefined && (
-						<>
-							<Button
-								type="button"
-								variant="ghost"
-								size="icon"
-								className="rounded-full"
-								aria-label="Notifications"
-							>
-								<Bell className="size-5" />
-							</Button>
-							<UserProfile />
-						</>
-					)}
-				</div>
-			</header>
-		</div>
+				{!isUserDefined && (
+					<Button asChild variant="ghost" size="sm">
+						<Link to="/home">Sign in</Link>
+					</Button>
+				)}
+				{isUserDefined && (
+					<>
+						<Button
+							type="button"
+							variant="ghost"
+							size="icon"
+							className="rounded-full"
+							aria-label="Notifications"
+						>
+							<Bell className="size-5" />
+						</Button>
+						<UserProfile />
+					</>
+				)}
+			</div>
+		</header>
 	)
 }
 

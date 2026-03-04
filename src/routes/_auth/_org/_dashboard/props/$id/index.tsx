@@ -131,7 +131,7 @@ function PropLayout() {
 						<FormDialog
 							open={editDialog.isOpen}
 							onOpenChange={() => editDialog.close()}
-							title='Edit property'
+							title="Edit property"
 							description={`Update ${editDialog.editing!.legalName} details.`}
 							className={FORM_DIALOG_CLASS}
 						>
@@ -152,7 +152,7 @@ function PropLayout() {
 							<div className="rounded border bg-card px-5 py-4">
 								<div className="grid gap-4 sm:grid-cols-2">
 									<DetailField
-										label='Legal Name'
+										label="Legal Name"
 										valueClassName="text-lg font-semibold text-foreground"
 									>
 										{prop.legalName}
@@ -169,7 +169,7 @@ function PropLayout() {
 										{prop.yearBuilt ?? '—'}
 									</DetailField>
 									<DetailField
-										label='Parcel Number'
+										label="Parcel Number"
 										valueClassName="text-foreground font-mono"
 									>
 										{prop.parcelNumber ?? '—'}
@@ -182,7 +182,7 @@ function PropLayout() {
 								<DetailField label="Location">
 									<AddressDisplay
 										address={prop.address}
-										className='text-foreground'
+										className="text-foreground"
 									/>
 								</DetailField>
 							</div>
@@ -191,7 +191,7 @@ function PropLayout() {
 							{prop.description && (
 								<div className="rounded border bg-card px-5 py-4">
 									<DetailField
-										label='Description'
+										label="Description"
 										valueClassName="text-foreground whitespace-pre-wrap leading-relaxed"
 									>
 										{prop.description}

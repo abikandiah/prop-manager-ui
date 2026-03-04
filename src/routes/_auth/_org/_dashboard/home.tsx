@@ -23,15 +23,15 @@ function DashboardHome() {
 
 			<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 				<DashboardCard
-					to='/props'
+					to="/props"
 					icon={Package}
 					title="Properties"
 					description="See and manage every property you own or look after."
 				/>
 				<DashboardCard
-					to='/units'
+					to="/units"
 					icon={LayoutGrid}
-					title='Units'
+					title="Units"
 					description="Manage every unit across all your properties in one place."
 				/>
 				<DashboardCard
@@ -47,7 +47,7 @@ function DashboardHome() {
 					description="Manage lease agreements that connect tenants to your properties and units."
 				/>
 				<DashboardCard
-					to='/messages'
+					to="/messages"
 					icon={MessageSquare}
 					title="Messages"
 					description="Read and manage your messages in one place."

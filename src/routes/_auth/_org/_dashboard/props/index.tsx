@@ -42,7 +42,7 @@ function RouteComponent() {
 						trigger={
 							<DialogTrigger asChild>
 								<Button>
-									<Plus className='size-4' />
+									<Plus className="size-4" />
 									Add property
 								</Button>
 							</DialogTrigger>
@@ -51,7 +51,8 @@ function RouteComponent() {
 						<PropsForm
 							onSuccess={(data) => {
 								dialog.close()
-								if (data) navigate({ to: '/props/$id', params: { id: data.id } })
+								if (data)
+									navigate({ to: '/props/$id', params: { id: data.id } })
 							}}
 							onCancel={dialog.close}
 							submitLabel="Create Property"

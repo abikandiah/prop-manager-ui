@@ -1,5 +1,6 @@
-import { api, setDevToken } from '@/api/client'
+import { setDevToken } from '@/api/client'
 import { FormActions, FormCard } from '@/components/ui/FormCard'
+import { authApi } from '@/features/auth'
 import { Button } from '@abumble/design-system/components/Button'
 import { Input } from '@abumble/design-system/components/Input'
 import { Label } from '@abumble/design-system/components/Label'
@@ -19,11 +20,7 @@ export function DevAuthForm({ onSuccess }: DevAuthFormProps) {
 		e.preventDefault()
 		setLoading(true)
 		try {
-			const response = await api.post<{ token: string }>('/dev/login', {
-				email,
-				password,
-			})
-			const token = response.data.token
+			const { token } = await authApi.devLogin({ email, password })
 
 			if (token) {
 				setDevToken(token)

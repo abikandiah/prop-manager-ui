@@ -1,4 +1,3 @@
-import { BannerLandingPage } from '@/components/pages'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_public')({
@@ -6,9 +5,5 @@ export const Route = createFileRoute('/_public')({
 })
 
 function RouteComponent() {
-	return (
-		<BannerLandingPage>
-			<Outlet />
-		</BannerLandingPage>
-	)
+	return <Outlet />
 }

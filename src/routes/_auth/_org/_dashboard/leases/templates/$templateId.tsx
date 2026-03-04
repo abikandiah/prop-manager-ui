@@ -26,7 +26,9 @@ import { FORM_DIALOG_CLASS_WIDE, useEditDialogState } from '@/lib/dialog'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 
-export const Route = createFileRoute('/_auth/_org/_dashboard/leases/templates/$templateId')({
+export const Route = createFileRoute(
+	'/_auth/_org/_dashboard/leases/templates/$templateId',
+)({
 	component: LeaseTemplateDetailPage,
 })
 
@@ -175,7 +177,7 @@ function LeaseTemplateDetailPage() {
 							<div className="rounded border bg-card px-5 py-4">
 								<div className="grid gap-4 sm:grid-cols-2">
 									<DetailField
-										label='Template Name'
+										label="Template Name"
 										valueClassName="text-lg font-semibold text-foreground"
 									>
 										{template.name}
@@ -263,7 +265,7 @@ function LeaseTemplateDetailPage() {
 						<FormDialog
 							open={editDialog.isOpen}
 							onOpenChange={handleEditClose}
-							title='Edit template'
+							title="Edit template"
 							description="Update template details."
 							className={FORM_DIALOG_CLASS_WIDE}
 							wizard={{
@@ -278,7 +280,7 @@ function LeaseTemplateDetailPage() {
 								initialTemplate={editDialog.editing}
 								onSuccess={handleEditClose}
 								onCancel={handleEditClose}
-								submitLabel='Save'
+								submitLabel="Save"
 							/>
 						</FormDialog>
 					)}

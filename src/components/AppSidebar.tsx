@@ -1,5 +1,5 @@
-import { useAuth } from '@/features/auth'
 import { AppRole } from '@/domain/user'
+import { useAuth } from '@/features/auth'
 import { useCan } from '@/lib/permissions'
 import {
 	Sidebar,
@@ -86,7 +86,11 @@ export function AppSidebar() {
 						<SidebarGroupContent>
 							<SidebarMenu>
 								<SidebarNavLink
-									item={{ to: '/home', label: 'Dashboard', icon: LayoutDashboard }}
+									item={{
+										to: '/home',
+										label: 'Dashboard',
+										icon: LayoutDashboard,
+									}}
 									onClick={closeMobileSidebar}
 								/>
 								{isManagerOrAdmin && (

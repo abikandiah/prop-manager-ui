@@ -1,3 +1,4 @@
+import { BannerLandingPage } from '@/components/pages'
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
@@ -11,6 +12,14 @@ export const Route = createFileRoute('/_public/privacy')({
 })
 
 function RouteComponent() {
+	return (
+		<BannerLandingPage>
+			<PrivacyContent />
+		</BannerLandingPage>
+	)
+}
+
+function PrivacyContent() {
 	const { data, isLoading, isError, error } = useQuery({
 		queryKey: ['public', 'privacy'],
 		queryFn: async () => {

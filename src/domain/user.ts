@@ -21,6 +21,11 @@ export interface UserUpdatePayload {
 	termsAccepted: boolean
 }
 
+export interface DevLoginPayload {
+	email: string
+	password: string
+}
+
 export interface UserOrganization {
 	id: string
 	name: string

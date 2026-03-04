@@ -5,7 +5,9 @@ const searchSchema = z.object({
 	orgId: z.string().optional(),
 })
 
-export const Route = createFileRoute('/_auth/_org/_dashboard/settings/permission-templates')({
+export const Route = createFileRoute(
+	'/_auth/_org/_dashboard/settings/permission-templates',
+)({
 	validateSearch: searchSchema,
 	beforeLoad: ({ search }) => {
 		throw redirect({

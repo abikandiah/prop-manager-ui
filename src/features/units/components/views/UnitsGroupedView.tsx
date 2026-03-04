@@ -54,8 +54,18 @@ function writeExpandedToStorage(ids: Set<string>): void {
 
 function UnitRowActions({ unit, onEdit }: { unit: Unit; onEdit: () => void }) {
 	const deleteUnit = useDeleteUnit()
-	const canUpdate = useCan('UPDATE', 'PORTFOLIO', ResourceType.PROPERTY, unit.propertyId)
-	const canDelete = useCan('DELETE', 'PORTFOLIO', ResourceType.PROPERTY, unit.propertyId)
+	const canUpdate = useCan(
+		'UPDATE',
+		'PORTFOLIO',
+		ResourceType.PROPERTY,
+		unit.propertyId,
+	)
+	const canDelete = useCan(
+		'DELETE',
+		'PORTFOLIO',
+		ResourceType.PROPERTY,
+		unit.propertyId,
+	)
 	return (
 		<EntityActions
 			label="Unit actions"

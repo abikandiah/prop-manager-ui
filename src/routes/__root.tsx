@@ -1,4 +1,6 @@
+import { EnvironmentBanner } from '@/components/EnvironmentBanner'
 import Footer from '@/components/Footer'
+import Header from '@/components/Header'
 import { config } from '@/config'
 import { useTheme } from '@/contexts/theme'
 import type { MyRouterContext } from '@/integrations/tanstack-query/router'
@@ -27,7 +29,10 @@ function Root() {
 	return (
 		<div className="flex flex-col min-h-screen w-full">
 			<Toaster theme={effectiveTheme} />
+			<Header />
+			<EnvironmentBanner />
 			<Outlet />
+			<Footer />
 		</div>
 	)
 }

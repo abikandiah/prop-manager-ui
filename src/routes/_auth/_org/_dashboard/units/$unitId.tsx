@@ -148,7 +148,7 @@ function UnitDetailPage() {
 							<div className="rounded border bg-card px-5 py-4">
 								<div className="grid gap-4 sm:grid-cols-3">
 									<DetailField
-										label='Unit Number'
+										label="Unit Number"
 										valueClassName="text-lg font-semibold text-foreground"
 									>
 										{unit.unitNumber}
@@ -157,12 +157,12 @@ function UnitDetailPage() {
 										{formatEnumLabel(unit.status)}
 									</DetailField>
 									<DetailField
-										label='Property'
+										label="Property"
 										valueClassName="text-foreground font-medium"
 									>
 										{prop?.legalName ?? '—'}
 									</DetailField>
-									<DetailField label='Rent'>
+									<DetailField label="Rent">
 										{formatCurrency(unit.rentAmount)}
 									</DetailField>
 									<DetailField label="Security Deposit">
@@ -214,7 +214,7 @@ function UnitDetailPage() {
 							{unit.description && (
 								<div className="rounded border bg-card px-5 py-4">
 									<DetailField
-										label='Description'
+										label="Description"
 										valueClassName="text-foreground whitespace-pre-wrap leading-relaxed"
 									>
 										{unit.description}
@@ -243,7 +243,7 @@ function UnitDetailPage() {
 						<FormDialog
 							open={editDialog.isOpen}
 							onOpenChange={() => editDialog.close()}
-							title='Edit unit'
+							title="Edit unit"
 							description={`Update unit ${editDialog.editing!.unitNumber} details.`}
 							className={FORM_DIALOG_CLASS}
 						>
@@ -252,7 +252,7 @@ function UnitDetailPage() {
 								initialUnit={editDialog.editing}
 								onSuccess={editDialog.close}
 								onCancel={editDialog.close}
-								submitLabel='Save'
+								submitLabel="Save"
 							/>
 						</FormDialog>
 					)}

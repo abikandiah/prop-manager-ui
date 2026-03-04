@@ -30,12 +30,12 @@ export const Route = createFileRoute('/_auth')({
 })
 
 function RouteComponent() {
-	const { user } = useAuth()
+	const { user, refreshUser } = useAuth()
 
 	if (!user) {
 		return (
 			<BannerLandingPage>
-				<DevAuthForm />
+				<DevAuthForm onSuccess={refreshUser} />
 			</BannerLandingPage>
 		)
 	}

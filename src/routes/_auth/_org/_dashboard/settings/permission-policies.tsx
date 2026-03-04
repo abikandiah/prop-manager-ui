@@ -17,7 +17,9 @@ const searchSchema = z.object({
 	orgId: z.string().optional(),
 })
 
-export const Route = createFileRoute('/_auth/_org/_dashboard/settings/permission-policies')({
+export const Route = createFileRoute(
+	'/_auth/_org/_dashboard/settings/permission-policies',
+)({
 	validateSearch: searchSchema,
 	component: RouteComponent,
 })

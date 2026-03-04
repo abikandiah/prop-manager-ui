@@ -10,7 +10,9 @@ import { Plus } from 'lucide-react'
 import { FORM_DIALOG_CLASS_WIDE, useWizardDialogState } from '@/lib/dialog'
 import { PermissionGate } from '@/components/auth/PermissionGate'
 
-export const Route = createFileRoute('/_auth/_org/_dashboard/leases/agreements/')({
+export const Route = createFileRoute(
+	'/_auth/_org/_dashboard/leases/agreements/',
+)({
 	component: RouteComponent,
 })
 
@@ -48,7 +50,7 @@ function RouteComponent() {
 						trigger={
 							<DialogTrigger asChild>
 								<Button>
-									<Plus className='size-4' />
+									<Plus className="size-4" />
 									Add lease
 								</Button>
 							</DialogTrigger>

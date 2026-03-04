@@ -13,7 +13,9 @@ import {
 } from '@/features/lease-templates'
 import { FORM_DIALOG_CLASS_WIDE, useWizardDialogState } from '@/lib/dialog'
 
-export const Route = createFileRoute('/_auth/_org/_dashboard/leases/templates/')({
+export const Route = createFileRoute(
+	'/_auth/_org/_dashboard/leases/templates/',
+)({
 	component: RouteComponent,
 })
 

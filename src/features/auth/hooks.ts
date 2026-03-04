@@ -29,11 +29,9 @@ export function useAuth() {
 		globalClient,
 	)
 
-	const refreshUser = !user
-		? async () => {}
-		: async () => {
-				await globalClient.invalidateQueries(authQueryOptions)
-			}
+	const refreshUser = async () => {
+		await globalClient.invalidateQueries(authQueryOptions)
+	}
 
 	const logout = !user
 		? async () => {}

@@ -1,5 +1,10 @@
 import { api } from '@/api/client'
-import type { AppRole, User, UserUpdatePayload } from '@/domain/user'
+import type {
+	AppRole,
+	DevLoginPayload,
+	User,
+	UserUpdatePayload,
+} from '@/domain/user'
 
 /** Raw shape returned by /api/me — `uiRoles` is mapped to `roles` on the way in. */
 interface RawUserResponse extends Omit<User, 'roles'> {
@@ -15,6 +20,11 @@ class AuthApi {
 
 	async updateMe(payload: UserUpdatePayload): Promise<User> {
 		const res = await api.patch<User>('/me', payload)
+		return res.data
+	}
+
+	async devLogin(payload: DevLoginPayload): Promise<{ token?: string }> {
+		const res = await api.post<{ token: string }>('/dev/login', payload)
 		return res.data
 	}
 

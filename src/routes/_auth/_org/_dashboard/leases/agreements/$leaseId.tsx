@@ -29,7 +29,9 @@ import { FORM_DIALOG_CLASS_WIDE, useEditDialogState } from '@/lib/dialog'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 
-export const Route = createFileRoute('/_auth/_org/_dashboard/leases/agreements/$leaseId')({
+export const Route = createFileRoute(
+	'/_auth/_org/_dashboard/leases/agreements/$leaseId',
+)({
 	component: LeaseDetailPage,
 })
 
@@ -211,7 +213,7 @@ function LeaseDetailPage() {
 									<DetailField label="Property">
 										{prop ? (
 											<TextLink
-												to='/props/$id'
+												to="/props/$id"
 												params={{ id: lease.propertyId }}
 											>
 												{prop.legalName}
@@ -220,10 +222,10 @@ function LeaseDetailPage() {
 											'—'
 										)}
 									</DetailField>
-									<DetailField label='Unit'>
+									<DetailField label="Unit">
 										{unit ? (
 											<TextLink
-												to='/units/$unitId'
+												to="/units/$unitId"
 												params={{ unitId: lease.unitId }}
 											>
 												Unit {unit.unitNumber}
@@ -239,7 +241,7 @@ function LeaseDetailPage() {
 							<div className="rounded border bg-card px-5 py-4">
 								<div className="grid gap-4 sm:grid-cols-3">
 									<DetailField
-										label='Monthly Rent'
+										label="Monthly Rent"
 										valueClassName="text-lg font-semibold text-foreground"
 									>
 										{formatCurrency(lease.rentAmount)}
@@ -305,7 +307,7 @@ function LeaseDetailPage() {
 									</DetailField>
 									{lease.templateParameters &&
 										Object.keys(lease.templateParameters).length > 0 && (
-											<div className='mt-4'>
+											<div className="mt-4">
 												<p className={`${DETAIL_LABEL_CLASS} mb-3`}>
 													Parameters
 												</p>
@@ -314,7 +316,7 @@ function LeaseDetailPage() {
 														([key, value]) => (
 															<div
 																key={key}
-																className='rounded border bg-muted/30 p-3'
+																className="rounded border bg-muted/30 p-3"
 															>
 																<p className="text-xs font-mono text-muted-foreground">
 																	{'{{'}
@@ -367,7 +369,7 @@ function LeaseDetailPage() {
 								onOpenChange={(open) => {
 									if (!open) handleEditClose()
 								}}
-								title='Edit lease'
+								title="Edit lease"
 								description="Update lease details. Only draft leases can be edited."
 								className={FORM_DIALOG_CLASS_WIDE}
 								wizard={{
@@ -383,7 +385,7 @@ function LeaseDetailPage() {
 									onStepChange={setWizardStep}
 									onSuccess={handleEditClose}
 									onCancel={handleEditClose}
-									submitLabel='Save'
+									submitLabel="Save"
 								/>
 							</FormDialog>
 						)}

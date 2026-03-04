@@ -3,7 +3,9 @@ import { MembershipDetailView } from '@/features/memberships'
 import { useOrganization } from '@/contexts/organization'
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
 
-export const Route = createFileRoute('/_auth/_org/_dashboard/organization/members/$membershipId')({
+export const Route = createFileRoute(
+	'/_auth/_org/_dashboard/organization/members/$membershipId',
+)({
 	component: RouteComponent,
 })
 

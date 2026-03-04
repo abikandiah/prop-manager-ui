@@ -1,7 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
 
-export const Route = createFileRoute('/_auth/_org/_dashboard/maintenance/work-orders/')({
+export const Route = createFileRoute(
+	'/_auth/_org/_dashboard/maintenance/work-orders/',
+)({
 	component: WorkOrdersPage,
 })
 

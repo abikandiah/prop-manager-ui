@@ -28,13 +28,13 @@ function UnitsPage() {
 					<FormDialog
 						open={dialog.isOpen}
 						onOpenChange={dialog.setIsOpen}
-						title='Add unit'
+						title="Add unit"
 						description="Select a property and enter the unit details."
 						className={FORM_DIALOG_CLASS}
 						trigger={
 							<DialogTrigger asChild>
 								<Button>
-									<Plus className='size-4' />
+									<Plus className="size-4" />
 									Add unit
 								</Button>
 							</DialogTrigger>

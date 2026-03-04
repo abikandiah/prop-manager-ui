@@ -4,7 +4,7 @@ import {
 	Mutation,
 	Query,
 	QueryClient,
-	QueryClientProvider
+	QueryClientProvider,
 } from '@tanstack/react-query'
 import {
 	PersistQueryClientProvider,

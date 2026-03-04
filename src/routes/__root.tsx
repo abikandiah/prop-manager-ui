@@ -4,9 +4,9 @@ import Header from '@/components/Header'
 import { config } from '@/config'
 import { useTheme } from '@/contexts/theme'
 import type { MyRouterContext } from '@/integrations/tanstack-query/router'
+import { Toaster } from '@abumble/design-system/components/Toaster'
 import { UnderConstruction } from '@abumble/design-system/components/UnderConstruction'
 import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
-import { Toaster } from 'sonner'
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
 	component: Root,
@@ -28,7 +28,7 @@ function Root() {
 
 	return (
 		<div className="flex flex-col min-h-screen w-full">
-			<Toaster theme={effectiveTheme} />
+			<Toaster theme={effectiveTheme} position="bottom-right" />
 			<Header />
 			<EnvironmentBanner />
 			<Outlet />

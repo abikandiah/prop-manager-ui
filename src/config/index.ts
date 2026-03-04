@@ -2,6 +2,7 @@ import { stringToBoolean } from '@abumble/design-system/utils'
 
 export const config = {
 	apiBaseUrl: import.meta.env.VITE_API_BASE_URL || '',
+	authRedirectUrl: import.meta.env.VITE_AUTH_REDIRECT_URL || '',
 	constructionDisabled:
 		stringToBoolean(import.meta.env.VITE_CONSTRUCTION_DISABLED) || false,
 
@@ -26,9 +27,8 @@ export const config = {
 		Number(import.meta.env.VITE_LOADING_FALLBACK_DELAY_MS) || 250,
 
 	/** True when running via `vite` (dev server); false for production builds. */
-	isDevelopment: import.meta.env.MODE === 'development',
-	/** True when hostname suggests a local/dev environment (localhost, .local, etc.). */
-	isDev:
+	isDevelopment:
+		import.meta.env.MODE === 'development' ||
 		['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname) ||
 		window.location.hostname.endsWith('.local'),
 }

@@ -1,7 +1,7 @@
-import { AppRole } from '@/domain/user'
-import { ResourceType } from '@/domain/policy-assignment'
-import { useAuth } from '@/contexts/auth'
 import { useOrganization } from '@/contexts/organization'
+import { ResourceType } from '@/domain/policy-assignment'
+import { AppRole } from '@/domain/user'
+import { useAuth } from '@/features/auth'
 
 export const Actions = {
 	READ: 1,
@@ -72,5 +72,11 @@ export function useCan(
 
 	if (!targetId) return false
 
-	return can(user.access, Actions[action], PermissionDomains[domain], scopeType, targetId)
+	return can(
+		user.access,
+		Actions[action],
+		PermissionDomains[domain],
+		scopeType,
+		targetId,
+	)
 }

@@ -1,5 +1,8 @@
 import { ApiError } from '@/api/errors'
+import { emitApiEvent } from '@/api/events'
 import { config } from '@/config'
+import { authQueryOptions } from '@/features/auth'
+import { globalClient } from '@/integrations/tanstack-query/globalClient'
 import axios from 'axios'
 
 const DEV_AUTH_TOKEN_KEY = 'DEV_AUTH_TOKEN'
@@ -71,30 +74,26 @@ api.interceptors.request.use((_config) => {
 // Response Interceptor: Global Error Handling + Network Detection
 api.interceptors.response.use(
 	(response) => {
-		// Report successful request to NetworkProvider
-		if (typeof (window as any).__reportRequestSuccess === 'function') {
-			;(window as any).__reportRequestSuccess()
-		}
+		emitApiEvent('api-success')
 		return response
 	},
 	(error) => {
 		const status = error.response?.status
 
 		if (status === 401) {
-			console.error('401 Unauthorized')
-			if (config.isDevelopment) {
-				clearDevToken()
+			// Immediately clear cached user so UI reacts without waiting for the event
+			globalClient.setQueryData(authQueryOptions.queryKey, undefined)
+			// Skip emitting for the /logout call itself to prevent re-entry
+			if (!error.config?.url?.endsWith('/logout')) {
+				emitApiEvent('api-unauthorized')
 			}
 		}
 
-		// 4xx means server is responding, report request success
+		// 4xx means server is responding — treat as success for reachability
 		if (status >= 400 && status < 500) {
-			if (typeof (window as any).__reportRequestSuccess === 'function') {
-				;(window as any).__reportRequestSuccess()
-			}
+			emitApiEvent('api-success')
 		}
 
-		// Report failed request to NetworkProvider
 		// Only report server errors and network errors (not 4xx client errors)
 		const shouldReport =
 			!error.response || // Network error
@@ -103,9 +102,7 @@ api.interceptors.response.use(
 			(status >= 500 && status < 600) // 5xx errors
 
 		if (shouldReport) {
-			if (typeof (window as any).__reportRequestFailure === 'function') {
-				;(window as any).__reportRequestFailure()
-			}
+			emitApiEvent('api-failure')
 		}
 
 		return Promise.reject(ApiError.from(error))

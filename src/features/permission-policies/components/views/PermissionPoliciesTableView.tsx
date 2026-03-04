@@ -1,7 +1,7 @@
 import { EntityActions, TableSkeleton } from '@/components/ui'
 import { config } from '@/config'
-import { useAuth } from '@/contexts/auth'
 import type { PermissionPolicy } from '@/domain/permission-policy'
+import { useAuth } from '@/features/auth'
 import { FORM_DIALOG_CLASS } from '@/lib/dialog'
 import { formatDate } from '@/lib/format'
 import { useQueryErrorToast } from '@/lib/hooks'

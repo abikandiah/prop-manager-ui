@@ -1,12 +1,11 @@
 import { setActiveOrgId } from '@/api/client'
-import type { UserOrganization } from '@/domain/organization'
+import type { UserOrganization } from '@/domain/user'
+import { useAuth } from '@/features/auth'
 import { createContext, useContext, useEffect } from 'react'
-import { useAuth } from './auth'
 
 interface OrganizationContextValue {
 	activeOrgId: string | null
 	activeOrg: UserOrganization | null
-	// User organizations
 	organizations: UserOrganization[]
 }
 
@@ -20,9 +19,10 @@ const OrganizationContext = createContext<OrganizationContextValue | undefined>(
  * Phase 1: defaults to the user's first organization (read-only, no switcher).
  * Phase 5: will read activeOrgId from the URL search param (?orgId=) with fallback.
  *
- * Must be rendered inside AuthProvider and the user-scoped QueryClientProvider,
- * but OUTSIDE RouterProvider — it syncs org state to the Axios interceptor via
- * a module-level variable (not localStorage, which is shared across tabs).
+ * Must be rendered inside the _auth route layout to ensure we have a
+ * valid user and a user-scoped QueryClient. It syncs org state to the
+ * Axios interceptor via a module-level variable (not localStorage,
+ * which is shared across tabs).
  */
 export function OrganizationProvider({
 	children,

@@ -1,6 +1,5 @@
 import { api, setDevToken } from '@/api/client'
 import { config } from '@/config'
-import { useAuth } from '@/contexts/auth'
 import type {
 	CreateOrganizationPayload,
 	Organization,
@@ -10,6 +9,7 @@ import { IDEMPOTENCY_HEADER } from '@/lib/constants'
 import { stableRequestId } from '@/lib/offline-types'
 import { generateId, nowIso } from '@/lib/util'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useAuth } from '../auth'
 import { organizationsApi } from './api'
 import { organizationKeys } from './keys'
 

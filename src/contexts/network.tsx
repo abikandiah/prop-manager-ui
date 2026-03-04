@@ -1,3 +1,4 @@
+import { useApiEvent } from '@/api/events'
 import { config } from '@/config'
 import { onlineManager, useQueryClient } from '@tanstack/react-query'
 import {
@@ -156,37 +157,22 @@ export function NetworkProvider({ children }: { children: React.ReactNode }) {
 		}
 	}, [isOnline, queryClient])
 
-	/**
-	 * Report failed API request (SERVER reachability only, uses threshold)
-	 * Called by axios interceptor on 5xx errors, timeouts, network errors
-	 */
-	const reportRequestFailure = () => {
-		setConsecutiveFailures((prev) => {
-			const newCount = prev + 1
+	// Subscribe to Axios lifecycle events — functional updaters prevent stale closures
+	useApiEvent('api-success', () => {
+		setConsecutiveFailures(0)
+		setIsServerReachable(true)
+	})
 
-			// After 3 consecutive failures, mark server as unreachable
-			if (newCount >= MAX_FAILURES_BEFORE_OFFLINE && isServerReachable) {
-				console.warn(
-					`[Network] ${newCount} consecutive server failures, marking as unreachable`,
-				)
+	useApiEvent('api-failure', () => {
+		setConsecutiveFailures((prev) => {
+			const next = prev + 1
+			if (next >= MAX_FAILURES_BEFORE_OFFLINE) {
+				console.warn(`[Network] ${next} consecutive server failures, marking as unreachable`)
 				setIsServerReachable(false)
 			}
-
-			return newCount
+			return next
 		})
-	}
-
-	const reportRequestSuccess = () => {
-		if (consecutiveFailures > 0) {
-			console.log('[Network] Request succeeded, resetting failure count')
-			setConsecutiveFailures(0)
-		}
-
-		if (!isServerReachable && isNetworkOnline) {
-			console.log('[Network] Server is reachable again')
-			setIsServerReachable(true)
-		}
-	}
+	})
 
 	useEffect(() => {
 		return () => {
@@ -205,12 +191,6 @@ export function NetworkProvider({ children }: { children: React.ReactNode }) {
 		}),
 		[isOnline, isServerReachable, consecutiveFailures],
 	)
-
-	// Store report functions on context for axios interceptor
-	useEffect(() => {
-		;(window as any).__reportRequestFailure = reportRequestFailure
-		;(window as any).__reportRequestSuccess = reportRequestSuccess
-	}, [])
 
 	return (
 		<NetworkContext.Provider value={value}>{children}</NetworkContext.Provider>

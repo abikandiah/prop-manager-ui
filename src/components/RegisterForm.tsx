@@ -1,7 +1,6 @@
-import { api } from '@/api/client'
 import { TextLink } from '@/components/ui'
 import { FormActions, FormCard } from '@/components/ui/FormCard'
-import { useAuth, type User } from '@/contexts/auth'
+import { authApi, useAuth } from '@/features/auth'
 import { Button } from '@abumble/design-system/components/Button'
 import { Checkbox } from '@abumble/design-system/components/Checkbox'
 import { useMutation } from '@tanstack/react-query'
@@ -22,7 +21,7 @@ export function RegisterForm({
 	const [agreedToTermsAndPrivacy, setAgreedToTermsAndPrivacy] = useState(false)
 
 	const acceptTermsMutation = useMutation({
-		mutationFn: () => api.patch<User>('/me', { termsAccepted: true }),
+		mutationFn: () => authApi.updateMe({ termsAccepted: true }),
 		onSuccess: async () => {
 			toast.success('Terms accepted. Welcome!')
 			refreshUser()
@@ -59,7 +58,7 @@ export function RegisterForm({
 						>
 							I've read and agree to the{' '}
 							<TextLink
-								to="/public/terms"
+								to="/terms"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="text-foreground underline underline-offset-2"
@@ -68,7 +67,7 @@ export function RegisterForm({
 							</TextLink>{' '}
 							and{' '}
 							<TextLink
-								to="/public/privacy"
+								to="/privacy"
 								target="_blank"
 								rel="noopener noreferrer"
 								className="text-foreground underline underline-offset-2"

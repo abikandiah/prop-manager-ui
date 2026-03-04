@@ -1,11 +1,11 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { invitesApi } from './api'
-import { stableRequestId } from '@/lib/offline-types'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
+import { stableRequestId } from '@/lib/offline-types'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
+import { useAuth } from '../auth'
+import { invitesApi } from './api'
 import { TargetType } from './types'
-import { useAuth } from '@/contexts/auth'
 
 export function useInvitePreview(token: string) {
 	return useQuery({

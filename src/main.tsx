@@ -1,74 +1,13 @@
-import { Toaster } from '@abumble/design-system/components/Toaster'
 import { QueryClientProvider } from '@tanstack/react-query'
-import { RouterProvider, createRouter } from '@tanstack/react-router'
-import { StrictMode, useMemo } from 'react'
+import { RouterProvider } from '@tanstack/react-router'
+import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ErrorBoundary } from './components/ErrorBoundary'
-import { NotFound } from './components/NotFound.tsx'
-import { AuthProvider, useAuth } from './contexts/auth'
-import { NetworkProvider } from './contexts/network'
-import { OrganizationProvider } from './contexts/organization'
-import { ThemeProvider, useTheme } from './contexts/theme'
-import { bootstrapQueryClient } from './integrations/tanstack-query/bootstrap.ts'
-import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
+import { ThemeProvider } from './contexts/theme'
+import { globalClient } from './integrations/tanstack-query/globalClient.ts'
+import { router } from './integrations/tanstack-query/router.tsx'
 import reportWebVitals from './reportWebVitals'
-import { routeTree } from './routeTree.gen'
 import './styles.css'
-
-const router = createRouter({
-	routeTree,
-	defaultPreload: 'intent',
-	scrollRestoration: true,
-	defaultStructuralSharing: true,
-	defaultPreloadStaleTime: 0,
-	defaultNotFoundComponent: NotFound,
-})
-
-// Register the router instance for type safety
-declare module '@tanstack/react-router' {
-	interface Register {
-		router: typeof router
-	}
-}
-
-/**
- * Toaster that follows the app's light/dark theme.
- * Must be rendered inside ThemeProvider.
- */
-function ThemedToaster() {
-	const { effectiveTheme } = useTheme()
-	return <Toaster theme={effectiveTheme} />
-}
-
-/**
- * App with user-scoped providers.
- * Must be inside AuthProvider to access user ID.
- */
-function AppWithProviders() {
-	const { user } = useAuth()
-
-	// Use 'anonymous' for unauthenticated users (will be cleared on login)
-	const userId = user?.id || 'anonymous'
-
-	// Create user-scoped query client
-	const queryContext = useMemo(() => {
-		console.log('[App] Creating query client for user:', userId)
-		return TanStackQueryProvider.getContext(userId)
-	}, [userId])
-
-	return (
-		<TanStackQueryProvider.Provider {...queryContext}>
-			<ThemeProvider>
-				<NetworkProvider>
-					<OrganizationProvider>
-						<RouterProvider router={router} />
-						<ThemedToaster />
-					</OrganizationProvider>
-				</NetworkProvider>
-			</ThemeProvider>
-		</TanStackQueryProvider.Provider>
-	)
-}
 
 // Render the app
 const rootElement = document.getElementById('app')
@@ -77,10 +16,15 @@ if (rootElement && !rootElement.innerHTML) {
 	root.render(
 		<StrictMode>
 			<ErrorBoundary>
-				<QueryClientProvider client={bootstrapQueryClient}>
-					<AuthProvider>
-						<AppWithProviders />
-					</AuthProvider>
+				<QueryClientProvider client={globalClient}>
+					<ThemeProvider>
+						<RouterProvider
+							router={router}
+							context={{
+								globalClient: globalClient,
+							}}
+						/>
+					</ThemeProvider>
 				</QueryClientProvider>
 			</ErrorBoundary>
 		</StrictMode>,

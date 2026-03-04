@@ -9,7 +9,7 @@ import type {
 import { stableRequestId } from '@/lib/offline-types'
 import { generateId, nowIso } from '@/lib/util'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
-import { useAuth } from '@/contexts/auth'
+import { useAuth } from '../auth'
 
 /** Payload for create without id — the hook generates it. */
 export type CreatePolicyAssignmentPayloadWithoutId = Omit<

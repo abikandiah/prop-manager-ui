@@ -1,4 +1,4 @@
-import { useAuth } from '@/contexts/auth'
+import { useAuth } from '@/features/auth'
 import { AppRole } from '@/domain/user'
 import { useCan } from '@/lib/permissions'
 import {
@@ -9,7 +9,6 @@ import {
 	SidebarMenu,
 	SidebarMenuButton,
 	SidebarMenuItem,
-	SidebarRail,
 	SidebarTrigger,
 	useSidebar,
 } from '@abumble/design-system/components/Sidebar'
@@ -31,7 +30,7 @@ import { useCallback } from 'react'
 import { CollapsibleSidebarSection } from './CollapsibleSidebarSection'
 
 type NavItem = {
-	to: '/'
+	to: '/home'
 	label: string
 	icon: LucideIcon
 }
@@ -87,7 +86,7 @@ export function AppSidebar() {
 						<SidebarGroupContent>
 							<SidebarMenu>
 								<SidebarNavLink
-									item={{ to: '/', label: 'Dashboard', icon: LayoutDashboard }}
+									item={{ to: '/home', label: 'Dashboard', icon: LayoutDashboard }}
 									onClick={closeMobileSidebar}
 								/>
 								{isManagerOrAdmin && (
@@ -203,8 +202,6 @@ export function AppSidebar() {
 						</SidebarGroupContent>
 					</SidebarGroup>
 				</SidebarContent>
-
-				<SidebarRail />
 			</Sidebar>
 
 			{state.isMobile && (

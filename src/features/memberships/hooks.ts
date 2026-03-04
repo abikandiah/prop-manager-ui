@@ -1,16 +1,16 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { membershipsApi } from './api'
-import { membershipKeys } from './keys'
 import {
 	InviteStatus,
+	type InviteMemberPayload,
 	type Membership,
 	type UpdateMembershipPayload,
-	type InviteMemberPayload,
 } from '@/domain/membership'
-import { stableRequestId } from '@/lib/offline-types'
 import { IDEMPOTENCY_HEADER } from '@/lib/constants'
+import { stableRequestId } from '@/lib/offline-types'
 import { generateId, nowIso } from '@/lib/util'
-import { useAuth } from '@/contexts/auth'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useAuth } from '../auth'
+import { membershipsApi } from './api'
+import { membershipKeys } from './keys'
 
 // --- Queries ---
 

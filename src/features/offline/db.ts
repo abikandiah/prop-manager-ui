@@ -1,5 +1,5 @@
-import Dexie from 'dexie'
 import type { PersistedClient } from '@tanstack/react-query-persist-client'
+import Dexie from 'dexie'
 
 const CACHE_KEY = 'react-query-cache'
 
@@ -20,7 +20,8 @@ export class AppDatabase extends Dexie {
 
 	constructor(userId: string) {
 		// User-scoped database name for privacy/security
-		super(`prop-manager-db-${userId}`)
+		const dbName = getUserDbName(userId)
+		super(dbName)
 
 		this.version(1).stores({
 			queries: 'id, updatedAt',
@@ -75,8 +76,15 @@ export function getDb(userId: string): AppDatabase {
  * Called on logout to ensure data privacy.
  */
 export async function clearUserDb(userId: string) {
-	const dbName = `prop-manager-db-${userId}`
 	console.log('[DB] Clearing database for user:', userId)
+	const dbName = getUserDbName(userId)
+
+	// Close if active
+	if (currentDb && currentUserId === userId) {
+		currentDb.close() // Dexie's close is synchronous
+		currentDb = null
+		currentUserId = null
+	}
 
 	try {
 		await Dexie.delete(dbName)
@@ -90,4 +98,8 @@ export async function clearUserDb(userId: string) {
 		currentDb = null
 		currentUserId = null
 	}
+}
+
+function getUserDbName(userId: string) {
+	return `prop-manager-v1-db-${userId}`
 }

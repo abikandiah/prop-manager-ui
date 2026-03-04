@@ -1,3 +1,5 @@
+import bee from '@/assets/bee.svg'
+import { useAuth } from '@/features/auth'
 import { Button } from '@abumble/design-system/components/Button'
 import {
 	Popover,
@@ -9,8 +11,6 @@ import { Link, useRouterState } from '@tanstack/react-router'
 import { Bell, LogOut, Moon, Settings, Sun, UserRound } from 'lucide-react'
 import { useState } from 'react'
 import { useTheme } from '../contexts/theme'
-import { useAuth } from '../contexts/auth'
-import bee from '@/assets/bee.svg'
 
 function Header() {
 	const { isUserDefined } = useAuth()

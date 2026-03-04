@@ -167,7 +167,9 @@ export function NetworkProvider({ children }: { children: React.ReactNode }) {
 		setConsecutiveFailures((prev) => {
 			const next = prev + 1
 			if (next >= MAX_FAILURES_BEFORE_OFFLINE) {
-				console.warn(`[Network] ${next} consecutive server failures, marking as unreachable`)
+				console.warn(
+					`[Network] ${next} consecutive server failures, marking as unreachable`,
+				)
 				setIsServerReachable(false)
 			}
 			return next

@@ -1,11 +1,14 @@
 import { NotFound as InternalNotFound } from '@abumble/design-system/components/NotFound'
+import { BannerLandingPage } from './pages'
 import { TextLink } from './ui'
 
 function NotFound() {
 	return (
-		<InternalNotFound>
-			<TextLink to="/">Return home</TextLink>
-		</InternalNotFound>
+		<BannerLandingPage>
+			<InternalNotFound>
+				<TextLink to="/">Return home</TextLink>
+			</InternalNotFound>
+		</BannerLandingPage>
 	)
 }
 

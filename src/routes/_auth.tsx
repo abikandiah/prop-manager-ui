@@ -1,8 +1,6 @@
 import { emitApiEvent, useApiEvent } from '@/api/events'
 import { DevAuthForm } from '@/components/DevAuthForm'
-import Footer from '@/components/Footer'
-import Header from '@/components/Header'
-import { BannerLandingPage, LoadingPage } from '@/components/pages'
+import { BannerLandingPage } from '@/components/pages'
 import { RegisterForm } from '@/components/RegisterForm'
 import { config } from '@/config'
 import { NetworkProvider } from '@/contexts/network'
@@ -19,12 +17,15 @@ export const Route = createFileRoute('/_auth')({
 		} catch (error) {
 			console.warn('[Auth] Failed to load user:', error)
 
-			if (!config.isDevelopment && config.authRedirectUrl) {
-				window.location.href = config.authRedirectUrl
+			if (!config.isDevelopment) {
+				if (config.authRedirectUrl) {
+					window.location.href = config.authRedirectUrl
+				} else {
+					throw error
+				}
 			}
 		}
 	},
-	pendingComponent: LoadingPage,
 	component: RouteComponent,
 })
 
@@ -34,9 +35,7 @@ function RouteComponent() {
 	if (!user) {
 		return (
 			<BannerLandingPage>
-				<Header />
 				<DevAuthForm />
-				<Footer />
 			</BannerLandingPage>
 		)
 	}
@@ -44,9 +43,7 @@ function RouteComponent() {
 	if (!user.termsAccepted) {
 		return (
 			<BannerLandingPage>
-				<Header />
 				<RegisterForm />
-				<Footer />
 			</BannerLandingPage>
 		)
 	}
@@ -61,25 +58,23 @@ function RouteComponent() {
 function AppWithProviders() {
 	const { user, isLoadingUser, isUserDefined, logout } = useAuth()
 
-	// user is always defined here (RouteComponent guards above), but typed as optional
+	// Create user-scoped queryContext
 	const userId = user!.id
-
-	// Create user-scoped query client — recreated only when userId changes
-	const queryContext = useMemo(() => {
+	const userQueryContext = useMemo(() => {
 		console.log('[App] Creating query client for user:', userId)
 		return TanStackQueryProvider.getUserContext(userId)
 	}, [userId])
 
-	// Single logout handler — both trigger paths converge here
+	// Logout event handler
 	useApiEvent('api-unauthorized', logout)
 
-	// Emit the same event when /me polling detects the session is gone
+	// If user no longer defined, emit unauthorized
 	useEffect(() => {
 		if (!isLoadingUser && !isUserDefined) emitApiEvent('api-unauthorized')
 	}, [isLoadingUser, isUserDefined])
 
 	return (
-		<TanStackQueryProvider.Provider {...queryContext}>
+		<TanStackQueryProvider.Provider {...userQueryContext}>
 			<NetworkProvider>
 				<OrganizationProvider>
 					<Outlet />

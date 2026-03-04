@@ -20,7 +20,7 @@ export const config = {
 
 	/** How often to re-fetch /me in the background to pick up permission changes. */
 	userRefetchIntervalMs:
-		Number(import.meta.env.VITE_USER_REFETCH_INTERVAL_MS) || 5 * 60 * 1000,
+		Number(import.meta.env.VITE_USER_REFETCH_INTERVAL_MS) || 30 * 60 * 1000,
 
 	/** Delay (ms) before showing skeleton/spinner so fast loads don't flash loading UI. */
 	loadingFallbackDelayMs:

@@ -1,13 +1,10 @@
-import { config } from '@/config'
 import { MessageBanner } from '@abumble/design-system/components/Banner'
-import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
 import {
 	SidebarInset,
 	SidebarProvider,
 } from '@abumble/design-system/components/Sidebar'
 import { stringToBoolean } from '@abumble/design-system/utils'
 import React, { useState } from 'react'
-import { AppSidebar } from '../AppSidebar'
 import Footer from '../Footer'
 import Header from '../Header'
 import {
@@ -15,15 +12,6 @@ import {
 	LoadingScreen,
 	OfflineWarningBanner,
 } from '../ui'
-
-export function MainPage({ children }: { children: React.ReactNode }) {
-	return (
-		<main className="flex flex-col mt-14 p-6 min-h-[75vh]">
-			<OfflineWarningBanner />
-			{children}
-		</main>
-	)
-}
 
 const DISCLAIMER_DISMISSED_KEY = 'prop_mange_disclaimer_dismissed'
 
@@ -38,40 +26,49 @@ export function BannerLandingPage({ children }: { children: React.ReactNode }) {
 	}
 
 	return (
-		<main className="flex flex-1 flex-col">
-			<BannerBackgroundImage>
-				<div className="app-center-background-image" />
-			</BannerBackgroundImage>
+		<>
+			<Header />
+			<main className="flex flex-1 flex-col">
+				<BannerBackgroundImage>
+					<div className="app-center-background-image" />
+				</BannerBackgroundImage>
 
-			<div className="flex-1 flex flex-col items-center justify-start mt-12 p-6">
-				<div className="w-full max-w-md space-y-4">
-					<OfflineWarningBanner />
+				<div className="flex-1 flex flex-col items-center justify-start p-6">
+					<div className="w-full max-w-md space-y-4">
+						<OfflineWarningBanner />
 
-					{!dismissed && (
-						<MessageBanner
-							type="info"
-							message="This is a sandbox environment. It is not intended for business or commercial use. No warranty, uptime guarantees, 
+						{!dismissed && (
+							<MessageBanner
+								type="info"
+								message="This is a sandbox environment. It is not intended for business or commercial use. No warranty, uptime guarantees, 
 									or technical support are provided."
-							className="w-full max-w-md rounded"
-							onClose={onDisclaimerDismiss}
-							hideIcon
-						/>
-					)}
-
-					{children}
+								className="w-full max-w-md rounded"
+								onClose={onDisclaimerDismiss}
+								hideIcon
+							/>
+						)}
+						{children}
+					</div>
 				</div>
-			</div>
-		</main>
+			</main>
+			<Footer />
+		</>
 	)
 }
 
-export function DashboardPage({ children }: { children: React.ReactNode }) {
+export function DashboardPage({
+	children,
+	Sidebar,
+}: {
+	children: React.ReactNode
+	Sidebar: React.ComponentType
+}) {
 	return (
 		<SidebarProvider>
 			<div className="flex flex-col min-h-screen w-full">
 				<Header />
-				<div className="flex flex-1 min-w-0 mt-14">
-					<AppSidebar />
+				<div className="flex flex-1 min-w-0">
+					<Sidebar />
 					<SidebarInset>
 						<main className="flex flex-col p-6">
 							<OfflineWarningBanner />
@@ -87,14 +84,12 @@ export function DashboardPage({ children }: { children: React.ReactNode }) {
 
 export function LoadingPage() {
 	return (
-		<MainPage>
-			<DelayedLoadingFallback
-				isLoading={true}
-				delayMs={config.loadingFallbackDelayMs}
-				fallback={<LoadingScreen />}
-			>
-				{null}
-			</DelayedLoadingFallback>
-		</MainPage>
+		<>
+			<Header />
+			<main className="flex flex-col p-6 min-h-[75vh]">
+				<LoadingScreen />
+			</main>
+			<Footer />
+		</>
 	)
 }

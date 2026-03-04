@@ -77,7 +77,7 @@ export function BannerBackgroundImage({
 }) {
 	return (
 		<div
-			className={cn(className, 'relative h-64 w-full overflow-hidden')}
+			className={cn(className, 'relative -mt-14 h-64 w-full overflow-hidden')}
 			{...props}
 		>
 			{children}
@@ -123,6 +123,6 @@ export * from './DetailField'
 export * from './EntityActions'
 export * from './FieldError'
 export * from './FormFooter'
+export * from './OfflineWarningBanner'
 export * from './TableSkeleton'
 export * from './WizardFooter'
-export * from './OfflineWarningBanner'

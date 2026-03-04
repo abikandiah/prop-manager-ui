@@ -1,5 +1,3 @@
-import Footer from '@/components/Footer'
-import Header from '@/components/Header'
 import { OnboardingForm } from '@/components/OnboardingForm'
 import { BannerLandingPage } from '@/components/pages'
 import { useOrganization } from '@/contexts/organization'
@@ -15,9 +13,7 @@ function OrgLayout() {
 	if (organizations.length === 0) {
 		return (
 			<BannerLandingPage>
-				<Header />
 				<OnboardingForm />
-				<Footer />
 			</BannerLandingPage>
 		)
 	}

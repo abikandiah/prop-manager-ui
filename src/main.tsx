@@ -3,6 +3,7 @@ import { RouterProvider } from '@tanstack/react-router'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ErrorBoundary } from './components/ErrorBoundary'
+import { NetworkProvider } from './contexts/network.tsx'
 import { ThemeProvider } from './contexts/theme'
 import { globalClient } from './integrations/tanstack-query/globalClient.ts'
 import { router } from './integrations/tanstack-query/router.tsx'
@@ -17,14 +18,16 @@ if (rootElement && !rootElement.innerHTML) {
 		<StrictMode>
 			<ErrorBoundary>
 				<QueryClientProvider client={globalClient}>
-					<ThemeProvider>
-						<RouterProvider
-							router={router}
-							context={{
-								globalClient: globalClient,
-							}}
-						/>
-					</ThemeProvider>
+					<NetworkProvider>
+						<ThemeProvider>
+							<RouterProvider
+								router={router}
+								context={{
+									globalClient: globalClient,
+								}}
+							/>
+						</ThemeProvider>
+					</NetworkProvider>
 				</QueryClientProvider>
 			</ErrorBoundary>
 		</StrictMode>,

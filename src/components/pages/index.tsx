@@ -16,11 +16,9 @@ export function BannerLandingPage({ children }: { children: React.ReactNode }) {
 				<div className="app-center-background-image" />
 			</BannerBackgroundImage>
 
-			<div className="flex-1 flex flex-col items-center justify-start p-6">
-				<div className="w-full max-w-md space-y-4">
-					<OfflineWarningBanner />
-					{children}
-				</div>
+			<div className="flex-1 p-6">
+				<OfflineWarningBanner />
+				{children}
 			</div>
 		</main>
 	)

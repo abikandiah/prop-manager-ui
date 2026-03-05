@@ -38,7 +38,7 @@ function TermsContent() {
 
 	if (isLoading) {
 		return (
-			<div className="center-page w-full p-4 md:p-6">
+			<div className="center-page w-full px-4">
 				<div className="flex flex-col gap-2">
 					<Skeleton className="h-9 w-64" />
 					<Skeleton className="h-4 w-48" />
@@ -75,7 +75,7 @@ function TermsContent() {
 
 	if (isError) {
 		return (
-			<div className="center-page w-full p-4 md:p-6">
+			<div className="center-page w-full px-4">
 				<h1 className="text-2xl font-semibold text-foreground">Terms</h1>
 				<p className="mt-2 text-sm text-muted-foreground">
 					We couldn’t load this document right now.
@@ -87,7 +87,7 @@ function TermsContent() {
 	if (!data) return null
 
 	return (
-		<div className="center-page w-full p-4 md:p-6">
+		<div className="center-page w-full px-4">
 			<article className="prose prose-sm prose-zinc max-w-none dark:prose-invert">
 				<ReactMarkdown>{data.content}</ReactMarkdown>
 			</article>

@@ -1,11 +1,11 @@
-import { BannerLandingPage } from '@/components/pages'
-import { createFileRoute } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
-import { Skeleton } from '@abumble/design-system/components/Skeleton'
-import ReactMarkdown from 'react-markdown'
-import { useEffect } from 'react'
-import { toast } from 'sonner'
 import { api } from '@/api/client'
+import { BannerLandingPage } from '@/components/pages'
+import { Skeleton } from '@abumble/design-system/components/Skeleton'
+import { useQuery } from '@tanstack/react-query'
+import { createFileRoute } from '@tanstack/react-router'
+import { useEffect } from 'react'
+import ReactMarkdown from 'react-markdown'
+import { toast } from 'sonner'
 
 export const Route = createFileRoute('/_public/privacy')({
 	component: RouteComponent,
@@ -38,7 +38,7 @@ function PrivacyContent() {
 
 	if (isLoading) {
 		return (
-			<div className="center-page w-full p-4 md:p-6">
+			<div className="center-page w-full px-4">
 				<div className="flex flex-col gap-2">
 					<Skeleton className="h-9 w-72" />
 					<Skeleton className="h-4 w-48" />
@@ -75,12 +75,12 @@ function PrivacyContent() {
 
 	if (isError) {
 		return (
-			<div className="center-page w-full p-4 md:p-6">
+			<div className="center-page w-full px-4">
 				<h1 className="text-2xl font-semibold text-foreground">
 					Privacy Policy
 				</h1>
 				<p className="mt-2 text-sm text-muted-foreground">
-					We couldn’t load this document right now.
+					We couldn't load this document right now.
 				</p>
 			</div>
 		)
@@ -89,7 +89,7 @@ function PrivacyContent() {
 	if (!data) return null
 
 	return (
-		<div className="center-page w-full p-4 md:p-6">
+		<div className="center-page w-full px-4">
 			<article className="prose prose-sm prose-zinc max-w-none dark:prose-invert">
 				<ReactMarkdown>{data.content}</ReactMarkdown>
 			</article>

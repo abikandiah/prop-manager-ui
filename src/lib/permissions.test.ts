@@ -52,6 +52,7 @@ describe('useCan', () => {
 			},
 			isLoadingUser: false,
 			isUserDefined: true,
+			error: null,
 			logout: vi.fn(),
 			refreshUser: vi.fn(),
 		})
@@ -64,6 +65,7 @@ describe('useCan', () => {
 			user: undefined,
 			isLoadingUser: true,
 			isUserDefined: false,
+			error: null,
 			logout: vi.fn(),
 			refreshUser: vi.fn(),
 		})
@@ -84,6 +86,7 @@ describe('useCan', () => {
 			},
 			isLoadingUser: false,
 			isUserDefined: true,
+			error: null,
 			logout: vi.fn(),
 			refreshUser: vi.fn(),
 		})
@@ -109,6 +112,7 @@ describe('useCan', () => {
 			},
 			isLoadingUser: false,
 			isUserDefined: true,
+			error: null,
 			logout: vi.fn(),
 			refreshUser: vi.fn(),
 		})
@@ -131,6 +135,7 @@ describe('useCan', () => {
 			},
 			isLoadingUser: false,
 			isUserDefined: true,
+			error: null,
 			logout: vi.fn(),
 			refreshUser: vi.fn(),
 		})

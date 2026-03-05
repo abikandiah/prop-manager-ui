@@ -9,7 +9,13 @@ import {
 	OfflineWarningBanner,
 } from '../ui'
 
-export function BannerLandingPage({ children }: { children: React.ReactNode }) {
+export function BannerLandingPage({
+	children,
+	hideOfflineBanner,
+}: {
+	children: React.ReactNode
+	hideOfflineBanner?: boolean
+}) {
 	return (
 		<main className="flex flex-1 flex-col">
 			<BannerBackgroundImage>
@@ -17,7 +23,7 @@ export function BannerLandingPage({ children }: { children: React.ReactNode }) {
 			</BannerBackgroundImage>
 
 			<div className="flex-1 p-6">
-				<OfflineWarningBanner />
+				{!hideOfflineBanner && <OfflineWarningBanner />}
 				{children}
 			</div>
 		</main>

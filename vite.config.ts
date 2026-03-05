@@ -31,7 +31,11 @@ const config = defineConfig({
 	server: {
 		proxy: {
 			'/api': {
-				target: 'http://localhost:4080',
+				target: 'http://localhost:8080',
+				changeOrigin: true,
+			},
+			'/actuator': {
+				target: 'http://localhost:8080',
 				changeOrigin: true,
 			},
 		},

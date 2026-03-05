@@ -18,10 +18,9 @@ import { useEffect, useRef } from 'react'
 import { Pie, PieChart } from 'recharts'
 
 export const Route = createFileRoute('/_public/')({
-	beforeLoad: async ({ context }) => {
-		const user = await context.globalClient
-			.fetchQuery(authQueryOptions)
-			.catch(() => null)
+	beforeLoad: ({ context }) => {
+		// Cache-only check — no network request on the public landing page
+		const user = context.globalClient.getQueryData(authQueryOptions.queryKey)
 		if (user) throw redirect({ to: '/home' })
 	},
 	component: Home,
@@ -189,7 +188,10 @@ function CapabilityBar() {
 	useReveal(ref)
 
 	return (
-		<section className="w-full bg-parchment dark:bg-background" aria-label="Features">
+		<section
+			className="w-full bg-parchment dark:bg-background"
+			aria-label="Features"
+		>
 			<div ref={ref} className="reveal mx-auto max-w-7xl px-6 py-14">
 				<p className="mb-8 text-center text-sm font-medium text-muted-foreground">
 					Everything an independent landlord needs, in one place.
@@ -200,7 +202,10 @@ function CapabilityBar() {
 							key={label}
 							className="flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-medium text-foreground"
 						>
-							<Icon className="size-4 shrink-0 text-primary" aria-hidden="true" />
+							<Icon
+								className="size-4 shrink-0 text-primary"
+								aria-hidden="true"
+							/>
 							{label}
 						</div>
 					))}
@@ -217,7 +222,10 @@ function BentoSection() {
 	useReveal(ref)
 
 	return (
-		<section className="w-full bg-parchment dark:bg-background" aria-label="Product features">
+		<section
+			className="w-full bg-parchment dark:bg-background"
+			aria-label="Product features"
+		>
 			<div ref={ref} className="reveal mx-auto max-w-7xl px-6 pb-24">
 				<h2 className="mb-4 text-center text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
 					Built for how landlords actually work
@@ -296,7 +304,10 @@ function LeaseTimeline() {
 					</div>
 					{i < steps.length - 1 && (
 						<div
-							className={cn('mb-4 h-0.5 flex-1', done ? 'bg-hive' : 'bg-border')}
+							className={cn(
+								'mb-4 h-0.5 flex-1',
+								done ? 'bg-hive' : 'bg-border',
+							)}
 							aria-hidden="true"
 						/>
 					)}
@@ -403,8 +414,7 @@ function IntegrationSection() {
 					{/* Copy */}
 					<div className="max-w-lg text-center lg:text-left">
 						<h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-							Built to connect,{' '}
-							<span className="text-hive">not replace.</span>
+							Built to connect, <span className="text-hive">not replace.</span>
 						</h2>
 						<p className="mt-4 text-base leading-relaxed text-white/70">
 							PropMange is designed with an open, API-first architecture. Plug
@@ -428,7 +438,10 @@ function PreFooterCTA() {
 	useReveal(ref)
 
 	return (
-		<section className="w-full bg-parchment dark:bg-background" aria-label="Call to action">
+		<section
+			className="w-full bg-parchment dark:bg-background"
+			aria-label="Call to action"
+		>
 			<div
 				ref={ref}
 				className="reveal mx-auto flex max-w-md flex-col items-center px-6 py-24 text-center"

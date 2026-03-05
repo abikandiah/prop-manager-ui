@@ -1,9 +1,10 @@
 import { emitApiEvent, useApiEvent } from '@/api/events'
 import { DevAuthForm } from '@/components/DevAuthForm'
+import { NotConnectedPage } from '@/components/NotConnectedPage'
 import { BannerLandingPage } from '@/components/pages'
 import { RegisterForm } from '@/components/RegisterForm'
 import { config } from '@/config'
-import { NetworkProvider } from '@/contexts/network'
+import { NetworkProvider, useNetwork } from '@/contexts/network'
 import { OrganizationProvider } from '@/contexts/organization'
 import { authQueryOptions, useAuth } from '@/features/auth'
 import * as TanStackQueryProvider from '@/integrations/tanstack-query/user-provider'
@@ -13,7 +14,10 @@ import { useEffect, useMemo } from 'react'
 export const Route = createFileRoute('/_auth')({
 	beforeLoad: async ({ context }) => {
 		try {
-			await context.globalClient.ensureQueryData(authQueryOptions)
+			// retry: false — fail fast on network errors; don't hold up navigation with retries
+			await context.globalClient.ensureQueryData({
+				...authQueryOptions,
+			})
 		} catch (error) {
 			console.warn('[Auth] Failed to load user:', error)
 
@@ -31,8 +35,13 @@ export const Route = createFileRoute('/_auth')({
 
 function RouteComponent() {
 	const { user, refreshUser } = useAuth()
+	const { isOnline } = useNetwork()
 
 	if (!user) {
+		if (!isOnline) {
+			return <NotConnectedPage />
+		}
+
 		return (
 			<BannerLandingPage>
 				<DevAuthForm onSuccess={refreshUser} />

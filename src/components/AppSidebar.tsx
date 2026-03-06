@@ -17,6 +17,7 @@ import { Link } from '@tanstack/react-router'
 import type { LucideIcon } from 'lucide-react'
 import {
 	Building2,
+	CreditCard,
 	FileCheck,
 	FileSignature,
 	FileText,
@@ -25,6 +26,7 @@ import {
 	Store,
 	UserCheck,
 	Users,
+	Wrench,
 } from 'lucide-react'
 import { useCallback } from 'react'
 import { CollapsibleSidebarSection } from './CollapsibleSidebarSection'
@@ -62,6 +64,7 @@ export function AppSidebar() {
 	const roles = user?.roles ?? []
 	const isManagerOrAdmin =
 		roles.includes(AppRole.MANAGER) || roles.includes(AppRole.ADMIN)
+	const isTenant = roles.includes(AppRole.TENANT)
 	const canReadLeases = useCan('READ', 'LEASES')
 
 	const closeMobileSidebar = useCallback(
@@ -158,6 +161,30 @@ export function AppSidebar() {
 												to: '/organization/roles',
 												label: 'Roles',
 												icon: FileSignature,
+											},
+										]}
+										onItemClick={closeMobileSidebar}
+									/>
+								)}
+								{isTenant && (
+									<CollapsibleSidebarSection
+										title="My Tenancy"
+										icon={FileCheck}
+										items={[
+											{
+												to: '/my-lease',
+												label: 'My Lease',
+												icon: FileCheck,
+											},
+											{
+												to: '/payments',
+												label: 'Payments',
+												icon: CreditCard,
+											},
+											{
+												to: '/maintenance',
+												label: 'Maintenance',
+												icon: Wrench,
 											},
 										]}
 										onItemClick={closeMobileSidebar}

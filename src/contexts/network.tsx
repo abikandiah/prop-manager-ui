@@ -52,8 +52,7 @@ export function NetworkProvider({ children }: { children: React.ReactNode }) {
 			abortControllerRef.current = new AbortController()
 
 			// Strip /api suffix so we hit /actuator/health, not /api/actuator/health
-			const base = config.apiBaseUrl.replace(/\/api\/?$/, '').replace(/\/$/, '')
-			const response = await fetch(`${base}/actuator/health`, {
+			const response = await fetch(`${config.apiBaseUrl}/actuator/health`, {
 				method: 'HEAD',
 				cache: 'no-store',
 				signal: abortControllerRef.current.signal,

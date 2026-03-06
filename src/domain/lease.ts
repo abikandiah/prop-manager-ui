@@ -40,7 +40,6 @@ export interface Lease {
 	endDate: string
 	rentAmount: number
 	executedContentMarkdown: string | null
-	signedPdfUrl: string | null
 	rentDueDay: number
 	securityDepositHeld: number | null
 	lateFeeType: LateFeeType | null

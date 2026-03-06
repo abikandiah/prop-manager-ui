@@ -19,35 +19,40 @@ import { Route as AuthOrgRouteImport } from './routes/_auth/_org'
 import { Route as AuthInviteTokenRouteImport } from './routes/_auth/invite/$token'
 import { Route as AuthOrgDashboardRouteImport } from './routes/_auth/_org/_dashboard'
 import { Route as AuthOrgDashboardHomeRouteImport } from './routes/_auth/_org/_dashboard/home'
-import { Route as AuthOrgDashboardUnitsIndexRouteImport } from './routes/_auth/_org/_dashboard/units/index'
+import { Route as AuthOrgDashboardTenantRouteImport } from './routes/_auth/_org/_dashboard/_tenant'
+import { Route as AuthOrgDashboardManagerRouteImport } from './routes/_auth/_org/_dashboard/_manager'
 import { Route as AuthOrgDashboardSettingsIndexRouteImport } from './routes/_auth/_org/_dashboard/settings/index'
-import { Route as AuthOrgDashboardPropsIndexRouteImport } from './routes/_auth/_org/_dashboard/props/index'
 import { Route as AuthOrgDashboardProfileIndexRouteImport } from './routes/_auth/_org/_dashboard/profile/index'
 import { Route as AuthOrgDashboardMessagesIndexRouteImport } from './routes/_auth/_org/_dashboard/messages/index'
-import { Route as AuthOrgDashboardUnitsUnitIdRouteImport } from './routes/_auth/_org/_dashboard/units/$unitId'
 import { Route as AuthOrgDashboardSettingsPermissionTemplatesRouteImport } from './routes/_auth/_org/_dashboard/settings/permission-templates'
 import { Route as AuthOrgDashboardSettingsPermissionPoliciesRouteImport } from './routes/_auth/_org/_dashboard/settings/permission-policies'
-import { Route as AuthOrgDashboardPropsIdRouteRouteImport } from './routes/_auth/_org/_dashboard/props/$id/route'
-import { Route as AuthOrgDashboardLeasesTemplatesRouteRouteImport } from './routes/_auth/_org/_dashboard/leases/templates/route'
-import { Route as AuthOrgDashboardLeasesAgreementsRouteRouteImport } from './routes/_auth/_org/_dashboard/leases/agreements/route'
-import { Route as AuthOrgDashboardPropsIdIndexRouteImport } from './routes/_auth/_org/_dashboard/props/$id/index'
-import { Route as AuthOrgDashboardPeopleVendorsIndexRouteImport } from './routes/_auth/_org/_dashboard/people/vendors/index'
-import { Route as AuthOrgDashboardPeopleTenantsIndexRouteImport } from './routes/_auth/_org/_dashboard/people/tenants/index'
-import { Route as AuthOrgDashboardPeopleOwnersIndexRouteImport } from './routes/_auth/_org/_dashboard/people/owners/index'
-import { Route as AuthOrgDashboardOrganizationRolesIndexRouteImport } from './routes/_auth/_org/_dashboard/organization/roles/index'
-import { Route as AuthOrgDashboardOrganizationMembersIndexRouteImport } from './routes/_auth/_org/_dashboard/organization/members/index'
-import { Route as AuthOrgDashboardMaintenanceWorkOrdersIndexRouteImport } from './routes/_auth/_org/_dashboard/maintenance/work-orders/index'
-import { Route as AuthOrgDashboardMaintenanceRequestsIndexRouteImport } from './routes/_auth/_org/_dashboard/maintenance/requests/index'
-import { Route as AuthOrgDashboardLeasesTemplatesIndexRouteImport } from './routes/_auth/_org/_dashboard/leases/templates/index'
-import { Route as AuthOrgDashboardLeasesApplicationsIndexRouteImport } from './routes/_auth/_org/_dashboard/leases/applications/index'
-import { Route as AuthOrgDashboardLeasesAgreementsIndexRouteImport } from './routes/_auth/_org/_dashboard/leases/agreements/index'
-import { Route as AuthOrgDashboardFinanceTransactionsIndexRouteImport } from './routes/_auth/_org/_dashboard/finance/transactions/index'
-import { Route as AuthOrgDashboardFinanceReportsIndexRouteImport } from './routes/_auth/_org/_dashboard/finance/reports/index'
-import { Route as AuthOrgDashboardFinanceInvoicesIndexRouteImport } from './routes/_auth/_org/_dashboard/finance/invoices/index'
-import { Route as AuthOrgDashboardPeopleTenantsTenantIdRouteImport } from './routes/_auth/_org/_dashboard/people/tenants/$tenantId'
-import { Route as AuthOrgDashboardOrganizationMembersMembershipIdRouteImport } from './routes/_auth/_org/_dashboard/organization/members/$membershipId'
-import { Route as AuthOrgDashboardLeasesTemplatesTemplateIdRouteImport } from './routes/_auth/_org/_dashboard/leases/templates/$templateId'
-import { Route as AuthOrgDashboardLeasesAgreementsLeaseIdRouteImport } from './routes/_auth/_org/_dashboard/leases/agreements/$leaseId'
+import { Route as AuthOrgDashboardTenantPaymentsIndexRouteImport } from './routes/_auth/_org/_dashboard/_tenant/payments/index'
+import { Route as AuthOrgDashboardTenantMyLeaseIndexRouteImport } from './routes/_auth/_org/_dashboard/_tenant/my-lease/index'
+import { Route as AuthOrgDashboardTenantMaintenanceIndexRouteImport } from './routes/_auth/_org/_dashboard/_tenant/maintenance/index'
+import { Route as AuthOrgDashboardManagerUnitsIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/units/index'
+import { Route as AuthOrgDashboardManagerPropsIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/props/index'
+import { Route as AuthOrgDashboardManagerUnitsUnitIdRouteImport } from './routes/_auth/_org/_dashboard/_manager/units/$unitId'
+import { Route as AuthOrgDashboardManagerPropsIdRouteRouteImport } from './routes/_auth/_org/_dashboard/_manager/props/$id/route'
+import { Route as AuthOrgDashboardManagerLeasesTemplatesRouteRouteImport } from './routes/_auth/_org/_dashboard/_manager/leases/templates/route'
+import { Route as AuthOrgDashboardManagerLeasesAgreementsRouteRouteImport } from './routes/_auth/_org/_dashboard/_manager/leases/agreements/route'
+import { Route as AuthOrgDashboardManagerPropsIdIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/props/$id/index'
+import { Route as AuthOrgDashboardManagerPeopleVendorsIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/people/vendors/index'
+import { Route as AuthOrgDashboardManagerPeopleTenantsIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/people/tenants/index'
+import { Route as AuthOrgDashboardManagerPeopleOwnersIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/people/owners/index'
+import { Route as AuthOrgDashboardManagerOrganizationRolesIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/organization/roles/index'
+import { Route as AuthOrgDashboardManagerOrganizationMembersIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/organization/members/index'
+import { Route as AuthOrgDashboardManagerMaintenanceWorkOrdersIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/maintenance/work-orders/index'
+import { Route as AuthOrgDashboardManagerMaintenanceRequestsIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/maintenance/requests/index'
+import { Route as AuthOrgDashboardManagerLeasesTemplatesIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/leases/templates/index'
+import { Route as AuthOrgDashboardManagerLeasesApplicationsIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/leases/applications/index'
+import { Route as AuthOrgDashboardManagerLeasesAgreementsIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/leases/agreements/index'
+import { Route as AuthOrgDashboardManagerFinanceTransactionsIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/finance/transactions/index'
+import { Route as AuthOrgDashboardManagerFinanceReportsIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/finance/reports/index'
+import { Route as AuthOrgDashboardManagerFinanceInvoicesIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/finance/invoices/index'
+import { Route as AuthOrgDashboardManagerPeopleTenantsTenantIdRouteImport } from './routes/_auth/_org/_dashboard/_manager/people/tenants/$tenantId'
+import { Route as AuthOrgDashboardManagerOrganizationMembersMembershipIdRouteImport } from './routes/_auth/_org/_dashboard/_manager/organization/members/$membershipId'
+import { Route as AuthOrgDashboardManagerLeasesTemplatesTemplateIdRouteImport } from './routes/_auth/_org/_dashboard/_manager/leases/templates/$templateId'
+import { Route as AuthOrgDashboardManagerLeasesAgreementsLeaseIdRouteImport } from './routes/_auth/_org/_dashboard/_manager/leases/agreements/$leaseId'
 
 const PublicRoute = PublicRouteImport.update({
   id: '/_public',
@@ -95,22 +100,18 @@ const AuthOrgDashboardHomeRoute = AuthOrgDashboardHomeRouteImport.update({
   path: '/home',
   getParentRoute: () => AuthOrgDashboardRoute,
 } as any)
-const AuthOrgDashboardUnitsIndexRoute =
-  AuthOrgDashboardUnitsIndexRouteImport.update({
-    id: '/units/',
-    path: '/units/',
-    getParentRoute: () => AuthOrgDashboardRoute,
-  } as any)
+const AuthOrgDashboardTenantRoute = AuthOrgDashboardTenantRouteImport.update({
+  id: '/_tenant',
+  getParentRoute: () => AuthOrgDashboardRoute,
+} as any)
+const AuthOrgDashboardManagerRoute = AuthOrgDashboardManagerRouteImport.update({
+  id: '/_manager',
+  getParentRoute: () => AuthOrgDashboardRoute,
+} as any)
 const AuthOrgDashboardSettingsIndexRoute =
   AuthOrgDashboardSettingsIndexRouteImport.update({
     id: '/settings/',
     path: '/settings/',
-    getParentRoute: () => AuthOrgDashboardRoute,
-  } as any)
-const AuthOrgDashboardPropsIndexRoute =
-  AuthOrgDashboardPropsIndexRouteImport.update({
-    id: '/props/',
-    path: '/props/',
     getParentRoute: () => AuthOrgDashboardRoute,
   } as any)
 const AuthOrgDashboardProfileIndexRoute =
@@ -125,12 +126,6 @@ const AuthOrgDashboardMessagesIndexRoute =
     path: '/messages/',
     getParentRoute: () => AuthOrgDashboardRoute,
   } as any)
-const AuthOrgDashboardUnitsUnitIdRoute =
-  AuthOrgDashboardUnitsUnitIdRouteImport.update({
-    id: '/units/$unitId',
-    path: '/units/$unitId',
-    getParentRoute: () => AuthOrgDashboardRoute,
-  } as any)
 const AuthOrgDashboardSettingsPermissionTemplatesRoute =
   AuthOrgDashboardSettingsPermissionTemplatesRouteImport.update({
     id: '/settings/permission-templates',
@@ -143,131 +138,167 @@ const AuthOrgDashboardSettingsPermissionPoliciesRoute =
     path: '/settings/permission-policies',
     getParentRoute: () => AuthOrgDashboardRoute,
   } as any)
-const AuthOrgDashboardPropsIdRouteRoute =
-  AuthOrgDashboardPropsIdRouteRouteImport.update({
+const AuthOrgDashboardTenantPaymentsIndexRoute =
+  AuthOrgDashboardTenantPaymentsIndexRouteImport.update({
+    id: '/payments/',
+    path: '/payments/',
+    getParentRoute: () => AuthOrgDashboardTenantRoute,
+  } as any)
+const AuthOrgDashboardTenantMyLeaseIndexRoute =
+  AuthOrgDashboardTenantMyLeaseIndexRouteImport.update({
+    id: '/my-lease/',
+    path: '/my-lease/',
+    getParentRoute: () => AuthOrgDashboardTenantRoute,
+  } as any)
+const AuthOrgDashboardTenantMaintenanceIndexRoute =
+  AuthOrgDashboardTenantMaintenanceIndexRouteImport.update({
+    id: '/maintenance/',
+    path: '/maintenance/',
+    getParentRoute: () => AuthOrgDashboardTenantRoute,
+  } as any)
+const AuthOrgDashboardManagerUnitsIndexRoute =
+  AuthOrgDashboardManagerUnitsIndexRouteImport.update({
+    id: '/units/',
+    path: '/units/',
+    getParentRoute: () => AuthOrgDashboardManagerRoute,
+  } as any)
+const AuthOrgDashboardManagerPropsIndexRoute =
+  AuthOrgDashboardManagerPropsIndexRouteImport.update({
+    id: '/props/',
+    path: '/props/',
+    getParentRoute: () => AuthOrgDashboardManagerRoute,
+  } as any)
+const AuthOrgDashboardManagerUnitsUnitIdRoute =
+  AuthOrgDashboardManagerUnitsUnitIdRouteImport.update({
+    id: '/units/$unitId',
+    path: '/units/$unitId',
+    getParentRoute: () => AuthOrgDashboardManagerRoute,
+  } as any)
+const AuthOrgDashboardManagerPropsIdRouteRoute =
+  AuthOrgDashboardManagerPropsIdRouteRouteImport.update({
     id: '/props/$id',
     path: '/props/$id',
-    getParentRoute: () => AuthOrgDashboardRoute,
+    getParentRoute: () => AuthOrgDashboardManagerRoute,
   } as any)
-const AuthOrgDashboardLeasesTemplatesRouteRoute =
-  AuthOrgDashboardLeasesTemplatesRouteRouteImport.update({
+const AuthOrgDashboardManagerLeasesTemplatesRouteRoute =
+  AuthOrgDashboardManagerLeasesTemplatesRouteRouteImport.update({
     id: '/leases/templates',
     path: '/leases/templates',
-    getParentRoute: () => AuthOrgDashboardRoute,
+    getParentRoute: () => AuthOrgDashboardManagerRoute,
   } as any)
-const AuthOrgDashboardLeasesAgreementsRouteRoute =
-  AuthOrgDashboardLeasesAgreementsRouteRouteImport.update({
+const AuthOrgDashboardManagerLeasesAgreementsRouteRoute =
+  AuthOrgDashboardManagerLeasesAgreementsRouteRouteImport.update({
     id: '/leases/agreements',
     path: '/leases/agreements',
-    getParentRoute: () => AuthOrgDashboardRoute,
+    getParentRoute: () => AuthOrgDashboardManagerRoute,
   } as any)
-const AuthOrgDashboardPropsIdIndexRoute =
-  AuthOrgDashboardPropsIdIndexRouteImport.update({
+const AuthOrgDashboardManagerPropsIdIndexRoute =
+  AuthOrgDashboardManagerPropsIdIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => AuthOrgDashboardPropsIdRouteRoute,
+    getParentRoute: () => AuthOrgDashboardManagerPropsIdRouteRoute,
   } as any)
-const AuthOrgDashboardPeopleVendorsIndexRoute =
-  AuthOrgDashboardPeopleVendorsIndexRouteImport.update({
+const AuthOrgDashboardManagerPeopleVendorsIndexRoute =
+  AuthOrgDashboardManagerPeopleVendorsIndexRouteImport.update({
     id: '/people/vendors/',
     path: '/people/vendors/',
-    getParentRoute: () => AuthOrgDashboardRoute,
+    getParentRoute: () => AuthOrgDashboardManagerRoute,
   } as any)
-const AuthOrgDashboardPeopleTenantsIndexRoute =
-  AuthOrgDashboardPeopleTenantsIndexRouteImport.update({
+const AuthOrgDashboardManagerPeopleTenantsIndexRoute =
+  AuthOrgDashboardManagerPeopleTenantsIndexRouteImport.update({
     id: '/people/tenants/',
     path: '/people/tenants/',
-    getParentRoute: () => AuthOrgDashboardRoute,
+    getParentRoute: () => AuthOrgDashboardManagerRoute,
   } as any)
-const AuthOrgDashboardPeopleOwnersIndexRoute =
-  AuthOrgDashboardPeopleOwnersIndexRouteImport.update({
+const AuthOrgDashboardManagerPeopleOwnersIndexRoute =
+  AuthOrgDashboardManagerPeopleOwnersIndexRouteImport.update({
     id: '/people/owners/',
     path: '/people/owners/',
-    getParentRoute: () => AuthOrgDashboardRoute,
+    getParentRoute: () => AuthOrgDashboardManagerRoute,
   } as any)
-const AuthOrgDashboardOrganizationRolesIndexRoute =
-  AuthOrgDashboardOrganizationRolesIndexRouteImport.update({
+const AuthOrgDashboardManagerOrganizationRolesIndexRoute =
+  AuthOrgDashboardManagerOrganizationRolesIndexRouteImport.update({
     id: '/organization/roles/',
     path: '/organization/roles/',
-    getParentRoute: () => AuthOrgDashboardRoute,
+    getParentRoute: () => AuthOrgDashboardManagerRoute,
   } as any)
-const AuthOrgDashboardOrganizationMembersIndexRoute =
-  AuthOrgDashboardOrganizationMembersIndexRouteImport.update({
+const AuthOrgDashboardManagerOrganizationMembersIndexRoute =
+  AuthOrgDashboardManagerOrganizationMembersIndexRouteImport.update({
     id: '/organization/members/',
     path: '/organization/members/',
-    getParentRoute: () => AuthOrgDashboardRoute,
+    getParentRoute: () => AuthOrgDashboardManagerRoute,
   } as any)
-const AuthOrgDashboardMaintenanceWorkOrdersIndexRoute =
-  AuthOrgDashboardMaintenanceWorkOrdersIndexRouteImport.update({
+const AuthOrgDashboardManagerMaintenanceWorkOrdersIndexRoute =
+  AuthOrgDashboardManagerMaintenanceWorkOrdersIndexRouteImport.update({
     id: '/maintenance/work-orders/',
     path: '/maintenance/work-orders/',
-    getParentRoute: () => AuthOrgDashboardRoute,
+    getParentRoute: () => AuthOrgDashboardManagerRoute,
   } as any)
-const AuthOrgDashboardMaintenanceRequestsIndexRoute =
-  AuthOrgDashboardMaintenanceRequestsIndexRouteImport.update({
+const AuthOrgDashboardManagerMaintenanceRequestsIndexRoute =
+  AuthOrgDashboardManagerMaintenanceRequestsIndexRouteImport.update({
     id: '/maintenance/requests/',
     path: '/maintenance/requests/',
-    getParentRoute: () => AuthOrgDashboardRoute,
+    getParentRoute: () => AuthOrgDashboardManagerRoute,
   } as any)
-const AuthOrgDashboardLeasesTemplatesIndexRoute =
-  AuthOrgDashboardLeasesTemplatesIndexRouteImport.update({
+const AuthOrgDashboardManagerLeasesTemplatesIndexRoute =
+  AuthOrgDashboardManagerLeasesTemplatesIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => AuthOrgDashboardLeasesTemplatesRouteRoute,
+    getParentRoute: () => AuthOrgDashboardManagerLeasesTemplatesRouteRoute,
   } as any)
-const AuthOrgDashboardLeasesApplicationsIndexRoute =
-  AuthOrgDashboardLeasesApplicationsIndexRouteImport.update({
+const AuthOrgDashboardManagerLeasesApplicationsIndexRoute =
+  AuthOrgDashboardManagerLeasesApplicationsIndexRouteImport.update({
     id: '/leases/applications/',
     path: '/leases/applications/',
-    getParentRoute: () => AuthOrgDashboardRoute,
+    getParentRoute: () => AuthOrgDashboardManagerRoute,
   } as any)
-const AuthOrgDashboardLeasesAgreementsIndexRoute =
-  AuthOrgDashboardLeasesAgreementsIndexRouteImport.update({
+const AuthOrgDashboardManagerLeasesAgreementsIndexRoute =
+  AuthOrgDashboardManagerLeasesAgreementsIndexRouteImport.update({
     id: '/',
     path: '/',
-    getParentRoute: () => AuthOrgDashboardLeasesAgreementsRouteRoute,
+    getParentRoute: () => AuthOrgDashboardManagerLeasesAgreementsRouteRoute,
   } as any)
-const AuthOrgDashboardFinanceTransactionsIndexRoute =
-  AuthOrgDashboardFinanceTransactionsIndexRouteImport.update({
+const AuthOrgDashboardManagerFinanceTransactionsIndexRoute =
+  AuthOrgDashboardManagerFinanceTransactionsIndexRouteImport.update({
     id: '/finance/transactions/',
     path: '/finance/transactions/',
-    getParentRoute: () => AuthOrgDashboardRoute,
+    getParentRoute: () => AuthOrgDashboardManagerRoute,
   } as any)
-const AuthOrgDashboardFinanceReportsIndexRoute =
-  AuthOrgDashboardFinanceReportsIndexRouteImport.update({
+const AuthOrgDashboardManagerFinanceReportsIndexRoute =
+  AuthOrgDashboardManagerFinanceReportsIndexRouteImport.update({
     id: '/finance/reports/',
     path: '/finance/reports/',
-    getParentRoute: () => AuthOrgDashboardRoute,
+    getParentRoute: () => AuthOrgDashboardManagerRoute,
   } as any)
-const AuthOrgDashboardFinanceInvoicesIndexRoute =
-  AuthOrgDashboardFinanceInvoicesIndexRouteImport.update({
+const AuthOrgDashboardManagerFinanceInvoicesIndexRoute =
+  AuthOrgDashboardManagerFinanceInvoicesIndexRouteImport.update({
     id: '/finance/invoices/',
     path: '/finance/invoices/',
-    getParentRoute: () => AuthOrgDashboardRoute,
+    getParentRoute: () => AuthOrgDashboardManagerRoute,
   } as any)
-const AuthOrgDashboardPeopleTenantsTenantIdRoute =
-  AuthOrgDashboardPeopleTenantsTenantIdRouteImport.update({
+const AuthOrgDashboardManagerPeopleTenantsTenantIdRoute =
+  AuthOrgDashboardManagerPeopleTenantsTenantIdRouteImport.update({
     id: '/people/tenants/$tenantId',
     path: '/people/tenants/$tenantId',
-    getParentRoute: () => AuthOrgDashboardRoute,
+    getParentRoute: () => AuthOrgDashboardManagerRoute,
   } as any)
-const AuthOrgDashboardOrganizationMembersMembershipIdRoute =
-  AuthOrgDashboardOrganizationMembersMembershipIdRouteImport.update({
+const AuthOrgDashboardManagerOrganizationMembersMembershipIdRoute =
+  AuthOrgDashboardManagerOrganizationMembersMembershipIdRouteImport.update({
     id: '/organization/members/$membershipId',
     path: '/organization/members/$membershipId',
-    getParentRoute: () => AuthOrgDashboardRoute,
+    getParentRoute: () => AuthOrgDashboardManagerRoute,
   } as any)
-const AuthOrgDashboardLeasesTemplatesTemplateIdRoute =
-  AuthOrgDashboardLeasesTemplatesTemplateIdRouteImport.update({
+const AuthOrgDashboardManagerLeasesTemplatesTemplateIdRoute =
+  AuthOrgDashboardManagerLeasesTemplatesTemplateIdRouteImport.update({
     id: '/$templateId',
     path: '/$templateId',
-    getParentRoute: () => AuthOrgDashboardLeasesTemplatesRouteRoute,
+    getParentRoute: () => AuthOrgDashboardManagerLeasesTemplatesRouteRoute,
   } as any)
-const AuthOrgDashboardLeasesAgreementsLeaseIdRoute =
-  AuthOrgDashboardLeasesAgreementsLeaseIdRouteImport.update({
+const AuthOrgDashboardManagerLeasesAgreementsLeaseIdRoute =
+  AuthOrgDashboardManagerLeasesAgreementsLeaseIdRouteImport.update({
     id: '/$leaseId',
     path: '/$leaseId',
-    getParentRoute: () => AuthOrgDashboardLeasesAgreementsRouteRoute,
+    getParentRoute: () => AuthOrgDashboardManagerLeasesAgreementsRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
@@ -277,35 +308,38 @@ export interface FileRoutesByFullPath {
   '/terms': typeof PublicTermsRoute
   '/invite/$token': typeof AuthInviteTokenRoute
   '/home': typeof AuthOrgDashboardHomeRoute
-  '/leases/agreements': typeof AuthOrgDashboardLeasesAgreementsRouteRouteWithChildren
-  '/leases/templates': typeof AuthOrgDashboardLeasesTemplatesRouteRouteWithChildren
-  '/props/$id': typeof AuthOrgDashboardPropsIdRouteRouteWithChildren
   '/settings/permission-policies': typeof AuthOrgDashboardSettingsPermissionPoliciesRoute
   '/settings/permission-templates': typeof AuthOrgDashboardSettingsPermissionTemplatesRoute
-  '/units/$unitId': typeof AuthOrgDashboardUnitsUnitIdRoute
   '/messages/': typeof AuthOrgDashboardMessagesIndexRoute
   '/profile/': typeof AuthOrgDashboardProfileIndexRoute
-  '/props/': typeof AuthOrgDashboardPropsIndexRoute
   '/settings/': typeof AuthOrgDashboardSettingsIndexRoute
-  '/units/': typeof AuthOrgDashboardUnitsIndexRoute
-  '/leases/agreements/$leaseId': typeof AuthOrgDashboardLeasesAgreementsLeaseIdRoute
-  '/leases/templates/$templateId': typeof AuthOrgDashboardLeasesTemplatesTemplateIdRoute
-  '/organization/members/$membershipId': typeof AuthOrgDashboardOrganizationMembersMembershipIdRoute
-  '/people/tenants/$tenantId': typeof AuthOrgDashboardPeopleTenantsTenantIdRoute
-  '/finance/invoices/': typeof AuthOrgDashboardFinanceInvoicesIndexRoute
-  '/finance/reports/': typeof AuthOrgDashboardFinanceReportsIndexRoute
-  '/finance/transactions/': typeof AuthOrgDashboardFinanceTransactionsIndexRoute
-  '/leases/agreements/': typeof AuthOrgDashboardLeasesAgreementsIndexRoute
-  '/leases/applications/': typeof AuthOrgDashboardLeasesApplicationsIndexRoute
-  '/leases/templates/': typeof AuthOrgDashboardLeasesTemplatesIndexRoute
-  '/maintenance/requests/': typeof AuthOrgDashboardMaintenanceRequestsIndexRoute
-  '/maintenance/work-orders/': typeof AuthOrgDashboardMaintenanceWorkOrdersIndexRoute
-  '/organization/members/': typeof AuthOrgDashboardOrganizationMembersIndexRoute
-  '/organization/roles/': typeof AuthOrgDashboardOrganizationRolesIndexRoute
-  '/people/owners/': typeof AuthOrgDashboardPeopleOwnersIndexRoute
-  '/people/tenants/': typeof AuthOrgDashboardPeopleTenantsIndexRoute
-  '/people/vendors/': typeof AuthOrgDashboardPeopleVendorsIndexRoute
-  '/props/$id/': typeof AuthOrgDashboardPropsIdIndexRoute
+  '/leases/agreements': typeof AuthOrgDashboardManagerLeasesAgreementsRouteRouteWithChildren
+  '/leases/templates': typeof AuthOrgDashboardManagerLeasesTemplatesRouteRouteWithChildren
+  '/props/$id': typeof AuthOrgDashboardManagerPropsIdRouteRouteWithChildren
+  '/units/$unitId': typeof AuthOrgDashboardManagerUnitsUnitIdRoute
+  '/props/': typeof AuthOrgDashboardManagerPropsIndexRoute
+  '/units/': typeof AuthOrgDashboardManagerUnitsIndexRoute
+  '/maintenance/': typeof AuthOrgDashboardTenantMaintenanceIndexRoute
+  '/my-lease/': typeof AuthOrgDashboardTenantMyLeaseIndexRoute
+  '/payments/': typeof AuthOrgDashboardTenantPaymentsIndexRoute
+  '/leases/agreements/$leaseId': typeof AuthOrgDashboardManagerLeasesAgreementsLeaseIdRoute
+  '/leases/templates/$templateId': typeof AuthOrgDashboardManagerLeasesTemplatesTemplateIdRoute
+  '/organization/members/$membershipId': typeof AuthOrgDashboardManagerOrganizationMembersMembershipIdRoute
+  '/people/tenants/$tenantId': typeof AuthOrgDashboardManagerPeopleTenantsTenantIdRoute
+  '/finance/invoices/': typeof AuthOrgDashboardManagerFinanceInvoicesIndexRoute
+  '/finance/reports/': typeof AuthOrgDashboardManagerFinanceReportsIndexRoute
+  '/finance/transactions/': typeof AuthOrgDashboardManagerFinanceTransactionsIndexRoute
+  '/leases/agreements/': typeof AuthOrgDashboardManagerLeasesAgreementsIndexRoute
+  '/leases/applications/': typeof AuthOrgDashboardManagerLeasesApplicationsIndexRoute
+  '/leases/templates/': typeof AuthOrgDashboardManagerLeasesTemplatesIndexRoute
+  '/maintenance/requests/': typeof AuthOrgDashboardManagerMaintenanceRequestsIndexRoute
+  '/maintenance/work-orders/': typeof AuthOrgDashboardManagerMaintenanceWorkOrdersIndexRoute
+  '/organization/members/': typeof AuthOrgDashboardManagerOrganizationMembersIndexRoute
+  '/organization/roles/': typeof AuthOrgDashboardManagerOrganizationRolesIndexRoute
+  '/people/owners/': typeof AuthOrgDashboardManagerPeopleOwnersIndexRoute
+  '/people/tenants/': typeof AuthOrgDashboardManagerPeopleTenantsIndexRoute
+  '/people/vendors/': typeof AuthOrgDashboardManagerPeopleVendorsIndexRoute
+  '/props/$id/': typeof AuthOrgDashboardManagerPropsIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof PublicIndexRoute
@@ -316,30 +350,33 @@ export interface FileRoutesByTo {
   '/home': typeof AuthOrgDashboardHomeRoute
   '/settings/permission-policies': typeof AuthOrgDashboardSettingsPermissionPoliciesRoute
   '/settings/permission-templates': typeof AuthOrgDashboardSettingsPermissionTemplatesRoute
-  '/units/$unitId': typeof AuthOrgDashboardUnitsUnitIdRoute
   '/messages': typeof AuthOrgDashboardMessagesIndexRoute
   '/profile': typeof AuthOrgDashboardProfileIndexRoute
-  '/props': typeof AuthOrgDashboardPropsIndexRoute
   '/settings': typeof AuthOrgDashboardSettingsIndexRoute
-  '/units': typeof AuthOrgDashboardUnitsIndexRoute
-  '/leases/agreements/$leaseId': typeof AuthOrgDashboardLeasesAgreementsLeaseIdRoute
-  '/leases/templates/$templateId': typeof AuthOrgDashboardLeasesTemplatesTemplateIdRoute
-  '/organization/members/$membershipId': typeof AuthOrgDashboardOrganizationMembersMembershipIdRoute
-  '/people/tenants/$tenantId': typeof AuthOrgDashboardPeopleTenantsTenantIdRoute
-  '/finance/invoices': typeof AuthOrgDashboardFinanceInvoicesIndexRoute
-  '/finance/reports': typeof AuthOrgDashboardFinanceReportsIndexRoute
-  '/finance/transactions': typeof AuthOrgDashboardFinanceTransactionsIndexRoute
-  '/leases/agreements': typeof AuthOrgDashboardLeasesAgreementsIndexRoute
-  '/leases/applications': typeof AuthOrgDashboardLeasesApplicationsIndexRoute
-  '/leases/templates': typeof AuthOrgDashboardLeasesTemplatesIndexRoute
-  '/maintenance/requests': typeof AuthOrgDashboardMaintenanceRequestsIndexRoute
-  '/maintenance/work-orders': typeof AuthOrgDashboardMaintenanceWorkOrdersIndexRoute
-  '/organization/members': typeof AuthOrgDashboardOrganizationMembersIndexRoute
-  '/organization/roles': typeof AuthOrgDashboardOrganizationRolesIndexRoute
-  '/people/owners': typeof AuthOrgDashboardPeopleOwnersIndexRoute
-  '/people/tenants': typeof AuthOrgDashboardPeopleTenantsIndexRoute
-  '/people/vendors': typeof AuthOrgDashboardPeopleVendorsIndexRoute
-  '/props/$id': typeof AuthOrgDashboardPropsIdIndexRoute
+  '/units/$unitId': typeof AuthOrgDashboardManagerUnitsUnitIdRoute
+  '/props': typeof AuthOrgDashboardManagerPropsIndexRoute
+  '/units': typeof AuthOrgDashboardManagerUnitsIndexRoute
+  '/maintenance': typeof AuthOrgDashboardTenantMaintenanceIndexRoute
+  '/my-lease': typeof AuthOrgDashboardTenantMyLeaseIndexRoute
+  '/payments': typeof AuthOrgDashboardTenantPaymentsIndexRoute
+  '/leases/agreements/$leaseId': typeof AuthOrgDashboardManagerLeasesAgreementsLeaseIdRoute
+  '/leases/templates/$templateId': typeof AuthOrgDashboardManagerLeasesTemplatesTemplateIdRoute
+  '/organization/members/$membershipId': typeof AuthOrgDashboardManagerOrganizationMembersMembershipIdRoute
+  '/people/tenants/$tenantId': typeof AuthOrgDashboardManagerPeopleTenantsTenantIdRoute
+  '/finance/invoices': typeof AuthOrgDashboardManagerFinanceInvoicesIndexRoute
+  '/finance/reports': typeof AuthOrgDashboardManagerFinanceReportsIndexRoute
+  '/finance/transactions': typeof AuthOrgDashboardManagerFinanceTransactionsIndexRoute
+  '/leases/agreements': typeof AuthOrgDashboardManagerLeasesAgreementsIndexRoute
+  '/leases/applications': typeof AuthOrgDashboardManagerLeasesApplicationsIndexRoute
+  '/leases/templates': typeof AuthOrgDashboardManagerLeasesTemplatesIndexRoute
+  '/maintenance/requests': typeof AuthOrgDashboardManagerMaintenanceRequestsIndexRoute
+  '/maintenance/work-orders': typeof AuthOrgDashboardManagerMaintenanceWorkOrdersIndexRoute
+  '/organization/members': typeof AuthOrgDashboardManagerOrganizationMembersIndexRoute
+  '/organization/roles': typeof AuthOrgDashboardManagerOrganizationRolesIndexRoute
+  '/people/owners': typeof AuthOrgDashboardManagerPeopleOwnersIndexRoute
+  '/people/tenants': typeof AuthOrgDashboardManagerPeopleTenantsIndexRoute
+  '/people/vendors': typeof AuthOrgDashboardManagerPeopleVendorsIndexRoute
+  '/props/$id': typeof AuthOrgDashboardManagerPropsIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -352,36 +389,41 @@ export interface FileRoutesById {
   '/_public/': typeof PublicIndexRoute
   '/_auth/_org/_dashboard': typeof AuthOrgDashboardRouteWithChildren
   '/_auth/invite/$token': typeof AuthInviteTokenRoute
+  '/_auth/_org/_dashboard/_manager': typeof AuthOrgDashboardManagerRouteWithChildren
+  '/_auth/_org/_dashboard/_tenant': typeof AuthOrgDashboardTenantRouteWithChildren
   '/_auth/_org/_dashboard/home': typeof AuthOrgDashboardHomeRoute
-  '/_auth/_org/_dashboard/leases/agreements': typeof AuthOrgDashboardLeasesAgreementsRouteRouteWithChildren
-  '/_auth/_org/_dashboard/leases/templates': typeof AuthOrgDashboardLeasesTemplatesRouteRouteWithChildren
-  '/_auth/_org/_dashboard/props/$id': typeof AuthOrgDashboardPropsIdRouteRouteWithChildren
   '/_auth/_org/_dashboard/settings/permission-policies': typeof AuthOrgDashboardSettingsPermissionPoliciesRoute
   '/_auth/_org/_dashboard/settings/permission-templates': typeof AuthOrgDashboardSettingsPermissionTemplatesRoute
-  '/_auth/_org/_dashboard/units/$unitId': typeof AuthOrgDashboardUnitsUnitIdRoute
   '/_auth/_org/_dashboard/messages/': typeof AuthOrgDashboardMessagesIndexRoute
   '/_auth/_org/_dashboard/profile/': typeof AuthOrgDashboardProfileIndexRoute
-  '/_auth/_org/_dashboard/props/': typeof AuthOrgDashboardPropsIndexRoute
   '/_auth/_org/_dashboard/settings/': typeof AuthOrgDashboardSettingsIndexRoute
-  '/_auth/_org/_dashboard/units/': typeof AuthOrgDashboardUnitsIndexRoute
-  '/_auth/_org/_dashboard/leases/agreements/$leaseId': typeof AuthOrgDashboardLeasesAgreementsLeaseIdRoute
-  '/_auth/_org/_dashboard/leases/templates/$templateId': typeof AuthOrgDashboardLeasesTemplatesTemplateIdRoute
-  '/_auth/_org/_dashboard/organization/members/$membershipId': typeof AuthOrgDashboardOrganizationMembersMembershipIdRoute
-  '/_auth/_org/_dashboard/people/tenants/$tenantId': typeof AuthOrgDashboardPeopleTenantsTenantIdRoute
-  '/_auth/_org/_dashboard/finance/invoices/': typeof AuthOrgDashboardFinanceInvoicesIndexRoute
-  '/_auth/_org/_dashboard/finance/reports/': typeof AuthOrgDashboardFinanceReportsIndexRoute
-  '/_auth/_org/_dashboard/finance/transactions/': typeof AuthOrgDashboardFinanceTransactionsIndexRoute
-  '/_auth/_org/_dashboard/leases/agreements/': typeof AuthOrgDashboardLeasesAgreementsIndexRoute
-  '/_auth/_org/_dashboard/leases/applications/': typeof AuthOrgDashboardLeasesApplicationsIndexRoute
-  '/_auth/_org/_dashboard/leases/templates/': typeof AuthOrgDashboardLeasesTemplatesIndexRoute
-  '/_auth/_org/_dashboard/maintenance/requests/': typeof AuthOrgDashboardMaintenanceRequestsIndexRoute
-  '/_auth/_org/_dashboard/maintenance/work-orders/': typeof AuthOrgDashboardMaintenanceWorkOrdersIndexRoute
-  '/_auth/_org/_dashboard/organization/members/': typeof AuthOrgDashboardOrganizationMembersIndexRoute
-  '/_auth/_org/_dashboard/organization/roles/': typeof AuthOrgDashboardOrganizationRolesIndexRoute
-  '/_auth/_org/_dashboard/people/owners/': typeof AuthOrgDashboardPeopleOwnersIndexRoute
-  '/_auth/_org/_dashboard/people/tenants/': typeof AuthOrgDashboardPeopleTenantsIndexRoute
-  '/_auth/_org/_dashboard/people/vendors/': typeof AuthOrgDashboardPeopleVendorsIndexRoute
-  '/_auth/_org/_dashboard/props/$id/': typeof AuthOrgDashboardPropsIdIndexRoute
+  '/_auth/_org/_dashboard/_manager/leases/agreements': typeof AuthOrgDashboardManagerLeasesAgreementsRouteRouteWithChildren
+  '/_auth/_org/_dashboard/_manager/leases/templates': typeof AuthOrgDashboardManagerLeasesTemplatesRouteRouteWithChildren
+  '/_auth/_org/_dashboard/_manager/props/$id': typeof AuthOrgDashboardManagerPropsIdRouteRouteWithChildren
+  '/_auth/_org/_dashboard/_manager/units/$unitId': typeof AuthOrgDashboardManagerUnitsUnitIdRoute
+  '/_auth/_org/_dashboard/_manager/props/': typeof AuthOrgDashboardManagerPropsIndexRoute
+  '/_auth/_org/_dashboard/_manager/units/': typeof AuthOrgDashboardManagerUnitsIndexRoute
+  '/_auth/_org/_dashboard/_tenant/maintenance/': typeof AuthOrgDashboardTenantMaintenanceIndexRoute
+  '/_auth/_org/_dashboard/_tenant/my-lease/': typeof AuthOrgDashboardTenantMyLeaseIndexRoute
+  '/_auth/_org/_dashboard/_tenant/payments/': typeof AuthOrgDashboardTenantPaymentsIndexRoute
+  '/_auth/_org/_dashboard/_manager/leases/agreements/$leaseId': typeof AuthOrgDashboardManagerLeasesAgreementsLeaseIdRoute
+  '/_auth/_org/_dashboard/_manager/leases/templates/$templateId': typeof AuthOrgDashboardManagerLeasesTemplatesTemplateIdRoute
+  '/_auth/_org/_dashboard/_manager/organization/members/$membershipId': typeof AuthOrgDashboardManagerOrganizationMembersMembershipIdRoute
+  '/_auth/_org/_dashboard/_manager/people/tenants/$tenantId': typeof AuthOrgDashboardManagerPeopleTenantsTenantIdRoute
+  '/_auth/_org/_dashboard/_manager/finance/invoices/': typeof AuthOrgDashboardManagerFinanceInvoicesIndexRoute
+  '/_auth/_org/_dashboard/_manager/finance/reports/': typeof AuthOrgDashboardManagerFinanceReportsIndexRoute
+  '/_auth/_org/_dashboard/_manager/finance/transactions/': typeof AuthOrgDashboardManagerFinanceTransactionsIndexRoute
+  '/_auth/_org/_dashboard/_manager/leases/agreements/': typeof AuthOrgDashboardManagerLeasesAgreementsIndexRoute
+  '/_auth/_org/_dashboard/_manager/leases/applications/': typeof AuthOrgDashboardManagerLeasesApplicationsIndexRoute
+  '/_auth/_org/_dashboard/_manager/leases/templates/': typeof AuthOrgDashboardManagerLeasesTemplatesIndexRoute
+  '/_auth/_org/_dashboard/_manager/maintenance/requests/': typeof AuthOrgDashboardManagerMaintenanceRequestsIndexRoute
+  '/_auth/_org/_dashboard/_manager/maintenance/work-orders/': typeof AuthOrgDashboardManagerMaintenanceWorkOrdersIndexRoute
+  '/_auth/_org/_dashboard/_manager/organization/members/': typeof AuthOrgDashboardManagerOrganizationMembersIndexRoute
+  '/_auth/_org/_dashboard/_manager/organization/roles/': typeof AuthOrgDashboardManagerOrganizationRolesIndexRoute
+  '/_auth/_org/_dashboard/_manager/people/owners/': typeof AuthOrgDashboardManagerPeopleOwnersIndexRoute
+  '/_auth/_org/_dashboard/_manager/people/tenants/': typeof AuthOrgDashboardManagerPeopleTenantsIndexRoute
+  '/_auth/_org/_dashboard/_manager/people/vendors/': typeof AuthOrgDashboardManagerPeopleVendorsIndexRoute
+  '/_auth/_org/_dashboard/_manager/props/$id/': typeof AuthOrgDashboardManagerPropsIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -392,17 +434,20 @@ export interface FileRouteTypes {
     | '/terms'
     | '/invite/$token'
     | '/home'
+    | '/settings/permission-policies'
+    | '/settings/permission-templates'
+    | '/messages/'
+    | '/profile/'
+    | '/settings/'
     | '/leases/agreements'
     | '/leases/templates'
     | '/props/$id'
-    | '/settings/permission-policies'
-    | '/settings/permission-templates'
     | '/units/$unitId'
-    | '/messages/'
-    | '/profile/'
     | '/props/'
-    | '/settings/'
     | '/units/'
+    | '/maintenance/'
+    | '/my-lease/'
+    | '/payments/'
     | '/leases/agreements/$leaseId'
     | '/leases/templates/$templateId'
     | '/organization/members/$membershipId'
@@ -431,12 +476,15 @@ export interface FileRouteTypes {
     | '/home'
     | '/settings/permission-policies'
     | '/settings/permission-templates'
-    | '/units/$unitId'
     | '/messages'
     | '/profile'
-    | '/props'
     | '/settings'
+    | '/units/$unitId'
+    | '/props'
     | '/units'
+    | '/maintenance'
+    | '/my-lease'
+    | '/payments'
     | '/leases/agreements/$leaseId'
     | '/leases/templates/$templateId'
     | '/organization/members/$membershipId'
@@ -466,36 +514,41 @@ export interface FileRouteTypes {
     | '/_public/'
     | '/_auth/_org/_dashboard'
     | '/_auth/invite/$token'
+    | '/_auth/_org/_dashboard/_manager'
+    | '/_auth/_org/_dashboard/_tenant'
     | '/_auth/_org/_dashboard/home'
-    | '/_auth/_org/_dashboard/leases/agreements'
-    | '/_auth/_org/_dashboard/leases/templates'
-    | '/_auth/_org/_dashboard/props/$id'
     | '/_auth/_org/_dashboard/settings/permission-policies'
     | '/_auth/_org/_dashboard/settings/permission-templates'
-    | '/_auth/_org/_dashboard/units/$unitId'
     | '/_auth/_org/_dashboard/messages/'
     | '/_auth/_org/_dashboard/profile/'
-    | '/_auth/_org/_dashboard/props/'
     | '/_auth/_org/_dashboard/settings/'
-    | '/_auth/_org/_dashboard/units/'
-    | '/_auth/_org/_dashboard/leases/agreements/$leaseId'
-    | '/_auth/_org/_dashboard/leases/templates/$templateId'
-    | '/_auth/_org/_dashboard/organization/members/$membershipId'
-    | '/_auth/_org/_dashboard/people/tenants/$tenantId'
-    | '/_auth/_org/_dashboard/finance/invoices/'
-    | '/_auth/_org/_dashboard/finance/reports/'
-    | '/_auth/_org/_dashboard/finance/transactions/'
-    | '/_auth/_org/_dashboard/leases/agreements/'
-    | '/_auth/_org/_dashboard/leases/applications/'
-    | '/_auth/_org/_dashboard/leases/templates/'
-    | '/_auth/_org/_dashboard/maintenance/requests/'
-    | '/_auth/_org/_dashboard/maintenance/work-orders/'
-    | '/_auth/_org/_dashboard/organization/members/'
-    | '/_auth/_org/_dashboard/organization/roles/'
-    | '/_auth/_org/_dashboard/people/owners/'
-    | '/_auth/_org/_dashboard/people/tenants/'
-    | '/_auth/_org/_dashboard/people/vendors/'
-    | '/_auth/_org/_dashboard/props/$id/'
+    | '/_auth/_org/_dashboard/_manager/leases/agreements'
+    | '/_auth/_org/_dashboard/_manager/leases/templates'
+    | '/_auth/_org/_dashboard/_manager/props/$id'
+    | '/_auth/_org/_dashboard/_manager/units/$unitId'
+    | '/_auth/_org/_dashboard/_manager/props/'
+    | '/_auth/_org/_dashboard/_manager/units/'
+    | '/_auth/_org/_dashboard/_tenant/maintenance/'
+    | '/_auth/_org/_dashboard/_tenant/my-lease/'
+    | '/_auth/_org/_dashboard/_tenant/payments/'
+    | '/_auth/_org/_dashboard/_manager/leases/agreements/$leaseId'
+    | '/_auth/_org/_dashboard/_manager/leases/templates/$templateId'
+    | '/_auth/_org/_dashboard/_manager/organization/members/$membershipId'
+    | '/_auth/_org/_dashboard/_manager/people/tenants/$tenantId'
+    | '/_auth/_org/_dashboard/_manager/finance/invoices/'
+    | '/_auth/_org/_dashboard/_manager/finance/reports/'
+    | '/_auth/_org/_dashboard/_manager/finance/transactions/'
+    | '/_auth/_org/_dashboard/_manager/leases/agreements/'
+    | '/_auth/_org/_dashboard/_manager/leases/applications/'
+    | '/_auth/_org/_dashboard/_manager/leases/templates/'
+    | '/_auth/_org/_dashboard/_manager/maintenance/requests/'
+    | '/_auth/_org/_dashboard/_manager/maintenance/work-orders/'
+    | '/_auth/_org/_dashboard/_manager/organization/members/'
+    | '/_auth/_org/_dashboard/_manager/organization/roles/'
+    | '/_auth/_org/_dashboard/_manager/people/owners/'
+    | '/_auth/_org/_dashboard/_manager/people/tenants/'
+    | '/_auth/_org/_dashboard/_manager/people/vendors/'
+    | '/_auth/_org/_dashboard/_manager/props/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -575,11 +628,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthOrgDashboardHomeRouteImport
       parentRoute: typeof AuthOrgDashboardRoute
     }
-    '/_auth/_org/_dashboard/units/': {
-      id: '/_auth/_org/_dashboard/units/'
-      path: '/units'
-      fullPath: '/units/'
-      preLoaderRoute: typeof AuthOrgDashboardUnitsIndexRouteImport
+    '/_auth/_org/_dashboard/_tenant': {
+      id: '/_auth/_org/_dashboard/_tenant'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthOrgDashboardTenantRouteImport
+      parentRoute: typeof AuthOrgDashboardRoute
+    }
+    '/_auth/_org/_dashboard/_manager': {
+      id: '/_auth/_org/_dashboard/_manager'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthOrgDashboardManagerRouteImport
       parentRoute: typeof AuthOrgDashboardRoute
     }
     '/_auth/_org/_dashboard/settings/': {
@@ -587,13 +647,6 @@ declare module '@tanstack/react-router' {
       path: '/settings'
       fullPath: '/settings/'
       preLoaderRoute: typeof AuthOrgDashboardSettingsIndexRouteImport
-      parentRoute: typeof AuthOrgDashboardRoute
-    }
-    '/_auth/_org/_dashboard/props/': {
-      id: '/_auth/_org/_dashboard/props/'
-      path: '/props'
-      fullPath: '/props/'
-      preLoaderRoute: typeof AuthOrgDashboardPropsIndexRouteImport
       parentRoute: typeof AuthOrgDashboardRoute
     }
     '/_auth/_org/_dashboard/profile/': {
@@ -610,13 +663,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthOrgDashboardMessagesIndexRouteImport
       parentRoute: typeof AuthOrgDashboardRoute
     }
-    '/_auth/_org/_dashboard/units/$unitId': {
-      id: '/_auth/_org/_dashboard/units/$unitId'
-      path: '/units/$unitId'
-      fullPath: '/units/$unitId'
-      preLoaderRoute: typeof AuthOrgDashboardUnitsUnitIdRouteImport
-      parentRoute: typeof AuthOrgDashboardRoute
-    }
     '/_auth/_org/_dashboard/settings/permission-templates': {
       id: '/_auth/_org/_dashboard/settings/permission-templates'
       path: '/settings/permission-templates'
@@ -631,278 +677,361 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthOrgDashboardSettingsPermissionPoliciesRouteImport
       parentRoute: typeof AuthOrgDashboardRoute
     }
-    '/_auth/_org/_dashboard/props/$id': {
-      id: '/_auth/_org/_dashboard/props/$id'
+    '/_auth/_org/_dashboard/_tenant/payments/': {
+      id: '/_auth/_org/_dashboard/_tenant/payments/'
+      path: '/payments'
+      fullPath: '/payments/'
+      preLoaderRoute: typeof AuthOrgDashboardTenantPaymentsIndexRouteImport
+      parentRoute: typeof AuthOrgDashboardTenantRoute
+    }
+    '/_auth/_org/_dashboard/_tenant/my-lease/': {
+      id: '/_auth/_org/_dashboard/_tenant/my-lease/'
+      path: '/my-lease'
+      fullPath: '/my-lease/'
+      preLoaderRoute: typeof AuthOrgDashboardTenantMyLeaseIndexRouteImport
+      parentRoute: typeof AuthOrgDashboardTenantRoute
+    }
+    '/_auth/_org/_dashboard/_tenant/maintenance/': {
+      id: '/_auth/_org/_dashboard/_tenant/maintenance/'
+      path: '/maintenance'
+      fullPath: '/maintenance/'
+      preLoaderRoute: typeof AuthOrgDashboardTenantMaintenanceIndexRouteImport
+      parentRoute: typeof AuthOrgDashboardTenantRoute
+    }
+    '/_auth/_org/_dashboard/_manager/units/': {
+      id: '/_auth/_org/_dashboard/_manager/units/'
+      path: '/units'
+      fullPath: '/units/'
+      preLoaderRoute: typeof AuthOrgDashboardManagerUnitsIndexRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerRoute
+    }
+    '/_auth/_org/_dashboard/_manager/props/': {
+      id: '/_auth/_org/_dashboard/_manager/props/'
+      path: '/props'
+      fullPath: '/props/'
+      preLoaderRoute: typeof AuthOrgDashboardManagerPropsIndexRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerRoute
+    }
+    '/_auth/_org/_dashboard/_manager/units/$unitId': {
+      id: '/_auth/_org/_dashboard/_manager/units/$unitId'
+      path: '/units/$unitId'
+      fullPath: '/units/$unitId'
+      preLoaderRoute: typeof AuthOrgDashboardManagerUnitsUnitIdRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerRoute
+    }
+    '/_auth/_org/_dashboard/_manager/props/$id': {
+      id: '/_auth/_org/_dashboard/_manager/props/$id'
       path: '/props/$id'
       fullPath: '/props/$id'
-      preLoaderRoute: typeof AuthOrgDashboardPropsIdRouteRouteImport
-      parentRoute: typeof AuthOrgDashboardRoute
+      preLoaderRoute: typeof AuthOrgDashboardManagerPropsIdRouteRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerRoute
     }
-    '/_auth/_org/_dashboard/leases/templates': {
-      id: '/_auth/_org/_dashboard/leases/templates'
+    '/_auth/_org/_dashboard/_manager/leases/templates': {
+      id: '/_auth/_org/_dashboard/_manager/leases/templates'
       path: '/leases/templates'
       fullPath: '/leases/templates'
-      preLoaderRoute: typeof AuthOrgDashboardLeasesTemplatesRouteRouteImport
-      parentRoute: typeof AuthOrgDashboardRoute
+      preLoaderRoute: typeof AuthOrgDashboardManagerLeasesTemplatesRouteRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerRoute
     }
-    '/_auth/_org/_dashboard/leases/agreements': {
-      id: '/_auth/_org/_dashboard/leases/agreements'
+    '/_auth/_org/_dashboard/_manager/leases/agreements': {
+      id: '/_auth/_org/_dashboard/_manager/leases/agreements'
       path: '/leases/agreements'
       fullPath: '/leases/agreements'
-      preLoaderRoute: typeof AuthOrgDashboardLeasesAgreementsRouteRouteImport
-      parentRoute: typeof AuthOrgDashboardRoute
+      preLoaderRoute: typeof AuthOrgDashboardManagerLeasesAgreementsRouteRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerRoute
     }
-    '/_auth/_org/_dashboard/props/$id/': {
-      id: '/_auth/_org/_dashboard/props/$id/'
+    '/_auth/_org/_dashboard/_manager/props/$id/': {
+      id: '/_auth/_org/_dashboard/_manager/props/$id/'
       path: '/'
       fullPath: '/props/$id/'
-      preLoaderRoute: typeof AuthOrgDashboardPropsIdIndexRouteImport
-      parentRoute: typeof AuthOrgDashboardPropsIdRouteRoute
+      preLoaderRoute: typeof AuthOrgDashboardManagerPropsIdIndexRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerPropsIdRouteRoute
     }
-    '/_auth/_org/_dashboard/people/vendors/': {
-      id: '/_auth/_org/_dashboard/people/vendors/'
+    '/_auth/_org/_dashboard/_manager/people/vendors/': {
+      id: '/_auth/_org/_dashboard/_manager/people/vendors/'
       path: '/people/vendors'
       fullPath: '/people/vendors/'
-      preLoaderRoute: typeof AuthOrgDashboardPeopleVendorsIndexRouteImport
-      parentRoute: typeof AuthOrgDashboardRoute
+      preLoaderRoute: typeof AuthOrgDashboardManagerPeopleVendorsIndexRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerRoute
     }
-    '/_auth/_org/_dashboard/people/tenants/': {
-      id: '/_auth/_org/_dashboard/people/tenants/'
+    '/_auth/_org/_dashboard/_manager/people/tenants/': {
+      id: '/_auth/_org/_dashboard/_manager/people/tenants/'
       path: '/people/tenants'
       fullPath: '/people/tenants/'
-      preLoaderRoute: typeof AuthOrgDashboardPeopleTenantsIndexRouteImport
-      parentRoute: typeof AuthOrgDashboardRoute
+      preLoaderRoute: typeof AuthOrgDashboardManagerPeopleTenantsIndexRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerRoute
     }
-    '/_auth/_org/_dashboard/people/owners/': {
-      id: '/_auth/_org/_dashboard/people/owners/'
+    '/_auth/_org/_dashboard/_manager/people/owners/': {
+      id: '/_auth/_org/_dashboard/_manager/people/owners/'
       path: '/people/owners'
       fullPath: '/people/owners/'
-      preLoaderRoute: typeof AuthOrgDashboardPeopleOwnersIndexRouteImport
-      parentRoute: typeof AuthOrgDashboardRoute
+      preLoaderRoute: typeof AuthOrgDashboardManagerPeopleOwnersIndexRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerRoute
     }
-    '/_auth/_org/_dashboard/organization/roles/': {
-      id: '/_auth/_org/_dashboard/organization/roles/'
+    '/_auth/_org/_dashboard/_manager/organization/roles/': {
+      id: '/_auth/_org/_dashboard/_manager/organization/roles/'
       path: '/organization/roles'
       fullPath: '/organization/roles/'
-      preLoaderRoute: typeof AuthOrgDashboardOrganizationRolesIndexRouteImport
-      parentRoute: typeof AuthOrgDashboardRoute
+      preLoaderRoute: typeof AuthOrgDashboardManagerOrganizationRolesIndexRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerRoute
     }
-    '/_auth/_org/_dashboard/organization/members/': {
-      id: '/_auth/_org/_dashboard/organization/members/'
+    '/_auth/_org/_dashboard/_manager/organization/members/': {
+      id: '/_auth/_org/_dashboard/_manager/organization/members/'
       path: '/organization/members'
       fullPath: '/organization/members/'
-      preLoaderRoute: typeof AuthOrgDashboardOrganizationMembersIndexRouteImport
-      parentRoute: typeof AuthOrgDashboardRoute
+      preLoaderRoute: typeof AuthOrgDashboardManagerOrganizationMembersIndexRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerRoute
     }
-    '/_auth/_org/_dashboard/maintenance/work-orders/': {
-      id: '/_auth/_org/_dashboard/maintenance/work-orders/'
+    '/_auth/_org/_dashboard/_manager/maintenance/work-orders/': {
+      id: '/_auth/_org/_dashboard/_manager/maintenance/work-orders/'
       path: '/maintenance/work-orders'
       fullPath: '/maintenance/work-orders/'
-      preLoaderRoute: typeof AuthOrgDashboardMaintenanceWorkOrdersIndexRouteImport
-      parentRoute: typeof AuthOrgDashboardRoute
+      preLoaderRoute: typeof AuthOrgDashboardManagerMaintenanceWorkOrdersIndexRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerRoute
     }
-    '/_auth/_org/_dashboard/maintenance/requests/': {
-      id: '/_auth/_org/_dashboard/maintenance/requests/'
+    '/_auth/_org/_dashboard/_manager/maintenance/requests/': {
+      id: '/_auth/_org/_dashboard/_manager/maintenance/requests/'
       path: '/maintenance/requests'
       fullPath: '/maintenance/requests/'
-      preLoaderRoute: typeof AuthOrgDashboardMaintenanceRequestsIndexRouteImport
-      parentRoute: typeof AuthOrgDashboardRoute
+      preLoaderRoute: typeof AuthOrgDashboardManagerMaintenanceRequestsIndexRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerRoute
     }
-    '/_auth/_org/_dashboard/leases/templates/': {
-      id: '/_auth/_org/_dashboard/leases/templates/'
+    '/_auth/_org/_dashboard/_manager/leases/templates/': {
+      id: '/_auth/_org/_dashboard/_manager/leases/templates/'
       path: '/'
       fullPath: '/leases/templates/'
-      preLoaderRoute: typeof AuthOrgDashboardLeasesTemplatesIndexRouteImport
-      parentRoute: typeof AuthOrgDashboardLeasesTemplatesRouteRoute
+      preLoaderRoute: typeof AuthOrgDashboardManagerLeasesTemplatesIndexRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerLeasesTemplatesRouteRoute
     }
-    '/_auth/_org/_dashboard/leases/applications/': {
-      id: '/_auth/_org/_dashboard/leases/applications/'
+    '/_auth/_org/_dashboard/_manager/leases/applications/': {
+      id: '/_auth/_org/_dashboard/_manager/leases/applications/'
       path: '/leases/applications'
       fullPath: '/leases/applications/'
-      preLoaderRoute: typeof AuthOrgDashboardLeasesApplicationsIndexRouteImport
-      parentRoute: typeof AuthOrgDashboardRoute
+      preLoaderRoute: typeof AuthOrgDashboardManagerLeasesApplicationsIndexRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerRoute
     }
-    '/_auth/_org/_dashboard/leases/agreements/': {
-      id: '/_auth/_org/_dashboard/leases/agreements/'
+    '/_auth/_org/_dashboard/_manager/leases/agreements/': {
+      id: '/_auth/_org/_dashboard/_manager/leases/agreements/'
       path: '/'
       fullPath: '/leases/agreements/'
-      preLoaderRoute: typeof AuthOrgDashboardLeasesAgreementsIndexRouteImport
-      parentRoute: typeof AuthOrgDashboardLeasesAgreementsRouteRoute
+      preLoaderRoute: typeof AuthOrgDashboardManagerLeasesAgreementsIndexRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerLeasesAgreementsRouteRoute
     }
-    '/_auth/_org/_dashboard/finance/transactions/': {
-      id: '/_auth/_org/_dashboard/finance/transactions/'
+    '/_auth/_org/_dashboard/_manager/finance/transactions/': {
+      id: '/_auth/_org/_dashboard/_manager/finance/transactions/'
       path: '/finance/transactions'
       fullPath: '/finance/transactions/'
-      preLoaderRoute: typeof AuthOrgDashboardFinanceTransactionsIndexRouteImport
-      parentRoute: typeof AuthOrgDashboardRoute
+      preLoaderRoute: typeof AuthOrgDashboardManagerFinanceTransactionsIndexRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerRoute
     }
-    '/_auth/_org/_dashboard/finance/reports/': {
-      id: '/_auth/_org/_dashboard/finance/reports/'
+    '/_auth/_org/_dashboard/_manager/finance/reports/': {
+      id: '/_auth/_org/_dashboard/_manager/finance/reports/'
       path: '/finance/reports'
       fullPath: '/finance/reports/'
-      preLoaderRoute: typeof AuthOrgDashboardFinanceReportsIndexRouteImport
-      parentRoute: typeof AuthOrgDashboardRoute
+      preLoaderRoute: typeof AuthOrgDashboardManagerFinanceReportsIndexRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerRoute
     }
-    '/_auth/_org/_dashboard/finance/invoices/': {
-      id: '/_auth/_org/_dashboard/finance/invoices/'
+    '/_auth/_org/_dashboard/_manager/finance/invoices/': {
+      id: '/_auth/_org/_dashboard/_manager/finance/invoices/'
       path: '/finance/invoices'
       fullPath: '/finance/invoices/'
-      preLoaderRoute: typeof AuthOrgDashboardFinanceInvoicesIndexRouteImport
-      parentRoute: typeof AuthOrgDashboardRoute
+      preLoaderRoute: typeof AuthOrgDashboardManagerFinanceInvoicesIndexRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerRoute
     }
-    '/_auth/_org/_dashboard/people/tenants/$tenantId': {
-      id: '/_auth/_org/_dashboard/people/tenants/$tenantId'
+    '/_auth/_org/_dashboard/_manager/people/tenants/$tenantId': {
+      id: '/_auth/_org/_dashboard/_manager/people/tenants/$tenantId'
       path: '/people/tenants/$tenantId'
       fullPath: '/people/tenants/$tenantId'
-      preLoaderRoute: typeof AuthOrgDashboardPeopleTenantsTenantIdRouteImport
-      parentRoute: typeof AuthOrgDashboardRoute
+      preLoaderRoute: typeof AuthOrgDashboardManagerPeopleTenantsTenantIdRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerRoute
     }
-    '/_auth/_org/_dashboard/organization/members/$membershipId': {
-      id: '/_auth/_org/_dashboard/organization/members/$membershipId'
+    '/_auth/_org/_dashboard/_manager/organization/members/$membershipId': {
+      id: '/_auth/_org/_dashboard/_manager/organization/members/$membershipId'
       path: '/organization/members/$membershipId'
       fullPath: '/organization/members/$membershipId'
-      preLoaderRoute: typeof AuthOrgDashboardOrganizationMembersMembershipIdRouteImport
-      parentRoute: typeof AuthOrgDashboardRoute
+      preLoaderRoute: typeof AuthOrgDashboardManagerOrganizationMembersMembershipIdRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerRoute
     }
-    '/_auth/_org/_dashboard/leases/templates/$templateId': {
-      id: '/_auth/_org/_dashboard/leases/templates/$templateId'
+    '/_auth/_org/_dashboard/_manager/leases/templates/$templateId': {
+      id: '/_auth/_org/_dashboard/_manager/leases/templates/$templateId'
       path: '/$templateId'
       fullPath: '/leases/templates/$templateId'
-      preLoaderRoute: typeof AuthOrgDashboardLeasesTemplatesTemplateIdRouteImport
-      parentRoute: typeof AuthOrgDashboardLeasesTemplatesRouteRoute
+      preLoaderRoute: typeof AuthOrgDashboardManagerLeasesTemplatesTemplateIdRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerLeasesTemplatesRouteRoute
     }
-    '/_auth/_org/_dashboard/leases/agreements/$leaseId': {
-      id: '/_auth/_org/_dashboard/leases/agreements/$leaseId'
+    '/_auth/_org/_dashboard/_manager/leases/agreements/$leaseId': {
+      id: '/_auth/_org/_dashboard/_manager/leases/agreements/$leaseId'
       path: '/$leaseId'
       fullPath: '/leases/agreements/$leaseId'
-      preLoaderRoute: typeof AuthOrgDashboardLeasesAgreementsLeaseIdRouteImport
-      parentRoute: typeof AuthOrgDashboardLeasesAgreementsRouteRoute
+      preLoaderRoute: typeof AuthOrgDashboardManagerLeasesAgreementsLeaseIdRouteImport
+      parentRoute: typeof AuthOrgDashboardManagerLeasesAgreementsRouteRoute
     }
   }
 }
 
-interface AuthOrgDashboardLeasesAgreementsRouteRouteChildren {
-  AuthOrgDashboardLeasesAgreementsLeaseIdRoute: typeof AuthOrgDashboardLeasesAgreementsLeaseIdRoute
-  AuthOrgDashboardLeasesAgreementsIndexRoute: typeof AuthOrgDashboardLeasesAgreementsIndexRoute
+interface AuthOrgDashboardManagerLeasesAgreementsRouteRouteChildren {
+  AuthOrgDashboardManagerLeasesAgreementsLeaseIdRoute: typeof AuthOrgDashboardManagerLeasesAgreementsLeaseIdRoute
+  AuthOrgDashboardManagerLeasesAgreementsIndexRoute: typeof AuthOrgDashboardManagerLeasesAgreementsIndexRoute
 }
 
-const AuthOrgDashboardLeasesAgreementsRouteRouteChildren: AuthOrgDashboardLeasesAgreementsRouteRouteChildren =
+const AuthOrgDashboardManagerLeasesAgreementsRouteRouteChildren: AuthOrgDashboardManagerLeasesAgreementsRouteRouteChildren =
   {
-    AuthOrgDashboardLeasesAgreementsLeaseIdRoute:
-      AuthOrgDashboardLeasesAgreementsLeaseIdRoute,
-    AuthOrgDashboardLeasesAgreementsIndexRoute:
-      AuthOrgDashboardLeasesAgreementsIndexRoute,
+    AuthOrgDashboardManagerLeasesAgreementsLeaseIdRoute:
+      AuthOrgDashboardManagerLeasesAgreementsLeaseIdRoute,
+    AuthOrgDashboardManagerLeasesAgreementsIndexRoute:
+      AuthOrgDashboardManagerLeasesAgreementsIndexRoute,
   }
 
-const AuthOrgDashboardLeasesAgreementsRouteRouteWithChildren =
-  AuthOrgDashboardLeasesAgreementsRouteRoute._addFileChildren(
-    AuthOrgDashboardLeasesAgreementsRouteRouteChildren,
+const AuthOrgDashboardManagerLeasesAgreementsRouteRouteWithChildren =
+  AuthOrgDashboardManagerLeasesAgreementsRouteRoute._addFileChildren(
+    AuthOrgDashboardManagerLeasesAgreementsRouteRouteChildren,
   )
 
-interface AuthOrgDashboardLeasesTemplatesRouteRouteChildren {
-  AuthOrgDashboardLeasesTemplatesTemplateIdRoute: typeof AuthOrgDashboardLeasesTemplatesTemplateIdRoute
-  AuthOrgDashboardLeasesTemplatesIndexRoute: typeof AuthOrgDashboardLeasesTemplatesIndexRoute
+interface AuthOrgDashboardManagerLeasesTemplatesRouteRouteChildren {
+  AuthOrgDashboardManagerLeasesTemplatesTemplateIdRoute: typeof AuthOrgDashboardManagerLeasesTemplatesTemplateIdRoute
+  AuthOrgDashboardManagerLeasesTemplatesIndexRoute: typeof AuthOrgDashboardManagerLeasesTemplatesIndexRoute
 }
 
-const AuthOrgDashboardLeasesTemplatesRouteRouteChildren: AuthOrgDashboardLeasesTemplatesRouteRouteChildren =
+const AuthOrgDashboardManagerLeasesTemplatesRouteRouteChildren: AuthOrgDashboardManagerLeasesTemplatesRouteRouteChildren =
   {
-    AuthOrgDashboardLeasesTemplatesTemplateIdRoute:
-      AuthOrgDashboardLeasesTemplatesTemplateIdRoute,
-    AuthOrgDashboardLeasesTemplatesIndexRoute:
-      AuthOrgDashboardLeasesTemplatesIndexRoute,
+    AuthOrgDashboardManagerLeasesTemplatesTemplateIdRoute:
+      AuthOrgDashboardManagerLeasesTemplatesTemplateIdRoute,
+    AuthOrgDashboardManagerLeasesTemplatesIndexRoute:
+      AuthOrgDashboardManagerLeasesTemplatesIndexRoute,
   }
 
-const AuthOrgDashboardLeasesTemplatesRouteRouteWithChildren =
-  AuthOrgDashboardLeasesTemplatesRouteRoute._addFileChildren(
-    AuthOrgDashboardLeasesTemplatesRouteRouteChildren,
+const AuthOrgDashboardManagerLeasesTemplatesRouteRouteWithChildren =
+  AuthOrgDashboardManagerLeasesTemplatesRouteRoute._addFileChildren(
+    AuthOrgDashboardManagerLeasesTemplatesRouteRouteChildren,
   )
 
-interface AuthOrgDashboardPropsIdRouteRouteChildren {
-  AuthOrgDashboardPropsIdIndexRoute: typeof AuthOrgDashboardPropsIdIndexRoute
+interface AuthOrgDashboardManagerPropsIdRouteRouteChildren {
+  AuthOrgDashboardManagerPropsIdIndexRoute: typeof AuthOrgDashboardManagerPropsIdIndexRoute
 }
 
-const AuthOrgDashboardPropsIdRouteRouteChildren: AuthOrgDashboardPropsIdRouteRouteChildren =
+const AuthOrgDashboardManagerPropsIdRouteRouteChildren: AuthOrgDashboardManagerPropsIdRouteRouteChildren =
   {
-    AuthOrgDashboardPropsIdIndexRoute: AuthOrgDashboardPropsIdIndexRoute,
+    AuthOrgDashboardManagerPropsIdIndexRoute:
+      AuthOrgDashboardManagerPropsIdIndexRoute,
   }
 
-const AuthOrgDashboardPropsIdRouteRouteWithChildren =
-  AuthOrgDashboardPropsIdRouteRoute._addFileChildren(
-    AuthOrgDashboardPropsIdRouteRouteChildren,
+const AuthOrgDashboardManagerPropsIdRouteRouteWithChildren =
+  AuthOrgDashboardManagerPropsIdRouteRoute._addFileChildren(
+    AuthOrgDashboardManagerPropsIdRouteRouteChildren,
+  )
+
+interface AuthOrgDashboardManagerRouteChildren {
+  AuthOrgDashboardManagerLeasesAgreementsRouteRoute: typeof AuthOrgDashboardManagerLeasesAgreementsRouteRouteWithChildren
+  AuthOrgDashboardManagerLeasesTemplatesRouteRoute: typeof AuthOrgDashboardManagerLeasesTemplatesRouteRouteWithChildren
+  AuthOrgDashboardManagerPropsIdRouteRoute: typeof AuthOrgDashboardManagerPropsIdRouteRouteWithChildren
+  AuthOrgDashboardManagerUnitsUnitIdRoute: typeof AuthOrgDashboardManagerUnitsUnitIdRoute
+  AuthOrgDashboardManagerPropsIndexRoute: typeof AuthOrgDashboardManagerPropsIndexRoute
+  AuthOrgDashboardManagerUnitsIndexRoute: typeof AuthOrgDashboardManagerUnitsIndexRoute
+  AuthOrgDashboardManagerOrganizationMembersMembershipIdRoute: typeof AuthOrgDashboardManagerOrganizationMembersMembershipIdRoute
+  AuthOrgDashboardManagerPeopleTenantsTenantIdRoute: typeof AuthOrgDashboardManagerPeopleTenantsTenantIdRoute
+  AuthOrgDashboardManagerFinanceInvoicesIndexRoute: typeof AuthOrgDashboardManagerFinanceInvoicesIndexRoute
+  AuthOrgDashboardManagerFinanceReportsIndexRoute: typeof AuthOrgDashboardManagerFinanceReportsIndexRoute
+  AuthOrgDashboardManagerFinanceTransactionsIndexRoute: typeof AuthOrgDashboardManagerFinanceTransactionsIndexRoute
+  AuthOrgDashboardManagerLeasesApplicationsIndexRoute: typeof AuthOrgDashboardManagerLeasesApplicationsIndexRoute
+  AuthOrgDashboardManagerMaintenanceRequestsIndexRoute: typeof AuthOrgDashboardManagerMaintenanceRequestsIndexRoute
+  AuthOrgDashboardManagerMaintenanceWorkOrdersIndexRoute: typeof AuthOrgDashboardManagerMaintenanceWorkOrdersIndexRoute
+  AuthOrgDashboardManagerOrganizationMembersIndexRoute: typeof AuthOrgDashboardManagerOrganizationMembersIndexRoute
+  AuthOrgDashboardManagerOrganizationRolesIndexRoute: typeof AuthOrgDashboardManagerOrganizationRolesIndexRoute
+  AuthOrgDashboardManagerPeopleOwnersIndexRoute: typeof AuthOrgDashboardManagerPeopleOwnersIndexRoute
+  AuthOrgDashboardManagerPeopleTenantsIndexRoute: typeof AuthOrgDashboardManagerPeopleTenantsIndexRoute
+  AuthOrgDashboardManagerPeopleVendorsIndexRoute: typeof AuthOrgDashboardManagerPeopleVendorsIndexRoute
+}
+
+const AuthOrgDashboardManagerRouteChildren: AuthOrgDashboardManagerRouteChildren =
+  {
+    AuthOrgDashboardManagerLeasesAgreementsRouteRoute:
+      AuthOrgDashboardManagerLeasesAgreementsRouteRouteWithChildren,
+    AuthOrgDashboardManagerLeasesTemplatesRouteRoute:
+      AuthOrgDashboardManagerLeasesTemplatesRouteRouteWithChildren,
+    AuthOrgDashboardManagerPropsIdRouteRoute:
+      AuthOrgDashboardManagerPropsIdRouteRouteWithChildren,
+    AuthOrgDashboardManagerUnitsUnitIdRoute:
+      AuthOrgDashboardManagerUnitsUnitIdRoute,
+    AuthOrgDashboardManagerPropsIndexRoute:
+      AuthOrgDashboardManagerPropsIndexRoute,
+    AuthOrgDashboardManagerUnitsIndexRoute:
+      AuthOrgDashboardManagerUnitsIndexRoute,
+    AuthOrgDashboardManagerOrganizationMembersMembershipIdRoute:
+      AuthOrgDashboardManagerOrganizationMembersMembershipIdRoute,
+    AuthOrgDashboardManagerPeopleTenantsTenantIdRoute:
+      AuthOrgDashboardManagerPeopleTenantsTenantIdRoute,
+    AuthOrgDashboardManagerFinanceInvoicesIndexRoute:
+      AuthOrgDashboardManagerFinanceInvoicesIndexRoute,
+    AuthOrgDashboardManagerFinanceReportsIndexRoute:
+      AuthOrgDashboardManagerFinanceReportsIndexRoute,
+    AuthOrgDashboardManagerFinanceTransactionsIndexRoute:
+      AuthOrgDashboardManagerFinanceTransactionsIndexRoute,
+    AuthOrgDashboardManagerLeasesApplicationsIndexRoute:
+      AuthOrgDashboardManagerLeasesApplicationsIndexRoute,
+    AuthOrgDashboardManagerMaintenanceRequestsIndexRoute:
+      AuthOrgDashboardManagerMaintenanceRequestsIndexRoute,
+    AuthOrgDashboardManagerMaintenanceWorkOrdersIndexRoute:
+      AuthOrgDashboardManagerMaintenanceWorkOrdersIndexRoute,
+    AuthOrgDashboardManagerOrganizationMembersIndexRoute:
+      AuthOrgDashboardManagerOrganizationMembersIndexRoute,
+    AuthOrgDashboardManagerOrganizationRolesIndexRoute:
+      AuthOrgDashboardManagerOrganizationRolesIndexRoute,
+    AuthOrgDashboardManagerPeopleOwnersIndexRoute:
+      AuthOrgDashboardManagerPeopleOwnersIndexRoute,
+    AuthOrgDashboardManagerPeopleTenantsIndexRoute:
+      AuthOrgDashboardManagerPeopleTenantsIndexRoute,
+    AuthOrgDashboardManagerPeopleVendorsIndexRoute:
+      AuthOrgDashboardManagerPeopleVendorsIndexRoute,
+  }
+
+const AuthOrgDashboardManagerRouteWithChildren =
+  AuthOrgDashboardManagerRoute._addFileChildren(
+    AuthOrgDashboardManagerRouteChildren,
+  )
+
+interface AuthOrgDashboardTenantRouteChildren {
+  AuthOrgDashboardTenantMaintenanceIndexRoute: typeof AuthOrgDashboardTenantMaintenanceIndexRoute
+  AuthOrgDashboardTenantMyLeaseIndexRoute: typeof AuthOrgDashboardTenantMyLeaseIndexRoute
+  AuthOrgDashboardTenantPaymentsIndexRoute: typeof AuthOrgDashboardTenantPaymentsIndexRoute
+}
+
+const AuthOrgDashboardTenantRouteChildren: AuthOrgDashboardTenantRouteChildren =
+  {
+    AuthOrgDashboardTenantMaintenanceIndexRoute:
+      AuthOrgDashboardTenantMaintenanceIndexRoute,
+    AuthOrgDashboardTenantMyLeaseIndexRoute:
+      AuthOrgDashboardTenantMyLeaseIndexRoute,
+    AuthOrgDashboardTenantPaymentsIndexRoute:
+      AuthOrgDashboardTenantPaymentsIndexRoute,
+  }
+
+const AuthOrgDashboardTenantRouteWithChildren =
+  AuthOrgDashboardTenantRoute._addFileChildren(
+    AuthOrgDashboardTenantRouteChildren,
   )
 
 interface AuthOrgDashboardRouteChildren {
+  AuthOrgDashboardManagerRoute: typeof AuthOrgDashboardManagerRouteWithChildren
+  AuthOrgDashboardTenantRoute: typeof AuthOrgDashboardTenantRouteWithChildren
   AuthOrgDashboardHomeRoute: typeof AuthOrgDashboardHomeRoute
-  AuthOrgDashboardLeasesAgreementsRouteRoute: typeof AuthOrgDashboardLeasesAgreementsRouteRouteWithChildren
-  AuthOrgDashboardLeasesTemplatesRouteRoute: typeof AuthOrgDashboardLeasesTemplatesRouteRouteWithChildren
-  AuthOrgDashboardPropsIdRouteRoute: typeof AuthOrgDashboardPropsIdRouteRouteWithChildren
   AuthOrgDashboardSettingsPermissionPoliciesRoute: typeof AuthOrgDashboardSettingsPermissionPoliciesRoute
   AuthOrgDashboardSettingsPermissionTemplatesRoute: typeof AuthOrgDashboardSettingsPermissionTemplatesRoute
-  AuthOrgDashboardUnitsUnitIdRoute: typeof AuthOrgDashboardUnitsUnitIdRoute
   AuthOrgDashboardMessagesIndexRoute: typeof AuthOrgDashboardMessagesIndexRoute
   AuthOrgDashboardProfileIndexRoute: typeof AuthOrgDashboardProfileIndexRoute
-  AuthOrgDashboardPropsIndexRoute: typeof AuthOrgDashboardPropsIndexRoute
   AuthOrgDashboardSettingsIndexRoute: typeof AuthOrgDashboardSettingsIndexRoute
-  AuthOrgDashboardUnitsIndexRoute: typeof AuthOrgDashboardUnitsIndexRoute
-  AuthOrgDashboardOrganizationMembersMembershipIdRoute: typeof AuthOrgDashboardOrganizationMembersMembershipIdRoute
-  AuthOrgDashboardPeopleTenantsTenantIdRoute: typeof AuthOrgDashboardPeopleTenantsTenantIdRoute
-  AuthOrgDashboardFinanceInvoicesIndexRoute: typeof AuthOrgDashboardFinanceInvoicesIndexRoute
-  AuthOrgDashboardFinanceReportsIndexRoute: typeof AuthOrgDashboardFinanceReportsIndexRoute
-  AuthOrgDashboardFinanceTransactionsIndexRoute: typeof AuthOrgDashboardFinanceTransactionsIndexRoute
-  AuthOrgDashboardLeasesApplicationsIndexRoute: typeof AuthOrgDashboardLeasesApplicationsIndexRoute
-  AuthOrgDashboardMaintenanceRequestsIndexRoute: typeof AuthOrgDashboardMaintenanceRequestsIndexRoute
-  AuthOrgDashboardMaintenanceWorkOrdersIndexRoute: typeof AuthOrgDashboardMaintenanceWorkOrdersIndexRoute
-  AuthOrgDashboardOrganizationMembersIndexRoute: typeof AuthOrgDashboardOrganizationMembersIndexRoute
-  AuthOrgDashboardOrganizationRolesIndexRoute: typeof AuthOrgDashboardOrganizationRolesIndexRoute
-  AuthOrgDashboardPeopleOwnersIndexRoute: typeof AuthOrgDashboardPeopleOwnersIndexRoute
-  AuthOrgDashboardPeopleTenantsIndexRoute: typeof AuthOrgDashboardPeopleTenantsIndexRoute
-  AuthOrgDashboardPeopleVendorsIndexRoute: typeof AuthOrgDashboardPeopleVendorsIndexRoute
 }
 
 const AuthOrgDashboardRouteChildren: AuthOrgDashboardRouteChildren = {
+  AuthOrgDashboardManagerRoute: AuthOrgDashboardManagerRouteWithChildren,
+  AuthOrgDashboardTenantRoute: AuthOrgDashboardTenantRouteWithChildren,
   AuthOrgDashboardHomeRoute: AuthOrgDashboardHomeRoute,
-  AuthOrgDashboardLeasesAgreementsRouteRoute:
-    AuthOrgDashboardLeasesAgreementsRouteRouteWithChildren,
-  AuthOrgDashboardLeasesTemplatesRouteRoute:
-    AuthOrgDashboardLeasesTemplatesRouteRouteWithChildren,
-  AuthOrgDashboardPropsIdRouteRoute:
-    AuthOrgDashboardPropsIdRouteRouteWithChildren,
   AuthOrgDashboardSettingsPermissionPoliciesRoute:
     AuthOrgDashboardSettingsPermissionPoliciesRoute,
   AuthOrgDashboardSettingsPermissionTemplatesRoute:
     AuthOrgDashboardSettingsPermissionTemplatesRoute,
-  AuthOrgDashboardUnitsUnitIdRoute: AuthOrgDashboardUnitsUnitIdRoute,
   AuthOrgDashboardMessagesIndexRoute: AuthOrgDashboardMessagesIndexRoute,
   AuthOrgDashboardProfileIndexRoute: AuthOrgDashboardProfileIndexRoute,
-  AuthOrgDashboardPropsIndexRoute: AuthOrgDashboardPropsIndexRoute,
   AuthOrgDashboardSettingsIndexRoute: AuthOrgDashboardSettingsIndexRoute,
-  AuthOrgDashboardUnitsIndexRoute: AuthOrgDashboardUnitsIndexRoute,
-  AuthOrgDashboardOrganizationMembersMembershipIdRoute:
-    AuthOrgDashboardOrganizationMembersMembershipIdRoute,
-  AuthOrgDashboardPeopleTenantsTenantIdRoute:
-    AuthOrgDashboardPeopleTenantsTenantIdRoute,
-  AuthOrgDashboardFinanceInvoicesIndexRoute:
-    AuthOrgDashboardFinanceInvoicesIndexRoute,
-  AuthOrgDashboardFinanceReportsIndexRoute:
-    AuthOrgDashboardFinanceReportsIndexRoute,
-  AuthOrgDashboardFinanceTransactionsIndexRoute:
-    AuthOrgDashboardFinanceTransactionsIndexRoute,
-  AuthOrgDashboardLeasesApplicationsIndexRoute:
-    AuthOrgDashboardLeasesApplicationsIndexRoute,
-  AuthOrgDashboardMaintenanceRequestsIndexRoute:
-    AuthOrgDashboardMaintenanceRequestsIndexRoute,
-  AuthOrgDashboardMaintenanceWorkOrdersIndexRoute:
-    AuthOrgDashboardMaintenanceWorkOrdersIndexRoute,
-  AuthOrgDashboardOrganizationMembersIndexRoute:
-    AuthOrgDashboardOrganizationMembersIndexRoute,
-  AuthOrgDashboardOrganizationRolesIndexRoute:
-    AuthOrgDashboardOrganizationRolesIndexRoute,
-  AuthOrgDashboardPeopleOwnersIndexRoute:
-    AuthOrgDashboardPeopleOwnersIndexRoute,
-  AuthOrgDashboardPeopleTenantsIndexRoute:
-    AuthOrgDashboardPeopleTenantsIndexRoute,
-  AuthOrgDashboardPeopleVendorsIndexRoute:
-    AuthOrgDashboardPeopleVendorsIndexRoute,
 }
 
 const AuthOrgDashboardRouteWithChildren =

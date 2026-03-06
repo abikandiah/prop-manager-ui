@@ -37,7 +37,6 @@ function applyCreate(
 		endDate: payload.endDate,
 		rentAmount: payload.rentAmount,
 		executedContentMarkdown: null,
-		signedPdfUrl: null,
 		rentDueDay: payload.rentDueDay,
 		securityDepositHeld: payload.securityDepositHeld ?? null,
 		lateFeeType: payload.lateFeeType ?? null,

@@ -44,8 +44,10 @@ const WIZARD_STEP_TITLES: Record<1 | 2 | 3, string> = {
 function statusVariant(status: LeaseStatus) {
 	switch (status) {
 		case LeaseStatus.ACTIVE:
+		case LeaseStatus.SIGNED:
 			return 'success'
 		case LeaseStatus.DRAFT:
+		case LeaseStatus.EXPIRED:
 			return 'secondary'
 		case LeaseStatus.REVIEW:
 			return 'warning'
@@ -290,6 +292,7 @@ function LeaseDetailPage() {
 							<LeaseTenantsList
 								leaseId={lease.id}
 								isDraft={lease.status === LeaseStatus.DRAFT}
+								isReview={lease.status === LeaseStatus.REVIEW}
 							/>
 
 							{/* Template & Parameters — conditional */}

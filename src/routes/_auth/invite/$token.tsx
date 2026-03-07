@@ -285,7 +285,7 @@ function InviteActionCard({
 
 					{isLease && (
 						<p className="text-xs text-muted-foreground text-center">
-							Accepting this invite is not the same as signing the lease.
+							After accepting, you'll be taken to your lease to review and sign.
 						</p>
 					)}
 				</div>

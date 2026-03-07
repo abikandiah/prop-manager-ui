@@ -15,3 +15,13 @@ export interface Tenant {
 	updatedAt: string
 	version: number
 }
+
+export interface UpdateTenantPayload {
+	emergencyContactName?: string | null
+	emergencyContactPhone?: string | null
+	hasPets?: boolean | null
+	petDescription?: string | null
+	vehicleInfo?: string | null
+	notes?: string | null
+	version: number
+}

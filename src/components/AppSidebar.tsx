@@ -1,5 +1,5 @@
 import { AppRole } from '@/domain/user'
-import { useAuth } from '@/features/auth'
+import { useActiveOrgRoles } from '@/features/auth'
 import { useCan } from '@/lib/permissions'
 import {
 	Sidebar,
@@ -32,7 +32,7 @@ import { useCallback } from 'react'
 import { CollapsibleSidebarSection } from './CollapsibleSidebarSection'
 
 type NavItem = {
-	to: '/home'
+	to: string
 	label: string
 	icon: LucideIcon
 }
@@ -45,7 +45,7 @@ function SidebarNavLink({
 	return (
 		<SidebarMenuItem>
 			<Link to={to} {...props}>
-				{({ isActive }) => (
+				{({ isActive }: { isActive: boolean }) => (
 					<SidebarMenuButton asChild isActive={isActive}>
 						<span className="flex items-center gap-2">
 							<Icon className="size-4 shrink-0" />
@@ -60,11 +60,10 @@ function SidebarNavLink({
 
 export function AppSidebar() {
 	const state = useSidebar()
-	const { user } = useAuth()
-	const roles = user?.roles ?? []
+	const activeOrgRoles = useActiveOrgRoles()
 	const isManagerOrAdmin =
-		roles.includes(AppRole.MANAGER) || roles.includes(AppRole.ADMIN)
-	const isTenant = roles.includes(AppRole.TENANT)
+		activeOrgRoles.includes(AppRole.MANAGER) || activeOrgRoles.includes(AppRole.ADMIN)
+	const isTenant = activeOrgRoles.includes(AppRole.TENANT)
 	const canReadLeases = useCan('READ', 'LEASES')
 
 	const closeMobileSidebar = useCallback(
@@ -166,6 +165,16 @@ export function AppSidebar() {
 										onItemClick={closeMobileSidebar}
 									/>
 								)}
+								{(isManagerOrAdmin || isTenant) && (
+									<SidebarNavLink
+										item={{
+											to: '/maintenance',
+											label: 'Maintenance',
+											icon: Wrench,
+										}}
+										onClick={closeMobileSidebar}
+									/>
+								)}
 								{isTenant && (
 									<CollapsibleSidebarSection
 										title="My Tenancy"
@@ -181,32 +190,10 @@ export function AppSidebar() {
 												label: 'Payments',
 												icon: CreditCard,
 											},
-											{
-												to: '/maintenance',
-												label: 'Maintenance',
-												icon: Wrench,
-											},
 										]}
 										onItemClick={closeMobileSidebar}
 									/>
 								)}
-								{/* <CollapsibleSidebarSection
-									title="Maintenance"
-									icon={Wrench}
-									items={[
-										{
-											to: '/maintenance/requests',
-											label: 'Requests',
-											icon: ClipboardList,
-										},
-										{
-											to: '/maintenance/work-orders',
-											label: 'Work Orders',
-											icon: Hammer,
-										},
-									]}
-									onItemClick={closeMobileSidebar}
-								/> */}
 								{/* <CollapsibleSidebarSection
 									title="Finance"
 									icon={BarChart3}

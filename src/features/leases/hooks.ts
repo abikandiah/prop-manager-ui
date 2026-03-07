@@ -537,6 +537,12 @@ export const useTerminateLease = makeLeaseStatusTransitionHook(
 	LeaseStatus.TERMINATED,
 )
 
+export const useEvictLease = makeLeaseStatusTransitionHook(
+	'evictLease',
+	(id) => leasesApi.evict(id),
+	LeaseStatus.EVICTED,
+)
+
 // --- Lease Tenant Queries ---
 
 /** Fetch all tenants for a single lease. */
@@ -635,6 +641,32 @@ export function useRemoveLeaseTenant() {
 		onSettled: (_data, _error, { leaseId }) => {
 			queryClient.invalidateQueries({
 				queryKey: leaseTenantKeys.list(activeOrgId!, leaseId),
+			})
+		},
+	})
+}
+
+export type SignLeaseVariables = {
+	leaseId: string
+	leaseTenantId: string
+}
+
+/** Tenant signs the lease. Invalidates both tenant list and lease detail (status may advance to SIGNED). */
+export function useSignLease() {
+	const queryClient = useQueryClient()
+	const { activeOrgId } = useOrganization()
+
+	return useMutation({
+		mutationKey: ['signLease'],
+		networkMode: 'online',
+		mutationFn: ({ leaseId, leaseTenantId }: SignLeaseVariables) =>
+			leaseTenantApi.sign(leaseId, leaseTenantId),
+		onSettled: (_data, _error, { leaseId }) => {
+			queryClient.invalidateQueries({
+				queryKey: leaseTenantKeys.list(activeOrgId!, leaseId),
+			})
+			queryClient.invalidateQueries({
+				queryKey: leaseKeys.detail(activeOrgId!, leaseId),
 			})
 		},
 	})

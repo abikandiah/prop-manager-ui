@@ -40,13 +40,17 @@ export interface LeaseTenant {
 	/** Email address from the originating invite. */
 	email: string
 	role: LeaseTenantRole
-	/** Derived from entity state on the server — not stored in the DB. */
+	/** Persisted in the DB. */
 	status: LeaseTenantStatus
 	/** Null until the invited user accepts and their tenant profile is linked. */
 	tenantId: string | null
 	inviteId: string
 	invitedDate: string | null
 	signedDate: string | null
+	/** Timestamp of when the tenant accepted the invite. Null until accepted. */
+	inviteAcceptedAt: string | null
+	/** The lease version the tenant signed at; used to detect post-sign edits. */
+	acceptedLeaseVersion: number | null
 	/** Timestamp of the last resend, null if never resent. */
 	lastResentAt: string | null
 	/** Expiry timestamp of the originating invite. */

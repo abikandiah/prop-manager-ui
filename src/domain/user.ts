@@ -29,6 +29,7 @@ export interface DevLoginPayload {
 export interface UserOrganization {
 	id: string
 	name: string
+	roles: AppRole[]
 	createdAt: string
 	updatedAt: string
 }

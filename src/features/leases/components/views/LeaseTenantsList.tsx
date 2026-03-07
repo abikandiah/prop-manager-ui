@@ -89,9 +89,16 @@ interface TenantRowActionsProps {
 	tenant: LeaseTenant
 	leaseId: string
 	isDraft: boolean
+	/** True when the lease is in REVIEW (unsigned tenants can still be removed). */
+	isReview: boolean
 }
 
-function TenantRowActions({ tenant, leaseId, isDraft }: TenantRowActionsProps) {
+function TenantRowActions({
+	tenant,
+	leaseId,
+	isDraft,
+	isReview,
+}: TenantRowActionsProps) {
 	const [confirmOpen, setConfirmOpen] = useState(false)
 	const removeTenant = useRemoveLeaseTenant()
 	const resendInvite = useResendInvite()
@@ -99,7 +106,7 @@ function TenantRowActions({ tenant, leaseId, isDraft }: TenantRowActionsProps) {
 	const { activeOrgId } = useOrganization()
 
 	const canResend = tenant.status === 'INVITED'
-	const canRemove = isDraft && tenant.status !== 'SIGNED'
+	const canRemove = (isDraft || isReview) && tenant.status !== 'SIGNED'
 
 	if (!canResend && !canRemove) return null
 
@@ -185,8 +192,10 @@ function TenantRowActions({ tenant, leaseId, isDraft }: TenantRowActionsProps) {
 
 export interface LeaseTenantListProps {
 	leaseId: string
-	/** Controls invite/remove visibility — only available on DRAFT leases. */
+	/** True for DRAFT leases — shows the "Invite tenants" button and enables removal. */
 	isDraft: boolean
+	/** True for REVIEW leases — enables removal of unsigned tenants only. */
+	isReview?: boolean
 }
 
 const TABLE_COLS_BASE = 4
@@ -195,15 +204,20 @@ const TABLE_COLS_WITH_ACTIONS = TABLE_COLS_BASE + 1
 /**
  * Displays a list of tenants for a lease.
  * - INVITED tenants always get a "Resend invite" action (regardless of lease status).
- * - In DRAFT mode: also shows "Invite tenants" button and a per-row "Remove" action
- *   (only for tenants who haven't signed yet).
+ * - In DRAFT/REVIEW mode: a per-row "Remove" action appears for unsigned tenants.
+ * - In DRAFT mode only: also shows the "Invite tenants" button.
  * - The INVITED status badge shows a tooltip with the last resent timestamp.
  */
-export function LeaseTenantsList({ leaseId, isDraft }: LeaseTenantListProps) {
+export function LeaseTenantsList({
+	leaseId,
+	isDraft,
+	isReview = false,
+}: LeaseTenantListProps) {
 	const inviteDialog = useDialogState()
 	const { data: tenants = [], isLoading } = useLeaseTenants(leaseId)
 
-	const hasActions = isDraft || tenants.some((t) => t.status === 'INVITED')
+	const hasActions =
+		isDraft || isReview || tenants.some((t) => t.status === 'INVITED')
 	const totalCols = hasActions ? TABLE_COLS_WITH_ACTIONS : TABLE_COLS_BASE
 
 	const tableContent = (
@@ -252,13 +266,23 @@ export function LeaseTenantsList({ leaseId, isDraft }: LeaseTenantListProps) {
 									</Badge>
 								</TableCell>
 								<TableCell>
-									<InviteStatusBadge
-										status={tenant.status === 'INVITED' ? 'PENDING' : 'ACTIVE'}
-										lastResentAt={tenant.lastResentAt}
-										expiresAt={tenant.expiresAt}
-										emailStatus={tenant.emailStatus}
-										emailError={tenant.emailError}
-									/>
+									{tenant.status === 'INVITED' ? (
+										<InviteStatusBadge
+											status="PENDING"
+											lastResentAt={tenant.lastResentAt}
+											expiresAt={tenant.expiresAt}
+											emailStatus={tenant.emailStatus}
+											emailError={tenant.emailError}
+										/>
+									) : (
+										<Badge
+											variant={
+												tenant.status === 'SIGNED' ? 'success' : 'secondary'
+											}
+										>
+											{formatEnumLabel(tenant.status)}
+										</Badge>
+									)}
 								</TableCell>
 								<TableCell className="text-muted-foreground">
 									{formatDate(tenant.invitedDate)}
@@ -269,6 +293,7 @@ export function LeaseTenantsList({ leaseId, isDraft }: LeaseTenantListProps) {
 											tenant={tenant}
 											leaseId={leaseId}
 											isDraft={isDraft}
+											isReview={isReview}
 										/>
 									</TableCell>
 								)}

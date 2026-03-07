@@ -24,11 +24,11 @@ import { Route as AuthOrgDashboardManagerRouteImport } from './routes/_auth/_org
 import { Route as AuthOrgDashboardSettingsIndexRouteImport } from './routes/_auth/_org/_dashboard/settings/index'
 import { Route as AuthOrgDashboardProfileIndexRouteImport } from './routes/_auth/_org/_dashboard/profile/index'
 import { Route as AuthOrgDashboardMessagesIndexRouteImport } from './routes/_auth/_org/_dashboard/messages/index'
+import { Route as AuthOrgDashboardMaintenanceIndexRouteImport } from './routes/_auth/_org/_dashboard/maintenance/index'
 import { Route as AuthOrgDashboardSettingsPermissionTemplatesRouteImport } from './routes/_auth/_org/_dashboard/settings/permission-templates'
 import { Route as AuthOrgDashboardSettingsPermissionPoliciesRouteImport } from './routes/_auth/_org/_dashboard/settings/permission-policies'
 import { Route as AuthOrgDashboardTenantPaymentsIndexRouteImport } from './routes/_auth/_org/_dashboard/_tenant/payments/index'
 import { Route as AuthOrgDashboardTenantMyLeaseIndexRouteImport } from './routes/_auth/_org/_dashboard/_tenant/my-lease/index'
-import { Route as AuthOrgDashboardTenantMaintenanceIndexRouteImport } from './routes/_auth/_org/_dashboard/_tenant/maintenance/index'
 import { Route as AuthOrgDashboardManagerUnitsIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/units/index'
 import { Route as AuthOrgDashboardManagerPropsIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/props/index'
 import { Route as AuthOrgDashboardManagerUnitsUnitIdRouteImport } from './routes/_auth/_org/_dashboard/_manager/units/$unitId'
@@ -41,8 +41,6 @@ import { Route as AuthOrgDashboardManagerPeopleTenantsIndexRouteImport } from '.
 import { Route as AuthOrgDashboardManagerPeopleOwnersIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/people/owners/index'
 import { Route as AuthOrgDashboardManagerOrganizationRolesIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/organization/roles/index'
 import { Route as AuthOrgDashboardManagerOrganizationMembersIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/organization/members/index'
-import { Route as AuthOrgDashboardManagerMaintenanceWorkOrdersIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/maintenance/work-orders/index'
-import { Route as AuthOrgDashboardManagerMaintenanceRequestsIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/maintenance/requests/index'
 import { Route as AuthOrgDashboardManagerLeasesTemplatesIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/leases/templates/index'
 import { Route as AuthOrgDashboardManagerLeasesApplicationsIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/leases/applications/index'
 import { Route as AuthOrgDashboardManagerLeasesAgreementsIndexRouteImport } from './routes/_auth/_org/_dashboard/_manager/leases/agreements/index'
@@ -126,6 +124,12 @@ const AuthOrgDashboardMessagesIndexRoute =
     path: '/messages/',
     getParentRoute: () => AuthOrgDashboardRoute,
   } as any)
+const AuthOrgDashboardMaintenanceIndexRoute =
+  AuthOrgDashboardMaintenanceIndexRouteImport.update({
+    id: '/maintenance/',
+    path: '/maintenance/',
+    getParentRoute: () => AuthOrgDashboardRoute,
+  } as any)
 const AuthOrgDashboardSettingsPermissionTemplatesRoute =
   AuthOrgDashboardSettingsPermissionTemplatesRouteImport.update({
     id: '/settings/permission-templates',
@@ -148,12 +152,6 @@ const AuthOrgDashboardTenantMyLeaseIndexRoute =
   AuthOrgDashboardTenantMyLeaseIndexRouteImport.update({
     id: '/my-lease/',
     path: '/my-lease/',
-    getParentRoute: () => AuthOrgDashboardTenantRoute,
-  } as any)
-const AuthOrgDashboardTenantMaintenanceIndexRoute =
-  AuthOrgDashboardTenantMaintenanceIndexRouteImport.update({
-    id: '/maintenance/',
-    path: '/maintenance/',
     getParentRoute: () => AuthOrgDashboardTenantRoute,
   } as any)
 const AuthOrgDashboardManagerUnitsIndexRoute =
@@ -228,18 +226,6 @@ const AuthOrgDashboardManagerOrganizationMembersIndexRoute =
     path: '/organization/members/',
     getParentRoute: () => AuthOrgDashboardManagerRoute,
   } as any)
-const AuthOrgDashboardManagerMaintenanceWorkOrdersIndexRoute =
-  AuthOrgDashboardManagerMaintenanceWorkOrdersIndexRouteImport.update({
-    id: '/maintenance/work-orders/',
-    path: '/maintenance/work-orders/',
-    getParentRoute: () => AuthOrgDashboardManagerRoute,
-  } as any)
-const AuthOrgDashboardManagerMaintenanceRequestsIndexRoute =
-  AuthOrgDashboardManagerMaintenanceRequestsIndexRouteImport.update({
-    id: '/maintenance/requests/',
-    path: '/maintenance/requests/',
-    getParentRoute: () => AuthOrgDashboardManagerRoute,
-  } as any)
 const AuthOrgDashboardManagerLeasesTemplatesIndexRoute =
   AuthOrgDashboardManagerLeasesTemplatesIndexRouteImport.update({
     id: '/',
@@ -310,6 +296,7 @@ export interface FileRoutesByFullPath {
   '/home': typeof AuthOrgDashboardHomeRoute
   '/settings/permission-policies': typeof AuthOrgDashboardSettingsPermissionPoliciesRoute
   '/settings/permission-templates': typeof AuthOrgDashboardSettingsPermissionTemplatesRoute
+  '/maintenance/': typeof AuthOrgDashboardMaintenanceIndexRoute
   '/messages/': typeof AuthOrgDashboardMessagesIndexRoute
   '/profile/': typeof AuthOrgDashboardProfileIndexRoute
   '/settings/': typeof AuthOrgDashboardSettingsIndexRoute
@@ -319,7 +306,6 @@ export interface FileRoutesByFullPath {
   '/units/$unitId': typeof AuthOrgDashboardManagerUnitsUnitIdRoute
   '/props/': typeof AuthOrgDashboardManagerPropsIndexRoute
   '/units/': typeof AuthOrgDashboardManagerUnitsIndexRoute
-  '/maintenance/': typeof AuthOrgDashboardTenantMaintenanceIndexRoute
   '/my-lease/': typeof AuthOrgDashboardTenantMyLeaseIndexRoute
   '/payments/': typeof AuthOrgDashboardTenantPaymentsIndexRoute
   '/leases/agreements/$leaseId': typeof AuthOrgDashboardManagerLeasesAgreementsLeaseIdRoute
@@ -332,8 +318,6 @@ export interface FileRoutesByFullPath {
   '/leases/agreements/': typeof AuthOrgDashboardManagerLeasesAgreementsIndexRoute
   '/leases/applications/': typeof AuthOrgDashboardManagerLeasesApplicationsIndexRoute
   '/leases/templates/': typeof AuthOrgDashboardManagerLeasesTemplatesIndexRoute
-  '/maintenance/requests/': typeof AuthOrgDashboardManagerMaintenanceRequestsIndexRoute
-  '/maintenance/work-orders/': typeof AuthOrgDashboardManagerMaintenanceWorkOrdersIndexRoute
   '/organization/members/': typeof AuthOrgDashboardManagerOrganizationMembersIndexRoute
   '/organization/roles/': typeof AuthOrgDashboardManagerOrganizationRolesIndexRoute
   '/people/owners/': typeof AuthOrgDashboardManagerPeopleOwnersIndexRoute
@@ -350,13 +334,13 @@ export interface FileRoutesByTo {
   '/home': typeof AuthOrgDashboardHomeRoute
   '/settings/permission-policies': typeof AuthOrgDashboardSettingsPermissionPoliciesRoute
   '/settings/permission-templates': typeof AuthOrgDashboardSettingsPermissionTemplatesRoute
+  '/maintenance': typeof AuthOrgDashboardMaintenanceIndexRoute
   '/messages': typeof AuthOrgDashboardMessagesIndexRoute
   '/profile': typeof AuthOrgDashboardProfileIndexRoute
   '/settings': typeof AuthOrgDashboardSettingsIndexRoute
   '/units/$unitId': typeof AuthOrgDashboardManagerUnitsUnitIdRoute
   '/props': typeof AuthOrgDashboardManagerPropsIndexRoute
   '/units': typeof AuthOrgDashboardManagerUnitsIndexRoute
-  '/maintenance': typeof AuthOrgDashboardTenantMaintenanceIndexRoute
   '/my-lease': typeof AuthOrgDashboardTenantMyLeaseIndexRoute
   '/payments': typeof AuthOrgDashboardTenantPaymentsIndexRoute
   '/leases/agreements/$leaseId': typeof AuthOrgDashboardManagerLeasesAgreementsLeaseIdRoute
@@ -369,8 +353,6 @@ export interface FileRoutesByTo {
   '/leases/agreements': typeof AuthOrgDashboardManagerLeasesAgreementsIndexRoute
   '/leases/applications': typeof AuthOrgDashboardManagerLeasesApplicationsIndexRoute
   '/leases/templates': typeof AuthOrgDashboardManagerLeasesTemplatesIndexRoute
-  '/maintenance/requests': typeof AuthOrgDashboardManagerMaintenanceRequestsIndexRoute
-  '/maintenance/work-orders': typeof AuthOrgDashboardManagerMaintenanceWorkOrdersIndexRoute
   '/organization/members': typeof AuthOrgDashboardManagerOrganizationMembersIndexRoute
   '/organization/roles': typeof AuthOrgDashboardManagerOrganizationRolesIndexRoute
   '/people/owners': typeof AuthOrgDashboardManagerPeopleOwnersIndexRoute
@@ -394,6 +376,7 @@ export interface FileRoutesById {
   '/_auth/_org/_dashboard/home': typeof AuthOrgDashboardHomeRoute
   '/_auth/_org/_dashboard/settings/permission-policies': typeof AuthOrgDashboardSettingsPermissionPoliciesRoute
   '/_auth/_org/_dashboard/settings/permission-templates': typeof AuthOrgDashboardSettingsPermissionTemplatesRoute
+  '/_auth/_org/_dashboard/maintenance/': typeof AuthOrgDashboardMaintenanceIndexRoute
   '/_auth/_org/_dashboard/messages/': typeof AuthOrgDashboardMessagesIndexRoute
   '/_auth/_org/_dashboard/profile/': typeof AuthOrgDashboardProfileIndexRoute
   '/_auth/_org/_dashboard/settings/': typeof AuthOrgDashboardSettingsIndexRoute
@@ -403,7 +386,6 @@ export interface FileRoutesById {
   '/_auth/_org/_dashboard/_manager/units/$unitId': typeof AuthOrgDashboardManagerUnitsUnitIdRoute
   '/_auth/_org/_dashboard/_manager/props/': typeof AuthOrgDashboardManagerPropsIndexRoute
   '/_auth/_org/_dashboard/_manager/units/': typeof AuthOrgDashboardManagerUnitsIndexRoute
-  '/_auth/_org/_dashboard/_tenant/maintenance/': typeof AuthOrgDashboardTenantMaintenanceIndexRoute
   '/_auth/_org/_dashboard/_tenant/my-lease/': typeof AuthOrgDashboardTenantMyLeaseIndexRoute
   '/_auth/_org/_dashboard/_tenant/payments/': typeof AuthOrgDashboardTenantPaymentsIndexRoute
   '/_auth/_org/_dashboard/_manager/leases/agreements/$leaseId': typeof AuthOrgDashboardManagerLeasesAgreementsLeaseIdRoute
@@ -416,8 +398,6 @@ export interface FileRoutesById {
   '/_auth/_org/_dashboard/_manager/leases/agreements/': typeof AuthOrgDashboardManagerLeasesAgreementsIndexRoute
   '/_auth/_org/_dashboard/_manager/leases/applications/': typeof AuthOrgDashboardManagerLeasesApplicationsIndexRoute
   '/_auth/_org/_dashboard/_manager/leases/templates/': typeof AuthOrgDashboardManagerLeasesTemplatesIndexRoute
-  '/_auth/_org/_dashboard/_manager/maintenance/requests/': typeof AuthOrgDashboardManagerMaintenanceRequestsIndexRoute
-  '/_auth/_org/_dashboard/_manager/maintenance/work-orders/': typeof AuthOrgDashboardManagerMaintenanceWorkOrdersIndexRoute
   '/_auth/_org/_dashboard/_manager/organization/members/': typeof AuthOrgDashboardManagerOrganizationMembersIndexRoute
   '/_auth/_org/_dashboard/_manager/organization/roles/': typeof AuthOrgDashboardManagerOrganizationRolesIndexRoute
   '/_auth/_org/_dashboard/_manager/people/owners/': typeof AuthOrgDashboardManagerPeopleOwnersIndexRoute
@@ -436,6 +416,7 @@ export interface FileRouteTypes {
     | '/home'
     | '/settings/permission-policies'
     | '/settings/permission-templates'
+    | '/maintenance/'
     | '/messages/'
     | '/profile/'
     | '/settings/'
@@ -445,7 +426,6 @@ export interface FileRouteTypes {
     | '/units/$unitId'
     | '/props/'
     | '/units/'
-    | '/maintenance/'
     | '/my-lease/'
     | '/payments/'
     | '/leases/agreements/$leaseId'
@@ -458,8 +438,6 @@ export interface FileRouteTypes {
     | '/leases/agreements/'
     | '/leases/applications/'
     | '/leases/templates/'
-    | '/maintenance/requests/'
-    | '/maintenance/work-orders/'
     | '/organization/members/'
     | '/organization/roles/'
     | '/people/owners/'
@@ -476,13 +454,13 @@ export interface FileRouteTypes {
     | '/home'
     | '/settings/permission-policies'
     | '/settings/permission-templates'
+    | '/maintenance'
     | '/messages'
     | '/profile'
     | '/settings'
     | '/units/$unitId'
     | '/props'
     | '/units'
-    | '/maintenance'
     | '/my-lease'
     | '/payments'
     | '/leases/agreements/$leaseId'
@@ -495,8 +473,6 @@ export interface FileRouteTypes {
     | '/leases/agreements'
     | '/leases/applications'
     | '/leases/templates'
-    | '/maintenance/requests'
-    | '/maintenance/work-orders'
     | '/organization/members'
     | '/organization/roles'
     | '/people/owners'
@@ -519,6 +495,7 @@ export interface FileRouteTypes {
     | '/_auth/_org/_dashboard/home'
     | '/_auth/_org/_dashboard/settings/permission-policies'
     | '/_auth/_org/_dashboard/settings/permission-templates'
+    | '/_auth/_org/_dashboard/maintenance/'
     | '/_auth/_org/_dashboard/messages/'
     | '/_auth/_org/_dashboard/profile/'
     | '/_auth/_org/_dashboard/settings/'
@@ -528,7 +505,6 @@ export interface FileRouteTypes {
     | '/_auth/_org/_dashboard/_manager/units/$unitId'
     | '/_auth/_org/_dashboard/_manager/props/'
     | '/_auth/_org/_dashboard/_manager/units/'
-    | '/_auth/_org/_dashboard/_tenant/maintenance/'
     | '/_auth/_org/_dashboard/_tenant/my-lease/'
     | '/_auth/_org/_dashboard/_tenant/payments/'
     | '/_auth/_org/_dashboard/_manager/leases/agreements/$leaseId'
@@ -541,8 +517,6 @@ export interface FileRouteTypes {
     | '/_auth/_org/_dashboard/_manager/leases/agreements/'
     | '/_auth/_org/_dashboard/_manager/leases/applications/'
     | '/_auth/_org/_dashboard/_manager/leases/templates/'
-    | '/_auth/_org/_dashboard/_manager/maintenance/requests/'
-    | '/_auth/_org/_dashboard/_manager/maintenance/work-orders/'
     | '/_auth/_org/_dashboard/_manager/organization/members/'
     | '/_auth/_org/_dashboard/_manager/organization/roles/'
     | '/_auth/_org/_dashboard/_manager/people/owners/'
@@ -663,6 +637,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthOrgDashboardMessagesIndexRouteImport
       parentRoute: typeof AuthOrgDashboardRoute
     }
+    '/_auth/_org/_dashboard/maintenance/': {
+      id: '/_auth/_org/_dashboard/maintenance/'
+      path: '/maintenance'
+      fullPath: '/maintenance/'
+      preLoaderRoute: typeof AuthOrgDashboardMaintenanceIndexRouteImport
+      parentRoute: typeof AuthOrgDashboardRoute
+    }
     '/_auth/_org/_dashboard/settings/permission-templates': {
       id: '/_auth/_org/_dashboard/settings/permission-templates'
       path: '/settings/permission-templates'
@@ -689,13 +670,6 @@ declare module '@tanstack/react-router' {
       path: '/my-lease'
       fullPath: '/my-lease/'
       preLoaderRoute: typeof AuthOrgDashboardTenantMyLeaseIndexRouteImport
-      parentRoute: typeof AuthOrgDashboardTenantRoute
-    }
-    '/_auth/_org/_dashboard/_tenant/maintenance/': {
-      id: '/_auth/_org/_dashboard/_tenant/maintenance/'
-      path: '/maintenance'
-      fullPath: '/maintenance/'
-      preLoaderRoute: typeof AuthOrgDashboardTenantMaintenanceIndexRouteImport
       parentRoute: typeof AuthOrgDashboardTenantRoute
     }
     '/_auth/_org/_dashboard/_manager/units/': {
@@ -780,20 +754,6 @@ declare module '@tanstack/react-router' {
       path: '/organization/members'
       fullPath: '/organization/members/'
       preLoaderRoute: typeof AuthOrgDashboardManagerOrganizationMembersIndexRouteImport
-      parentRoute: typeof AuthOrgDashboardManagerRoute
-    }
-    '/_auth/_org/_dashboard/_manager/maintenance/work-orders/': {
-      id: '/_auth/_org/_dashboard/_manager/maintenance/work-orders/'
-      path: '/maintenance/work-orders'
-      fullPath: '/maintenance/work-orders/'
-      preLoaderRoute: typeof AuthOrgDashboardManagerMaintenanceWorkOrdersIndexRouteImport
-      parentRoute: typeof AuthOrgDashboardManagerRoute
-    }
-    '/_auth/_org/_dashboard/_manager/maintenance/requests/': {
-      id: '/_auth/_org/_dashboard/_manager/maintenance/requests/'
-      path: '/maintenance/requests'
-      fullPath: '/maintenance/requests/'
-      preLoaderRoute: typeof AuthOrgDashboardManagerMaintenanceRequestsIndexRouteImport
       parentRoute: typeof AuthOrgDashboardManagerRoute
     }
     '/_auth/_org/_dashboard/_manager/leases/templates/': {
@@ -933,8 +893,6 @@ interface AuthOrgDashboardManagerRouteChildren {
   AuthOrgDashboardManagerFinanceReportsIndexRoute: typeof AuthOrgDashboardManagerFinanceReportsIndexRoute
   AuthOrgDashboardManagerFinanceTransactionsIndexRoute: typeof AuthOrgDashboardManagerFinanceTransactionsIndexRoute
   AuthOrgDashboardManagerLeasesApplicationsIndexRoute: typeof AuthOrgDashboardManagerLeasesApplicationsIndexRoute
-  AuthOrgDashboardManagerMaintenanceRequestsIndexRoute: typeof AuthOrgDashboardManagerMaintenanceRequestsIndexRoute
-  AuthOrgDashboardManagerMaintenanceWorkOrdersIndexRoute: typeof AuthOrgDashboardManagerMaintenanceWorkOrdersIndexRoute
   AuthOrgDashboardManagerOrganizationMembersIndexRoute: typeof AuthOrgDashboardManagerOrganizationMembersIndexRoute
   AuthOrgDashboardManagerOrganizationRolesIndexRoute: typeof AuthOrgDashboardManagerOrganizationRolesIndexRoute
   AuthOrgDashboardManagerPeopleOwnersIndexRoute: typeof AuthOrgDashboardManagerPeopleOwnersIndexRoute
@@ -968,10 +926,6 @@ const AuthOrgDashboardManagerRouteChildren: AuthOrgDashboardManagerRouteChildren
       AuthOrgDashboardManagerFinanceTransactionsIndexRoute,
     AuthOrgDashboardManagerLeasesApplicationsIndexRoute:
       AuthOrgDashboardManagerLeasesApplicationsIndexRoute,
-    AuthOrgDashboardManagerMaintenanceRequestsIndexRoute:
-      AuthOrgDashboardManagerMaintenanceRequestsIndexRoute,
-    AuthOrgDashboardManagerMaintenanceWorkOrdersIndexRoute:
-      AuthOrgDashboardManagerMaintenanceWorkOrdersIndexRoute,
     AuthOrgDashboardManagerOrganizationMembersIndexRoute:
       AuthOrgDashboardManagerOrganizationMembersIndexRoute,
     AuthOrgDashboardManagerOrganizationRolesIndexRoute:
@@ -990,15 +944,12 @@ const AuthOrgDashboardManagerRouteWithChildren =
   )
 
 interface AuthOrgDashboardTenantRouteChildren {
-  AuthOrgDashboardTenantMaintenanceIndexRoute: typeof AuthOrgDashboardTenantMaintenanceIndexRoute
   AuthOrgDashboardTenantMyLeaseIndexRoute: typeof AuthOrgDashboardTenantMyLeaseIndexRoute
   AuthOrgDashboardTenantPaymentsIndexRoute: typeof AuthOrgDashboardTenantPaymentsIndexRoute
 }
 
 const AuthOrgDashboardTenantRouteChildren: AuthOrgDashboardTenantRouteChildren =
   {
-    AuthOrgDashboardTenantMaintenanceIndexRoute:
-      AuthOrgDashboardTenantMaintenanceIndexRoute,
     AuthOrgDashboardTenantMyLeaseIndexRoute:
       AuthOrgDashboardTenantMyLeaseIndexRoute,
     AuthOrgDashboardTenantPaymentsIndexRoute:
@@ -1016,6 +967,7 @@ interface AuthOrgDashboardRouteChildren {
   AuthOrgDashboardHomeRoute: typeof AuthOrgDashboardHomeRoute
   AuthOrgDashboardSettingsPermissionPoliciesRoute: typeof AuthOrgDashboardSettingsPermissionPoliciesRoute
   AuthOrgDashboardSettingsPermissionTemplatesRoute: typeof AuthOrgDashboardSettingsPermissionTemplatesRoute
+  AuthOrgDashboardMaintenanceIndexRoute: typeof AuthOrgDashboardMaintenanceIndexRoute
   AuthOrgDashboardMessagesIndexRoute: typeof AuthOrgDashboardMessagesIndexRoute
   AuthOrgDashboardProfileIndexRoute: typeof AuthOrgDashboardProfileIndexRoute
   AuthOrgDashboardSettingsIndexRoute: typeof AuthOrgDashboardSettingsIndexRoute
@@ -1029,6 +981,7 @@ const AuthOrgDashboardRouteChildren: AuthOrgDashboardRouteChildren = {
     AuthOrgDashboardSettingsPermissionPoliciesRoute,
   AuthOrgDashboardSettingsPermissionTemplatesRoute:
     AuthOrgDashboardSettingsPermissionTemplatesRoute,
+  AuthOrgDashboardMaintenanceIndexRoute: AuthOrgDashboardMaintenanceIndexRoute,
   AuthOrgDashboardMessagesIndexRoute: AuthOrgDashboardMessagesIndexRoute,
   AuthOrgDashboardProfileIndexRoute: AuthOrgDashboardProfileIndexRoute,
   AuthOrgDashboardSettingsIndexRoute: AuthOrgDashboardSettingsIndexRoute,

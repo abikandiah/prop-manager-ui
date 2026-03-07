@@ -60,6 +60,12 @@ class LeasesApi extends BaseService<
 		const res = await api.post<Lease>(`${this.endpoint}/${id}/terminate`)
 		return res.data
 	}
+
+	/** Evict tenants from an active lease (ACTIVE → EVICTED) */
+	async evict(id: string): Promise<Lease> {
+		const res = await api.post<Lease>(`${this.endpoint}/${id}/evict`)
+		return res.data
+	}
 }
 
 export const leasesApi = new LeasesApi()
@@ -94,7 +100,7 @@ class LeaseTenantApi {
 		return res.data
 	}
 
-	/** Remove a tenant from a DRAFT lease (only allowed if they haven't signed). */
+	/** Remove a tenant from a DRAFT/REVIEW lease (only allowed before signing). */
 	async remove(
 		leaseId: string,
 		leaseTenantId: string,
@@ -103,6 +109,14 @@ class LeaseTenantApi {
 		await api.delete(`${this.endpoint(leaseId)}/${leaseTenantId}`, {
 			headers,
 		})
+	}
+
+	/** Tenant signs the lease. */
+	async sign(leaseId: string, leaseTenantId: string): Promise<LeaseTenant> {
+		const res = await api.post<LeaseTenant>(
+			`${this.endpoint(leaseId)}/${leaseTenantId}/sign`,
+		)
+		return res.data
 	}
 }
 

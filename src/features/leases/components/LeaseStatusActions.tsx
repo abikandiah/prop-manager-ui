@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@abumble/design-system/components/Button'
-import { FileCheck, SendHorizontal, Undo2, XCircle } from 'lucide-react'
+import { FileCheck, SendHorizontal, Undo2, UserX, XCircle } from 'lucide-react'
 import {
 	Dialog,
 	DialogContent,
@@ -14,12 +14,13 @@ import type { Lease } from '@/domain/lease'
 import { LeaseStatus } from '@/domain/lease'
 import {
 	useActivateLease,
+	useEvictLease,
 	useRevertLeaseToDraft,
 	useSubmitLeaseForReview,
 	useTerminateLease,
 } from '@/features/leases'
 
-type ActionKey = 'submit' | 'activate' | 'revert' | 'terminate'
+type ActionKey = 'submit' | 'activate' | 'revert' | 'terminate' | 'evict'
 
 interface ActionConfig {
 	label: string
@@ -30,9 +31,13 @@ interface ActionConfig {
 	icon: React.ReactNode
 	variant?: 'default' | 'destructive' | 'outline'
 	confirmVariant?: 'default' | 'destructive'
-	visibleWhen: LeaseStatus
+	/** Statuses in which this action button is rendered. */
+	visibleWhen: Array<LeaseStatus>
+	/** Statuses in which this action is visible but disabled (button shown greyed out). */
+	disabledWhen?: Array<LeaseStatus>
+	/** Tooltip shown on the disabled button. */
+	disabledTooltip?: string
 	successMessage: string
-	errorMessage: string
 }
 
 const ACTION_CONFIGS: Record<ActionKey, ActionConfig> = {
@@ -44,9 +49,8 @@ const ACTION_CONFIGS: Record<ActionKey, ActionConfig> = {
 		description:
 			'This will send the lease to the tenant for review. You can revert it back to draft if changes are needed.',
 		icon: <SendHorizontal className="size-4" />,
-		visibleWhen: LeaseStatus.DRAFT,
+		visibleWhen: [LeaseStatus.DRAFT],
 		successMessage: 'Lease submitted for review',
-		errorMessage: 'Failed to submit lease',
 	},
 	activate: {
 		label: 'Activate lease',
@@ -56,9 +60,10 @@ const ACTION_CONFIGS: Record<ActionKey, ActionConfig> = {
 		description:
 			'This will activate the lease and make it official. The lease content will become immutable. This action cannot be undone.',
 		icon: <FileCheck className="size-4" />,
-		visibleWhen: LeaseStatus.REVIEW,
+		visibleWhen: [LeaseStatus.REVIEW, LeaseStatus.SIGNED],
+		disabledWhen: [LeaseStatus.REVIEW],
+		disabledTooltip: 'Waiting for all tenants to sign before activating',
 		successMessage: 'Lease activated',
-		errorMessage: 'Failed to activate lease',
 	},
 	revert: {
 		label: 'Revert to draft',
@@ -66,12 +71,11 @@ const ACTION_CONFIGS: Record<ActionKey, ActionConfig> = {
 		pendingLabel: 'Reverting…',
 		title: 'Revert to draft?',
 		description:
-			'This will move the lease back to draft status so you can make changes. You can submit it for review again later.',
+			'This will move the lease back to draft status. Any tenants who already signed will need to sign again after the next review submission.',
 		icon: <Undo2 className="size-4" />,
 		variant: 'outline',
-		visibleWhen: LeaseStatus.REVIEW,
+		visibleWhen: [LeaseStatus.REVIEW, LeaseStatus.SIGNED],
 		successMessage: 'Lease reverted to draft',
-		errorMessage: 'Failed to revert lease',
 	},
 	terminate: {
 		label: 'Terminate lease',
@@ -83,9 +87,21 @@ const ACTION_CONFIGS: Record<ActionKey, ActionConfig> = {
 		icon: <XCircle className="size-4" />,
 		variant: 'destructive',
 		confirmVariant: 'destructive',
-		visibleWhen: LeaseStatus.ACTIVE,
+		visibleWhen: [LeaseStatus.ACTIVE],
 		successMessage: 'Lease terminated',
-		errorMessage: 'Failed to terminate lease',
+	},
+	evict: {
+		label: 'Evict tenants',
+		confirmLabel: 'Evict',
+		pendingLabel: 'Processing…',
+		title: 'Evict tenants?',
+		description:
+			'This will evict all tenants from this lease. The unit will be marked as vacant. This action cannot be undone.',
+		icon: <UserX className="size-4" />,
+		variant: 'destructive',
+		confirmVariant: 'destructive',
+		visibleWhen: [LeaseStatus.ACTIVE],
+		successMessage: 'Tenants evicted',
 	},
 }
 
@@ -100,13 +116,14 @@ export function LeaseStatusActions({ lease }: LeaseStatusActionsProps) {
 	const activate = useActivateLease()
 	const revertToDraft = useRevertLeaseToDraft()
 	const terminate = useTerminateLease()
+	const evict = useEvictLease()
 
 	const mutations: Record<
 		ActionKey,
 		{
 			mutate: (
 				id: string,
-				callbacks: { onSuccess: () => void; onError?: (err: Error) => void },
+				callbacks: { onSuccess: () => void },
 			) => void
 			isPending: boolean
 		}
@@ -115,12 +132,13 @@ export function LeaseStatusActions({ lease }: LeaseStatusActionsProps) {
 		activate,
 		revert: revertToDraft,
 		terminate,
+		evict,
 	}
 
 	const isPending = Object.values(mutations).some((m) => m.isPending)
 	const visibleActions = (
 		Object.keys(ACTION_CONFIGS) as Array<ActionKey>
-	).filter((key) => ACTION_CONFIGS[key].visibleWhen === lease.status)
+	).filter((key) => ACTION_CONFIGS[key].visibleWhen.includes(lease.status))
 
 	const activeConfig = confirmAction ? ACTION_CONFIGS[confirmAction] : null
 	const activeMutation = confirmAction ? mutations[confirmAction] : null
@@ -140,16 +158,26 @@ export function LeaseStatusActions({ lease }: LeaseStatusActionsProps) {
 			<div className="flex flex-wrap gap-2">
 				{visibleActions.map((key) => {
 					const cfg = ACTION_CONFIGS[key]
+					const isDisabled =
+						isPending || cfg.disabledWhen?.includes(lease.status)
 					return (
-						<Button
+						<span
 							key={key}
-							variant={cfg.variant ?? 'default'}
-							onClick={() => setConfirmAction(key)}
-							disabled={isPending}
+							title={
+								cfg.disabledWhen?.includes(lease.status)
+									? cfg.disabledTooltip
+									: undefined
+							}
 						>
-							{cfg.icon}
-							{cfg.label}
-						</Button>
+							<Button
+								variant={cfg.variant ?? 'default'}
+								onClick={() => setConfirmAction(key)}
+								disabled={isDisabled}
+							>
+								{cfg.icon}
+								{cfg.label}
+							</Button>
+						</span>
 					)
 				})}
 			</div>

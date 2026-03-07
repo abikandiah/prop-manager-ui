@@ -33,11 +33,8 @@ export function useAcceptInvite() {
 
 			// Navigate and notify
 			if (data.targetType === TargetType.LEASE) {
-				toast.success("You've joined the lease!")
-				navigate({
-					to: '/leases/agreements/$leaseId',
-					params: { leaseId: data.targetId },
-				})
+				toast.success("You've joined the lease! Review and sign below.")
+				navigate({ to: '/my-lease' })
 			} else {
 				toast.success("You've joined the organization!")
 				navigate({ to: '/' })

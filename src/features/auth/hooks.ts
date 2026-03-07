@@ -1,5 +1,7 @@
 import { clearDevToken } from '@/api/client'
 import { config } from '@/config'
+import { useOrganization } from '@/contexts/organization'
+import type { AppRole } from '@/domain/user'
 import { globalClient } from '@/integrations/tanstack-query/globalClient'
 import { queryOptions, useQuery, useQueryClient } from '@tanstack/react-query'
 import { clearUserDb } from '../offline/db'
@@ -70,4 +72,11 @@ export function useAuth() {
 		refreshUser,
 		logout,
 	}
+}
+
+/** Returns the current user's roles within the active org. Empty array if no active org or not a member. */
+export function useActiveOrgRoles(): AppRole[] {
+	const { user } = useAuth()
+	const { activeOrgId } = useOrganization()
+	return user?.organizations.find((o) => o.id === activeOrgId)?.roles ?? []
 }

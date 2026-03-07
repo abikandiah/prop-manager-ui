@@ -2,7 +2,7 @@ import Footer from '@/components/Footer'
 import Header from '@/components/Header'
 import { HeaderBanner } from '@/components/HeaderBanner'
 import { config } from '@/config'
-import { useHeaderBanner, HeaderBannerProvider } from '@/contexts/header-banner'
+import { HeaderBannerProvider, useHeaderBanner } from '@/contexts/header-banner'
 import { useNetwork } from '@/contexts/network'
 import { useTheme } from '@/contexts/theme'
 import type { MyRouterContext } from '@/integrations/tanstack-query/router'
@@ -57,7 +57,6 @@ function EnvironmentBannerEffect() {
 
 		bannerIdRef.current = showBanner({
 			type: 'info',
-			hideIcon: true,
 			message:
 				'This is a sandbox environment. It is not intended for business or commercial use. No warranty, uptime guarantees, or technical support are provided.',
 			onClose: () => localStorage.setItem(DISCLAIMER_KEY, 'true'),
@@ -84,7 +83,9 @@ function OfflineBannerEffect() {
 						{isServerReachable ? (
 							<>
 								<WifiOff className="size-4 shrink-0" aria-hidden />
-								<span>You're offline. Changes will sync when you're back online.</span>
+								<span>
+									You're offline. Changes will sync when you're back online.
+								</span>
 							</>
 						) : (
 							<>
@@ -118,13 +119,20 @@ function OfflineBannerEffect() {
 		if (bannerIdRef.current) {
 			updateBanner(bannerIdRef.current, { message })
 		} else {
-			bannerIdRef.current = showBanner({ type: 'warning', hideIcon: true, message })
+			bannerIdRef.current = showBanner({
+				type: 'warning',
+				hideIcon: true,
+				message,
+			})
 		}
 	}, [message, showBanner, updateBanner, hideBanner])
 
-	useEffect(() => () => {
-		if (bannerIdRef.current) hideBanner(bannerIdRef.current)
-	}, [hideBanner])
+	useEffect(
+		() => () => {
+			if (bannerIdRef.current) hideBanner(bannerIdRef.current)
+		},
+		[hideBanner],
+	)
 
 	return null
 }

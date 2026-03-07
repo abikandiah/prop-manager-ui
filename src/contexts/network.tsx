@@ -1,6 +1,6 @@
 import { useApiEvent } from '@/api/events'
 import { config } from '@/config'
-import { onlineManager, useQueryClient } from '@tanstack/react-query'
+import { onlineManager } from '@tanstack/react-query'
 import {
 	createContext,
 	useContext,
@@ -18,6 +18,9 @@ import {
  * 2. API server reachability (health check + failed request detection) - Uses failure threshold
  *
  * The app is considered "online" only when BOTH network AND server are available.
+ *
+ * Only one instance of this provider should exist (main.tsx).
+ * User-scoped mutation resumption is handled in AppWithProviders (_auth.tsx).
  */
 interface NetworkContextValue {
 	isOnline: boolean // Combined: network AND server must be reachable
@@ -38,7 +41,6 @@ export function NetworkProvider({ children }: { children: React.ReactNode }) {
 
 	const abortControllerRef = useRef<AbortController | null>(null)
 	const healthCheckIntervalRef = useRef<NodeJS.Timeout | null>(null)
-	const queryClient = useQueryClient()
 
 	// Combined online status: network AND server must be reachable
 	const isOnline = isNetworkOnline && isServerReachable
@@ -148,18 +150,17 @@ export function NetworkProvider({ children }: { children: React.ReactNode }) {
 	}, [isNetworkOnline, isServerReachable])
 
 	/**
-	 * Sync TanStack Query's onlineManager with our combined status
+	 * Sync TanStack Query's onlineManager with our combined status.
+	 * Each QueryClient subscribed to onlineManager will auto-resume its paused mutations.
 	 */
 	useEffect(() => {
 		onlineManager.setOnline(isOnline)
-
 		if (isOnline) {
-			console.log('[Network] App is online, resuming paused mutations...')
-			queryClient.resumePausedMutations()
+			console.log('[Network] App is online')
 		} else {
 			console.log('[Network] App is offline, mutations will pause')
 		}
-	}, [isOnline, queryClient])
+	}, [isOnline])
 
 	// Subscribe to Axios lifecycle events — functional updaters prevent stale closures
 	useApiEvent('api-success', () => {

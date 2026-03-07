@@ -3,29 +3,16 @@ import {
 	SidebarProvider,
 } from '@abumble/design-system/components/Sidebar'
 import React from 'react'
-import {
-	BannerBackgroundImage,
-	LoadingScreen,
-	OfflineWarningBanner,
-} from '../ui'
+import { BannerBackgroundImage, LoadingScreen } from '../ui'
 
-export function BannerLandingPage({
-	children,
-	hideOfflineBanner,
-}: {
-	children: React.ReactNode
-	hideOfflineBanner?: boolean
-}) {
+export function BannerLandingPage({ children }: { children: React.ReactNode }) {
 	return (
 		<main className="flex flex-1 flex-col">
 			<BannerBackgroundImage>
 				<div className="app-center-background-image" />
 			</BannerBackgroundImage>
 
-			<div className="flex-1 p-6">
-				{!hideOfflineBanner && <OfflineWarningBanner />}
-				{children}
-			</div>
+			<div className="flex-1 p-6">{children}</div>
 		</main>
 	)
 }
@@ -43,7 +30,6 @@ export function DashboardPage({
 				<Sidebar />
 				<SidebarInset>
 					<main className="flex flex-col p-6">
-						<OfflineWarningBanner />
 						<div className="flex flex-col gap-4">{children}</div>
 					</main>
 				</SidebarInset>

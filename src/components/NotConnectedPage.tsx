@@ -1,5 +1,5 @@
 import { BannerLandingPage } from '@/components/pages'
-import { MessageBanner } from '@abumble/design-system/components/Banner'
+import { useHeaderBanner } from '@/contexts/header-banner'
 import {
 	Empty,
 	EmptyDescription,
@@ -7,14 +7,24 @@ import {
 	EmptyTitle,
 } from '@abumble/design-system/components/Empty'
 import { ServerOff } from 'lucide-react'
+import { useEffect, useRef } from 'react'
 
 export function NotConnectedPage() {
+	const { showBanner, hideBanner } = useHeaderBanner()
+	const bannerIdRef = useRef<string | null>(null)
+
+	useEffect(() => {
+		bannerIdRef.current = showBanner({
+			type: 'info',
+			message: 'Sadly, the backend server does not run 24/7 and is most likely offline.',
+		})
+		return () => {
+			if (bannerIdRef.current) hideBanner(bannerIdRef.current)
+		}
+	}, [showBanner, hideBanner])
+
 	return (
-		<BannerLandingPage hideOfflineBanner>
-			<MessageBanner
-				type="info"
-				message="Sadly, the backend server does not run 24/7 and is most likely offline."
-			/>
+		<BannerLandingPage>
 			<Empty className="relative top-full">
 				<EmptyHeader>
 					<ServerOff size={128} className="mb-2" />

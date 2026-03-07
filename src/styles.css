@@ -149,3 +149,7 @@
 .prose.prose-sm > *:last-child {
 	margin-bottom: 0;
 }
+
+.header-banner {
+	border-radius: 0;
+}

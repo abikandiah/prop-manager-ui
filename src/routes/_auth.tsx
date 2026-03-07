@@ -1,10 +1,11 @@
+import { isApiError } from '@/api/errors'
 import { emitApiEvent, useApiEvent } from '@/api/events'
 import { DevAuthForm } from '@/components/DevAuthForm'
 import { NotConnectedPage } from '@/components/NotConnectedPage'
 import { BannerLandingPage } from '@/components/pages'
 import { RegisterForm } from '@/components/RegisterForm'
 import { config } from '@/config'
-import { NetworkProvider, useNetwork } from '@/contexts/network'
+import { useNetwork } from '@/contexts/network'
 import { OrganizationProvider } from '@/contexts/organization'
 import { authQueryOptions, useAuth } from '@/features/auth'
 import * as TanStackQueryProvider from '@/integrations/tanstack-query/user-provider'
@@ -19,7 +20,9 @@ export const Route = createFileRoute('/_auth')({
 				...authQueryOptions,
 			})
 		} catch (error) {
-			console.warn('[Auth] Failed to load user:', error)
+			if (isApiError(error) && error.status !== 401) {
+				console.warn('[Auth] Failed to load user:', error)
+			}
 
 			if (!config.isDevelopment) {
 				if (config.authRedirectUrl) {
@@ -66,6 +69,7 @@ function RouteComponent() {
  */
 function AppWithProviders() {
 	const { user, isLoadingUser, isUserDefined, logout } = useAuth()
+	const { isOnline } = useNetwork()
 
 	// Create user-scoped queryContext
 	const userId = user!.id
@@ -73,6 +77,14 @@ function AppWithProviders() {
 		console.log('[App] Creating query client for user:', userId)
 		return TanStackQueryProvider.getUserContext(userId)
 	}, [userId])
+
+	// Resume user-scoped paused mutations when the app comes back online
+	useEffect(() => {
+		if (isOnline) {
+			console.log('[App] Online — resuming paused mutations for user:', userId)
+			userQueryContext.userClient.resumePausedMutations()
+		}
+	}, [isOnline, userQueryContext.userClient, userId])
 
 	// Logout event handler
 	useApiEvent('api-unauthorized', logout)
@@ -84,11 +96,9 @@ function AppWithProviders() {
 
 	return (
 		<TanStackQueryProvider.Provider {...userQueryContext}>
-			<NetworkProvider>
-				<OrganizationProvider>
-					<Outlet />
-				</OrganizationProvider>
-			</NetworkProvider>
+			<OrganizationProvider>
+				<Outlet />
+			</OrganizationProvider>
 		</TanStackQueryProvider.Provider>
 	)
 }

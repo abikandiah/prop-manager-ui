@@ -123,7 +123,6 @@ export * from './DetailField'
 export * from './EntityActions'
 export * from './FieldError'
 export * from './FormFooter'
-export * from './OfflineWarningBanner'
 export * from './TableSkeleton'
 export * from './WizardFooter'
 

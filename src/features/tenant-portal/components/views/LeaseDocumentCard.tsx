@@ -14,7 +14,7 @@ export function LeaseDocumentCard({ lease }: { lease: TenantLeaseSummary }) {
 
 	return (
 		<Card>
-			<CardHeader className="px-5 pb-3">
+			<CardHeader>
 				<CardTitle className="text-base">Lease document</CardTitle>
 			</CardHeader>
 			<CardContent className="px-5">

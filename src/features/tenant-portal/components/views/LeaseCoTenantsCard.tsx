@@ -39,10 +39,10 @@ export function LeaseCoTenantsCard({
 }) {
 	return (
 		<Card>
-			<CardHeader className="px-5 pb-3">
+			<CardHeader>
 				<CardTitle className="text-base">Co-tenants</CardTitle>
 			</CardHeader>
-			<CardContent className="px-5 pb-2">
+			<CardContent>
 				{coTenants.length === 0 ? (
 					<p className="text-sm text-muted-foreground py-2">
 						You're the only tenant on this lease.

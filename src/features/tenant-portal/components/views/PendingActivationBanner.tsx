@@ -135,5 +135,5 @@ export function PendingActivationBanner({
 
 	const message = SIMPLE_MESSAGES[status]
 	if (!message) return null
-	return <MessageBanner type="info" message={message} />
+	return <MessageBanner type="note" message={message} />
 }

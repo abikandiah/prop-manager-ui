@@ -14,7 +14,7 @@ export function LeasePropertyCard({
 }) {
 	return (
 		<Card>
-			<CardHeader className="px-5 pb-3">
+			<CardHeader>
 				<CardTitle className="text-base">Property</CardTitle>
 			</CardHeader>
 			<CardContent className="px-5 space-y-1 text-sm">

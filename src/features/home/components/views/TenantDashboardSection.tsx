@@ -1,4 +1,4 @@
-import { DashboardCard } from '@/components/DashboardCard'
+import { DashboardCard } from '@/features/home/components/views/DashboardCard'
 import { CreditCard, FileCheck, MessageSquare, Wrench } from 'lucide-react'
 
 export function TenantDashboardSection() {

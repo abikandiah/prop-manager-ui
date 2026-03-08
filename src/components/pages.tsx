@@ -3,16 +3,18 @@ import {
 	SidebarProvider,
 } from '@abumble/design-system/components/Sidebar'
 import React from 'react'
-import { BannerBackgroundImage, LoadingScreen } from '.'
+import { BannerBackgroundImage, LoadingScreen } from './ui'
 
 export function BannerLandingPage({ children }: { children: React.ReactNode }) {
 	return (
 		<main className="flex flex-1 flex-col">
 			<BannerBackgroundImage>
-				<div className="app-center-background-image" />
+				<div className="banner-background-image" />
 			</BannerBackgroundImage>
 
-			<div className="flex-1 p-6 flex items-center md:mb-42">{children}</div>
+			<div className="flex-1 p-6 flex items-center md:mb-24 z-1">
+				{children}
+			</div>
 		</main>
 	)
 }

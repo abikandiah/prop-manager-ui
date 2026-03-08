@@ -3,6 +3,7 @@ import {
 	DETAIL_LABEL_CLASS,
 	DetailField,
 	EntityActions,
+	SectionCard,
 	TextLink,
 } from '@/components/ui'
 import { config } from '@/config'
@@ -12,6 +13,7 @@ import {
 	LeaseAgreementFormWizard,
 	LeaseTenantsList,
 	LeaseStatusActions,
+	leaseStatusVariant,
 	useDeleteLease,
 	useLeaseDetail,
 } from '@/features/leases'
@@ -39,24 +41,6 @@ const WIZARD_STEP_TITLES: Record<1 | 2 | 3, string> = {
 	1: 'Details',
 	2: 'Terms',
 	3: 'Parameters',
-}
-
-function statusVariant(status: LeaseStatus) {
-	switch (status) {
-		case LeaseStatus.ACTIVE:
-		case LeaseStatus.SIGNED:
-			return 'success'
-		case LeaseStatus.DRAFT:
-		case LeaseStatus.EXPIRED:
-			return 'secondary'
-		case LeaseStatus.REVIEW:
-			return 'warning'
-		case LeaseStatus.TERMINATED:
-		case LeaseStatus.EVICTED:
-			return 'destructive'
-		default:
-			return 'default'
-	}
 }
 
 function LeaseActions({ lease, onEdit }: { lease: Lease; onEdit: () => void }) {
@@ -119,7 +103,7 @@ function LeaseDetailPage() {
 			<div className="grid gap-4 lg:grid-cols-[1fr_260px]">
 				<div className="flex flex-col gap-4">
 					{[3, 3, 3].map((count, si) => (
-						<div key={si} className="rounded border bg-card px-5 py-4">
+						<SectionCard key={si}>
 							<Skeleton className="mb-4 h-3 w-32" />
 							<div className="grid gap-4 sm:grid-cols-2">
 								{Array.from({ length: count }).map((_, i) => (
@@ -129,10 +113,10 @@ function LeaseDetailPage() {
 									</div>
 								))}
 							</div>
-						</div>
+						</SectionCard>
 					))}
 				</div>
-				<div className="rounded border bg-card px-5 py-4">
+				<SectionCard>
 					<Skeleton className="mb-4 h-3 w-24" />
 					<div className="flex flex-col gap-4">
 						{[1, 2, 3].map((i) => (
@@ -142,7 +126,7 @@ function LeaseDetailPage() {
 							</div>
 						))}
 					</div>
-				</div>
+				</SectionCard>
 			</div>
 		</div>
 	)
@@ -199,7 +183,7 @@ function LeaseDetailPage() {
 
 					{/* Status + actions row */}
 					<div className="flex flex-wrap items-center gap-3">
-						<Badge variant={statusVariant(lease.status)}>
+						<Badge variant={leaseStatusVariant(lease.status)}>
 							{formatEnumLabel(lease.status)}
 						</Badge>
 						<LeaseStatusActions lease={lease} />
@@ -210,7 +194,7 @@ function LeaseDetailPage() {
 						{/* Left: main detail sections */}
 						<div className="flex flex-col gap-4">
 							{/* Property & Unit */}
-							<div className="rounded border bg-card px-5 py-4">
+							<SectionCard>
 								<div className="grid gap-4 sm:grid-cols-2">
 									<DetailField label="Property">
 										{prop ? (
@@ -237,10 +221,10 @@ function LeaseDetailPage() {
 										)}
 									</DetailField>
 								</div>
-							</div>
+							</SectionCard>
 
 							{/* Lease Period, Financial Terms & Late Fees */}
-							<div className="rounded border bg-card px-5 py-4">
+							<SectionCard>
 								<div className="grid gap-4 sm:grid-cols-3">
 									<DetailField
 										label="Monthly Rent"
@@ -279,14 +263,14 @@ function LeaseDetailPage() {
 											<DetailField label="Late Fee Amount">
 												{lease.lateFeeAmount != null
 													? lease.lateFeeType === LateFeeType.PERCENTAGE
-														? '${lease.lateFeeAmount}%'
+														? `${lease.lateFeeAmount}%`
 														: formatCurrency(lease.lateFeeAmount)
 													: '—'}
 											</DetailField>
 										</>
 									)}
 								</div>
-							</div>
+							</SectionCard>
 
 							{/* Tenants */}
 							<LeaseTenantsList
@@ -299,7 +283,7 @@ function LeaseDetailPage() {
 							{(lease.leaseTemplateName ||
 								(lease.templateParameters &&
 									Object.keys(lease.templateParameters).length > 0)) && (
-								<div className="rounded border bg-card px-5 py-4">
+								<SectionCard>
 									<DetailField label="Template">
 										{lease.leaseTemplateName || '—'}
 										{lease.leaseTemplateVersionTag && (
@@ -335,13 +319,13 @@ function LeaseDetailPage() {
 												</div>
 											</div>
 										)}
-								</div>
+								</SectionCard>
 							)}
 						</div>
 
 						{/* Right: metadata sidebar */}
 						<div className="flex flex-col gap-4">
-							<div className="rounded border bg-card px-5 py-4">
+							<SectionCard>
 								<div className="flex flex-col gap-4">
 									<DetailField label="Version">v{lease.version}</DetailField>
 									<DetailField label="Created">
@@ -351,17 +335,19 @@ function LeaseDetailPage() {
 										{formatDate(lease.updatedAt)}
 									</DetailField>
 								</div>
-							</div>
+							</SectionCard>
 						</div>
 					</div>
 
 					{/* Executed content markdown — full width */}
 					{lease.executedContentMarkdown && (
-						<div className="rounded bg-card px-5 py-4">
-							<div className="prose prose-sm dark:prose-invert max-w-none">
-								<ReactMarkdown>{lease.executedContentMarkdown}</ReactMarkdown>
+						<SectionCard noPadding>
+							<div className="px-5 py-4">
+								<div className="prose prose-sm dark:prose-invert max-w-none">
+									<ReactMarkdown>{lease.executedContentMarkdown}</ReactMarkdown>
+								</div>
 							</div>
-						</div>
+						</SectionCard>
 					)}
 
 					{/* Edit dialog (draft only) */}

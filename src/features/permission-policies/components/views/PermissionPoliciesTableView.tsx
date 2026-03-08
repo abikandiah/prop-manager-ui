@@ -1,4 +1,4 @@
-import { EntityActions, TableSkeleton } from '@/components/ui'
+import { EntityActions, SectionCard, TableSkeleton } from '@/components/ui'
 import { config } from '@/config'
 import type { PermissionPolicy } from '@/domain/permission-policy'
 import { useAuth } from '@/features/auth'
@@ -119,7 +119,7 @@ export function PermissionPoliciesTableView({
 				delayMs={config.loadingFallbackDelayMs}
 				fallback={skeletonTable}
 			>
-				<div className="rounded border bg-card overflow-hidden">
+				<SectionCard noPadding className="overflow-hidden">
 					<Table>
 						<TableHeader>
 							<TableRow>
@@ -193,7 +193,7 @@ export function PermissionPoliciesTableView({
 							)}
 						</TableBody>
 					</Table>
-				</div>
+				</SectionCard>
 			</DelayedLoadingFallback>
 		</>
 	)

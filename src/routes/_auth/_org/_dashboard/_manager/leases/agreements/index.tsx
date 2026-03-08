@@ -8,7 +8,7 @@ import {
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { Plus } from 'lucide-react'
 import { FORM_DIALOG_CLASS_WIDE, useWizardDialogState } from '@/lib/dialog'
-import { PermissionGate } from '@/components/auth/PermissionGate'
+import { PermissionGate } from '@/features/auth/components/PermissionGate'
 
 export const Route = createFileRoute(
 	'/_auth/_org/_dashboard/_manager/leases/agreements/',

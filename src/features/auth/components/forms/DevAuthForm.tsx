@@ -1,11 +1,11 @@
 import { setDevToken } from '@/api/client'
 import { FormActions, FormCard } from '@/components/ui/FormCard'
-import { authApi } from '@/features/auth'
 import { Button } from '@abumble/design-system/components/Button'
 import { Input } from '@abumble/design-system/components/Input'
 import { Label } from '@abumble/design-system/components/Label'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { authApi } from '../../api'
 
 interface DevAuthFormProps {
 	onSuccess?: () => void

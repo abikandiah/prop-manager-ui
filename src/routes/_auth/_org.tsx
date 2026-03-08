@@ -1,5 +1,5 @@
-import { OnboardingForm } from '@/components/OnboardingForm'
-import { BannerLandingPage } from '@/components/ui/pages'
+import { OnboardingForm } from '@/features/organizations/components/forms/OnboardingForm'
+import { BannerLandingPage } from '@/components/pages'
 import { useOrganization } from '@/contexts/organization'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 

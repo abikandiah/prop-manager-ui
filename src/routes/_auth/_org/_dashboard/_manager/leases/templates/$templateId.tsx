@@ -3,6 +3,7 @@ import {
 	DETAIL_LABEL_CLASS,
 	DetailField,
 	EntityActions,
+	SectionCard,
 	TextLink,
 } from '@/components/ui'
 import { config } from '@/config'
@@ -100,7 +101,7 @@ function LeaseTemplateDetailPage() {
 			<div className="grid gap-4 lg:grid-cols-[1fr_260px]">
 				<div className="flex flex-col gap-4">
 					{[3, 3].map((count, si) => (
-						<div key={si} className="rounded border bg-card px-5 py-4">
+						<SectionCard key={si}>
 							<div className="grid gap-4 sm:grid-cols-2">
 								{Array.from({ length: count }).map((_, i) => (
 									<div key={i} className="space-y-2">
@@ -109,10 +110,10 @@ function LeaseTemplateDetailPage() {
 									</div>
 								))}
 							</div>
-						</div>
+						</SectionCard>
 					))}
 				</div>
-				<div className="rounded border bg-card px-5 py-4">
+				<SectionCard>
 					<div className="flex flex-col gap-4">
 						{[1, 2, 3].map((i) => (
 							<div key={i} className="space-y-2">
@@ -121,7 +122,7 @@ function LeaseTemplateDetailPage() {
 							</div>
 						))}
 					</div>
-				</div>
+				</SectionCard>
 			</div>
 		</div>
 	)
@@ -174,7 +175,7 @@ function LeaseTemplateDetailPage() {
 						{/* Left: main detail sections */}
 						<div className="flex flex-col gap-4">
 							{/* Template Info */}
-							<div className="rounded border bg-card px-5 py-4">
+							<SectionCard>
 								<div className="grid gap-4 sm:grid-cols-2">
 									<DetailField
 										label="Template Name"
@@ -186,10 +187,10 @@ function LeaseTemplateDetailPage() {
 										{template.versionTag || '—'}
 									</DetailField>
 								</div>
-							</div>
+							</SectionCard>
 
 							{/* Default Terms */}
-							<div className="rounded border bg-card px-5 py-4">
+							<SectionCard>
 								<div className="grid gap-4 sm:grid-cols-3">
 									<DetailField label="Default Late Fee Type">
 										{template.defaultLateFeeType
@@ -209,11 +210,11 @@ function LeaseTemplateDetailPage() {
 											: '—'}
 									</DetailField>
 								</div>
-							</div>
+							</SectionCard>
 
 							{/* Template Parameters — conditional */}
 							{Object.keys(template.templateParameters).length > 0 && (
-								<div className="rounded border bg-card px-5 py-4">
+								<SectionCard>
 									<p className={`${DETAIL_LABEL_CLASS} mb-3`}>Parameters</p>
 									<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
 										{Object.entries(template.templateParameters).map(
@@ -234,13 +235,13 @@ function LeaseTemplateDetailPage() {
 											),
 										)}
 									</div>
-								</div>
+								</SectionCard>
 							)}
 						</div>
 
 						{/* Right: metadata sidebar */}
 						<div className="flex flex-col gap-4">
-							<div className="rounded border bg-card px-5 py-4">
+							<SectionCard>
 								<div className="flex flex-col gap-4">
 									<DetailField label="Version">v{template.version}</DetailField>
 									<DetailField label="Created">
@@ -250,16 +251,18 @@ function LeaseTemplateDetailPage() {
 										{formatDate(template.updatedAt)}
 									</DetailField>
 								</div>
-							</div>
+							</SectionCard>
 						</div>
 					</div>
 
 					{/* Template Content — full width */}
-					<div className="rounded bg-card px-5 py-4">
-						<div className="prose prose-sm dark:prose-invert max-w-none">
-							<ReactMarkdown>{template.templateMarkdown}</ReactMarkdown>
+					<SectionCard noPadding>
+						<div className="px-5 py-4">
+							<div className="prose prose-sm dark:prose-invert max-w-none">
+								<ReactMarkdown>{template.templateMarkdown}</ReactMarkdown>
+							</div>
 						</div>
-					</div>
+					</SectionCard>
 
 					{editDialog.editing && (
 						<FormDialog

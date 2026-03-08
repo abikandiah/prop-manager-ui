@@ -1,5 +1,10 @@
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
-import { DetailField, EntityActions, TextLink } from '@/components/ui'
+import {
+	DetailField,
+	EntityActions,
+	SectionCard,
+	TextLink,
+} from '@/components/ui'
 import { config } from '@/config'
 import type { Prop } from '@/domain/property'
 import {
@@ -70,7 +75,7 @@ function PropLayout() {
 			<div className="grid gap-4 lg:grid-cols-[1fr_260px]">
 				<div className="flex flex-col gap-4">
 					{[3, 2].map((count, si) => (
-						<div key={si} className="rounded border bg-card px-5 py-4">
+						<SectionCard key={si}>
 							<div className="grid gap-4 sm:grid-cols-2">
 								{Array.from({ length: count }).map((_, i) => (
 									<div key={i} className="space-y-2">
@@ -79,10 +84,10 @@ function PropLayout() {
 									</div>
 								))}
 							</div>
-						</div>
+						</SectionCard>
 					))}
 				</div>
-				<div className="rounded border bg-card px-5 py-4">
+				<SectionCard>
 					<div className="flex flex-col gap-4">
 						{[1, 2, 3].map((i) => (
 							<div key={i} className="space-y-2">
@@ -91,7 +96,7 @@ function PropLayout() {
 							</div>
 						))}
 					</div>
-				</div>
+				</SectionCard>
 			</div>
 		</div>
 	)
@@ -151,7 +156,7 @@ function PropLayout() {
 						{/* Left: main detail sections */}
 						<div className="flex flex-col gap-4">
 							{/* Primary Info & Details */}
-							<div className="rounded border bg-card px-5 py-4">
+							<SectionCard>
 								<div className="grid gap-4 sm:grid-cols-2">
 									<DetailField
 										label="Legal Name"
@@ -177,34 +182,34 @@ function PropLayout() {
 										{prop.parcelNumber ?? '—'}
 									</DetailField>
 								</div>
-							</div>
+							</SectionCard>
 
 							{/* Location */}
-							<div className="rounded border bg-card px-5 py-4">
+							<SectionCard>
 								<DetailField label="Location">
 									<AddressDisplay
 										address={prop.address}
 										className="text-foreground"
 									/>
 								</DetailField>
-							</div>
+							</SectionCard>
 
 							{/* Description — conditional */}
 							{prop.description && (
-								<div className="rounded border bg-card px-5 py-4">
+								<SectionCard>
 									<DetailField
 										label="Description"
 										valueClassName="text-foreground whitespace-pre-wrap leading-relaxed"
 									>
 										{prop.description}
 									</DetailField>
-								</div>
+								</SectionCard>
 							)}
 						</div>
 
 						{/* Right: metadata sidebar */}
 						<div className="flex flex-col gap-4">
-							<div className="rounded border bg-card px-5 py-4">
+							<SectionCard>
 								<div className="flex flex-col gap-4">
 									<DetailField label="Version">v{prop.version}</DetailField>
 									<DetailField label="Created">
@@ -214,7 +219,7 @@ function PropLayout() {
 										{formatDate(prop.updatedAt)}
 									</DetailField>
 								</div>
-							</div>
+							</SectionCard>
 						</div>
 					</div>
 				</div>

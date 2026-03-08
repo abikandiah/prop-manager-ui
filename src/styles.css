@@ -139,10 +139,10 @@
 	@apply text-xl font-bold tracking-tight;
 }
 
-.app-center-background-image {
+.banner-background-image {
 	/* Position it in the center of the parent */
 	@apply absolute inset-0 bg-cover bg-center;
-	background-image: url('/src/assets/732.jpg');
+	background-image: url('/src/assets/home.jpg');
 }
 
 /* Tighter vertical rhythm for legal/docs prose (privacy, terms) */

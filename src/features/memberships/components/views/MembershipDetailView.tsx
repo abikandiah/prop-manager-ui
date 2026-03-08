@@ -1,6 +1,6 @@
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
-import { InviteStatusBadge } from '@/components/InviteStatusBadge'
-import { DetailField, TextLink } from '@/components/ui'
+import { InviteStatusBadge } from '@/features/invites/components/views/InviteStatusBadge'
+import { DetailField, SectionCard, TextLink } from '@/components/ui'
 import { Accordion } from '@/components/ui/accordion'
 import { config } from '@/config'
 import { useOrganization } from '@/contexts/organization'
@@ -151,7 +151,7 @@ const detailSkeleton = (
 			</div>
 		</div>
 		<div className="grid gap-4 lg:grid-cols-[1fr_260px]">
-			<div className="rounded border bg-card px-5 py-4">
+			<SectionCard>
 				<div className="grid gap-4 sm:grid-cols-2">
 					{Array.from({ length: 4 }).map((_, i) => (
 						<div key={i} className="space-y-2">
@@ -160,8 +160,8 @@ const detailSkeleton = (
 						</div>
 					))}
 				</div>
-			</div>
-			<div className="rounded border bg-card px-5 py-4">
+			</SectionCard>
+			<SectionCard>
 				<div className="flex flex-col gap-4">
 					{[1, 2, 3].map((i) => (
 						<div key={i} className="space-y-2">
@@ -170,16 +170,13 @@ const detailSkeleton = (
 						</div>
 					))}
 				</div>
-			</div>
+			</SectionCard>
 		</div>
-		<div className="rounded border bg-card">
-			<div className="px-5 py-4 border-b">
-				<Skeleton className="h-5 w-40" />
-			</div>
+		<SectionCard title={<Skeleton className="h-5 w-40" />} noPadding>
 			<div className="px-5 py-4">
 				<Skeleton className="h-16 w-full" />
 			</div>
-		</div>
+		</SectionCard>
 	</div>
 )
 
@@ -343,7 +340,7 @@ export function MembershipDetailView({
 					{/* Two-column body */}
 					<div className="grid gap-4 lg:grid-cols-[1fr_260px]">
 						{/* Left: member info */}
-						<div className="rounded border bg-card px-5 py-4">
+						<SectionCard>
 							<div className="grid gap-4 sm:grid-cols-2">
 								<DetailField label="Email">{displayEmail ?? '—'}</DetailField>
 								{membership.userId && (
@@ -372,10 +369,10 @@ export function MembershipDetailView({
 									</DetailField>
 								)}
 							</div>
-						</div>
+						</SectionCard>
 
 						{/* Right: metadata sidebar */}
-						<div className="rounded border bg-card px-5 py-4">
+						<SectionCard>
 							<div className="flex flex-col gap-4">
 								<DetailField label="Version">v{membership.version}</DetailField>
 								<DetailField label="Added">
@@ -385,26 +382,21 @@ export function MembershipDetailView({
 									{formatDate(membership.updatedAt)}
 								</DetailField>
 							</div>
-						</div>
+						</SectionCard>
 					</div>
 
 					{/* Permissions & Assignments */}
-					<div className="rounded border bg-card">
-						<div className="flex items-center justify-between border-b px-5 py-4">
-							<div>
-								<h3 className="font-semibold text-foreground">
-									Permissions &amp; Assignments
-								</h3>
-								<p className="text-sm text-muted-foreground mt-0.5">
-									Controls what this member can access and do.
-								</p>
-							</div>
+					<SectionCard
+						title="Permissions & Assignments"
+						description="Controls what this member can access and do."
+						noPadding
+						actions={
 							<Button size="sm" onClick={() => setAddAssignmentOpen(true)}>
 								<Plus className="size-4" />
 								Add
 							</Button>
-						</div>
-
+						}
+					>
 						<DelayedLoadingFallback
 							isLoading={isLoadingAssignments}
 							delayMs={config.loadingFallbackDelayMs}
@@ -437,7 +429,7 @@ export function MembershipDetailView({
 								</Accordion>
 							)}
 						</DelayedLoadingFallback>
-					</div>
+					</SectionCard>
 				</div>
 			)}
 

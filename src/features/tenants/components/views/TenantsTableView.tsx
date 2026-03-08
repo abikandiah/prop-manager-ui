@@ -8,7 +8,7 @@ import {
 	TableRow,
 } from '@abumble/design-system/components/Table'
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
-import { TableSkeleton } from '@/components/ui'
+import { SectionCard, TableSkeleton } from '@/components/ui'
 import { useTenantsList } from '@/features/tenants/hooks'
 import { config } from '@/config'
 import { useQueryErrorToast } from '@/lib/hooks'
@@ -32,7 +32,7 @@ export function TenantsTableView() {
 			delayMs={config.loadingFallbackDelayMs}
 			fallback={skeletonTable}
 		>
-			<div className="rounded border bg-card overflow-hidden">
+			<SectionCard noPadding className="overflow-hidden">
 				<Table>
 					<TableHeader>
 						<TableRow>
@@ -83,7 +83,7 @@ export function TenantsTableView() {
 						)}
 					</TableBody>
 				</Table>
-			</div>
+			</SectionCard>
 		</DelayedLoadingFallback>
 	)
 }

@@ -16,8 +16,9 @@ import { FormDialog } from '@abumble/design-system/components/Dialog'
 import { LeaseAgreementFormWizard } from '../forms/LeaseAgreementFormWizard'
 import type { Lease } from '@/domain/lease'
 import { LeaseStatus } from '@/domain/lease'
-import { EntityActions, TableSkeleton } from '@/components/ui'
+import { EntityActions, SectionCard, TableSkeleton } from '@/components/ui'
 import {
+	leaseStatusVariant,
 	useDeleteLease,
 	useLeasesByPropertyId,
 	useLeasesByUnitId,
@@ -26,22 +27,6 @@ import {
 import { config } from '@/config'
 import { formatCurrency, formatDate, formatEnumLabel } from '@/lib/format'
 import { useQueryErrorToast } from '@/lib/hooks'
-
-function statusVariant(status: LeaseStatus) {
-	switch (status) {
-		case LeaseStatus.ACTIVE:
-			return 'success'
-		case LeaseStatus.DRAFT:
-			return 'secondary'
-		case LeaseStatus.REVIEW:
-			return 'warning'
-		case LeaseStatus.TERMINATED:
-		case LeaseStatus.EVICTED:
-			return 'destructive'
-		default:
-			return 'default'
-	}
-}
 
 function LeaseRowActions({
 	lease,
@@ -144,7 +129,7 @@ export function LeasesTableView({
 			fallback={skeletonTable}
 		>
 			<>
-				<div className="rounded border bg-card overflow-hidden">
+				<SectionCard noPadding className="overflow-hidden">
 					<Table>
 						<TableHeader>
 							<TableRow>
@@ -178,7 +163,7 @@ export function LeasesTableView({
 											{lease.leaseTemplateName || '—'}
 										</TableCell>
 										<TableCell>
-											<Badge variant={statusVariant(lease.status)}>
+											<Badge variant={leaseStatusVariant(lease.status)}>
 												{formatEnumLabel(lease.status)}
 											</Badge>
 										</TableCell>
@@ -205,7 +190,7 @@ export function LeasesTableView({
 							)}
 						</TableBody>
 					</Table>
-				</div>
+				</SectionCard>
 
 				{editDialog.editing &&
 					editDialog.editing.status === LeaseStatus.DRAFT && (

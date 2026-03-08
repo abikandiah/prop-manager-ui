@@ -16,11 +16,12 @@ import {
 	TableRow,
 } from '@abumble/design-system/components/Table'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
+import { SectionCard } from '@/components/ui'
 import type { LeaseTenant } from '@/domain/lease-tenant'
 import { LeaseTenantRole } from '@/domain/lease-tenant'
 import { DETAIL_LABEL_CLASS } from '@/components/ui/DetailField'
 import { formatDate, formatEnumLabel } from '@/lib/format'
-import { InviteStatusBadge } from '@/components/InviteStatusBadge'
+import { InviteStatusBadge } from '@/features/invites/components/views/InviteStatusBadge'
 import { FORM_DIALOG_CLASS, useDialogState } from '@/lib/dialog'
 import { config } from '@/config'
 import { useQueryClient } from '@tanstack/react-query'
@@ -40,11 +41,12 @@ function roleVariant(role: LeaseTenant['role']) {
 
 function TenantsSkeleton({ showActions }: { showActions: boolean }) {
 	return (
-		<div className="rounded border bg-card overflow-hidden">
-			<div className="flex items-center justify-between px-5 py-4">
-				<p className={DETAIL_LABEL_CLASS}>Tenants</p>
-				{showActions && <Skeleton className="h-8 w-32" />}
-			</div>
+		<SectionCard
+			title="Tenants"
+			noPadding
+			className="overflow-hidden"
+			actions={showActions ? <Skeleton className="h-8 w-32" /> : null}
+		>
 			<Table className="[&_th:first-child]:pl-5 [&_td:first-child]:pl-5 [&_th:last-child]:pr-5 [&_td:last-child]:pr-5">
 				<TableHeader>
 					<TableRow>
@@ -79,7 +81,7 @@ function TenantsSkeleton({ showActions }: { showActions: boolean }) {
 					))}
 				</TableBody>
 			</Table>
-		</div>
+		</SectionCard>
 	)
 }
 
@@ -221,18 +223,19 @@ export function LeaseTenantsList({
 	const totalCols = hasActions ? TABLE_COLS_WITH_ACTIONS : TABLE_COLS_BASE
 
 	const tableContent = (
-		<div className="rounded border bg-card overflow-hidden">
-			{/* Card header */}
-			<div className="flex items-center justify-between px-5 py-4">
-				<p className={DETAIL_LABEL_CLASS}>Tenants</p>
-				{isDraft && (
+		<SectionCard
+			title="Tenants"
+			noPadding
+			className="overflow-hidden"
+			actions={
+				isDraft && (
 					<Button variant="outline" size="sm" onClick={inviteDialog.open}>
 						<UserPlus className="size-4" />
 						Invite tenants
 					</Button>
-				)}
-			</div>
-
+				)
+			}
+		>
 			{/* Table */}
 			<Table className="[&_th:first-child]:pl-5 [&_td:first-child]:pl-5 [&_th:last-child]:pr-5 [&_td:last-child]:pr-5">
 				<TableHeader>
@@ -302,7 +305,7 @@ export function LeaseTenantsList({
 					)}
 				</TableBody>
 			</Table>
-		</div>
+		</SectionCard>
 	)
 
 	return (

@@ -1,9 +1,9 @@
 import { isApiError } from '@/api/errors'
 import { emitApiEvent, useApiEvent } from '@/api/events'
-import { DevAuthForm } from '@/components/DevAuthForm'
+import { DevAuthForm } from '@/features/auth/components/forms/DevAuthForm'
 import { NotConnectedPage } from '@/components/NotConnectedPage'
-import { RegisterForm } from '@/components/RegisterForm'
-import { BannerLandingPage } from '@/components/ui/pages'
+import { RegisterForm } from '@/features/auth/components/forms/RegisterForm'
+import { BannerLandingPage } from '@/components/pages'
 import { config } from '@/config'
 import { useNetwork } from '@/contexts/network'
 import { OrganizationProvider } from '@/contexts/organization'
@@ -42,8 +42,6 @@ export const Route = createFileRoute('/_auth')({
 			}
 
 			return { user: undefined }
-		} finally {
-			console.log('done')
 		}
 	},
 	component: RouteComponent,

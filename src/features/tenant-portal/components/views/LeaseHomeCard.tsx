@@ -29,7 +29,7 @@ export function LeaseHomeCard({ unit }: { unit: TenantUnitSummary }) {
 
 	return (
 		<Card>
-			<CardHeader className="px-5 pb-3">
+			<CardHeader>
 				<CardTitle className="text-base">{headline}</CardTitle>
 			</CardHeader>
 			<CardContent className="px-5 space-y-4">

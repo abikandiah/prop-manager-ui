@@ -14,7 +14,7 @@ import {
 	useLeaseTemplatesActive,
 	useLeaseTemplatesList,
 } from '@/features/lease-templates/hooks'
-import { TableSkeleton } from '@/components/ui'
+import { SectionCard, TableSkeleton } from '@/components/ui'
 import { config } from '@/config'
 import { formatDate, formatEnumLabel } from '@/lib/format'
 import { useQueryErrorToast } from '@/lib/hooks'
@@ -66,7 +66,7 @@ export function LeaseTemplatesTableView({
 			delayMs={config.loadingFallbackDelayMs}
 			fallback={skeletonTable}
 		>
-			<div className="rounded border bg-card overflow-hidden">
+			<SectionCard noPadding className="overflow-hidden">
 				<Table>
 					<TableHeader>
 						<TableRow>
@@ -129,7 +129,7 @@ export function LeaseTemplatesTableView({
 						)}
 					</TableBody>
 				</Table>
-			</div>
+			</SectionCard>
 		</DelayedLoadingFallback>
 	)
 }

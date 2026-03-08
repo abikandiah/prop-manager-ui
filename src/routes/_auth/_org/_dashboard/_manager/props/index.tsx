@@ -8,7 +8,7 @@ import {
 } from '@abumble/design-system/components/Dialog'
 import { PropsForm, PropsTableView } from '@/features/props'
 import { FORM_DIALOG_CLASS, useDialogState } from '@/lib/dialog'
-import { PermissionGate } from '@/components/auth/PermissionGate'
+import { PermissionGate } from '@/features/auth/components/PermissionGate'
 
 export const Route = createFileRoute('/_auth/_org/_dashboard/_manager/props/')({
 	component: RouteComponent,

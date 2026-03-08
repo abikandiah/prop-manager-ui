@@ -15,7 +15,7 @@ import { FormDialog } from '@abumble/design-system/components/Dialog'
 import { UnitForm } from '../forms/UnitForm'
 import type { Unit } from '@/domain/unit'
 import { UnitStatus } from '@/domain/unit'
-import { EntityActions, TableSkeleton } from '@/components/ui'
+import { EntityActions, SectionCard, TableSkeleton } from '@/components/ui'
 import { useDeleteUnit, useUnitsList } from '@/features/units'
 import { usePropsList } from '@/features/props'
 import { config } from '@/config'
@@ -229,7 +229,7 @@ export function UnitsGroupedView() {
 			fallback={skeletonTable}
 		>
 			<>
-				<div className="rounded border bg-card overflow-hidden">
+				<SectionCard noPadding className="overflow-hidden">
 					<Table>
 						<TableHeader>
 							<TableRow>
@@ -303,7 +303,7 @@ export function UnitsGroupedView() {
 							)}
 						</TableBody>
 					</Table>
-				</div>
+				</SectionCard>
 
 				{editDialog.editing && (
 					<FormDialog

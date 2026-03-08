@@ -1,5 +1,5 @@
 import { NotFound as InternalNotFound } from '@abumble/design-system/components/NotFound'
-import { BannerLandingPage } from './ui/pages'
+import { BannerLandingPage } from './pages'
 import { TextLink } from './ui'
 
 function NotFound() {

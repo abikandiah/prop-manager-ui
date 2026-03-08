@@ -1,4 +1,4 @@
-import { DashboardCard } from '@/components/DashboardCard'
+import { DashboardCard } from '@/features/home/components/views/DashboardCard'
 import { FileCheck, FileSignature, LayoutGrid, Package } from 'lucide-react'
 
 export function ManagerDashboardSection() {

@@ -1,5 +1,5 @@
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
-import { DetailField, TextLink } from '@/components/ui'
+import { DetailField, SectionCard, TextLink } from '@/components/ui'
 import { FormActions, FormCard } from '@/components/ui/FormCard'
 import { config } from '@/config'
 import type { User } from '@/domain/user'
@@ -218,7 +218,7 @@ function InvitePageContent({
 // ─── Shared detail card wrapper ───────────────────────────────────────────────
 
 function DetailCard({ children }: { children: React.ReactNode }) {
-	return <div className="rounded border bg-card px-5 py-4">{children}</div>
+	return <SectionCard>{children}</SectionCard>
 }
 
 // ─── Action card ──────────────────────────────────────────────────────────────
@@ -350,7 +350,7 @@ function InvitePageSkeleton() {
 
 			{/* Detail cards */}
 			<div className="flex flex-col gap-4">
-				<div className="rounded border bg-card px-5 py-4">
+				<SectionCard>
 					<div className="grid gap-4 sm:grid-cols-2">
 						{Array.from({ length: 2 }).map((_, i) => (
 							<div key={i} className="space-y-2">
@@ -359,8 +359,8 @@ function InvitePageSkeleton() {
 							</div>
 						))}
 					</div>
-				</div>
-				<div className="rounded border bg-card px-5 py-4">
+				</SectionCard>
+				<SectionCard>
 					<div className="grid gap-4 sm:grid-cols-3">
 						{Array.from({ length: 3 }).map((_, i) => (
 							<div key={i} className="space-y-2">
@@ -369,7 +369,7 @@ function InvitePageSkeleton() {
 							</div>
 						))}
 					</div>
-				</div>
+				</SectionCard>
 			</div>
 
 			{/* Action card */}

@@ -23,8 +23,8 @@ import {
 import { membershipKeys } from '@/features/memberships/keys'
 import { useQueryErrorToast } from '@/lib/hooks'
 import { config } from '@/config'
-import { TableSkeleton } from '@/components/ui'
-import { InviteStatusBadge } from '@/components/InviteStatusBadge'
+import { SectionCard, TableSkeleton } from '@/components/ui'
+import { InviteStatusBadge } from '@/features/invites/components/views/InviteStatusBadge'
 import { formatDateTime } from '@/lib/format'
 import { InviteStatus } from '@/domain/membership'
 import type { Membership } from '@/domain/membership'
@@ -47,7 +47,7 @@ export function MembershipsTableView({ orgId }: MembershipsTableViewProps) {
 	)
 
 	return (
-		<div className="rounded border bg-card overflow-hidden">
+		<SectionCard noPadding className="overflow-hidden">
 			<Table>
 				<TableHeader>
 					<TableRow>
@@ -174,7 +174,7 @@ export function MembershipsTableView({ orgId }: MembershipsTableViewProps) {
 					</DelayedLoadingFallback>
 				</TableBody>
 			</Table>
-		</div>
+		</SectionCard>
 	)
 }
 

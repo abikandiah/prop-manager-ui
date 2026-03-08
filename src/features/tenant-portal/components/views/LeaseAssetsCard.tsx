@@ -42,10 +42,10 @@ function AssetRow({ asset }: { asset: TenantAssetSummary }) {
 export function LeaseAssetsCard({ assets }: { assets: TenantAssetSummary[] }) {
 	return (
 		<Card>
-			<CardHeader className="px-5 pb-3">
+			<CardHeader>
 				<CardTitle className="text-base">Appliances & assets</CardTitle>
 			</CardHeader>
-			<CardContent className="px-5 pb-2">
+			<CardContent>
 				{assets.length === 0 ? (
 					<p className="text-sm text-muted-foreground py-2">
 						No appliances on record for your unit.

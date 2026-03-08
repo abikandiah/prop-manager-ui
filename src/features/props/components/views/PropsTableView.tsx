@@ -14,6 +14,7 @@ import { useCreateProp, usePropsList } from '@/features/props'
 import { config } from '@/config'
 import { formatAddress, formatEnumLabel } from '@/lib/format'
 import { useQueryErrorToast } from '@/lib/hooks'
+import { SectionCard } from '@/components/ui'
 
 export function PropsTableView() {
 	const navigate = useNavigate()
@@ -23,7 +24,7 @@ export function PropsTableView() {
 	useQueryErrorToast(isError, error, 'properties')
 
 	return (
-		<div className="rounded border bg-card overflow-hidden">
+		<SectionCard noPadding className="overflow-hidden">
 			<Table>
 				<TableHeader>
 					<TableRow>
@@ -110,6 +111,6 @@ export function PropsTableView() {
 					</DelayedLoadingFallback>
 				</TableBody>
 			</Table>
-		</div>
+		</SectionCard>
 	)
 }

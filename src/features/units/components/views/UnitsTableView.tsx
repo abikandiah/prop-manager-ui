@@ -12,7 +12,7 @@ import { DelayedLoadingFallback } from '@abumble/design-system/components/Delaye
 import { FormDialog } from '@abumble/design-system/components/Dialog'
 import { UnitForm } from '../forms/UnitForm'
 import type { Unit } from '@/domain/unit'
-import { EntityActions, TableSkeleton } from '@/components/ui'
+import { EntityActions, SectionCard, TableSkeleton } from '@/components/ui'
 import { useDeleteUnit, useUnitsByPropId, useUnitsList } from '@/features/units'
 import { config } from '@/config'
 import { formatCurrency, formatEnumLabel } from '@/lib/format'
@@ -99,7 +99,7 @@ export function UnitsTableView({ propId }: UnitsTableViewProps) {
 			fallback={skeletonTable}
 		>
 			<>
-				<div className="rounded border bg-card overflow-hidden">
+				<SectionCard noPadding className="overflow-hidden">
 					<Table>
 						<TableHeader>
 							<TableRow>
@@ -160,7 +160,7 @@ export function UnitsTableView({ propId }: UnitsTableViewProps) {
 							)}
 						</TableBody>
 					</Table>
-				</div>
+				</SectionCard>
 
 				{editDialog.editing && (
 					<FormDialog

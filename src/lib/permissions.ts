@@ -15,7 +15,7 @@ export const PermissionDomains = {
 	LEASES: 'l',
 	MAINTENANCE: 'm',
 	FINANCES: 'f',
-	TENANTS: 't',
+	PEOPLE: 'c',
 	ORGANIZATION: 'o',
 } as const
 

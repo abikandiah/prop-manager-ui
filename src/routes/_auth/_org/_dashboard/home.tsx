@@ -1,5 +1,5 @@
-import { ManagerDashboardSection } from '@/components/ManagerDashboardSection'
-import { TenantDashboardSection } from '@/components/TenantDashboardSection'
+import { ManagerDashboardSection } from '@/features/home/components/views/ManagerDashboardSection'
+import { TenantDashboardSection } from '@/features/home/components/views/TenantDashboardSection'
 import { AppRole } from '@/domain/user'
 import { useActiveOrgRoles } from '@/features/auth'
 import { useOrganization } from '@/contexts/organization'

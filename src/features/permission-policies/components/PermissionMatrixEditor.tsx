@@ -6,7 +6,7 @@ const DOMAINS = [
 	{ key: 'o', label: 'Organization' },
 	{ key: 'p', label: 'Portfolio' },
 	{ key: 'l', label: 'Leases' },
-	{ key: 't', label: 'Tenants' },
+	{ key: 'c', label: 'People' },
 ] as const
 
 const ACTIONS = [

@@ -1,15 +1,16 @@
 import { isApiError } from '@/api/errors'
 import { config } from '@/config'
 import { LeaseStatus } from '@/domain/lease'
+import { leaseStatusVariant } from '@/features/leases'
 import { useMyLease } from '@/features/tenant-portal'
-import { LeaseAssetsCard } from '@/features/tenant-portal/components/LeaseAssetsCard'
-import { LeaseCoTenantsCard } from '@/features/tenant-portal/components/LeaseCoTenantsCard'
-import { LeaseDocumentCard } from '@/features/tenant-portal/components/LeaseDocumentCard'
-import { LeaseHomeCard } from '@/features/tenant-portal/components/LeaseHomeCard'
-import { LeasePeriodCard } from '@/features/tenant-portal/components/LeasePeriodCard'
-import { LeasePropertyCard } from '@/features/tenant-portal/components/LeasePropertyCard'
-import { PendingActivationBanner } from '@/features/tenant-portal/components/PendingActivationBanner'
-import { RentSummaryBar } from '@/features/tenant-portal/components/RentSummaryBar'
+import { LeaseAssetsCard } from '@/features/tenant-portal/components/views/LeaseAssetsCard'
+import { LeaseCoTenantsCard } from '@/features/tenant-portal/components/views/LeaseCoTenantsCard'
+import { LeaseDocumentCard } from '@/features/tenant-portal/components/views/LeaseDocumentCard'
+import { LeaseHomeCard } from '@/features/tenant-portal/components/views/LeaseHomeCard'
+import { LeasePeriodCard } from '@/features/tenant-portal/components/views/LeasePeriodCard'
+import { LeasePropertyCard } from '@/features/tenant-portal/components/views/LeasePropertyCard'
+import { PendingActivationBanner } from '@/features/tenant-portal/components/views/PendingActivationBanner'
+import { RentSummaryBar } from '@/features/tenant-portal/components/views/RentSummaryBar'
 import { formatEnumLabel } from '@/lib/format'
 import { Badge } from '@abumble/design-system/components/Badge'
 import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
@@ -22,21 +23,6 @@ export const Route = createFileRoute(
 )({
 	component: MyLeasePage,
 })
-
-function statusVariant(status: LeaseStatus) {
-	switch (status) {
-		case LeaseStatus.ACTIVE:
-			return 'success'
-		case LeaseStatus.SIGNED:
-			return 'default'
-		case LeaseStatus.REVIEW:
-			return 'warning'
-		case LeaseStatus.DRAFT:
-			return 'secondary'
-		default:
-			return 'secondary'
-	}
-}
 
 function MyLeasePageSkeleton() {
 	return (
@@ -103,7 +89,7 @@ function MyLeasePage() {
 				<h1 className="text-2xl font-bold text-foreground">
 					{data.property.legalName}
 				</h1>
-				<Badge variant={statusVariant(data.lease.status)}>
+				<Badge variant={leaseStatusVariant(data.lease.status)}>
 					{formatEnumLabel(data.lease.status)}
 				</Badge>
 			</div>

@@ -1,5 +1,5 @@
 import { api } from '@/api/client'
-import { BannerLandingPage } from '@/components/ui/pages'
+import { BannerLandingPage } from '@/components/pages'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { useQuery } from '@tanstack/react-query'
 import { createFileRoute } from '@tanstack/react-router'

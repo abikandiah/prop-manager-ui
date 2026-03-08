@@ -1,4 +1,5 @@
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
+import { SectionCard } from './SectionCard'
 import {
 	Table,
 	TableBody,
@@ -30,7 +31,7 @@ export function TableSkeleton({
 	rows = 3,
 }: TableSkeletonProps) {
 	return (
-		<div className="rounded border bg-card overflow-hidden">
+		<SectionCard noPadding className="overflow-hidden">
 			<Table>
 				<TableHeader>
 					<TableRow>
@@ -53,6 +54,6 @@ export function TableSkeleton({
 					))}
 				</TableBody>
 			</Table>
-		</div>
+		</SectionCard>
 	)
 }

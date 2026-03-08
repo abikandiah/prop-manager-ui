@@ -1,16 +1,16 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { z } from 'zod'
-import { UserPlus } from 'lucide-react'
+import { useAuth } from '@/features/auth'
+import { InviteMemberForm } from '@/features/invites/components/forms/InviteMemberForm'
+import { MembershipsTableView } from '@/features/memberships'
+import { FORM_DIALOG_CLASS, useDialogState } from '@/lib/dialog'
 import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
 import { Button } from '@abumble/design-system/components/Button'
 import {
 	DialogTrigger,
 	FormDialog,
 } from '@abumble/design-system/components/Dialog'
-import { MembershipsTableView } from '@/features/memberships'
-import { InviteMemberForm } from '@/features/invites/components/forms/InviteMemberForm'
-import { FORM_DIALOG_CLASS_MEDIUM, useDialogState } from '@/lib/dialog'
-import { useAuth } from '@/features/auth'
+import { createFileRoute } from '@tanstack/react-router'
+import { UserPlus } from 'lucide-react'
+import { z } from 'zod'
 
 const searchSchema = z.object({
 	orgId: z.string().optional(),
@@ -59,7 +59,7 @@ function RouteComponent() {
 					onOpenChange={dialog.setIsOpen}
 					title="Invite team member"
 					description="Send an invitation to join your organization."
-					className={FORM_DIALOG_CLASS_MEDIUM}
+					className={FORM_DIALOG_CLASS}
 					trigger={
 						<DialogTrigger asChild>
 							<Button>

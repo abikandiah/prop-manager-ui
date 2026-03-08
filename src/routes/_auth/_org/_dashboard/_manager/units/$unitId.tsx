@@ -10,7 +10,12 @@ import { usePropDetail } from '@/features/props'
 import { UnitForm, useDeleteUnit, useUnitDetail } from '@/features/units'
 import { formatCurrency, formatDate, formatEnumLabel } from '@/lib/format'
 import { FORM_DIALOG_CLASS, useEditDialogState } from '@/lib/dialog'
-import { DetailField, EntityActions, TextLink } from '@/components/ui'
+import {
+	DetailField,
+	EntityActions,
+	SectionCard,
+	TextLink,
+} from '@/components/ui'
 import { config } from '@/config'
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
 
@@ -81,7 +86,7 @@ function UnitDetailPage() {
 			<div className="grid gap-4 lg:grid-cols-[1fr_260px]">
 				<div className="flex flex-col gap-4">
 					{[3, 3].map((count, si) => (
-						<div key={si} className="rounded border bg-card px-5 py-4">
+						<SectionCard key={si}>
 							<div className="grid gap-4 sm:grid-cols-3">
 								{Array.from({ length: count }).map((_, i) => (
 									<div key={i} className="space-y-2">
@@ -90,10 +95,10 @@ function UnitDetailPage() {
 									</div>
 								))}
 							</div>
-						</div>
+						</SectionCard>
 					))}
 				</div>
-				<div className="rounded border bg-card px-5 py-4">
+				<SectionCard>
 					<div className="flex flex-col gap-4">
 						{[1, 2, 3].map((i) => (
 							<div key={i} className="space-y-2">
@@ -102,7 +107,7 @@ function UnitDetailPage() {
 							</div>
 						))}
 					</div>
-				</div>
+				</SectionCard>
 			</div>
 		</div>
 	)
@@ -147,7 +152,7 @@ function UnitDetailPage() {
 						{/* Left: main detail sections */}
 						<div className="flex flex-col gap-4">
 							{/* Primary Info & Specs */}
-							<div className="rounded border bg-card px-5 py-4">
+							<SectionCard>
 								<div className="grid gap-4 sm:grid-cols-3">
 									<DetailField
 										label="Unit Number"
@@ -181,10 +186,10 @@ function UnitDetailPage() {
 											: '—'}
 									</DetailField>
 								</div>
-							</div>
+							</SectionCard>
 
 							{/* Features */}
-							<div className="rounded border bg-card px-5 py-4">
+							<SectionCard>
 								<DetailField label="Features">
 									<div className="flex flex-wrap gap-2">
 										{[
@@ -210,24 +215,24 @@ function UnitDetailPage() {
 											)}
 									</div>
 								</DetailField>
-							</div>
+							</SectionCard>
 
 							{/* Description — conditional */}
 							{unit.description && (
-								<div className="rounded border bg-card px-5 py-4">
+								<SectionCard>
 									<DetailField
 										label="Description"
 										valueClassName="text-foreground whitespace-pre-wrap leading-relaxed"
 									>
 										{unit.description}
 									</DetailField>
-								</div>
+								</SectionCard>
 							)}
 						</div>
 
 						{/* Right: metadata sidebar */}
 						<div className="flex flex-col gap-4">
-							<div className="rounded border bg-card px-5 py-4">
+							<SectionCard>
 								<div className="flex flex-col gap-4">
 									<DetailField label="Version">v{unit.version}</DetailField>
 									<DetailField label="Created">
@@ -237,7 +242,7 @@ function UnitDetailPage() {
 										{formatDate(unit.updatedAt)}
 									</DetailField>
 								</div>
-							</div>
+							</SectionCard>
 						</div>
 					</div>
 

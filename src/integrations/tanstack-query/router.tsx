@@ -1,5 +1,5 @@
 import { NotFound } from '@/components/NotFound'
-import { LoadingPage } from '@/components/ui/pages'
+import { LoadingPage } from '@/components/pages'
 import type { User } from '@/domain/user'
 import { routeTree } from '@/routeTree.gen'
 import type { QueryClient } from '@tanstack/react-query'

@@ -1,27 +1,34 @@
-import { FieldError, FormFooter } from '@/components/ui'
+import { FieldError, FormFooter, ProfileField } from '@/components/ui'
 import type { Tenant } from '@/domain/tenant'
 import { useUpdateMyTenantProfile } from '@/features/tenant-portal/hooks'
-import { Input } from '@abumble/design-system/components/Input'
-import { Label } from '@abumble/design-system/components/Label'
+import { FORM_DIALOG_CLASS } from '@/lib/dialog'
+import { formatPhoneNumber, validatePhoneNumber } from '@/lib/phone'
+import { Button } from '@abumble/design-system/components/Button'
 import {
 	Card,
 	CardContent,
 	CardHeader,
 	CardTitle,
 } from '@abumble/design-system/components/Card'
-import { Button } from '@abumble/design-system/components/Button'
 import { FormDialog } from '@abumble/design-system/components/Dialog'
+import { Input } from '@abumble/design-system/components/Input'
+import { Label } from '@abumble/design-system/components/Label'
 import { Textarea } from '@abumble/design-system/components/Textarea'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
-import { FORM_DIALOG_CLASS_WIDE } from '@/lib/dialog'
 
 const schema = z.object({
 	emergencyContactName: z.string().max(255).optional(),
-	emergencyContactPhone: z.string().max(50).optional(),
+	emergencyContactPhone: z
+		.string()
+		.max(50)
+		.optional()
+		.refine((val) => validatePhoneNumber(val), {
+			message: 'Please enter a valid phone number (e.g. +1 555-555-5555)',
+		}),
 	hasPets: z.enum(['yes', 'no', '']).optional(),
 	petDescription: z.string().optional(),
 	vehicleInfo: z.string().max(255).optional(),
@@ -60,7 +67,8 @@ function TenantProfileEditForm({
 		update.mutate(
 			{
 				emergencyContactName: values.emergencyContactName || null,
-				emergencyContactPhone: values.emergencyContactPhone || null,
+				emergencyContactPhone:
+					formatPhoneNumber(values.emergencyContactPhone) || null,
 				hasPets:
 					values.hasPets === 'yes'
 						? true
@@ -84,7 +92,7 @@ function TenantProfileEditForm({
 	const hasPets = useWatch({ control, name: 'hasPets' })
 
 	return (
-		<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+		<form onSubmit={handleSubmit(onSubmit)} className="space-y-4 pt-4">
 			<div className="space-y-1.5">
 				<Label htmlFor="emergencyContactName">Emergency contact name</Label>
 				<Input
@@ -149,34 +157,19 @@ function TenantProfileEditForm({
 	)
 }
 
-function ProfileField({
-	label,
-	value,
-}: {
-	label: string
-	value: string | null | undefined
-}) {
-	return (
-		<div className="flex flex-col gap-0.5">
-			<span className="text-xs text-muted-foreground">{label}</span>
-			<span className="text-sm text-foreground">{value || '—'}</span>
-		</div>
-	)
-}
-
 export function TenantProfileSection({ tenant }: { tenant: Tenant }) {
 	const [editing, setEditing] = useState(false)
 
 	return (
 		<>
 			<Card>
-				<CardHeader className="px-5 pb-3 flex flex-row items-center justify-between">
+				<CardHeader className="flex flex-row items-center justify-between">
 					<CardTitle className="text-base">Tenant profile</CardTitle>
-					<Button variant="outline" size="sm" onClick={() => setEditing(true)}>
+					<Button size="sm" onClick={() => setEditing(true)}>
 						Edit
 					</Button>
 				</CardHeader>
-				<CardContent className="px-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
+				<CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
 					<ProfileField
 						label="Emergency contact"
 						value={tenant.emergencyContactName}
@@ -210,7 +203,7 @@ export function TenantProfileSection({ tenant }: { tenant: Tenant }) {
 				onOpenChange={setEditing}
 				title="Edit tenant profile"
 				description="Update your tenant profile details."
-				className={FORM_DIALOG_CLASS_WIDE}
+				className={FORM_DIALOG_CLASS}
 			>
 				<TenantProfileEditForm
 					tenant={tenant}

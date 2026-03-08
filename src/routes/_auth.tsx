@@ -15,7 +15,6 @@ import { useEffect, useMemo } from 'react'
 export const Route = createFileRoute('/_auth')({
 	beforeLoad: async ({ context }) => {
 		try {
-			// retry: false — fail fast on network errors; don't hold up navigation with retries
 			await context.globalClient.ensureQueryData({
 				...authQueryOptions,
 			})

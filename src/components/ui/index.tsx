@@ -12,9 +12,9 @@ export function Spinner({ className }: { className?: string }) {
 			{/* Medium reverse inner ring */}
 			<div className="absolute inset-2 animate-[spin_2s_linear_infinite_reverse] rounded-full border-[3px] border-primary/10 border-b-primary/20" />
 
-			{/* Fast main orbital segment */}
+			{/* Indeterminate orbital arc — grows and collapses as it rotates */}
 			<svg
-				className="absolute inset-0 h-full w-full animate-[spin_1.5s_cubic-bezier(0.4,0,0.2,1)_infinite]"
+				className="absolute inset-0 h-full w-full spinner-rotate"
 				viewBox="0 0 100 100"
 			>
 				<circle
@@ -24,9 +24,8 @@ export function Spinner({ className }: { className?: string }) {
 					fill="none"
 					stroke="currentColor"
 					strokeWidth="6"
-					strokeDasharray="60 200"
 					strokeLinecap="round"
-					className="text-primary drop-shadow-[0_0_8px_rgba(var(--primary),0.5)]"
+					className="text-primary drop-shadow-[0_0_8px_rgba(var(--primary),0.5)] spinner-dash"
 				/>
 			</svg>
 
@@ -125,4 +124,3 @@ export * from './FieldError'
 export * from './FormFooter'
 export * from './TableSkeleton'
 export * from './WizardFooter'
-

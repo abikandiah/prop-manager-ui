@@ -10,7 +10,7 @@ import { Toaster } from '@abumble/design-system/components/Toaster'
 import { UnderConstruction } from '@abumble/design-system/components/UnderConstruction'
 import { stringToBoolean } from '@abumble/design-system/utils'
 import { Outlet, createRootRouteWithContext } from '@tanstack/react-router'
-import { ServerOff, WifiOff } from 'lucide-react'
+import { WifiOff } from 'lucide-react'
 import { useEffect, useMemo, useRef } from 'react'
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
@@ -89,7 +89,6 @@ function OfflineBannerEffect() {
 							</>
 						) : (
 							<>
-								<ServerOff className="size-4 shrink-0" aria-hidden />
 								<span>
 									Server unavailable. Changes will sync when the server is back
 									online.
@@ -120,8 +119,7 @@ function OfflineBannerEffect() {
 			updateBanner(bannerIdRef.current, { message })
 		} else {
 			bannerIdRef.current = showBanner({
-				type: 'warning',
-				hideIcon: true,
+				type: 'alert',
 				message,
 			})
 		}

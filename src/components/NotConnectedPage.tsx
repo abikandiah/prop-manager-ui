@@ -16,7 +16,8 @@ export function NotConnectedPage() {
 	useEffect(() => {
 		bannerIdRef.current = showBanner({
 			type: 'info',
-			message: 'Sadly, the backend server does not run 24/7 and is most likely offline.',
+			message:
+				'Unfortunately, the server does not run 24/7 and is most likely offline.',
 		})
 		return () => {
 			if (bannerIdRef.current) hideBanner(bannerIdRef.current)

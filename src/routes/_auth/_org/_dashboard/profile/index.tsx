@@ -52,7 +52,7 @@ function ProfilePage() {
 		<div className="flex flex-col gap-6">
 			<BannerHeader
 				title="Profile"
-				description="Manage your account details and tenant information."
+				description="Manage your account details."
 			/>
 			<UserProfileSection />
 			{isTenant && <TenantProfileSectionLoader />}

@@ -31,7 +31,7 @@ interface NetworkContextValue {
 const NetworkContext = createContext<NetworkContextValue | null>(null)
 
 // Thresholds for SERVER reachability only (network connectivity is instant)
-const MAX_FAILURES_BEFORE_OFFLINE = 3 // Server: 3 consecutive failures → mark unreachable
+const MAX_FAILURES_BEFORE_OFFLINE = 3
 const HEALTH_CHECK_INTERVAL_MS = 30000 // Poll server every 30s when unreachable
 
 export function NetworkProvider({ children }: { children: React.ReactNode }) {
@@ -53,7 +53,6 @@ export function NetworkProvider({ children }: { children: React.ReactNode }) {
 			abortControllerRef.current?.abort()
 			abortControllerRef.current = new AbortController()
 
-			// Strip /api suffix so we hit /actuator/health, not /api/actuator/health
 			const response = await fetch(`${config.apiBaseUrl}/actuator/health`, {
 				method: 'HEAD',
 				cache: 'no-store',

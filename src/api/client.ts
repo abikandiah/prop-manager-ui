@@ -43,7 +43,7 @@ export const clearDevToken = () => {
 }
 
 export const api = axios.create({
-	baseURL: config.apiBaseUrl,
+	baseURL: `${config.apiBaseUrl}/api`,
 	timeout: 10000,
 	headers: {
 		'Content-Type': 'application/json',

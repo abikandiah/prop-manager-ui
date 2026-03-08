@@ -79,7 +79,10 @@ export function BannerBackgroundImage({
 }) {
 	return (
 		<div
-			className={cn(className, 'absolute top-0 h-64 w-full overflow-hidden')}
+			className={cn(
+				className,
+				'absolute top-0 h-48 w-full overflow-hidden -z-1',
+			)}
 			{...props}
 		>
 			{children}
@@ -129,4 +132,3 @@ export * from './ProfileField'
 export * from './SectionCard'
 export * from './TableSkeleton'
 export * from './WizardFooter'
-

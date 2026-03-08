@@ -9,7 +9,7 @@ Property management frontend. React 19, TypeScript (strict), Vite 7, TanStack Ro
 ## Commands
 
 ```bash
-pnpm dev      # Dev server (port 3000, proxies /api → localhost:4080)
+pnpm dev      # Dev server (port 3000, proxies /api → localhost:8080)
 pnpm test     # Run tests (Vitest + jsdom)
 pnpm lint     # ESLint check
 pnpm check    # Prettier --write + ESLint --fix (run before committing)

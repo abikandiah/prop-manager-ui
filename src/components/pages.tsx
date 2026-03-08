@@ -12,9 +12,7 @@ export function BannerLandingPage({ children }: { children: React.ReactNode }) {
 				<div className="banner-background-image" />
 			</BannerBackgroundImage>
 
-			<div className="flex-1 p-6 flex items-center md:mb-24 z-1">
-				{children}
-			</div>
+			<div className="flex-1 p-6 flex items-center mb-32">{children}</div>
 		</main>
 	)
 }

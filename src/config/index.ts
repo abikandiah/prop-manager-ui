@@ -18,6 +18,8 @@ export const config = {
 	mutationOutboxMaxAgeDays:
 		Number(import.meta.env.VITE_MUTATION_OUTBOX_MAX_AGE_DAYS) || 7,
 
+	apiTimeoutMs: Number(import.meta.env.VITE_API_TIMEOUT_MS) || 1000,
+
 	/** How often to re-fetch /me in the background to pick up permission changes. */
 	userRefetchIntervalMs:
 		Number(import.meta.env.VITE_USER_REFETCH_INTERVAL_MS) || 5 * 60 * 1000,

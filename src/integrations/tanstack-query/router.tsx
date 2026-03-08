@@ -1,5 +1,6 @@
 import { NotFound } from '@/components/NotFound'
-import { LoadingPage } from '@/components/pages'
+import { LoadingPage } from '@/components/ui/pages'
+import type { User } from '@/domain/user'
 import { routeTree } from '@/routeTree.gen'
 import type { QueryClient } from '@tanstack/react-query'
 import { createRouter } from '@tanstack/react-router'
@@ -16,6 +17,8 @@ export const router = createRouter({
 	defaultPendingMinMs: 300,
 	context: {
 		globalClient: undefined!,
+		user: undefined,
+		orgId: undefined,
 	},
 })
 
@@ -28,4 +31,8 @@ declare module '@tanstack/react-router' {
 
 export type MyRouterContext = {
 	globalClient: QueryClient
+	/** Injected by _auth beforeLoad. Undefined when unauthenticated or server unreachable. */
+	user: User | undefined
+	/** Injected by _org beforeLoad. The active (first) org ID. */
+	orgId: string | undefined
 }

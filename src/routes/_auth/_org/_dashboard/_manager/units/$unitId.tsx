@@ -14,7 +14,9 @@ import { DetailField, EntityActions, TextLink } from '@/components/ui'
 import { config } from '@/config'
 import { CenteredEmptyState } from '@/components/CenteredEmptyState'
 
-export const Route = createFileRoute('/_auth/_org/_dashboard/_manager/units/$unitId')({
+export const Route = createFileRoute(
+	'/_auth/_org/_dashboard/_manager/units/$unitId',
+)({
 	component: UnitDetailPage,
 })
 

@@ -35,18 +35,29 @@ export function LeaseHomeCard({ unit }: { unit: TenantUnitSummary }) {
 			<CardContent className="px-5 space-y-4">
 				<div className="flex flex-wrap gap-4 text-sm">
 					{unit.bedrooms != null && (
-						<span><span className="font-semibold">{unit.bedrooms}</span> bed</span>
+						<span>
+							<span className="font-semibold">{unit.bedrooms}</span> bed
+						</span>
 					)}
 					{unit.bathrooms != null && (
-						<span><span className="font-semibold">{unit.bathrooms}</span> bath</span>
+						<span>
+							<span className="font-semibold">{unit.bathrooms}</span> bath
+						</span>
 					)}
 					{unit.squareFootage != null && (
-						<span><span className="font-semibold">{unit.squareFootage.toLocaleString()}</span> sq ft</span>
+						<span>
+							<span className="font-semibold">
+								{unit.squareFootage.toLocaleString()}
+							</span>{' '}
+							sq ft
+						</span>
 					)}
 				</div>
 				{amenities.length > 0 && (
 					<div className="flex flex-wrap gap-2">
-						{amenities.map((a) => <AmenityChip key={a} label={a} />)}
+						{amenities.map((a) => (
+							<AmenityChip key={a} label={a} />
+						))}
 					</div>
 				)}
 			</CardContent>

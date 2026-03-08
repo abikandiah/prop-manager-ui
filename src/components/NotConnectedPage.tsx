@@ -1,4 +1,4 @@
-import { BannerLandingPage } from '@/components/pages'
+import { BannerLandingPage } from '@/components/ui/pages'
 import { useHeaderBanner } from '@/contexts/header-banner'
 import {
 	Empty,

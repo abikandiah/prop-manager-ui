@@ -11,6 +11,7 @@ export interface User {
 	id: string
 	email: string
 	name: string
+	phoneNumber: string | null
 	termsAccepted: boolean
 	organizations: UserOrganization[]
 	roles: AppRole[]
@@ -18,7 +19,9 @@ export interface User {
 }
 
 export interface UserUpdatePayload {
-	termsAccepted: boolean
+	termsAccepted?: boolean
+	name?: string
+	phoneNumber?: string | null
 }
 
 export interface DevLoginPayload {

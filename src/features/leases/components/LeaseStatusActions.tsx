@@ -121,10 +121,7 @@ export function LeaseStatusActions({ lease }: LeaseStatusActionsProps) {
 	const mutations: Record<
 		ActionKey,
 		{
-			mutate: (
-				id: string,
-				callbacks: { onSuccess: () => void },
-			) => void
+			mutate: (id: string, callbacks: { onSuccess: () => void }) => void
 			isPending: boolean
 		}
 	> = {

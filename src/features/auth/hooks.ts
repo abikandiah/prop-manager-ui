@@ -1,9 +1,14 @@
 import { clearDevToken } from '@/api/client'
 import { config } from '@/config'
 import { useOrganization } from '@/contexts/organization'
-import type { AppRole } from '@/domain/user'
+import type { AppRole, UserUpdatePayload } from '@/domain/user'
 import { globalClient } from '@/integrations/tanstack-query/globalClient'
-import { queryOptions, useQuery, useQueryClient } from '@tanstack/react-query'
+import {
+	queryOptions,
+	useMutation,
+	useQuery,
+	useQueryClient,
+} from '@tanstack/react-query'
 import { clearUserDb } from '../offline/db'
 import { authApi } from './api'
 
@@ -72,6 +77,16 @@ export function useAuth() {
 		refreshUser,
 		logout,
 	}
+}
+
+/** Updates the current user's profile (name, phone). Invalidates /me on success. */
+export function useUpdateMe() {
+	return useMutation({
+		mutationKey: ['updateMe'],
+		networkMode: 'online',
+		mutationFn: (payload: UserUpdatePayload) => authApi.updateMe(payload),
+		onSuccess: () => globalClient.invalidateQueries(authQueryOptions),
+	})
 }
 
 /** Returns the current user's roles within the active org. Empty array if no active org or not a member. */

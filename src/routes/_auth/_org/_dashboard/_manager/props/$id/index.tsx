@@ -18,7 +18,9 @@ import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect } from 'react'
 import { toast } from 'sonner'
 
-export const Route = createFileRoute('/_auth/_org/_dashboard/_manager/props/$id/')({
+export const Route = createFileRoute(
+	'/_auth/_org/_dashboard/_manager/props/$id/',
+)({
 	component: PropLayout,
 })
 

@@ -20,7 +20,7 @@ export type BadgeConfig =
 	| 'dot' // Show indicator dot
 	| React.ReactNode // Custom content
 
-interface SidebarItem {
+export interface SidebarItem {
 	to: string
 	label: string
 	icon: LucideIcon
@@ -79,6 +79,40 @@ function renderBadge(badge: BadgeConfig | undefined) {
 	return <>{badge}</>
 }
 
+/**
+ * A unified sidebar navigation link component that handles both top-level
+ * and sub-level (nested) navigation items with consistent active states and badges.
+ */
+export function SidebarNavLink({
+	item,
+	isSub = false,
+	onClick,
+}: {
+	item: SidebarItem
+	isSub?: boolean
+	onClick?: () => void
+}) {
+	const { to, label, icon: Icon, badge } = item
+	const ItemComponent = isSub ? SidebarMenuSubItem : SidebarMenuItem
+	const ButtonComponent = isSub ? SidebarMenuSubButton : SidebarMenuButton
+
+	return (
+		<ItemComponent>
+			<Link to={to} onClick={onClick}>
+				{({ isActive }) => (
+					<ButtonComponent asChild isActive={isActive}>
+						<span className="flex items-center gap-2 w-full">
+							<Icon className="size-4 shrink-0" />
+							<span className="flex-1 text-left">{label}</span>
+							{renderBadge(badge)}
+						</span>
+					</ButtonComponent>
+				)}
+			</Link>
+		</ItemComponent>
+	)
+}
+
 export function CollapsibleSidebarSection({
 	title,
 	icon: Icon,
@@ -105,19 +139,12 @@ export function CollapsibleSidebarSection({
 				<CollapsibleContent>
 					<SidebarMenuSub>
 						{items.map((item) => (
-							<SidebarMenuSubItem key={item.to}>
-								<Link to={item.to} onClick={onItemClick}>
-									{({ isActive }) => (
-										<SidebarMenuSubButton asChild isActive={isActive}>
-											<span className="flex items-center gap-2 w-full">
-												<item.icon className="size-4 shrink-0" />
-												<span className="flex-1">{item.label}</span>
-												{renderBadge(item.badge)}
-											</span>
-										</SidebarMenuSubButton>
-									)}
-								</Link>
-							</SidebarMenuSubItem>
+							<SidebarNavLink
+								key={item.to}
+								item={item}
+								isSub
+								onClick={onItemClick}
+							/>
 						))}
 					</SidebarMenuSub>
 				</CollapsibleContent>

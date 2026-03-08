@@ -7,7 +7,11 @@ import {
 	CardTitle,
 } from '@abumble/design-system/components/Card'
 
-export function LeasePropertyCard({ property }: { property: TenantPropertySummary }) {
+export function LeasePropertyCard({
+	property,
+}: {
+	property: TenantPropertySummary
+}) {
 	return (
 		<Card>
 			<CardHeader className="px-5 pb-3">
@@ -16,9 +20,13 @@ export function LeasePropertyCard({ property }: { property: TenantPropertySummar
 			<CardContent className="px-5 space-y-1 text-sm">
 				<p className="font-medium text-foreground">{property.legalName}</p>
 				{property.address && (
-					<p className="text-muted-foreground">{formatAddress(property.address)}</p>
+					<p className="text-muted-foreground">
+						{formatAddress(property.address)}
+					</p>
 				)}
-				<p className="text-muted-foreground">{formatEnumLabel(property.propertyType)}</p>
+				<p className="text-muted-foreground">
+					{formatEnumLabel(property.propertyType)}
+				</p>
 				{property.yearBuilt && (
 					<p className="text-muted-foreground">Built {property.yearBuilt}</p>
 				)}

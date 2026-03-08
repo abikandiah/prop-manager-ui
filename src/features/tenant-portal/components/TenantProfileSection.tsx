@@ -14,7 +14,7 @@ import { FormDialog } from '@abumble/design-system/components/Dialog'
 import { Textarea } from '@abumble/design-system/components/Textarea'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { z } from 'zod'
 import { FORM_DIALOG_CLASS_WIDE } from '@/lib/dialog'
@@ -41,13 +41,15 @@ function TenantProfileEditForm({
 	const {
 		register,
 		handleSubmit,
+		control,
 		formState: { errors, isSubmitting },
 	} = useForm<FormValues>({
 		resolver: standardSchemaResolver(schema),
 		defaultValues: {
 			emergencyContactName: tenant.emergencyContactName ?? '',
 			emergencyContactPhone: tenant.emergencyContactPhone ?? '',
-			hasPets: tenant.hasPets === true ? 'yes' : tenant.hasPets === false ? 'no' : '',
+			hasPets:
+				tenant.hasPets === true ? 'yes' : tenant.hasPets === false ? 'no' : '',
 			petDescription: tenant.petDescription ?? '',
 			vehicleInfo: tenant.vehicleInfo ?? '',
 			notes: tenant.notes ?? '',
@@ -59,7 +61,12 @@ function TenantProfileEditForm({
 			{
 				emergencyContactName: values.emergencyContactName || null,
 				emergencyContactPhone: values.emergencyContactPhone || null,
-				hasPets: values.hasPets === 'yes' ? true : values.hasPets === 'no' ? false : null,
+				hasPets:
+					values.hasPets === 'yes'
+						? true
+						: values.hasPets === 'no'
+							? false
+							: null,
 				petDescription: values.petDescription || null,
 				vehicleInfo: values.vehicleInfo || null,
 				notes: values.notes || null,
@@ -74,37 +81,81 @@ function TenantProfileEditForm({
 		)
 	}
 
+	const hasPets = useWatch({ control, name: 'hasPets' })
+
 	return (
 		<form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 			<div className="space-y-1.5">
 				<Label htmlFor="emergencyContactName">Emergency contact name</Label>
-				<Input id="emergencyContactName" {...register('emergencyContactName')} />
-				<FieldError error={errors.emergencyContactName} />
+				<Input
+					id="emergencyContactName"
+					{...register('emergencyContactName')}
+				/>
+				<FieldError message={errors.emergencyContactName?.message} />
 			</div>
 			<div className="space-y-1.5">
 				<Label htmlFor="emergencyContactPhone">Emergency contact phone</Label>
-				<Input id="emergencyContactPhone" {...register('emergencyContactPhone')} />
-				<FieldError error={errors.emergencyContactPhone} />
+				<Input
+					id="emergencyContactPhone"
+					{...register('emergencyContactPhone')}
+				/>
+				<FieldError message={errors.emergencyContactPhone?.message} />
 			</div>
 			<div className="space-y-1.5">
+				<Label htmlFor="hasPets">Pets</Label>
+				<select
+					id="hasPets"
+					{...register('hasPets')}
+					className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-xs transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+				>
+					<option value="">Prefer not to say</option>
+					<option value="no">No pets</option>
+					<option value="yes">Yes, I have pets</option>
+				</select>
+				<FieldError message={errors.hasPets?.message} />
+			</div>
+			{hasPets === 'yes' && (
+				<div className="space-y-1.5">
+					<Label htmlFor="petDescription">Pet description</Label>
+					<Textarea
+						id="petDescription"
+						placeholder="e.g. 1 dog, golden retriever"
+						rows={2}
+						{...register('petDescription')}
+					/>
+					<FieldError message={errors.petDescription?.message} />
+				</div>
+			)}
+			<div className="space-y-1.5">
 				<Label htmlFor="vehicleInfo">Vehicle info</Label>
-				<Input id="vehicleInfo" placeholder="e.g. 2019 Honda Civic, plate ABC-123" {...register('vehicleInfo')} />
-				<FieldError error={errors.vehicleInfo} />
+				<Input
+					id="vehicleInfo"
+					placeholder="e.g. 2019 Honda Civic, plate ABC-123"
+					{...register('vehicleInfo')}
+				/>
+				<FieldError message={errors.vehicleInfo?.message} />
 			</div>
 			<div className="space-y-1.5">
 				<Label htmlFor="notes">Notes</Label>
 				<Textarea id="notes" rows={3} {...register('notes')} />
-				<FieldError error={errors.notes} />
+				<FieldError message={errors.notes?.message} />
 			</div>
-			<FormFooter>
-				<Button type="button" variant="outline" onClick={onClose}>Cancel</Button>
-				<Button type="submit" disabled={isSubmitting || update.isPending}>Save</Button>
-			</FormFooter>
+			<FormFooter
+				pending={isSubmitting || update.isPending}
+				onCancel={onClose}
+				submitLabel="Save"
+			/>
 		</form>
 	)
 }
 
-function ProfileField({ label, value }: { label: string; value: string | null | undefined }) {
+function ProfileField({
+	label,
+	value,
+}: {
+	label: string
+	value: string | null | undefined
+}) {
 	return (
 		<div className="flex flex-col gap-0.5">
 			<span className="text-xs text-muted-foreground">{label}</span>
@@ -126,12 +177,26 @@ export function TenantProfileSection({ tenant }: { tenant: Tenant }) {
 					</Button>
 				</CardHeader>
 				<CardContent className="px-5 grid grid-cols-1 sm:grid-cols-2 gap-4">
-					<ProfileField label="Emergency contact" value={tenant.emergencyContactName} />
-					<ProfileField label="Emergency phone" value={tenant.emergencyContactPhone} />
-					<ProfileField label="Pets" value={
-						tenant.hasPets === true ? (tenant.petDescription ? `Yes — ${tenant.petDescription}` : 'Yes') :
-						tenant.hasPets === false ? 'No' : null
-					} />
+					<ProfileField
+						label="Emergency contact"
+						value={tenant.emergencyContactName}
+					/>
+					<ProfileField
+						label="Emergency phone"
+						value={tenant.emergencyContactPhone}
+					/>
+					<ProfileField
+						label="Pets"
+						value={
+							tenant.hasPets === true
+								? tenant.petDescription
+									? `Yes — ${tenant.petDescription}`
+									: 'Yes'
+								: tenant.hasPets === false
+									? 'No'
+									: null
+						}
+					/>
 					<ProfileField label="Vehicle" value={tenant.vehicleInfo} />
 					{tenant.notes && (
 						<div className="sm:col-span-2">
@@ -144,9 +209,13 @@ export function TenantProfileSection({ tenant }: { tenant: Tenant }) {
 				open={editing}
 				onOpenChange={setEditing}
 				title="Edit tenant profile"
+				description="Update your tenant profile details."
 				className={FORM_DIALOG_CLASS_WIDE}
 			>
-				<TenantProfileEditForm tenant={tenant} onClose={() => setEditing(false)} />
+				<TenantProfileEditForm
+					tenant={tenant}
+					onClose={() => setEditing(false)}
+				/>
 			</FormDialog>
 		</>
 	)

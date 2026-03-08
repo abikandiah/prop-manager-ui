@@ -1,3 +1,4 @@
+import { isApiError } from '@/api/errors'
 import { config } from '@/config'
 import { LeaseStatus } from '@/domain/lease'
 import { useMyLease } from '@/features/tenant-portal'
@@ -15,9 +16,10 @@ import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { isApiError } from '@/api/errors'
 
-export const Route = createFileRoute('/_auth/_org/_dashboard/_tenant/my-lease/')({
+export const Route = createFileRoute(
+	'/_auth/_org/_dashboard/_tenant/my-lease/',
+)({
 	component: MyLeasePage,
 })
 
@@ -65,7 +67,10 @@ function NoActiveLeaseState() {
 			<p className="text-sm text-muted-foreground max-w-sm">
 				If you received a lease invite, check your email or visit your messages.
 			</p>
-			<Link to="/messages" className="text-sm text-primary underline-offset-4 hover:underline">
+			<Link
+				to="/messages"
+				className="text-sm text-primary underline-offset-4 hover:underline"
+			>
 				Go to Messages →
 			</Link>
 		</div>
@@ -95,7 +100,9 @@ function MyLeasePage() {
 				/>
 			)}
 			<div className="flex items-center gap-3">
-				<h1 className="text-2xl font-bold text-foreground">{data.property.legalName}</h1>
+				<h1 className="text-2xl font-bold text-foreground">
+					{data.property.legalName}
+				</h1>
 				<Badge variant={statusVariant(data.lease.status)}>
 					{formatEnumLabel(data.lease.status)}
 				</Badge>

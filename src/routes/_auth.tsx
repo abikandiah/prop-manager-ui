@@ -2,7 +2,7 @@ import { isApiError } from '@/api/errors'
 import { emitApiEvent, useApiEvent } from '@/api/events'
 import { DevAuthForm } from '@/components/DevAuthForm'
 import { NotConnectedPage } from '@/components/NotConnectedPage'
-import { BannerLandingPage } from '@/components/pages'
+import { BannerLandingPage } from '@/components/ui/pages'
 import { RegisterForm } from '@/components/RegisterForm'
 import { config } from '@/config'
 import { useNetwork } from '@/contexts/network'
@@ -15,9 +15,8 @@ import { useEffect, useMemo } from 'react'
 export const Route = createFileRoute('/_auth')({
 	beforeLoad: async ({ context }) => {
 		try {
-			await context.globalClient.ensureQueryData({
-				...authQueryOptions,
-			})
+			const user = await context.globalClient.ensureQueryData(authQueryOptions)
+			return { user }
 		} catch (error) {
 			if (isApiError(error) && error.status !== 401) {
 				console.warn('[Auth] Failed to load user:', error)
@@ -30,6 +29,8 @@ export const Route = createFileRoute('/_auth')({
 					throw error
 				}
 			}
+
+			return { user: undefined }
 		}
 	},
 	component: RouteComponent,

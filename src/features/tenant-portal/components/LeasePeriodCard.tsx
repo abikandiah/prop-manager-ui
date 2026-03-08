@@ -39,7 +39,10 @@ export function LeasePeriodCard({ lease }: { lease: TenantLeaseSummary }) {
 					<span>Ends {formatDate(lease.endDate)}</span>
 				</div>
 				<p className="text-sm text-foreground">
-					<span className="font-semibold">{daysRemaining.toLocaleString()}</span> days remaining
+					<span className="font-semibold">
+						{daysRemaining.toLocaleString()}
+					</span>{' '}
+					days remaining
 				</p>
 				{lease.noticeDeadlineDate && (
 					<p className="text-sm text-muted-foreground">

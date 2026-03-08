@@ -8,8 +8,10 @@ import { MessageBanner } from '@abumble/design-system/components/Banner'
 import { Button } from '@abumble/design-system/components/Button'
 
 const SIMPLE_MESSAGES: Partial<Record<LeaseStatus, string>> = {
-	DRAFT: "Your lease is being prepared. You'll be notified when it's ready to review.",
-	REVIEW: 'Your lease is under review by management and will be activated soon.',
+	DRAFT:
+		"Your lease is being prepared. You'll be notified when it's ready to review.",
+	REVIEW:
+		'Your lease is under review by management and will be activated soon.',
 }
 
 function CheckItem({ done, label }: { done: boolean; label: string }) {
@@ -18,7 +20,11 @@ function CheckItem({ done, label }: { done: boolean; label: string }) {
 			<span className={done ? 'text-green-600' : 'text-muted-foreground'}>
 				{done ? '✓' : '○'}
 			</span>
-			<span className={done ? 'line-through text-muted-foreground' : 'text-foreground'}>
+			<span
+				className={
+					done ? 'line-through text-muted-foreground' : 'text-foreground'
+				}
+			>
 				{label}
 			</span>
 		</li>
@@ -92,7 +98,10 @@ export function PendingActivationBanner({
 						/>
 					))}
 					{unsignedCoTenants.length === 0 && (
-						<CheckItem done={false} label="Waiting for manager to activate your tenancy." />
+						<CheckItem
+							done={false}
+							label="Waiting for manager to activate your tenancy."
+						/>
 					)}
 				</ul>
 			</div>
@@ -115,7 +124,10 @@ export function PendingActivationBanner({
 							label={`Waiting for ${ct.name} to sign.`}
 						/>
 					))}
-					<CheckItem done={false} label="Waiting for manager to activate your tenancy." />
+					<CheckItem
+						done={false}
+						label="Waiting for manager to activate your tenancy."
+					/>
 				</ul>
 			</div>
 		)

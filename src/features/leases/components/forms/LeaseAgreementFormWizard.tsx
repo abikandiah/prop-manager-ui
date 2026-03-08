@@ -85,19 +85,34 @@ const STEP_2_FIELDS: Array<keyof LeaseFormValues> = [
 
 // ---------- Default values ----------
 
-const defaultValues: LeaseFormValues = {
-	leaseTemplateId: '',
-	propertyId: '',
-	unitId: '',
-	startDate: '',
-	endDate: '',
-	rentAmount: '',
-	rentDueDay: '1',
-	securityDepositHeld: '',
-	lateFeeType: '',
-	lateFeeAmount: '',
-	noticePeriodDays: '',
-	templateParameters: {},
+function getLeaseDefaultValues(): LeaseFormValues {
+	const now = new Date()
+	// First of next month
+	const start = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+	// 6 months from today
+	const end = new Date(now.getFullYear(), now.getMonth() + 6, now.getDate())
+
+	const format = (d: Date) => {
+		const year = d.getFullYear()
+		const month = String(d.getMonth() + 1).padStart(2, '0')
+		const day = String(d.getDate()).padStart(2, '0')
+		return `${year}-${month}-${day}`
+	}
+
+	return {
+		leaseTemplateId: '',
+		propertyId: '',
+		unitId: '',
+		startDate: format(start),
+		endDate: format(end),
+		rentAmount: '2000',
+		rentDueDay: '1',
+		securityDepositHeld: '',
+		lateFeeType: '',
+		lateFeeAmount: '',
+		noticePeriodDays: '',
+		templateParameters: {},
+	}
 }
 
 function leaseToFormValues(lease: Lease): LeaseFormValues {
@@ -160,7 +175,9 @@ export function LeaseAgreementFormWizard({
 
 	const form = useForm<LeaseFormValues>({
 		resolver: standardSchemaResolver(leaseFormSchema),
-		defaultValues: isEdit ? leaseToFormValues(initialLease) : defaultValues,
+		defaultValues: isEdit
+			? leaseToFormValues(initialLease)
+			: getLeaseDefaultValues(),
 		mode: 'onSubmit',
 		reValidateMode: 'onChange',
 	})
@@ -286,7 +303,7 @@ export function LeaseAgreementFormWizard({
 					{
 						onSuccess: (data) => {
 							toast.success('Lease created')
-							reset(defaultValues)
+							reset(getLeaseDefaultValues())
 							setStep(1)
 							setTemplateDefaultsApplied(false)
 							onSuccess?.(data)

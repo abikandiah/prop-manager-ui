@@ -38,14 +38,13 @@ export function LeaseTermsStep() {
 					<Label htmlFor="rentDueDay">
 						Rent due day <RequiredMark />
 					</Label>
-					<Input
-						id="rentDueDay"
-						{...register('rentDueDay')}
-						type="number"
-						min={1}
-						max={31}
-						placeholder="1"
-					/>
+					<Select id="rentDueDay" {...register('rentDueDay')}>
+						{Array.from({ length: 31 }, (_, i) => i + 1).map((day) => (
+							<option key={day} value={String(day)}>
+								Day {day}
+							</option>
+						))}
+					</Select>
 					<FieldError message={errors.rentDueDay?.message} />
 				</div>
 			</div>

@@ -7,14 +7,9 @@ import {
 	SidebarGroup,
 	SidebarGroupContent,
 	SidebarMenu,
-	SidebarMenuButton,
-	SidebarMenuItem,
 	SidebarTrigger,
 	useSidebar,
 } from '@abumble/design-system/components/Sidebar'
-import type { LinkComponentProps } from '@tanstack/react-router'
-import { Link } from '@tanstack/react-router'
-import type { LucideIcon } from 'lucide-react'
 import {
 	Building2,
 	CreditCard,
@@ -29,40 +24,17 @@ import {
 	Wrench,
 } from 'lucide-react'
 import { useCallback } from 'react'
-import { CollapsibleSidebarSection } from './CollapsibleSidebarSection'
-
-type NavItem = {
-	to: string
-	label: string
-	icon: LucideIcon
-}
-
-function SidebarNavLink({
-	item,
-	...props
-}: { item: NavItem } & Omit<LinkComponentProps<'a'>, 'to' | 'children'>) {
-	const { to, label, icon: Icon } = item
-	return (
-		<SidebarMenuItem>
-			<Link to={to} {...props}>
-				{({ isActive }: { isActive: boolean }) => (
-					<SidebarMenuButton asChild isActive={isActive}>
-						<span className="flex items-center gap-2">
-							<Icon className="size-4 shrink-0" />
-							<span>{label}</span>
-						</span>
-					</SidebarMenuButton>
-				)}
-			</Link>
-		</SidebarMenuItem>
-	)
-}
+import {
+	CollapsibleSidebarSection,
+	SidebarNavLink,
+} from './CollapsibleSidebarSection'
 
 export function AppSidebar() {
 	const state = useSidebar()
 	const activeOrgRoles = useActiveOrgRoles()
 	const isManagerOrAdmin =
-		activeOrgRoles.includes(AppRole.MANAGER) || activeOrgRoles.includes(AppRole.ADMIN)
+		activeOrgRoles.includes(AppRole.MANAGER) ||
+		activeOrgRoles.includes(AppRole.ADMIN)
 	const isTenant = activeOrgRoles.includes(AppRole.TENANT)
 	const canReadLeases = useCan('READ', 'LEASES')
 
@@ -165,16 +137,6 @@ export function AppSidebar() {
 										onItemClick={closeMobileSidebar}
 									/>
 								)}
-								{(isManagerOrAdmin || isTenant) && (
-									<SidebarNavLink
-										item={{
-											to: '/maintenance',
-											label: 'Maintenance',
-											icon: Wrench,
-										}}
-										onClick={closeMobileSidebar}
-									/>
-								)}
 								{isTenant && (
 									<CollapsibleSidebarSection
 										title="My Tenancy"
@@ -192,6 +154,16 @@ export function AppSidebar() {
 											},
 										]}
 										onItemClick={closeMobileSidebar}
+									/>
+								)}
+								{(isManagerOrAdmin || isTenant) && (
+									<SidebarNavLink
+										item={{
+											to: '/maintenance',
+											label: 'Maintenance',
+											icon: Wrench,
+										}}
+										onClick={closeMobileSidebar}
 									/>
 								)}
 								{/* <CollapsibleSidebarSection

@@ -12,8 +12,8 @@ function AssetRow({ asset }: { asset: TenantAssetSummary }) {
 	const subLine = asset.warrantyExpiry
 		? `Warranty until ${formatDate(asset.warrantyExpiry)}`
 		: asset.lastServiceDate
-		? `Last serviced ${formatDate(asset.lastServiceDate)}`
-		: null
+			? `Last serviced ${formatDate(asset.lastServiceDate)}`
+			: null
 
 	return (
 		<div className="flex items-start gap-3 py-2.5 border-b last:border-0">
@@ -22,11 +22,16 @@ function AssetRow({ asset }: { asset: TenantAssetSummary }) {
 				<p className="text-sm font-medium leading-tight">
 					{formatEnumLabel(asset.category)}
 					{asset.makeModel && (
-						<span className="font-normal text-muted-foreground"> — {asset.makeModel}</span>
+						<span className="font-normal text-muted-foreground">
+							{' '}
+							— {asset.makeModel}
+						</span>
 					)}
 				</p>
 				{asset.serialNumber && (
-					<p className="text-xs text-muted-foreground">S/N: {asset.serialNumber}</p>
+					<p className="text-xs text-muted-foreground">
+						S/N: {asset.serialNumber}
+					</p>
 				)}
 				{subLine && <p className="text-xs text-muted-foreground">{subLine}</p>}
 			</div>

@@ -2,7 +2,9 @@ import { createFileRoute } from '@tanstack/react-router'
 import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
 import { TenantsTableView } from '@/features/tenants'
 
-export const Route = createFileRoute('/_auth/_org/_dashboard/_manager/people/tenants/')({
+export const Route = createFileRoute(
+	'/_auth/_org/_dashboard/_manager/people/tenants/',
+)({
 	component: TenantsPage,
 })
 

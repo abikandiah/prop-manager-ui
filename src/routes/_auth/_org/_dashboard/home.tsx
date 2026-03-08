@@ -30,9 +30,9 @@ function DashboardHome() {
 			{hasNoRoles && (
 				<div className="rounded-lg border border-dashed p-10 text-center">
 					<p className="text-muted-foreground">
-						Welcome to{' '}
-						<strong>{activeOrg?.name ?? 'your organization'}</strong>. Your
-						access is being set up — contact your administrator to get started.
+						Welcome to <strong>{activeOrg?.name ?? 'your organization'}</strong>
+						. Your access is being set up — contact your administrator to get
+						started.
 					</p>
 				</div>
 			)}

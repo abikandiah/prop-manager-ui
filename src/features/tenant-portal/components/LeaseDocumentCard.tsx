@@ -40,14 +40,18 @@ export function LeaseDocumentCard({ lease }: { lease: TenantLeaseSummary }) {
 										✕
 									</button>
 									<div className="prose prose-sm dark:prose-invert max-w-none pt-4">
-										<ReactMarkdown>{lease.executedContentMarkdown}</ReactMarkdown>
+										<ReactMarkdown>
+											{lease.executedContentMarkdown}
+										</ReactMarkdown>
 									</div>
 								</div>
 							</div>
 						)}
 					</>
 				) : (
-					<p className="text-sm text-muted-foreground">No document available yet.</p>
+					<p className="text-sm text-muted-foreground">
+						No document available yet.
+					</p>
 				)}
 			</CardContent>
 		</Card>

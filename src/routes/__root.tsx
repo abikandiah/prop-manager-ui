@@ -5,6 +5,7 @@ import { config } from '@/config'
 import { HeaderBannerProvider, useHeaderBanner } from '@/contexts/header-banner'
 import { useNetwork } from '@/contexts/network'
 import { useTheme } from '@/contexts/theme'
+import { useAuth } from '@/features/auth'
 import type { MyRouterContext } from '@/integrations/tanstack-query/router'
 import { Toaster } from '@abumble/design-system/components/Toaster'
 import { UnderConstruction } from '@abumble/design-system/components/UnderConstruction'
@@ -73,11 +74,12 @@ function EnvironmentBannerEffect() {
 function OfflineBannerEffect() {
 	const { isOnline, isServerReachable, consecutiveFailures } = useNetwork()
 	const { showBanner, updateBanner, hideBanner } = useHeaderBanner()
+	const { isUserDefined } = useAuth()
 	const bannerIdRef = useRef<string | null>(null)
 
 	const message = useMemo(
 		() =>
-			isOnline ? null : (
+			isOnline && isUserDefined ? null : (
 				<span className="flex flex-col gap-1">
 					<span className="flex items-center gap-2">
 						{isServerReachable ? (

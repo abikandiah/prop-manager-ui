@@ -6,6 +6,9 @@ import * as React from 'react'
 export function Spinner({ className }: { className?: string }) {
 	return (
 		<div className={cn('relative flex items-center justify-center', className)}>
+			{/* Ring background — only behind the spinner tracks, center stays transparent */}
+			<div className="absolute inset-0 rounded-full border-[14px] border-card/80" />
+
 			{/* Slow outer ring */}
 			<div className="absolute inset-0 animate-[spin_3s_linear_infinite] rounded-full border-[3px] border-primary/10 border-t-primary/30" />
 
@@ -76,7 +79,7 @@ export function BannerBackgroundImage({
 }) {
 	return (
 		<div
-			className={cn(className, 'relative h-64 w-full overflow-hidden')}
+			className={cn(className, 'absolute top-0 h-64 w-full overflow-hidden')}
 			{...props}
 		>
 			{children}
@@ -124,3 +127,4 @@ export * from './FieldError'
 export * from './FormFooter'
 export * from './TableSkeleton'
 export * from './WizardFooter'
+

@@ -12,7 +12,7 @@ export function BannerLandingPage({ children }: { children: React.ReactNode }) {
 				<div className="app-center-background-image" />
 			</BannerBackgroundImage>
 
-			<div className="flex-1 p-6">{children}</div>
+			<div className="flex-1 p-6 z-50 mt-24">{children}</div>
 		</main>
 	)
 }
@@ -40,8 +40,8 @@ export function DashboardPage({
 
 export function LoadingPage() {
 	return (
-		<main className="flex flex-col p-6 min-h-[75vh]">
+		<BannerLandingPage>
 			<LoadingScreen />
-		</main>
+		</BannerLandingPage>
 	)
 }

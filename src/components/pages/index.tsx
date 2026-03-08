@@ -26,7 +26,7 @@ export function DashboardPage({
 }) {
 	return (
 		<SidebarProvider>
-			<div className="flex flex-1 min-w-0 mt-14">
+			<div className="flex flex-1 min-w-0">
 				<Sidebar />
 				<SidebarInset>
 					<main className="flex flex-col p-6">

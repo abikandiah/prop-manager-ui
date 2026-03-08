@@ -131,6 +131,8 @@
 
 .header {
 	@apply h-14;
+	/* Override design-system's fixed — sticky keeps header in flow */
+	position: sticky;
 }
 
 .app-title {

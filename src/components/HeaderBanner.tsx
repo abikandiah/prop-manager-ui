@@ -9,7 +9,7 @@ export function HeaderBanner() {
 	if (banners.length === 0) return null
 
 	return (
-		<div className="fixed top-14 left-0 right-0 z-40 flex flex-col">
+		<div className="sticky top-14 left-0 right-0 z-40 flex flex-col w-full">
 			{banners.map(({ id, onClose, className, ...bannerProps }) => (
 				<MessageBanner
 					key={id}

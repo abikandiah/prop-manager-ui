@@ -2,19 +2,30 @@ import { isApiError } from '@/api/errors'
 import { emitApiEvent, useApiEvent } from '@/api/events'
 import { DevAuthForm } from '@/components/DevAuthForm'
 import { NotConnectedPage } from '@/components/NotConnectedPage'
-import { BannerLandingPage } from '@/components/ui/pages'
 import { RegisterForm } from '@/components/RegisterForm'
+import { BannerLandingPage } from '@/components/ui/pages'
 import { config } from '@/config'
 import { useNetwork } from '@/contexts/network'
 import { OrganizationProvider } from '@/contexts/organization'
 import { authQueryOptions, useAuth } from '@/features/auth'
 import * as TanStackQueryProvider from '@/integrations/tanstack-query/user-provider'
+import { onlineManager } from '@tanstack/react-query'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { useEffect, useMemo } from 'react'
+import type { User } from '@/domain/user'
 
 export const Route = createFileRoute('/_auth')({
 	beforeLoad: async ({ context }) => {
 		try {
+			// Fast path: return cached user immediately (staleTime: Infinity keeps it fresh)
+			const cached = context.globalClient.getQueryData<User>(
+				authQueryOptions.queryKey,
+			)
+			if (cached) return { user: cached }
+
+			// Server known unreachable — skip fetch, let component show NotConnectedPage
+			if (!onlineManager.isOnline()) return { user: undefined }
+
 			const user = await context.globalClient.ensureQueryData(authQueryOptions)
 			return { user }
 		} catch (error) {
@@ -31,6 +42,8 @@ export const Route = createFileRoute('/_auth')({
 			}
 
 			return { user: undefined }
+		} finally {
+			console.log('done')
 		}
 	},
 	component: RouteComponent,

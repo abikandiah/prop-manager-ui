@@ -31,8 +31,6 @@ declare module '@tanstack/react-router' {
 
 export type MyRouterContext = {
 	globalClient: QueryClient
-	/** Injected by _auth beforeLoad. Undefined when unauthenticated or server unreachable. */
 	user: User | undefined
-	/** Injected by _org beforeLoad. The active (first) org ID. */
 	orgId: string | undefined
 }

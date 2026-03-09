@@ -36,6 +36,7 @@ export interface Lease {
 	propertyId: string
 	status: LeaseStatus
 	version: number
+	contentVersion: number
 	startDate: string
 	endDate: string
 	rentAmount: number

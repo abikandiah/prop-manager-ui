@@ -6,6 +6,7 @@ import type { TenantCoTenantSummary } from '@/domain/tenant-portal'
 import { useSignLease } from '@/features/leases'
 import { MessageBanner } from '@abumble/design-system/components/Banner'
 import { Button } from '@abumble/design-system/components/Button'
+import { Input } from '@abumble/design-system/components/Input'
 
 const SIMPLE_MESSAGES: Partial<Record<LeaseStatus, string>> = {
 	DRAFT:
@@ -47,37 +48,49 @@ export function PendingActivationBanner({
 	myLeaseTenantStatus,
 }: Props) {
 	const [signed, setSigned] = useState(false)
+	const [signatureName, setSignatureName] = useState('')
 	const signLease = useSignLease()
 
 	if (status === 'REVIEW' && myLeaseTenantStatus === 'REGISTERED' && !signed) {
 		return (
-			<div className="rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/40 flex flex-col sm:flex-row sm:items-center gap-4">
-				<div className="flex-1">
-					<p className="text-sm font-medium text-amber-900 dark:text-amber-200">
-						Your signature is needed
-					</p>
-					<p className="text-sm text-amber-800 dark:text-amber-300 mt-0.5">
-						Review the lease document below and sign to proceed.
-					</p>
-				</div>
-				<Button
-					variant="default"
-					disabled={signLease.isPending}
-					onClick={() =>
-						signLease.mutate(
-							{ leaseId, leaseTenantId: myLeaseTenantId },
-							{
-								onSuccess: () => {
-									toast.success('Lease signed!')
-									setSigned(true)
-								},
-							},
-						)
-					}
-				>
-					{signLease.isPending ? 'Signing…' : 'Sign lease'}
-				</Button>
-			</div>
+			<MessageBanner
+				type="warning"
+				title="Your signature is needed"
+				message={
+					<div className="flex flex-col gap-3 mt-1">
+						<p className="text-sm">
+							Review the lease document below, then type your full name to
+							confirm your signature.
+						</p>
+						<div className="flex flex-col sm:flex-row gap-2">
+							<Input
+								type="text"
+								value={signatureName}
+								onChange={(e) => setSignatureName(e.target.value)}
+								placeholder="Type your full name"
+								className="sm:max-w-xs"
+							/>
+							<Button
+								variant="default"
+								disabled={!signatureName.trim() || signLease.isPending}
+								onClick={() =>
+									signLease.mutate(
+										{ leaseId, leaseTenantId: myLeaseTenantId },
+										{
+											onSuccess: () => {
+												toast.success('Lease signed!')
+												setSigned(true)
+											},
+										},
+									)
+								}
+							>
+								{signLease.isPending ? 'Signing…' : 'Confirm signature'}
+							</Button>
+						</div>
+					</div>
+				}
+			/>
 		)
 	}
 
@@ -85,51 +98,53 @@ export function PendingActivationBanner({
 	if (status === 'REVIEW' && myLeaseTenantStatus === 'SIGNED') {
 		const unsignedCoTenants = coTenants.filter((ct) => ct.status !== 'SIGNED')
 		return (
-			<div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/40">
-				<p className="text-sm font-medium text-blue-900 dark:text-blue-200 mb-2">
-					You've signed the lease
-				</p>
-				<ul className="space-y-1.5">
-					{unsignedCoTenants.map((ct) => (
-						<CheckItem
-							key={ct.name}
-							done={false}
-							label={`Waiting for ${ct.name} to sign.`}
-						/>
-					))}
-					{unsignedCoTenants.length === 0 && (
-						<CheckItem
-							done={false}
-							label="Waiting for manager to activate your tenancy."
-						/>
-					)}
-				</ul>
-			</div>
+			<MessageBanner
+				type="info"
+				title="You've signed the lease"
+				message={
+					<ul className="space-y-1.5 mt-1">
+						{unsignedCoTenants.map((ct) => (
+							<CheckItem
+								key={ct.name}
+								done={false}
+								label={`Waiting for ${ct.name} to sign.`}
+							/>
+						))}
+						{unsignedCoTenants.length === 0 && (
+							<CheckItem
+								done={false}
+								label="Waiting for manager to activate your tenancy."
+							/>
+						)}
+					</ul>
+				}
+			/>
 		)
 	}
 
 	if (status === 'SIGNED') {
 		const unsignedCoTenants = coTenants.filter((ct) => ct.status !== 'SIGNED')
 		return (
-			<div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/40">
-				<p className="text-sm font-medium text-blue-900 dark:text-blue-200 mb-3">
-					Your onboarding checklist
-				</p>
-				<ul className="space-y-1.5">
-					<CheckItem done label="You have signed the lease." />
-					{unsignedCoTenants.map((ct) => (
+			<MessageBanner
+				type="info"
+				title="Your onboarding checklist"
+				message={
+					<ul className="space-y-1.5 mt-1">
+						<CheckItem done label="You have signed the lease." />
+						{unsignedCoTenants.map((ct) => (
+							<CheckItem
+								key={ct.name}
+								done={false}
+								label={`Waiting for ${ct.name} to sign.`}
+							/>
+						))}
 						<CheckItem
-							key={ct.name}
 							done={false}
-							label={`Waiting for ${ct.name} to sign.`}
+							label="Waiting for manager to activate your tenancy."
 						/>
-					))}
-					<CheckItem
-						done={false}
-						label="Waiting for manager to activate your tenancy."
-					/>
-				</ul>
-			</div>
+					</ul>
+				}
+			/>
 		)
 	}
 

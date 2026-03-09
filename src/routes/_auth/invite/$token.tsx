@@ -62,7 +62,7 @@ function InviteAcceptPage() {
 	const isPageLoading = isLoading || isLoadingUser
 
 	return (
-		<div className="flex flex-1 flex-col">
+		<div className="flex flex-1 flex-col self-start mt-32">
 			<div className="mx-auto w-full max-w-5xl">
 				<DelayedLoadingFallback
 					isLoading={isPageLoading}

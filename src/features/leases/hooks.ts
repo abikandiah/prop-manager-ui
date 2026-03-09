@@ -33,6 +33,7 @@ function applyCreate(
 		propertyId: payload.propertyId,
 		status: LeaseStatus.DRAFT,
 		version: 0,
+		contentVersion: 0,
 		startDate: payload.startDate,
 		endDate: payload.endDate,
 		rentAmount: payload.rentAmount,

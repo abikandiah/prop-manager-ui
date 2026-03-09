@@ -70,7 +70,7 @@ export function AssignmentAccordionItem({
 	return (
 		<>
 			<AccordionItem value={assignment.id} className="border-b last:border-b-0">
-				<AccordionTrigger className="hover:no-underline px-5 py-3">
+				<AccordionTrigger className="hover:no-underline py-3">
 					<div className="flex flex-1 items-center gap-2 min-w-0">
 						<span className="font-medium text-sm truncate">{resourceName}</span>
 						<Badge variant="outline" className="text-xs shrink-0">
@@ -95,7 +95,7 @@ export function AssignmentAccordionItem({
 						/>
 					</div>
 				</AccordionTrigger>
-				<AccordionContent className="px-5 pb-4 pt-0">
+				<AccordionContent className="pb-4 pt-0">
 					<PermissionMatrixEditor value={effectivePermissions} readOnly />
 				</AccordionContent>
 			</AccordionItem>

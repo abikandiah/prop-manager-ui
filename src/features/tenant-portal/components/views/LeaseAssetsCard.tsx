@@ -1,11 +1,6 @@
 import type { TenantAssetSummary } from '@/domain/tenant-portal'
 import { formatDate, formatEnumLabel } from '@/lib/format'
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from '@abumble/design-system/components/Card'
+import { SectionCard } from '@/components/ui'
 import { Wrench } from 'lucide-react'
 
 function AssetRow({ asset }: { asset: TenantAssetSummary }) {
@@ -41,19 +36,14 @@ function AssetRow({ asset }: { asset: TenantAssetSummary }) {
 
 export function LeaseAssetsCard({ assets }: { assets: TenantAssetSummary[] }) {
 	return (
-		<Card>
-			<CardHeader>
-				<CardTitle className="text-base">Appliances & assets</CardTitle>
-			</CardHeader>
-			<CardContent>
-				{assets.length === 0 ? (
-					<p className="text-sm text-muted-foreground py-2">
-						No appliances on record for your unit.
-					</p>
-				) : (
-					assets.map((asset) => <AssetRow key={asset.id} asset={asset} />)
-				)}
-			</CardContent>
-		</Card>
+		<SectionCard title="Appliances & assets">
+			{assets.length === 0 ? (
+				<p className="text-sm text-muted-foreground py-2">
+					No appliances on record for your unit.
+				</p>
+			) : (
+				assets.map((asset) => <AssetRow key={asset.id} asset={asset} />)
+			)}
+		</SectionCard>
 	)
 }

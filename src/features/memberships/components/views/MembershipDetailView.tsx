@@ -172,8 +172,8 @@ const detailSkeleton = (
 				</div>
 			</SectionCard>
 		</div>
-		<SectionCard title={<Skeleton className="h-5 w-40" />} noPadding>
-			<div className="px-5 py-4">
+		<SectionCard title={<Skeleton className="h-5 w-40" />}>
+			<div className="py-4">
 				<Skeleton className="h-16 w-full" />
 			</div>
 		</SectionCard>
@@ -389,7 +389,6 @@ export function MembershipDetailView({
 					<SectionCard
 						title="Permissions & Assignments"
 						description="Controls what this member can access and do."
-						noPadding
 						actions={
 							<Button size="sm" onClick={() => setAddAssignmentOpen(true)}>
 								<Plus className="size-4" />
@@ -401,13 +400,13 @@ export function MembershipDetailView({
 							isLoading={isLoadingAssignments}
 							delayMs={config.loadingFallbackDelayMs}
 							fallback={
-								<div className="px-5 py-4">
+								<div className="py-4">
 									<div className="h-20 animate-pulse rounded bg-muted" />
 								</div>
 							}
 						>
 							{!assignments || assignments.length === 0 ? (
-								<div className="px-5 py-8 text-center">
+								<div className="py-8 text-center">
 									<p className="text-sm text-muted-foreground">
 										No permission assignments yet.
 									</p>

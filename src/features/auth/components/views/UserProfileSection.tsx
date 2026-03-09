@@ -1,15 +1,9 @@
-import { FieldError, FormFooter, ProfileField } from '@/components/ui'
+import { FieldError, FormFooter, ProfileField, SectionCard } from '@/components/ui'
 import type { User } from '@/domain/user'
 import { useAuth, useUpdateMe } from '@/features/auth/hooks'
 import { FORM_DIALOG_CLASS } from '@/lib/dialog'
 import { formatPhoneNumber, validatePhoneNumber } from '@/lib/phone'
 import { Button } from '@abumble/design-system/components/Button'
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from '@abumble/design-system/components/Card'
 import { FormDialog } from '@abumble/design-system/components/Dialog'
 import { Input } from '@abumble/design-system/components/Input'
 import { Label } from '@abumble/design-system/components/Label'
@@ -95,19 +89,19 @@ export function UserProfileSection() {
 
 	return (
 		<>
-			<Card>
-				<CardHeader className="flex flex-row items-center justify-between">
-					<CardTitle className="text-base">Your account</CardTitle>
+			<SectionCard
+				title="Your account"
+				actions={
 					<Button variant="outline" size="sm" onClick={() => setEditing(true)}>
 						Edit
 					</Button>
-				</CardHeader>
-				<CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-					<ProfileField label="Name" value={user.name} />
-					<ProfileField label="Email" value={user.email} />
-					<ProfileField label="Phone number" value={user.phoneNumber} />
-				</CardContent>
-			</Card>
+				}
+				contentClassName="grid grid-cols-1 sm:grid-cols-2 gap-4"
+			>
+				<ProfileField label="Name" value={user.name} />
+				<ProfileField label="Email" value={user.email} />
+				<ProfileField label="Phone number" value={user.phoneNumber} />
+			</SectionCard>
 			<FormDialog
 				open={editing}
 				onOpenChange={setEditing}

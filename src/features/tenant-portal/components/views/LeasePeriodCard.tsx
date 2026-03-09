@@ -1,11 +1,6 @@
 import type { TenantLeaseSummary } from '@/domain/tenant-portal'
 import { formatDate } from '@/lib/format'
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from '@abumble/design-system/components/Card'
+import { SectionCard } from '@/components/ui'
 
 function progressColor(pct: number): string {
 	if (pct >= 90) return 'bg-destructive'
@@ -23,37 +18,30 @@ export function LeasePeriodCard({ lease }: { lease: TenantLeaseSummary }) {
 	const daysRemaining = Math.max(0, Math.round((end - now) / 86_400_000))
 
 	return (
-		<Card>
-			<CardHeader>
-				<CardTitle className="text-base">Lease period</CardTitle>
-			</CardHeader>
-			<CardContent className="px-5 space-y-3">
-				<div className="h-2 w-full rounded-full bg-muted overflow-hidden">
-					<div
-						className={`h-full rounded-full transition-all ${progressColor(pct)}`}
-						style={{ width: `${pct}%` }}
-					/>
-				</div>
-				<div className="flex justify-between text-xs text-muted-foreground">
-					<span>Started {formatDate(lease.startDate)}</span>
-					<span>Ends {formatDate(lease.endDate)}</span>
-				</div>
-				<p className="text-sm text-foreground">
-					<span className="font-semibold">
-						{daysRemaining.toLocaleString()}
+		<SectionCard title="Lease period" contentClassName="space-y-3">
+			<div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+				<div
+					className={`h-full rounded-full transition-all ${progressColor(pct)}`}
+					style={{ width: `${pct}%` }}
+				/>
+			</div>
+			<div className="flex justify-between text-xs text-muted-foreground">
+				<span>Started {formatDate(lease.startDate)}</span>
+				<span>Ends {formatDate(lease.endDate)}</span>
+			</div>
+			<p className="text-sm text-foreground">
+				<span className="font-semibold">{daysRemaining.toLocaleString()}</span>{' '}
+				days remaining
+			</p>
+			{lease.noticeDeadlineDate && (
+				<p className="text-sm text-muted-foreground">
+					Give notice by{' '}
+					<span className="font-medium text-foreground">
+						{formatDate(lease.noticeDeadlineDate)}
 					</span>{' '}
-					days remaining
+					to avoid automatic renewal.
 				</p>
-				{lease.noticeDeadlineDate && (
-					<p className="text-sm text-muted-foreground">
-						Give notice by{' '}
-						<span className="font-medium text-foreground">
-							{formatDate(lease.noticeDeadlineDate)}
-						</span>{' '}
-						to avoid automatic renewal.
-					</p>
-				)}
-			</CardContent>
-		</Card>
+			)}
+		</SectionCard>
 	)
 }

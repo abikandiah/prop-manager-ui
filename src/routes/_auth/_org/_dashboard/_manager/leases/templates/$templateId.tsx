@@ -15,6 +15,7 @@ import {
 	useDeleteLeaseTemplate,
 	useLeaseTemplateDetail,
 } from '@/features/lease-templates'
+import { FORM_DIALOG_CLASS_WIDE, useEditDialogState } from '@/lib/dialog'
 import { formatCurrency, formatDate, formatEnumLabel } from '@/lib/format'
 import { Badge } from '@abumble/design-system/components/Badge'
 import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
@@ -23,7 +24,6 @@ import { FormDialog } from '@abumble/design-system/components/Dialog'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
 import { Link, createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
-import { FORM_DIALOG_CLASS_WIDE, useEditDialogState } from '@/lib/dialog'
 import ReactMarkdown from 'react-markdown'
 import { toast } from 'sonner'
 
@@ -256,11 +256,9 @@ function LeaseTemplateDetailPage() {
 					</div>
 
 					{/* Template Content — full width */}
-					<SectionCard noPadding>
-						<div className="px-5 py-4">
-							<div className="prose prose-sm dark:prose-invert max-w-none">
-								<ReactMarkdown>{template.templateMarkdown}</ReactMarkdown>
-							</div>
+					<SectionCard>
+						<div className="prose prose-sm dark:prose-invert max-w-none">
+							<ReactMarkdown>{template.templateMarkdown}</ReactMarkdown>
 						</div>
 					</SectionCard>
 

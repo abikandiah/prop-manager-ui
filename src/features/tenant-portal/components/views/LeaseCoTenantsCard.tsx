@@ -1,12 +1,7 @@
 import type { TenantCoTenantSummary } from '@/domain/tenant-portal'
 import { LeaseTenantStatus } from '@/domain/lease-tenant'
 import { formatEnumLabel } from '@/lib/format'
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from '@abumble/design-system/components/Card'
+import { SectionCard } from '@/components/ui'
 
 const STATUS_LABELS: Record<string, string | undefined> = {
 	[LeaseTenantStatus.INVITED]: 'Invited — not yet signed',
@@ -38,19 +33,14 @@ export function LeaseCoTenantsCard({
 	coTenants: TenantCoTenantSummary[]
 }) {
 	return (
-		<Card>
-			<CardHeader>
-				<CardTitle className="text-base">Co-tenants</CardTitle>
-			</CardHeader>
-			<CardContent>
-				{coTenants.length === 0 ? (
-					<p className="text-sm text-muted-foreground py-2">
-						You're the only tenant on this lease.
-					</p>
-				) : (
-					coTenants.map((ct, i) => <CoTenantRow key={i} coTenant={ct} />)
-				)}
-			</CardContent>
-		</Card>
+		<SectionCard title="Co-tenants">
+			{coTenants.length === 0 ? (
+				<p className="text-sm text-muted-foreground py-2">
+					You're the only tenant on this lease.
+				</p>
+			) : (
+				coTenants.map((ct, i) => <CoTenantRow key={i} coTenant={ct} />)
+			)}
+		</SectionCard>
 	)
 }

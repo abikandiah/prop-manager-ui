@@ -43,7 +43,6 @@ function TenantsSkeleton({ showActions }: { showActions: boolean }) {
 	return (
 		<SectionCard
 			title="Tenants"
-			noPadding
 			className="overflow-hidden"
 			actions={showActions ? <Skeleton className="h-8 w-32" /> : null}
 		>
@@ -225,7 +224,6 @@ export function LeaseTenantsList({
 	const tableContent = (
 		<SectionCard
 			title="Tenants"
-			noPadding
 			className="overflow-hidden"
 			actions={
 				isDraft && (

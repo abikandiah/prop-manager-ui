@@ -51,7 +51,7 @@ export function PendingActivationBanner({
 
 	if (status === 'REVIEW' && myLeaseTenantStatus === 'REGISTERED' && !signed) {
 		return (
-			<div className="rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/40 px-5 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
+			<div className="rounded-lg border border-amber-200 bg-amber-50 dark:border-amber-900 dark:bg-amber-950/40 flex flex-col sm:flex-row sm:items-center gap-4">
 				<div className="flex-1">
 					<p className="text-sm font-medium text-amber-900 dark:text-amber-200">
 						Your signature is needed
@@ -85,7 +85,7 @@ export function PendingActivationBanner({
 	if (status === 'REVIEW' && myLeaseTenantStatus === 'SIGNED') {
 		const unsignedCoTenants = coTenants.filter((ct) => ct.status !== 'SIGNED')
 		return (
-			<div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/40 px-5 py-4">
+			<div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/40">
 				<p className="text-sm font-medium text-blue-900 dark:text-blue-200 mb-2">
 					You've signed the lease
 				</p>
@@ -111,7 +111,7 @@ export function PendingActivationBanner({
 	if (status === 'SIGNED') {
 		const unsignedCoTenants = coTenants.filter((ct) => ct.status !== 'SIGNED')
 		return (
-			<div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/40 px-5 py-4">
+			<div className="rounded-lg border border-blue-200 bg-blue-50 dark:border-blue-900 dark:bg-blue-950/40">
 				<p className="text-sm font-medium text-blue-900 dark:text-blue-200 mb-3">
 					Your onboarding checklist
 				</p>

@@ -1,7 +1,6 @@
 import { EntityActions, SectionCard, TableSkeleton } from '@/components/ui'
 import { config } from '@/config'
 import type { PermissionPolicy } from '@/domain/permission-policy'
-import { useAuth } from '@/features/auth'
 import { FORM_DIALOG_CLASS } from '@/lib/dialog'
 import { formatDate } from '@/lib/format'
 import { useQueryErrorToast } from '@/lib/hooks'
@@ -40,7 +39,6 @@ function formatPermissions(
 export function PermissionPoliciesTableView({
 	orgId,
 }: PermissionPoliciesTableViewProps) {
-	const { user } = useAuth()
 	const {
 		data: policies,
 		isLoading,
@@ -119,7 +117,7 @@ export function PermissionPoliciesTableView({
 				delayMs={config.loadingFallbackDelayMs}
 				fallback={skeletonTable}
 			>
-				<SectionCard noPadding className="overflow-hidden">
+				<SectionCard className="overflow-hidden">
 					<Table>
 						<TableHeader>
 							<TableRow>

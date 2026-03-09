@@ -1,12 +1,6 @@
 import type { TenantUnitSummary } from '@/domain/tenant-portal'
 import { formatEnumLabel } from '@/lib/format'
-import { cn } from '@abumble/design-system/utils'
-import {
-	Card,
-	CardContent,
-	CardHeader,
-	CardTitle,
-} from '@abumble/design-system/components/Card'
+import { SectionCard } from '@/components/ui'
 
 function AmenityChip({ label }: { label: string }) {
 	return (
@@ -28,39 +22,34 @@ export function LeaseHomeCard({ unit }: { unit: TenantUnitSummary }) {
 	].filter(Boolean) as string[]
 
 	return (
-		<Card>
-			<CardHeader>
-				<CardTitle className="text-base">{headline}</CardTitle>
-			</CardHeader>
-			<CardContent className="px-5 space-y-4">
-				<div className="flex flex-wrap gap-4 text-sm">
-					{unit.bedrooms != null && (
-						<span>
-							<span className="font-semibold">{unit.bedrooms}</span> bed
-						</span>
-					)}
-					{unit.bathrooms != null && (
-						<span>
-							<span className="font-semibold">{unit.bathrooms}</span> bath
-						</span>
-					)}
-					{unit.squareFootage != null && (
-						<span>
-							<span className="font-semibold">
-								{unit.squareFootage.toLocaleString()}
-							</span>{' '}
-							sq ft
-						</span>
-					)}
-				</div>
-				{amenities.length > 0 && (
-					<div className="flex flex-wrap gap-2">
-						{amenities.map((a) => (
-							<AmenityChip key={a} label={a} />
-						))}
-					</div>
+		<SectionCard title={headline} contentClassName="space-y-4">
+			<div className="flex flex-wrap gap-4 text-sm">
+				{unit.bedrooms != null && (
+					<span>
+						<span className="font-semibold">{unit.bedrooms}</span> bed
+					</span>
 				)}
-			</CardContent>
-		</Card>
+				{unit.bathrooms != null && (
+					<span>
+						<span className="font-semibold">{unit.bathrooms}</span> bath
+					</span>
+				)}
+				{unit.squareFootage != null && (
+					<span>
+						<span className="font-semibold">
+							{unit.squareFootage.toLocaleString()}
+						</span>{' '}
+						sq ft
+					</span>
+				)}
+			</div>
+			{amenities.length > 0 && (
+				<div className="flex flex-wrap gap-2">
+					{amenities.map((a) => (
+						<AmenityChip key={a} label={a} />
+					))}
+				</div>
+			)}
+		</SectionCard>
 	)
 }

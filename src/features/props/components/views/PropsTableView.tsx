@@ -24,7 +24,7 @@ export function PropsTableView() {
 	useQueryErrorToast(isError, error, 'properties')
 
 	return (
-		<SectionCard noPadding className="overflow-hidden">
+		<SectionCard className="overflow-hidden">
 			<Table>
 				<TableHeader>
 					<TableRow>

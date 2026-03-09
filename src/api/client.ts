@@ -54,7 +54,7 @@ export const api = axios.create({
 // Request Interceptor: Dev token + org context injection
 api.interceptors.request.use((_config) => {
 	// Dev: attach Bearer token from localStorage
-	if (config.isDevelopment) {
+	if (config.isDevelopment && _config.url !== '/dev/login') {
 		const token = getDevToken()
 		if (token) {
 			_config.headers['Authorization'] = `Bearer ${token}`

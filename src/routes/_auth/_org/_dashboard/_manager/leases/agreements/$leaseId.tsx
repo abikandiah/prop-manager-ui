@@ -341,11 +341,9 @@ function LeaseDetailPage() {
 
 					{/* Executed content markdown — full width */}
 					{lease.executedContentMarkdown && (
-						<SectionCard noPadding>
-							<div className="px-5 py-4">
-								<div className="prose prose-sm dark:prose-invert max-w-none">
-									<ReactMarkdown>{lease.executedContentMarkdown}</ReactMarkdown>
-								</div>
+						<SectionCard>
+							<div className="prose prose-sm dark:prose-invert max-w-none">
+								<ReactMarkdown>{lease.executedContentMarkdown}</ReactMarkdown>
 							</div>
 						</SectionCard>
 					)}

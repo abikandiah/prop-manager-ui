@@ -129,7 +129,7 @@ export function LeasesTableView({
 			fallback={skeletonTable}
 		>
 			<>
-				<SectionCard noPadding className="overflow-hidden">
+				<SectionCard className="overflow-hidden">
 					<Table>
 						<TableHeader>
 							<TableRow>

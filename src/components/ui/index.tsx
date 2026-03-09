@@ -81,12 +81,12 @@ export function BannerBackgroundImage({
 		<div
 			className={cn(
 				className,
-				'absolute top-0 h-48 w-full overflow-hidden -z-1',
+				'absolute top-0 h-52 w-full overflow-hidden -z-1',
 			)}
 			{...props}
 		>
 			{children}
-			<div className="absolute inset-0 bg-linear-to-b from-slate-900/20 via-transparent to-white dark:to-background" />
+			<div className="absolute inset-0 bg-linear-to-b from-slate-900/20 via-background/0 to-background" />
 		</div>
 	)
 }

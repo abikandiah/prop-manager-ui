@@ -24,8 +24,9 @@ export function FormCard({
 	footer,
 }: FormCardProps) {
 	return (
-		<Card className={cn('w-full max-w-md mx-auto', className)}>
+		<Card className={cn('metallic-panel w-full max-w-md mx-auto', className)}>
 			<CardHeader>
+				{' '}
 				<CardTitle className="text-2xl">{title}</CardTitle>
 				{description && <CardDescription>{description}</CardDescription>}
 			</CardHeader>

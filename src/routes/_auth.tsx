@@ -1,18 +1,18 @@
 import { isApiError } from '@/api/errors'
 import { emitApiEvent, useApiEvent } from '@/api/events'
-import { DevAuthForm } from '@/features/auth/components/forms/DevAuthForm'
 import { NotConnectedPage } from '@/components/NotConnectedPage'
-import { RegisterForm } from '@/features/auth/components/forms/RegisterForm'
 import { BannerLandingPage } from '@/components/pages'
 import { config } from '@/config'
 import { useNetwork } from '@/contexts/network'
 import { OrganizationProvider } from '@/contexts/organization'
+import type { User } from '@/domain/user'
 import { authQueryOptions, useAuth } from '@/features/auth'
+import { DevAuthForm } from '@/features/auth/components/forms/DevAuthForm'
+import { RegisterForm } from '@/features/auth/components/forms/RegisterForm'
 import * as TanStackQueryProvider from '@/integrations/tanstack-query/user-provider'
 import { onlineManager } from '@tanstack/react-query'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
 import { useEffect, useMemo } from 'react'
-import type { User } from '@/domain/user'
 
 export const Route = createFileRoute('/_auth')({
 	beforeLoad: async ({ context }) => {

@@ -5,18 +5,18 @@
 @import '@abumble/design-system/styles.css';
 @source "../node_modules/@abumble/design-system";
 
-/* Brand palette — light */
+/* Brand palette — light (Metallic & Industrial) */
 :root {
-	--color-canopy: #0d2a25;
-	--color-hive: #cffb54;
-	--color-parchment: #fdfdfb;
+	--color-canopy: #0f172a;
+	--color-hive: #0ea5e9;
+	--color-parchment: #f1f5f9;
 }
 
-/* Brand palette — dark */
+/* Brand palette — dark (Deep Steel & Electric) */
 .dark {
-	--color-canopy: #0a1f1b;
-	--color-hive: #b8e842;
-	--color-parchment: #111210;
+	--color-canopy: #020617;
+	--color-hive: #38bdf8;
+	--color-parchment: #0f172a;
 }
 
 /* Expose brand tokens as Tailwind utilities */
@@ -129,6 +129,22 @@
 	@apply border border-border;
 }
 
+@utility metallic-panel {
+	background-color: var(--card);
+	background-image: linear-gradient(135deg, oklch(1 0 0 / 0.05) 0%, transparent 100%);
+	border: 1px solid var(--border);
+	box-shadow:
+		inset 0 1px 0 0 oklch(1 0 0 / 0.1),
+		0 1px 2px 0 oklch(0 0 0 / 0.05);
+
+	.dark & {
+		background-image: linear-gradient(135deg, oklch(1 0 0 / 0.02) 0%, transparent 100%);
+		box-shadow:
+			inset 0 1px 0 0 oklch(1 0 0 / 0.05),
+			0 2px 4px 0 oklch(0 0 0 / 0.2);
+	}
+}
+
 .header {
 	@apply h-14;
 	/* Override design-system's fixed — sticky keeps header in flow */
@@ -195,134 +211,133 @@
 }
 
 :root {
-	/* --- Light Theme (Linen & Slate - Minimal Warmth) --- */
-	--background: oklch(0.992 0.003 85);
-	/* Clean Linen White */
-	--foreground: oklch(0.2 0.01 85);
+	/* --- Light Theme (Metallic & Industrial - Brushed Steel) --- */
+	--background: oklch(0.94 0.01 250);
+	/* Steel Gray */
+	--foreground: oklch(0.2 0.02 250);
 
-	/* Surfaces (Tables, Cards, Buttons) - Frosted White */
-	--card: oklch(1 0 0 / 0.75);
-	--card-foreground: oklch(0.2 0.01 85);
+	/* Surfaces - Aluminum Finish */
+	--card: oklch(0.98 0.005 250 / 0.85);
+	--card-foreground: oklch(0.2 0.02 250);
 
 	--popover: oklch(1 0 0);
-	--popover-foreground: oklch(0.2 0.01 85);
+	--popover-foreground: oklch(0.2 0.02 250);
 
-	/* Primary: Deep Warm Charcoal (Neutral & High Contrast) */
-	--primary: oklch(0.18 0.01 85);
-	--primary-foreground: oklch(1 0 0);
+	/* Primary: Industrial Blue */
+	--primary: oklch(0.3 0.05 250);
+	--primary-foreground: oklch(0.98 0.005 250);
 
-	/* Button/Surface Colors: Pure White */
-	--secondary: oklch(1 0 0);
-	--secondary-foreground: oklch(0.18 0.01 85);
+	/* Button/Surface Colors: Silver */
+	--secondary: oklch(0.92 0.01 250);
+	--secondary-foreground: oklch(0.3 0.05 250);
 
-	--muted: oklch(1 0 0);
-	--muted-foreground: oklch(0.5 0.01 85);
+	--muted: oklch(0.92 0.01 250);
+	--muted-foreground: oklch(0.5 0.02 250);
 
-	--accent: oklch(1 0 0);
-	--accent-foreground: oklch(0.18 0.01 85);
+	--accent: oklch(0.9 0.02 250);
+	--accent-foreground: oklch(0.3 0.05 250);
 
 	--destructive: oklch(0.55 0.15 25);
 	--destructive-foreground: oklch(1 0 0);
 
-	--border: oklch(0.94 0.005 85);
-	--input: oklch(0.94 0.005 85);
-	--ring: oklch(0.18 0.01 85 / 0.1);
+	--border: oklch(0.85 0.01 250);
+	--input: oklch(0.85 0.01 250);
+	--ring: oklch(0.3 0.05 250 / 0.15);
 
-	--radius: 0.6rem;
+	--radius: 0.25rem; /* Sharper for robotic feel */
 
-	/* Sidebar (Soft White) */
-	--sidebar: oklch(0.995 0.002 85);
-	--sidebar-foreground: oklch(0.2 0.01 85);
-	--sidebar-primary: oklch(0.18 0.01 85);
-	--sidebar-primary-foreground: oklch(1 0 0);
-	--sidebar-accent: oklch(0.97 0.01 85);
-	/* Slightly darker for active/hover state */
-	--sidebar-accent-foreground: oklch(0.18 0.01 85);
-	--sidebar-border: oklch(0.95 0.005 85);
+	/* Sidebar (Cold Slate) */
+	--sidebar: oklch(0.96 0.01 250);
+	--sidebar-foreground: oklch(0.25 0.02 250);
+	--sidebar-primary: oklch(0.3 0.05 250);
+	--sidebar-primary-foreground: oklch(0.98 0.005 250);
+	--sidebar-accent: oklch(0.92 0.02 250);
+	--sidebar-accent-foreground: oklch(0.25 0.02 250);
+	--sidebar-border: oklch(0.88 0.01 250);
 
-	/* Banners (Refined) */
-	--banner-info: oklch(0.94 0.02 240);
-	--banner-info-foreground: oklch(0.4 0.1 240);
-	--banner-info-border: oklch(0.85 0.05 240);
-	--banner-note: oklch(0.94 0.02 160);
-	--banner-note-foreground: oklch(0.35 0.1 160);
-	--banner-note-border: oklch(0.85 0.05 160);
-	--banner-warning: oklch(0.95 0.03 80);
-	--banner-warning-foreground: oklch(0.45 0.1 60);
-	--banner-warning-border: oklch(0.88 0.05 70);
-	--banner-alert: oklch(0.95 0.03 25);
-	--banner-alert-foreground: oklch(0.45 0.12 25);
-	--banner-alert-border: oklch(0.88 0.08 25);
+	/* Banners (Metallic & Industrial) */
+	--banner-info: oklch(0.94 0.02 245);
+	--banner-info-foreground: oklch(0.24 0.09 245);
+	--banner-info-border: oklch(0.52 0.18 245);
+	--banner-note: oklch(0.94 0.02 162);
+	--banner-note-foreground: oklch(0.24 0.1 162);
+	--banner-note-border: oklch(0.48 0.16 162);
+	--banner-warning: oklch(0.95 0.04 78);
+	--banner-warning-foreground: oklch(0.34 0.13 62);
+	--banner-warning-border: oklch(0.62 0.18 72);
+	--banner-alert: oklch(0.95 0.03 22);
+	--banner-alert-foreground: oklch(0.34 0.14 22);
+	--banner-alert-border: oklch(0.52 0.2 22);
 
 	/* Interactive Elements */
-	--badge-success: oklch(0.4 0.1 160);
-	--badge-success-foreground: oklch(1 0 0);
-	--checkbox-checked: oklch(0.15 0.01 60);
+	--badge-success: oklch(0.35 0.1 160);
+	--badge-success-foreground: oklch(0.98 0.01 160);
+	--checkbox-checked: oklch(0.3 0.05 250);
 	--checkbox-checked-foreground: oklch(1 0 0);
 	--checkbox-unchecked-bg: oklch(1 0 0);
-	--checkbox-unchecked-border: oklch(0.88 0.01 60);
+	--checkbox-unchecked-border: oklch(0.85 0.01 250);
 }
 
 .dark {
-	/* --- Dark Theme (Modern Slate & Glow) --- */
-	--background: oklch(0.18 0.015 260);
-	--foreground: oklch(0.985 0 0);
+        /* --- Dark Theme (Modern Slate & Glow) --- */
+        --background: oklch(0.18 0.015 260);
+        --foreground: oklch(0.985 0 0);
 
-	/* Card Elevation: Brighter than background */
-	--card: oklch(0.23 0.02 260 / 0.75);
-	--card-foreground: oklch(0.985 0 0);
+        /* Card Elevation: Brighter than background */
+        --card: oklch(0.23 0.02 260 / 0.75);
+        --card-foreground: oklch(0.985 0 0);
 
-	--popover: oklch(0.21 0.015 260);
-	--popover-foreground: oklch(0.985 0 0);
+        --popover: oklch(0.21 0.015 260);
+        --popover-foreground: oklch(0.985 0 0);
 
-	/* Primary: Electric Cyan Glow */
-	--primary: oklch(0.9 0.1 220);
-	--primary-foreground: oklch(0.18 0.015 260);
+        /* Primary: Electric Cyan Glow */
+        --primary: oklch(0.9 0.1 220);
+        --primary-foreground: oklch(0.18 0.015 260);
 
-	--secondary: oklch(0.28 0.02 260);
-	--secondary-foreground: oklch(0.9 0.1 220);
+        --secondary: oklch(0.28 0.02 260);
+        --secondary-foreground: oklch(0.9 0.1 220);
 
-	--muted: oklch(0.28 0.02 260);
-	--muted-foreground: oklch(0.705 0.015 260);
+        --muted: oklch(0.28 0.02 260);
+        --muted-foreground: oklch(0.705 0.015 260);
 
-	--accent: oklch(0.28 0.02 260);
-	--accent-foreground: oklch(0.9 0.1 220);
+        --accent: oklch(0.28 0.02 260);
+        --accent-foreground: oklch(0.9 0.1 220);
 
-	--destructive: oklch(0.45 0.15 25);
-	--destructive-foreground: oklch(0.985 0 0);
+        --destructive: oklch(0.45 0.15 25);
+        --destructive-foreground: oklch(0.985 0 0);
 
-	--border: oklch(0.32 0.02 260);
-	--input: oklch(0.32 0.02 260);
-	--ring: oklch(0.9 0.1 220 / 0.3);
+        --border: oklch(0.32 0.02 260);
+        --input: oklch(0.32 0.02 260);
+        --ring: oklch(0.9 0.1 220 / 0.3);
 
-	/* Sidebar (Dark) */
-	--sidebar: oklch(0.21 0.015 260);
-	--sidebar-foreground: oklch(0.985 0 0);
-	--sidebar-primary: oklch(0.9 0.1 220);
-	--sidebar-primary-foreground: oklch(0.18 0.015 260);
-	--sidebar-accent: oklch(0.28 0.02 260);
-	--sidebar-accent-foreground: oklch(0.985 0 0);
-	--sidebar-border: oklch(0.32 0.02 260);
+        /* Sidebar (Dark) */
+        --sidebar: oklch(0.21 0.015 260);
+        --sidebar-foreground: oklch(0.985 0 0);
+        --sidebar-primary: oklch(0.9 0.1 220);
+        --sidebar-primary-foreground: oklch(0.18 0.015 260);
+        --sidebar-accent: oklch(0.28 0.02 260);
+        --sidebar-accent-foreground: oklch(0.985 0 0);
+        --sidebar-border: oklch(0.32 0.02 260);
 
-	/* Banners (Dark - Desaturated) */
-	--banner-info: oklch(0.274 0.079 260);
-	--banner-info-foreground: oklch(0.925 0.033 260);
-	--banner-info-border: oklch(0.488 0.2 260);
-	--banner-note: oklch(0.266 0.065 152);
-	--banner-note-foreground: oklch(0.962 0.044 156);
-	--banner-note-border: oklch(0.45 0.1 152);
-	--banner-warning: oklch(0.55 0.22 100);
-	--banner-warning-foreground: oklch(0.99 0.15 102);
-	--banner-warning-border: oklch(0.75 0.25 100);
-	--banner-alert: oklch(0.293 0.084 27);
-	--banner-alert-foreground: oklch(0.969 0.071 27);
-	--banner-alert-border: oklch(0.45 0.12 27);
+        /* Banners (Dark - Desaturated) */
+        --banner-info: oklch(0.274 0.079 260);
+        --banner-info-foreground: oklch(0.925 0.033 260);
+        --banner-info-border: oklch(0.488 0.2 260);
+        --banner-note: oklch(0.266 0.065 152);
+        --banner-note-foreground: oklch(0.962 0.044 156);
+        --banner-note-border: oklch(0.45 0.1 152);
+        --banner-warning: oklch(0.55 0.22 100);
+        --banner-warning-foreground: oklch(0.99 0.15 102);
+        --banner-warning-border: oklch(0.75 0.25 100);
+        --banner-alert: oklch(0.293 0.084 27);
+        --banner-alert-foreground: oklch(0.969 0.071 27);
+        --banner-alert-border: oklch(0.45 0.12 27);
 
-	/* Interactive Elements (Dark) */
-	--badge-success: oklch(0.48 0.15 150);
-	--badge-success-foreground: oklch(1 0 0);
-	--checkbox-checked: oklch(0.9 0.1 220);
-	--checkbox-checked-foreground: oklch(0.18 0.015 260);
-	--checkbox-unchecked-bg: oklch(0.25 0.01 260);
-	--checkbox-unchecked-border: oklch(0.4 0.01 260);
+        /* Interactive Elements (Dark) */
+        --badge-success: oklch(0.48 0.15 150);
+        --badge-success-foreground: oklch(1 0 0);
+        --checkbox-checked: oklch(0.9 0.1 220);
+        --checkbox-checked-foreground: oklch(0.18 0.015 260);
+        --checkbox-unchecked-bg: oklch(0.25 0.01 260);
+        --checkbox-unchecked-border: oklch(0.4 0.01 260);
 }

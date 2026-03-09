@@ -29,8 +29,5 @@ export const config = {
 		Number(import.meta.env.VITE_LOADING_FALLBACK_DELAY_MS) || 250,
 
 	/** True when running via `vite` (dev server); false for production builds. */
-	isDevelopment:
-		import.meta.env.MODE === 'development' ||
-		['localhost', '127.0.0.1', '0.0.0.0'].includes(window.location.hostname) ||
-		window.location.hostname.endsWith('.local'),
+	isDevelopment: import.meta.env.MODE === 'development',
 }

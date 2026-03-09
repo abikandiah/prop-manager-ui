@@ -1,8 +1,8 @@
-import { ManagerDashboardSection } from '@/features/home/components/views/ManagerDashboardSection'
-import { TenantDashboardSection } from '@/features/home/components/views/TenantDashboardSection'
+import { useOrganization } from '@/contexts/organization'
 import { AppRole } from '@/domain/user'
 import { useActiveOrgRoles } from '@/features/auth'
-import { useOrganization } from '@/contexts/organization'
+import { ManagerDashboardSection } from '@/features/home/components/views/ManagerDashboardSection'
+import { TenantDashboardSection } from '@/features/home/components/views/TenantDashboardSection'
 import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
 import { createFileRoute } from '@tanstack/react-router'
 

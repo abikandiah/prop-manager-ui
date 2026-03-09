@@ -6,7 +6,7 @@ export const Route = createFileRoute('/_public')({
 
 function RouteComponent() {
 	return (
-		<div className="mt-24">
+		<div className="mt-32">
 			<Outlet />
 		</div>
 	)

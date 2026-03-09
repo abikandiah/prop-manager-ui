@@ -97,7 +97,7 @@ function HeroSection() {
 				}}
 			/>
 
-			<div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-12 px-6 py-24 lg:grid-cols-2 lg:items-center lg:py-32">
+			<div className="relative mx-auto grid max-w-7xl grid-cols-1 gap-12 px-12 py-24 lg:grid-cols-2 lg:items-center lg:py-32">
 				{/* Copy */}
 				<div className="flex flex-col items-center text-center lg:items-start lg:text-left">
 					<h1 className="text-5xl font-bold tracking-tight text-white sm:text-6xl lg:text-7xl">
@@ -112,14 +112,14 @@ function HeroSection() {
 						{/* Lime pill — works reliably on dark canopy bg */}
 						<Link
 							to="/home"
-							className="inline-flex h-11 items-center justify-center rounded-full bg-hive px-6 text-sm font-semibold text-canopy transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hive focus-visible:ring-offset-2 focus-visible:ring-offset-canopy"
+							className="inline-flex h-11 items-center justify-center rounded-full bg-hive px-12 text-sm font-semibold text-canopy transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-hive focus-visible:ring-offset-2 focus-visible:ring-offset-canopy"
 						>
 							Get started
 						</Link>
 						{/* Ghost outline — transparent bg avoids design-system overrides */}
 						<Link
 							to="/home"
-							className="inline-flex h-11 items-center justify-center rounded-full border border-white/30 bg-transparent px-6 text-sm font-medium text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
+							className="inline-flex h-11 items-center justify-center rounded-full border border-white/30 bg-transparent px-12 text-sm font-medium text-white transition-colors hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
 						>
 							Sign in
 						</Link>
@@ -192,7 +192,7 @@ function CapabilityBar() {
 			className="w-full bg-parchment dark:bg-background"
 			aria-label="Features"
 		>
-			<div ref={ref} className="reveal mx-auto max-w-7xl px-6 py-14">
+			<div ref={ref} className="reveal mx-auto max-w-7xl px-12 py-14">
 				<p className="mb-8 text-center text-sm font-medium text-muted-foreground">
 					Everything an independent landlord needs, in one place.
 				</p>
@@ -226,7 +226,7 @@ function BentoSection() {
 			className="w-full bg-parchment dark:bg-background"
 			aria-label="Product features"
 		>
-			<div ref={ref} className="reveal mx-auto max-w-7xl px-6 pb-24">
+			<div ref={ref} className="reveal mx-auto max-w-7xl px-12 pb-24">
 				<h2 className="mb-4 text-center text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
 					Built for how landlords actually work
 				</h2>
@@ -378,7 +378,7 @@ function IntegrationSection() {
 
 	return (
 		<section className="w-full bg-canopy" aria-label="Integrations">
-			<div ref={ref} className="reveal mx-auto max-w-7xl px-6 py-24">
+			<div ref={ref} className="reveal mx-auto max-w-7xl px-12 py-24">
 				<div className="flex flex-col items-center gap-16 lg:flex-row lg:items-center lg:justify-between">
 					{/* Orbit visual */}
 					<div
@@ -444,7 +444,7 @@ function PreFooterCTA() {
 		>
 			<div
 				ref={ref}
-				className="reveal mx-auto flex max-w-md flex-col items-center px-6 py-24 text-center"
+				className="reveal mx-auto flex max-w-md flex-col items-center px-12 py-24 text-center"
 			>
 				<h2 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl">
 					Ready to simplify your rentals?

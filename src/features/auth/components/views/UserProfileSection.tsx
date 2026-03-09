@@ -1,4 +1,9 @@
-import { FieldError, FormFooter, ProfileField, SectionCard } from '@/components/ui'
+import {
+	FieldError,
+	FormFooter,
+	ProfileField,
+	SectionCard,
+} from '@/components/ui'
 import type { User } from '@/domain/user'
 import { useAuth, useUpdateMe } from '@/features/auth/hooks'
 import { FORM_DIALOG_CLASS } from '@/lib/dialog'

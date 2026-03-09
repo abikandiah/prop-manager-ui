@@ -6,8 +6,9 @@ import type {
 
 class NotificationPreferencesApi {
 	async list(): Promise<NotificationPreference[]> {
-		const { data } =
-			await api.get<NotificationPreference[]>('/notification-preferences')
+		const { data } = await api.get<NotificationPreference[]>(
+			'/notification-preferences',
+		)
 		return data
 	}
 

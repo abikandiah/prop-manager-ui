@@ -8,6 +8,7 @@ import { OrganizationProvider } from '@/contexts/organization'
 import type { User } from '@/domain/user'
 import { authQueryOptions, useAuth } from '@/features/auth'
 import { DevAuthForm } from '@/features/auth/components/forms/DevAuthForm'
+import { oidcManager } from '@/features/auth/oidc'
 import { RegisterForm } from '@/features/auth/components/forms/RegisterForm'
 import * as TanStackQueryProvider from '@/integrations/tanstack-query/user-provider'
 import { onlineManager } from '@tanstack/react-query'
@@ -34,8 +35,11 @@ export const Route = createFileRoute('/_auth')({
 			}
 
 			if (!config.isDevelopment) {
-				if (config.authRedirectUrl) {
-					window.location.href = config.authRedirectUrl
+				if (oidcManager) {
+					await oidcManager.signinRedirect({
+						state: { returnTo: window.location.pathname + window.location.search },
+					})
+					return { user: undefined } // never reached — browser navigates away
 				} else {
 					throw error
 				}
@@ -52,15 +56,14 @@ function RouteComponent() {
 	const { isOnline } = useNetwork()
 
 	if (!user) {
-		if (!isOnline) {
-			return <NotConnectedPage />
-		}
-
-		return (
-			<BannerLandingPage>
-				<DevAuthForm onSuccess={refreshUser} />
-			</BannerLandingPage>
-		)
+		if (!isOnline) return <NotConnectedPage />
+		if (config.isDevelopment)
+			return (
+				<BannerLandingPage>
+					<DevAuthForm onSuccess={refreshUser} />
+				</BannerLandingPage>
+			)
+		return null // production: browser is mid-redirect to Authentik
 	}
 
 	if (!user.termsAccepted) {

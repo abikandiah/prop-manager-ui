@@ -2,7 +2,11 @@ import { stringToBoolean } from '@abumble/design-system/utils'
 
 export const config = {
 	apiBaseUrl: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:8080',
-	authRedirectUrl: import.meta.env.VITE_AUTH_REDIRECT_URL || '',
+
+	oidcAuthority: import.meta.env.VITE_OIDC_AUTHORITY ?? '',
+	oidcClientId: import.meta.env.VITE_OIDC_CLIENT_ID ?? '',
+	oidcRedirectUri: import.meta.env.VITE_OIDC_REDIRECT_URI ?? '',
+
 	constructionDisabled:
 		stringToBoolean(import.meta.env.VITE_CONSTRUCTION_DISABLED) || false,
 

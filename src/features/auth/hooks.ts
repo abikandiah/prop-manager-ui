@@ -3,6 +3,7 @@ import { config } from '@/config'
 import { useOrganization } from '@/contexts/organization'
 import type { AppRole, UserUpdatePayload } from '@/domain/user'
 import { globalClient } from '@/integrations/tanstack-query/globalClient'
+import { oidcManager } from './oidc'
 import {
 	queryOptions,
 	useMutation,
@@ -44,6 +45,10 @@ export function useAuth() {
 		? async () => {}
 		: async () => {
 				let logoutUrl: string | undefined
+
+				if (!config.isDevelopment && oidcManager) {
+					await oidcManager.removeUser()
+				}
 
 				try {
 					const data = await authApi.logout()

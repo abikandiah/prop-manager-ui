@@ -2,6 +2,7 @@ import { ApiError } from '@/api/errors'
 import { emitApiEvent } from '@/api/events'
 import { config } from '@/config'
 import { authQueryOptions } from '@/features/auth'
+import { oidcManager } from '@/features/auth/oidc'
 import { globalClient } from '@/integrations/tanstack-query/globalClient'
 import axios from 'axios'
 
@@ -51,13 +52,21 @@ export const api = axios.create({
 	withCredentials: true,
 })
 
-// Request Interceptor: Dev token + org context injection
-api.interceptors.request.use((_config) => {
+// Request Interceptor: Dev token + OIDC token + org context injection
+api.interceptors.request.use(async (_config) => {
 	// Dev: attach Bearer token from localStorage
 	if (config.isDevelopment && _config.url !== '/dev/login') {
 		const token = getDevToken()
 		if (token) {
 			_config.headers['Authorization'] = `Bearer ${token}`
+		}
+	}
+
+	// Production: attach OIDC access token from oidc-client-ts (reads localStorage, fast)
+	if (!config.isDevelopment && oidcManager) {
+		const user = await oidcManager.getUser()
+		if (user?.access_token) {
+			_config.headers['Authorization'] = `Bearer ${user.access_token}`
 		}
 	}
 

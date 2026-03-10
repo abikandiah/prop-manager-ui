@@ -203,7 +203,7 @@
 	--color-parchment: #f1f5f9;
 
 	/* --- Light Theme (Metallic & Industrial - Brushed Steel) --- */
-	--background: oklch(0.94 0.01 250);
+	--background: oklch(0.95 0.005 250);
 	/* Steel Gray */
 	--foreground: oklch(0.2 0.02 250);
 
@@ -219,33 +219,32 @@
 	--primary-foreground: oklch(0.98 0.005 250);
 
 	/* Button/Surface Colors: Silver */
-	--secondary: oklch(0.92 0.01 250);
+	--secondary: oklch(0.93 0.005 250);
 	--secondary-foreground: oklch(0.3 0.05 250);
 
-	--muted: oklch(0.92 0.01 250);
+	--muted: oklch(0.93 0.005 250);
 	--muted-foreground: oklch(0.5 0.02 250);
 
-	--accent: oklch(0.9 0.02 250);
+	--accent: oklch(0.91 0.008 250);
 	--accent-foreground: oklch(0.3 0.05 250);
 
 	--destructive: oklch(0.55 0.15 25);
 	--destructive-foreground: oklch(1 0 0);
 
-	--border: oklch(0.85 0.01 250);
-	--input: oklch(0.85 0.01 250);
+	--border: oklch(0.88 0.005 250);
+	--input: oklch(0.88 0.005 250);
 	--ring: oklch(0.3 0.05 250 / 0.15);
 
 	--radius: 0.25rem; /* Sharper for robotic feel */
 
 	/* Sidebar (Cold Slate) */
-	--sidebar: oklch(0.96 0.01 250);
+	--sidebar: oklch(0.97 0.005 250);
 	--sidebar-foreground: oklch(0.25 0.02 250);
 	--sidebar-primary: oklch(0.3 0.05 250);
 	--sidebar-primary-foreground: oklch(0.98 0.005 250);
-	--sidebar-accent: oklch(0.92 0.02 250);
+	--sidebar-accent: oklch(0.93 0.008 250);
 	--sidebar-accent-foreground: oklch(0.25 0.02 250);
-	--sidebar-border: oklch(0.88 0.01 250);
-
+	--sidebar-border: oklch(0.9 0.005 250);
 	/* Banners (Metallic & Industrial) */
 	--banner-info: oklch(0.94 0.02 245);
 	--banner-info-foreground: oklch(0.24 0.09 245);

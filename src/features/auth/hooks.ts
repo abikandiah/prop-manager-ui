@@ -3,7 +3,6 @@ import { config } from '@/config'
 import { useOrganization } from '@/contexts/organization'
 import type { AppRole, UserUpdatePayload } from '@/domain/user'
 import { globalClient } from '@/integrations/tanstack-query/globalClient'
-import { oidcManager } from './oidc'
 import {
 	queryOptions,
 	useMutation,
@@ -12,6 +11,7 @@ import {
 } from '@tanstack/react-query'
 import { clearUserDb } from '../offline/db'
 import { authApi } from './api'
+import { oidcManager } from './oidc'
 
 export const authQueryOptions = queryOptions({
 	queryKey: ['me'],
@@ -29,13 +29,15 @@ export function useAuth() {
 	// true when inside AppWithProviders' user-scoped QueryClientProvider
 	const hasUserScopedClient = userClient !== globalClient
 
-	const { data: user, isLoading } = useQuery(
+	const { data, isLoading } = useQuery(
 		{
 			...authQueryOptions,
 			refetchInterval: config.userRefetchIntervalMs,
 		},
 		globalClient,
 	)
+
+	const user = data?.id ? data : null
 
 	const refreshUser = async () => {
 		await globalClient.invalidateQueries(authQueryOptions)

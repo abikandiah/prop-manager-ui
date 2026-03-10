@@ -8,8 +8,8 @@ import { OrganizationProvider } from '@/contexts/organization'
 import type { User } from '@/domain/user'
 import { authQueryOptions, useAuth } from '@/features/auth'
 import { DevAuthForm } from '@/features/auth/components/forms/DevAuthForm'
+import { OidcSignInForm } from '@/features/auth/components/forms/OidcSignInForm'
 import { RegisterForm } from '@/features/auth/components/forms/RegisterForm'
-import { oidcManager } from '@/features/auth/oidc'
 import * as TanStackQueryProvider from '@/integrations/tanstack-query/user-provider'
 import { onlineManager } from '@tanstack/react-query'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
@@ -30,20 +30,9 @@ export const Route = createFileRoute('/_auth')({
 			const user = await context.globalClient.ensureQueryData(authQueryOptions)
 			return { user }
 		} catch (error) {
+			// Log unexpected failures; 401 is expected when unauthenticated
 			if (isApiError(error) && error.status !== 401) {
 				console.warn('[Auth] Failed to load user:', error)
-			}
-
-			if (!config.isDevelopment) {
-				if (oidcManager) {
-					await oidcManager.signinRedirect({
-						state: {
-							returnTo: window.location.pathname + window.location.search,
-						},
-					})
-				} else {
-					throw error
-				}
 			}
 
 			return { user: undefined }
@@ -58,13 +47,18 @@ function RouteComponent() {
 
 	if (!user) {
 		if (!isOnline) return <NotConnectedPage />
-		if (config.isDevelopment)
+		if (config.isDevelopment) {
 			return (
 				<BannerLandingPage>
 					<DevAuthForm onSuccess={refreshUser} />
 				</BannerLandingPage>
 			)
-		return null // production: browser is mid-redirect to Authentik
+		}
+		return (
+			<BannerLandingPage>
+				<OidcSignInForm />
+			</BannerLandingPage>
+		)
 	}
 
 	if (!user.termsAccepted) {

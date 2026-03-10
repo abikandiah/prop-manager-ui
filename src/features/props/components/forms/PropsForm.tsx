@@ -2,6 +2,7 @@ import { FieldError, FormFooter } from '@/components/ui'
 import type { CreatePropPayload, Prop } from '@/domain/property'
 import { PROPERTY_TYPES, PropertyType } from '@/domain/property'
 import { useCreateProp, useUpdateProp } from '@/features/props/hooks'
+import { extractFieldErrors } from '@/api/errors'
 import { formatEnumLabel } from '@/lib/format'
 import { Input } from '@abumble/design-system/components/Input'
 import { Label } from '@abumble/design-system/components/Label'
@@ -121,6 +122,7 @@ export function PropsForm({
 		register,
 		handleSubmit,
 		reset,
+		setError,
 		formState: { errors },
 	} = form
 
@@ -154,6 +156,12 @@ export function PropsForm({
 			version: initialProp?.version ?? 0,
 		}
 
+		const handleFieldErrors = (error: unknown) => {
+			extractFieldErrors(error).forEach(({ field, message }) => {
+				setError(field as keyof PropFormValues, { message })
+			})
+		}
+
 		if (isEdit) {
 			updateProp.mutate(
 				{ id: initialProp.id, payload },
@@ -162,6 +170,7 @@ export function PropsForm({
 						toast.success('Property updated')
 						onSuccess?.()
 					},
+					onError: handleFieldErrors,
 				},
 			)
 		} else {
@@ -175,6 +184,7 @@ export function PropsForm({
 						navigate({ to: '/props/$id', params: { id: data.id } })
 					}
 				},
+				onError: handleFieldErrors,
 			})
 		}
 	}

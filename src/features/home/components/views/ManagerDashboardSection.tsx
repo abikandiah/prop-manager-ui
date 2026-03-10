@@ -1,12 +1,7 @@
 import { ActivityFeed } from '@/features/activity'
 import { SectionCard } from '@/components/ui/SectionCard'
 import { formatCurrency } from '@/lib/format'
-import {
-	Building2,
-	FileCheck,
-	FileSignature,
-	TrendingUp
-} from 'lucide-react'
+import { Building2, FileCheck, FileSignature, TrendingUp } from 'lucide-react'
 import { useDashboardStats } from '../../hooks'
 import { ExpiringLeasesTable } from './ExpiringLeasesTable'
 import { MetricCard } from './MetricCard'
@@ -79,4 +74,3 @@ export function ManagerDashboardSection() {
 		</div>
 	)
 }
-

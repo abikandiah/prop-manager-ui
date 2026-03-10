@@ -11,6 +11,7 @@ import { FieldError } from '@/components/ui/FieldError'
 import { RequiredMark } from '@/components/ui'
 import { FormActions } from '@/components/ui/FormCard'
 import { useCreateOrganization } from '@/features/organizations'
+import { extractFieldErrors } from '@/api/errors'
 
 const createOrganizationSchema = z.object({
 	name: z
@@ -36,6 +37,7 @@ export function CreateOrganizationForm({
 	const {
 		register,
 		handleSubmit,
+		setError,
 		formState: { errors },
 	} = useForm<CreateOrganizationFormValues>({
 		resolver: standardSchemaResolver(createOrganizationSchema),
@@ -52,6 +54,13 @@ export function CreateOrganizationForm({
 					onSuccess: () => {
 						toast.success('Organization created')
 						onSuccess?.()
+					},
+					onError: (error) => {
+						extractFieldErrors(error).forEach(({ field, message }) => {
+							setError(field as keyof CreateOrganizationFormValues, {
+								message,
+							})
+						})
 					},
 				},
 			)

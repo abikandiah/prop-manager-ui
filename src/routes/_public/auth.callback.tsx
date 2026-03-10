@@ -19,8 +19,7 @@ function AuthCallbackPage() {
 		oidcManager
 			.signinRedirectCallback()
 			.then((user) => {
-				const returnTo =
-					(user.state as { returnTo?: string })?.returnTo ?? '/'
+				const returnTo = (user.state as { returnTo?: string })?.returnTo ?? '/'
 				navigate({ to: returnTo, replace: true })
 			})
 			.catch(() => navigate({ to: '/', replace: true }))

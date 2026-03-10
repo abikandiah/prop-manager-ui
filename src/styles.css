@@ -219,7 +219,7 @@
 	--primary-foreground: oklch(0.98 0.005 250);
 
 	/* Button/Surface Colors: Silver */
-	--secondary: oklch(0.93 0.005 250);
+	--secondary: oklch(0.97 0.005 250);
 	--secondary-foreground: oklch(0.3 0.05 250);
 
 	--muted: oklch(0.93 0.005 250);

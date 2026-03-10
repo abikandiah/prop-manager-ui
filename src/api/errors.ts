@@ -7,7 +7,7 @@ export interface ProblemDetail {
 	status?: number
 	detail?: string
 	instance?: string
-	/** Validation field errors — present on 400 responses. */
+	/** Field errors — present on 400 validation failures and 409 name conflicts. */
 	errors?: Array<{ field: string; message: string }>
 }
 
@@ -73,4 +73,16 @@ export class ApiError extends Error {
 /** Type guard for ApiError. */
 export function isApiError(error: unknown): error is ApiError {
 	return error instanceof ApiError
+}
+
+/**
+ * Extracts field errors from a thrown ApiError (works for 400 validation and 409 name conflicts).
+ * The API client wraps all errors as ApiError; this unwraps to the original Axios error.
+ */
+export function extractFieldErrors(
+	error: unknown,
+): Array<{ field: string; message: string }> {
+	const raw = error instanceof ApiError ? error.cause : error
+	if (!axios.isAxiosError(raw)) return []
+	return (raw.response?.data as ProblemDetail | undefined)?.errors ?? []
 }

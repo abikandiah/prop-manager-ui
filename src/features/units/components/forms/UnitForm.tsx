@@ -11,6 +11,7 @@ import type { CreateUnitPayload, Unit, UpdateUnitPayload } from '@/domain/unit'
 import { FieldError, FormFooter } from '@/components/ui'
 import { UNIT_STATUSES, UNIT_TYPES, UnitStatus, UnitType } from '@/domain/unit'
 import { useCreateUnit, useUpdateUnit } from '@/features/units/hooks'
+import { extractFieldErrors } from '@/api/errors'
 import { usePropsList } from '@/features/props'
 import { formatEnumLabel } from '@/lib/format'
 import { generateId } from '@/lib/util'
@@ -116,6 +117,7 @@ export function UnitForm({
 		register,
 		handleSubmit,
 		reset,
+		setError,
 		control,
 		formState: { errors },
 	} = useForm<UnitFormValues>({
@@ -179,6 +181,12 @@ export function UnitForm({
 		version: initialUnit?.version ?? 0,
 	})
 
+	const handleFieldErrors = (error: unknown) => {
+		extractFieldErrors(error).forEach(({ field, message }) => {
+			setError(field as keyof UnitFormValues, { message })
+		})
+	}
+
 	const onSubmit = (values: UnitFormValues) => {
 		if (isEdit) {
 			updateUnit.mutate(
@@ -188,6 +196,7 @@ export function UnitForm({
 						toast.success('Unit updated')
 						onSuccess?.()
 					},
+					onError: handleFieldErrors,
 				},
 			)
 		} else {
@@ -197,6 +206,7 @@ export function UnitForm({
 					reset(makeDefaults(propId))
 					onSuccess?.()
 				},
+				onError: handleFieldErrors,
 			})
 		}
 	}

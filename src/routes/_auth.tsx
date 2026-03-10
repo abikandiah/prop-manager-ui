@@ -37,7 +37,9 @@ export const Route = createFileRoute('/_auth')({
 			if (!config.isDevelopment) {
 				if (oidcManager) {
 					await oidcManager.signinRedirect({
-						state: { returnTo: window.location.pathname + window.location.search },
+						state: {
+							returnTo: window.location.pathname + window.location.search,
+						},
 					})
 					return { user: undefined } // never reached — browser navigates away
 				} else {

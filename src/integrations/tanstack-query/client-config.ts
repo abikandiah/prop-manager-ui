@@ -77,6 +77,7 @@ export function createMutationCache(): MutationCache {
 export function createBootstrapDefaults(): DefaultOptions {
 	return {
 		queries: {
+			networkMode: 'always',
 			retry: queryRetryFn,
 			retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000),
 		},

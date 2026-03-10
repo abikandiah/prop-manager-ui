@@ -8,8 +8,8 @@ import { OrganizationProvider } from '@/contexts/organization'
 import type { User } from '@/domain/user'
 import { authQueryOptions, useAuth } from '@/features/auth'
 import { DevAuthForm } from '@/features/auth/components/forms/DevAuthForm'
-import { oidcManager } from '@/features/auth/oidc'
 import { RegisterForm } from '@/features/auth/components/forms/RegisterForm'
+import { oidcManager } from '@/features/auth/oidc'
 import * as TanStackQueryProvider from '@/integrations/tanstack-query/user-provider'
 import { onlineManager } from '@tanstack/react-query'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
@@ -41,7 +41,6 @@ export const Route = createFileRoute('/_auth')({
 							returnTo: window.location.pathname + window.location.search,
 						},
 					})
-					return { user: undefined } // never reached — browser navigates away
 				} else {
 					throw error
 				}

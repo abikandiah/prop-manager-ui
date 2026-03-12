@@ -37,7 +37,7 @@ export function useAuth() {
 		globalClient,
 	)
 
-	const user = data?.id ? data : null
+	const user = data?.id ? data : undefined
 
 	const refreshUser = async () => {
 		await globalClient.invalidateQueries(authQueryOptions)
@@ -48,15 +48,15 @@ export function useAuth() {
 		: async () => {
 				let logoutUrl: string | undefined
 
-				if (!config.isDevelopment && oidcManager) {
-					await oidcManager.removeUser()
-				}
-
 				try {
 					const data = await authApi.logout()
 					logoutUrl = data.logoutUrl
 				} catch (error) {
 					console.error('[Auth] Backend logout failed:', error)
+				}
+
+				if (!config.isDevelopment && oidcManager) {
+					await oidcManager.removeUser()
 				}
 
 				// Only clear user-scoped client — skip if useQueryClient() returned globalClient

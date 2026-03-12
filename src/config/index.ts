@@ -6,6 +6,7 @@ export const config = {
 	oidcAuthority: import.meta.env.VITE_OIDC_AUTHORITY ?? '',
 	oidcClientId: import.meta.env.VITE_OIDC_CLIENT_ID ?? '',
 	oidcRedirectUri: import.meta.env.VITE_OIDC_REDIRECT_URI ?? '',
+	oidcResource: import.meta.env.VITE_OIDC_RESOURCE ?? '',
 
 	constructionDisabled:
 		stringToBoolean(import.meta.env.VITE_CONSTRUCTION_DISABLED) || false,

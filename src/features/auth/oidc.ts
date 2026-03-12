@@ -9,6 +9,7 @@ export const oidcManager = config.oidcAuthority
 			client_id: config.oidcClientId,
 			redirect_uri: config.oidcRedirectUri,
 			scope: 'openid profile email offline_access',
+			resource: config.oidcResource || undefined,
 			response_type: 'code',
 			automaticSilentRenew: true,
 			userStore: new WebStorageStateStore({ store: window.localStorage }),

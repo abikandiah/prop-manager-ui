@@ -8,10 +8,14 @@ export function OidcSignInForm() {
 
 	const handleSignIn = async () => {
 		setLoading(true)
-		await oidcManager?.signinRedirect({
-			state: { returnTo: window.location.pathname + window.location.search },
-		})
-		// Browser navigates away — loading stays true intentionally
+		try {
+			await oidcManager?.signinRedirect({
+				state: { returnTo: window.location.pathname + window.location.search },
+			})
+			// Browser navigates away — loading stays true intentionally
+		} catch {
+			setLoading(false)
+		}
 	}
 
 	return (

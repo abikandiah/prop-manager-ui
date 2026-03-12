@@ -12,6 +12,9 @@ export const oidcManager = config.oidcAuthority
 				config.oidcResource ? ` ${config.oidcResource}/access` : ''
 			}`,
 			resource: config.oidcResource || undefined,
+			extraTokenParams: config.oidcResource
+				? { resource: config.oidcResource }
+				: {},
 			prompt: 'consent',
 			response_type: 'code',
 			automaticSilentRenew: true,

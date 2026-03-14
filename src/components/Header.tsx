@@ -17,7 +17,7 @@ function Header() {
 
 	return (
 		<header className="header">
-			<BeeLogo>
+			<BeeLogo asChild>
 				<Link to={'/'}>
 					<span className="app-title hidden text-foreground sm:inline">
 						PropMange

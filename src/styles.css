@@ -3,7 +3,6 @@
 @plugin "@tailwindcss/typography";
 
 @import '@abumble/design-system/styles.css';
-@import '@abumble/design-system/themes/steel.css';
 @source "../node_modules/@abumble/design-system";
 
 /* Spinner indeterminate animation (arc grows/collapses while rotating) */
@@ -104,11 +103,6 @@
 	}
 }
 
-/* Override border-container to use theme border color in dark mode */
-@utility border-container {
-	@apply border border-border;
-}
-
 @utility metallic-panel {
 	background-color: var(--card);
 	background-image: linear-gradient(
@@ -140,7 +134,7 @@
 }
 
 .app-title {
-	@apply text-xl font-bold tracking-tight;
+	@apply text-xl font-bold tracking-tight ml-2;
 }
 
 .banner-background-image {

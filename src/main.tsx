@@ -1,10 +1,10 @@
+import { ThemeProvider } from '@abumble/design-system/themes'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { RouterProvider } from '@tanstack/react-router'
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { NetworkProvider } from './contexts/network.tsx'
-import { ThemeProvider } from './contexts/theme'
 import { globalClient } from './integrations/tanstack-query/globalClient.ts'
 import { router } from './integrations/tanstack-query/router.tsx'
 import reportWebVitals from './reportWebVitals'
@@ -19,7 +19,7 @@ if (rootElement && !rootElement.innerHTML) {
 			<ErrorBoundary>
 				<QueryClientProvider client={globalClient}>
 					<NetworkProvider>
-						<ThemeProvider>
+						<ThemeProvider defaultColorTheme="steel">
 							<RouterProvider
 								router={router}
 								context={{

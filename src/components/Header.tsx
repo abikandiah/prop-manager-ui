@@ -1,28 +1,29 @@
-import bee from '@/assets/bee.svg'
 import { useAuth } from '@/features/auth'
+import { BeeLogo } from '@abumble/design-system/components/BeeLogo'
 import { Button } from '@abumble/design-system/components/Button'
 import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
 } from '@abumble/design-system/components/Popover'
+import { ThemeToggle } from '@abumble/design-system/components/ThemeToggle'
 import { cn } from '@abumble/design-system/utils'
 import { Link, useRouterState } from '@tanstack/react-router'
-import { Bell, LogOut, Moon, Settings, Sun, UserRound } from 'lucide-react'
+import { Bell, LogOut, Settings, UserRound } from 'lucide-react'
 import { useState } from 'react'
-import { useTheme } from '../contexts/theme'
 
 function Header() {
 	const { isUserDefined } = useAuth()
 
 	return (
 		<header className="header">
-			<Link to={'/'} className="flex items-center gap-2">
-				<img className="h-8 w-8 shrink-0" src={bee} alt="Home Bee" />
-				<span className="app-title hidden text-foreground sm:inline">
-					PropMange
-				</span>
-			</Link>
+			<BeeLogo>
+				<Link to={'/'}>
+					<span className="app-title hidden text-foreground sm:inline">
+						PropMange
+					</span>
+				</Link>
+			</BeeLogo>
 
 			<div className="flex items-center gap-1 rounded-full">
 				<ThemeToggle />
@@ -48,24 +49,6 @@ function Header() {
 				)}
 			</div>
 		</header>
-	)
-}
-
-function ThemeToggle() {
-	const { setTheme, effectiveTheme } = useTheme()
-	const isDark = effectiveTheme === 'dark'
-	const toggle = () => setTheme(isDark ? 'light' : 'dark')
-	return (
-		<Button
-			type="button"
-			variant="ghost"
-			size="icon"
-			className="rounded-full"
-			aria-label={isDark ? 'Dark mode on' : 'Dark mode off'}
-			onClick={toggle}
-		>
-			{isDark ? <Moon className="size-5" /> : <Sun className="size-5" />}
-		</Button>
 	)
 }
 

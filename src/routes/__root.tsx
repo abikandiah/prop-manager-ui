@@ -54,7 +54,7 @@ function EnvironmentBannerEffect() {
 	const bannerIdRef = useRef<string | null>(null)
 
 	useEffect(() => {
-		// if (stringToBoolean(localStorage.getItem(DISCLAIMER_KEY))) return
+		if (stringToBoolean(localStorage.getItem(DISCLAIMER_KEY))) return
 
 		bannerIdRef.current = showBanner({
 			type: 'info',

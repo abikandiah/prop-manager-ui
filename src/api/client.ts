@@ -53,19 +53,17 @@ export const api = axios.create({
 
 // Request Interceptor: Dev token + OIDC token + org context injection
 api.interceptors.request.use(async (_config) => {
-	// Dev: attach Bearer token from localStorage
-	if (config.isDevelopment && _config.url !== '/dev/login') {
+	// OIDC: attach access token (skipped if expired — 401 response interceptor handles logout)
+	if (oidcManager) {
+		const user = await oidcManager.getUser()
+		if (user?.access_token && !user.expired) {
+			_config.headers['Authorization'] = `Bearer ${user.access_token}`
+		}
+	} else if (config.isDevelopment && _config.url !== '/dev/login') {
+		// Dev: attach Bearer token from localStorage
 		const token = getDevToken()
 		if (token) {
 			_config.headers['Authorization'] = `Bearer ${token}`
-		}
-	}
-
-	// Production: attach OIDC access token from oidc-client-ts (reads localStorage, fast)
-	if (!config.isDevelopment && oidcManager) {
-		const user = await oidcManager.getUser()
-		if (user?.access_token) {
-			_config.headers['Authorization'] = `Bearer ${user.access_token}`
 		}
 	}
 

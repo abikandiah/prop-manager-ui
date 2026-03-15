@@ -16,6 +16,7 @@ import { Route as PublicTermsRouteImport } from './routes/_public/terms'
 import { Route as PublicPrivacyRouteImport } from './routes/_public/privacy'
 import { Route as AuthInviteRouteImport } from './routes/_auth/invite'
 import { Route as AuthOrgRouteImport } from './routes/_auth/_org'
+import { Route as PublicAuthSilentCallbackRouteImport } from './routes/_public/auth.silent-callback'
 import { Route as PublicAuthCallbackRouteImport } from './routes/_public/auth.callback'
 import { Route as AuthInviteTokenRouteImport } from './routes/_auth/invite/$token'
 import { Route as AuthOrgDashboardRouteImport } from './routes/_auth/_org/_dashboard'
@@ -85,6 +86,12 @@ const AuthOrgRoute = AuthOrgRouteImport.update({
   id: '/_org',
   getParentRoute: () => AuthRoute,
 } as any)
+const PublicAuthSilentCallbackRoute =
+  PublicAuthSilentCallbackRouteImport.update({
+    id: '/auth/silent-callback',
+    path: '/auth/silent-callback',
+    getParentRoute: () => PublicRoute,
+  } as any)
 const PublicAuthCallbackRoute = PublicAuthCallbackRouteImport.update({
   id: '/auth/callback',
   path: '/auth/callback',
@@ -300,6 +307,7 @@ export interface FileRoutesByFullPath {
   '/terms': typeof PublicTermsRoute
   '/invite/$token': typeof AuthInviteTokenRoute
   '/auth/callback': typeof PublicAuthCallbackRoute
+  '/auth/silent-callback': typeof PublicAuthSilentCallbackRoute
   '/home': typeof AuthOrgDashboardHomeRoute
   '/settings/permission-policies': typeof AuthOrgDashboardSettingsPermissionPoliciesRoute
   '/settings/permission-templates': typeof AuthOrgDashboardSettingsPermissionTemplatesRoute
@@ -339,6 +347,7 @@ export interface FileRoutesByTo {
   '/terms': typeof PublicTermsRoute
   '/invite/$token': typeof AuthInviteTokenRoute
   '/auth/callback': typeof PublicAuthCallbackRoute
+  '/auth/silent-callback': typeof PublicAuthSilentCallbackRoute
   '/home': typeof AuthOrgDashboardHomeRoute
   '/settings/permission-policies': typeof AuthOrgDashboardSettingsPermissionPoliciesRoute
   '/settings/permission-templates': typeof AuthOrgDashboardSettingsPermissionTemplatesRoute
@@ -380,6 +389,7 @@ export interface FileRoutesById {
   '/_auth/_org/_dashboard': typeof AuthOrgDashboardRouteWithChildren
   '/_auth/invite/$token': typeof AuthInviteTokenRoute
   '/_public/auth/callback': typeof PublicAuthCallbackRoute
+  '/_public/auth/silent-callback': typeof PublicAuthSilentCallbackRoute
   '/_auth/_org/_dashboard/_manager': typeof AuthOrgDashboardManagerRouteWithChildren
   '/_auth/_org/_dashboard/_tenant': typeof AuthOrgDashboardTenantRouteWithChildren
   '/_auth/_org/_dashboard/home': typeof AuthOrgDashboardHomeRoute
@@ -423,6 +433,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/invite/$token'
     | '/auth/callback'
+    | '/auth/silent-callback'
     | '/home'
     | '/settings/permission-policies'
     | '/settings/permission-templates'
@@ -462,6 +473,7 @@ export interface FileRouteTypes {
     | '/terms'
     | '/invite/$token'
     | '/auth/callback'
+    | '/auth/silent-callback'
     | '/home'
     | '/settings/permission-policies'
     | '/settings/permission-templates'
@@ -502,6 +514,7 @@ export interface FileRouteTypes {
     | '/_auth/_org/_dashboard'
     | '/_auth/invite/$token'
     | '/_public/auth/callback'
+    | '/_public/auth/silent-callback'
     | '/_auth/_org/_dashboard/_manager'
     | '/_auth/_org/_dashboard/_tenant'
     | '/_auth/_org/_dashboard/home'
@@ -592,6 +605,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof AuthOrgRouteImport
       parentRoute: typeof AuthRoute
+    }
+    '/_public/auth/silent-callback': {
+      id: '/_public/auth/silent-callback'
+      path: '/auth/silent-callback'
+      fullPath: '/auth/silent-callback'
+      preLoaderRoute: typeof PublicAuthSilentCallbackRouteImport
+      parentRoute: typeof PublicRoute
     }
     '/_public/auth/callback': {
       id: '/_public/auth/callback'
@@ -1049,6 +1069,7 @@ interface PublicRouteChildren {
   PublicTermsRoute: typeof PublicTermsRoute
   PublicIndexRoute: typeof PublicIndexRoute
   PublicAuthCallbackRoute: typeof PublicAuthCallbackRoute
+  PublicAuthSilentCallbackRoute: typeof PublicAuthSilentCallbackRoute
 }
 
 const PublicRouteChildren: PublicRouteChildren = {
@@ -1056,6 +1077,7 @@ const PublicRouteChildren: PublicRouteChildren = {
   PublicTermsRoute: PublicTermsRoute,
   PublicIndexRoute: PublicIndexRoute,
   PublicAuthCallbackRoute: PublicAuthCallbackRoute,
+  PublicAuthSilentCallbackRoute: PublicAuthSilentCallbackRoute,
 }
 
 const PublicRouteWithChildren =

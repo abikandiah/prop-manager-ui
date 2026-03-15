@@ -1,10 +1,14 @@
 import { FormActions, FormCard } from '@/components/ui/FormCard'
 import { Button } from '@abumble/design-system/components/Button'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { oidcManager } from '../../oidc'
 
 export function OidcSignInForm() {
 	const [loading, setLoading] = useState(false)
+
+	useEffect(() => {
+		setLoading(false)
+	}, [])
 
 	const handleSignIn = async () => {
 		setLoading(true)

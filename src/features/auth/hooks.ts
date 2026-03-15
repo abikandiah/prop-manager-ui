@@ -55,7 +55,11 @@ export function useAuth() {
 					console.error('[Auth] Backend logout failed:', error)
 				}
 
-				if (!config.isDevelopment && oidcManager) {
+				// Capture id_token BEFORE removeUser() clears it — Logto requires id_token_hint for post-logout redirect
+				let idToken: string | null = null
+				if (oidcManager) {
+					const oidcUser = await oidcManager.getUser()
+					idToken = oidcUser?.id_token ?? null
 					await oidcManager.removeUser()
 				}
 
@@ -64,7 +68,6 @@ export function useAuth() {
 					userClient.clear()
 				}
 
-				console.log('[Auth] Clearing local DB for user:', user.id)
 				await clearUserDb(user.id)
 
 				if (config.isDevelopment) {
@@ -73,8 +76,21 @@ export function useAuth() {
 
 				// Clear /me from globalClient
 				globalClient.setQueryData(authQueryOptions.queryKey, undefined)
-				// Redirect to OIDC logout URL or home
-				window.location.href = logoutUrl || '/'
+				// Redirect to OIDC logout URL or home; append post_logout_redirect_uri so
+				// the provider returns the user to the app root after completing logout.
+				if (logoutUrl) {
+					const url = new URL(logoutUrl)
+					url.searchParams.set(
+						'post_logout_redirect_uri',
+						window.location.origin,
+					)
+					if (idToken) {
+						url.searchParams.set('id_token_hint', idToken)
+					}
+					window.location.href = url.toString()
+				} else {
+					window.location.href = '/'
+				}
 			}
 
 	return {

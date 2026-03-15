@@ -9,7 +9,9 @@ import type { User } from '@/domain/user'
 import { authQueryOptions, useAuth } from '@/features/auth'
 import { DevAuthForm } from '@/features/auth/components/forms/DevAuthForm'
 import { OidcSignInForm } from '@/features/auth/components/forms/OidcSignInForm'
+import { FormCard } from '@/components/ui/FormCard'
 import { RegisterForm } from '@/features/auth/components/forms/RegisterForm'
+import { oidcManager } from '@/features/auth/oidc'
 import * as TanStackQueryProvider from '@/integrations/tanstack-query/user-provider'
 import { onlineManager } from '@tanstack/react-query'
 import { createFileRoute, Outlet } from '@tanstack/react-router'
@@ -47,6 +49,14 @@ function RouteComponent() {
 
 	if (!user) {
 		if (!isOnline) return <NotConnectedPage />
+		if (oidcManager) {
+			return (
+				<BannerLandingPage>
+					<OidcSignInForm />
+				</BannerLandingPage>
+			)
+		}
+
 		if (config.isDevelopment) {
 			return (
 				<BannerLandingPage>
@@ -54,9 +64,13 @@ function RouteComponent() {
 				</BannerLandingPage>
 			)
 		}
+		// Misconfigured deployment: OIDC authority not set and not in dev mode
 		return (
 			<BannerLandingPage>
-				<OidcSignInForm />
+				<FormCard
+					title="Authentication unavailable"
+					description="This application is not configured for sign-in. Please contact your administrator."
+				/>
 			</BannerLandingPage>
 		)
 	}

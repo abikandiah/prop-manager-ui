@@ -5,7 +5,6 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@abumble/design-system/components/Card'
-import { cn } from '@abumble/design-system/utils'
 import type { ReactNode } from 'react'
 
 interface SectionCardProps {
@@ -34,7 +33,7 @@ export function SectionCard({
 	const hasHeader = !!title || !!description || !!actions
 
 	return (
-		<Card className={cn('metallic-panel', className)}>
+		<Card className={className}>
 			{hasHeader && (
 				<CardHeader className="flex flex-row items-center justify-between gap-4 space-y-0 border-b">
 					<div className="space-y-1">
@@ -52,7 +51,7 @@ export function SectionCard({
 					{actions && <div>{actions}</div>}
 				</CardHeader>
 			)}
-			<CardContent className={cn(contentClassName)}>{children}</CardContent>
+			<CardContent className={contentClassName}>{children}</CardContent>
 		</Card>
 	)
 }

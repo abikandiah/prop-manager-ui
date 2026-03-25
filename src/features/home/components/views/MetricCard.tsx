@@ -1,6 +1,5 @@
 import { Card, CardContent } from '@abumble/design-system/components/Card'
 import { Skeleton } from '@abumble/design-system/components/Skeleton'
-import { cn } from '@abumble/design-system/utils'
 import type { LucideIcon } from 'lucide-react'
 
 interface MetricCardProps {
@@ -21,7 +20,7 @@ export function MetricCard({
 	className,
 }: MetricCardProps) {
 	return (
-		<Card className={cn('metallic-panel', className)}>
+		<Card className={className}>
 			<CardContent className="flex flex-col gap-3">
 				<div className="flex items-center justify-between">
 					<span className="text-sm text-muted-foreground">{title}</span>

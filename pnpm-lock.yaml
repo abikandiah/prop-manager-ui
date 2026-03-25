@@ -19,8 +19,8 @@ importers:
   .:
     dependencies:
       '@abumble/design-system':
-        specifier: ^0.0.49
-        version: 0.0.49(346ff8304a6a3ce902d454afd7d81834)
+        specifier: ^0.0.50
+        version: 0.0.50(346ff8304a6a3ce902d454afd7d81834)
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.71.2(react@19.2.4))
@@ -154,8 +154,8 @@ importers:
 
 packages:
 
-  '@abumble/design-system@0.0.49':
-    resolution: {integrity: sha512-sYy139dhlzxj8tFYFTKULvHLYAb2aFiWdSj2HemPAh8jB82VjiM+ecegVJ0rJT8oO+xivLsYXwOuoEurCqTpOw==}
+  '@abumble/design-system@0.0.50':
+    resolution: {integrity: sha512-I9fCufrEguQJ7tNphSBWPZdUyo+xjH6zxUVv4Qw2wXApgbhQovfdWIyeygFOeZKsuahqaKgISruYOchQwchkuw==}
     peerDependencies:
       '@radix-ui/react-checkbox': ^1.3.2
       '@radix-ui/react-collapsible': ^1.1.12
@@ -3760,7 +3760,7 @@ packages:
 
 snapshots:
 
-  '@abumble/design-system@0.0.49(346ff8304a6a3ce902d454afd7d81834)':
+  '@abumble/design-system@0.0.50(346ff8304a6a3ce902d454afd7d81834)':
     dependencies:
       '@radix-ui/react-checkbox': 1.3.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
       '@radix-ui/react-collapsible': 1.1.12(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)

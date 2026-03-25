@@ -25,7 +25,7 @@ export function AddressFormFields() {
 	const addressErrors = errors.address
 
 	return (
-		<fieldset className="rounded border bg-muted/20 p-5">
+		<fieldset className="rounded border p-5">
 			<legend className="text-sm font-semibold text-foreground px-2 -mx-2">
 				Address
 			</legend>

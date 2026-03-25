@@ -17,6 +17,7 @@ import { useUnitsList } from '@/features/units'
 import { FORM_DIALOG_CLASS } from '@/lib/dialog'
 import { formatDate, formatDateTime } from '@/lib/format'
 import { useQueryErrorToast } from '@/lib/hooks'
+import { useCan } from '@/lib/permissions'
 import type { ActionItem } from '@abumble/design-system/components/ActionsPopover'
 import { ActionsPopover } from '@abumble/design-system/components/ActionsPopover'
 import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
@@ -209,6 +210,7 @@ export function MembershipDetailView({
 	const queryClient = useQueryClient()
 
 	const [addAssignmentOpen, setAddAssignmentOpen] = useState(false)
+	const canUpdateOrg = useCan('UPDATE', 'ORGANIZATION')
 
 	useQueryErrorToast(isError, error, 'membership')
 
@@ -390,10 +392,12 @@ export function MembershipDetailView({
 						title="Permissions & Assignments"
 						description="Controls what this member can access and do."
 						actions={
-							<Button size="sm" onClick={() => setAddAssignmentOpen(true)}>
-								<Plus className="size-4" />
-								Add
-							</Button>
+							canUpdateOrg ? (
+								<Button size="sm" onClick={() => setAddAssignmentOpen(true)}>
+									<Plus className="size-4" />
+									Add
+								</Button>
+							) : undefined
 						}
 					>
 						<DelayedLoadingFallback

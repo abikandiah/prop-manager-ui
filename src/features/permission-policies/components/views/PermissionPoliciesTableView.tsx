@@ -175,7 +175,7 @@ export function PermissionPoliciesTableView({
 													deleteDescription="This policy will be permanently removed. Assignments that used it will keep their current permissions."
 													stopTriggerPropagation
 													additionalItems={
-														isSystem
+														isSystem && canUpdate
 															? [
 																	{
 																		label: 'Duplicate',

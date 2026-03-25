@@ -16,7 +16,9 @@ import { FormDialog } from '@abumble/design-system/components/Dialog'
 import { LeaseAgreementFormWizard } from '../forms/LeaseAgreementFormWizard'
 import type { Lease } from '@/domain/lease'
 import { LeaseStatus } from '@/domain/lease'
+import { ResourceType } from '@/domain/policy-assignment'
 import { EntityActions, SectionCard, TableSkeleton } from '@/components/ui'
+import { useCan } from '@/lib/permissions'
 import {
 	leaseStatusVariant,
 	useDeleteLease,
@@ -37,11 +39,14 @@ function LeaseRowActions({
 }) {
 	const deleteLease = useDeleteLease()
 	const isDraft = lease.status === LeaseStatus.DRAFT
+	const canUpdate = useCan('UPDATE', 'LEASES', ResourceType.UNIT, lease.unitId, lease.propertyId)
+	const canDelete = useCan('DELETE', 'LEASES', ResourceType.UNIT, lease.unitId, lease.propertyId)
 
 	return (
 		<EntityActions
 			label="Lease actions"
-			onEdit={isDraft ? onEdit : undefined}
+			onEdit={canUpdate && isDraft ? onEdit : undefined}
+			disableDelete={!canDelete}
 			onDelete={() => {
 				deleteLease.mutate(
 					{ id: lease.id, unitId: lease.unitId, propertyId: lease.propertyId },

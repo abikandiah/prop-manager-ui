@@ -11,6 +11,7 @@ import type {
 import { PermissionMatrixEditor } from '@/features/permission-policies/components/PermissionMatrixEditor'
 import { usePermissionPolicies } from '@/features/permission-policies/hooks'
 import { FORM_DIALOG_CLASS } from '@/lib/dialog'
+import { useCan } from '@/lib/permissions'
 import { Badge } from '@abumble/design-system/components/Badge'
 import { Button } from '@abumble/design-system/components/Button'
 import { FormDialog } from '@abumble/design-system/components/Dialog'
@@ -34,6 +35,8 @@ export function AssignmentAccordionItem({
 	const { data: policies } = usePermissionPolicies(orgId)
 	const updateAssignment = useUpdatePolicyAssignment()
 	const deleteAssignment = useDeletePolicyAssignment()
+	const canUpdate = useCan('UPDATE', 'ORGANIZATION')
+	const canDelete = useCan('DELETE', 'ORGANIZATION')
 
 	const [editOpen, setEditOpen] = useState(false)
 
@@ -86,8 +89,9 @@ export function AssignmentAccordionItem({
 					>
 						<EntityActions
 							label="Assignment actions"
-							onEdit={hasOverrides ? () => setEditOpen(true) : false}
+							onEdit={hasOverrides && canUpdate ? () => setEditOpen(true) : false}
 							onDelete={handleDelete}
+							disableDelete={!canDelete}
 							isDeletePending={deleteAssignment.isPending}
 							deleteTitle="Remove assignment?"
 							deleteDescription="This will remove the permission assignment from this member."

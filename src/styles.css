@@ -192,38 +192,6 @@
 	opacity: 0.95;
 }
 
-:root {
-	--color-canopy: #0f172a;
-	--color-hive: #0ea5e9;
-	--color-parchment: #f1f5f9;
-
-	/* Chart palette — semantic (portfolio health) + categorical (unit mix) */
-	--chart-1: oklch(0.65 0.18 142); /* green  — OCCUPIED / good */
-	--chart-2: oklch(0.72 0.17 72); /* amber  — VACANT / neutral */
-	--chart-3: oklch(0.69 0.19 38); /* orange — NOTICE_GIVEN / warning */
-	--chart-4: oklch(0.55 0.2 25); /* red    — UNDER_MAINTENANCE / bad */
-	--chart-5: oklch(0.57 0.22 264); /* indigo — revenue bar / unit type 1 */
-	--chart-6: oklch(0.55 0.22 290); /* violet — unit type 2 */
-	--chart-7: oklch(0.62 0.2 314); /* pink   — unit type 3 */
-	--chart-8: oklch(0.62 0.2 340); /* rose   — unit type 4 */
-}
-
-.dark {
-	/* Brand palette — dark (Deep Steel & Electric) */
-	--color-canopy: #020617;
-	--color-hive: #38bdf8;
-	--color-parchment: #0f172a;
-
-	--chart-1: oklch(0.72 0.2 142);
-	--chart-2: oklch(0.78 0.18 72);
-	--chart-3: oklch(0.75 0.2 38);
-	--chart-4: oklch(0.65 0.22 25);
-	--chart-5: oklch(0.65 0.22 264);
-	--chart-6: oklch(0.63 0.22 290);
-	--chart-7: oklch(0.7 0.2 314);
-	--chart-8: oklch(0.7 0.2 340);
-}
-
 /* Expose brand tokens as Tailwind utilities */
 @theme inline {
 	--color-canopy: var(--color-canopy);

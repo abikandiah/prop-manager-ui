@@ -1,4 +1,4 @@
-import { useAuth } from '@/features/auth'
+import { useAuth, PermissionGate } from '@/features/auth'
 import { InviteMemberForm } from '@/features/invites/components/forms/InviteMemberForm'
 import { MembershipsTableView } from '@/features/memberships'
 import { FORM_DIALOG_CLASS, useDialogState } from '@/lib/dialog'
@@ -54,27 +54,29 @@ function RouteComponent() {
 			/>
 
 			<div>
-				<FormDialog
-					open={dialog.isOpen}
-					onOpenChange={dialog.setIsOpen}
-					title="Invite team member"
-					description="Send an invitation to join your organization."
-					className={FORM_DIALOG_CLASS}
-					trigger={
-						<DialogTrigger asChild>
-							<Button>
-								<UserPlus className="size-4" />
-								Invite member
-							</Button>
-						</DialogTrigger>
-					}
-				>
-					<InviteMemberForm
-						orgId={orgId}
-						onSuccess={dialog.close}
-						onCancel={dialog.close}
-					/>
-				</FormDialog>
+				<PermissionGate action="CREATE" domain="ORGANIZATION">
+					<FormDialog
+						open={dialog.isOpen}
+						onOpenChange={dialog.setIsOpen}
+						title="Invite team member"
+						description="Send an invitation to join your organization."
+						className={FORM_DIALOG_CLASS}
+						trigger={
+							<DialogTrigger asChild>
+								<Button>
+									<UserPlus className="size-4" />
+									Invite member
+								</Button>
+							</DialogTrigger>
+						}
+					>
+						<InviteMemberForm
+							orgId={orgId}
+							onSuccess={dialog.close}
+							onCancel={dialog.close}
+						/>
+					</FormDialog>
+				</PermissionGate>
 			</div>
 
 			<MembershipsTableView orgId={orgId} />

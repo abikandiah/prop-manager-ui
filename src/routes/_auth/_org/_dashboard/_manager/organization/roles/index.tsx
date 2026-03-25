@@ -1,4 +1,4 @@
-import { useAuth } from '@/features/auth'
+import { useAuth, PermissionGate } from '@/features/auth'
 import {
 	PermissionPoliciesTableView,
 	PermissionPolicyForm,
@@ -56,27 +56,29 @@ function RouteComponent() {
 			/>
 
 			<div>
-				<FormDialog
-					open={dialog.isOpen}
-					onOpenChange={dialog.setIsOpen}
-					title="Add role"
-					description="Create a reusable permission set for your team."
-					className={FORM_DIALOG_CLASS}
-					trigger={
-						<DialogTrigger asChild>
-							<Button>
-								<Plus className="size-4" />
-								Add role
-							</Button>
-						</DialogTrigger>
-					}
-				>
-					<PermissionPolicyForm
-						orgId={orgId}
-						onSuccess={dialog.close}
-						onCancel={dialog.close}
-					/>
-				</FormDialog>
+				<PermissionGate action="CREATE" domain="ORGANIZATION">
+					<FormDialog
+						open={dialog.isOpen}
+						onOpenChange={dialog.setIsOpen}
+						title="Add role"
+						description="Create a reusable permission set for your team."
+						className={FORM_DIALOG_CLASS}
+						trigger={
+							<DialogTrigger asChild>
+								<Button>
+									<Plus className="size-4" />
+									Add role
+								</Button>
+							</DialogTrigger>
+						}
+					>
+						<PermissionPolicyForm
+							orgId={orgId}
+							onSuccess={dialog.close}
+							onCancel={dialog.close}
+						/>
+					</FormDialog>
+				</PermissionGate>
 			</div>
 
 			<PermissionPoliciesTableView orgId={orgId} />

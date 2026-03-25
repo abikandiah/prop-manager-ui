@@ -9,6 +9,7 @@ import {
 import { config } from '@/config'
 import type { Lease } from '@/domain/lease'
 import { LateFeeType, LeaseStatus } from '@/domain/lease'
+import { ResourceType } from '@/domain/policy-assignment'
 import {
 	LeaseAgreementFormWizard,
 	LeaseTenantsList,
@@ -20,6 +21,7 @@ import {
 import { usePropDetail } from '@/features/props'
 import { useUnitDetail } from '@/features/units'
 import { formatCurrency, formatDate, formatEnumLabel } from '@/lib/format'
+import { useCan } from '@/lib/permissions'
 import { Badge } from '@abumble/design-system/components/Badge'
 import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
@@ -46,11 +48,25 @@ const WIZARD_STEP_TITLES: Record<1 | 2 | 3, string> = {
 function LeaseActions({ lease, onEdit }: { lease: Lease; onEdit: () => void }) {
 	const navigate = useNavigate()
 	const deleteLease = useDeleteLease()
+	const canUpdate = useCan(
+		'UPDATE',
+		'LEASES',
+		ResourceType.UNIT,
+		lease.unitId,
+		lease.propertyId,
+	)
+	const canDelete = useCan(
+		'DELETE',
+		'LEASES',
+		ResourceType.UNIT,
+		lease.unitId,
+		lease.propertyId,
+	)
 
 	return (
 		<EntityActions
 			label="Lease actions"
-			onEdit={lease.status === LeaseStatus.DRAFT ? onEdit : undefined}
+			onEdit={canUpdate && lease.status === LeaseStatus.DRAFT ? onEdit : undefined}
 			onDelete={() => {
 				deleteLease.mutate(
 					{ id: lease.id, unitId: lease.unitId, propertyId: lease.propertyId },
@@ -62,6 +78,7 @@ function LeaseActions({ lease, onEdit }: { lease: Lease; onEdit: () => void }) {
 					},
 				)
 			}}
+			disableDelete={!canDelete}
 			isDeletePending={deleteLease.isPending}
 			deleteTitle="Delete lease?"
 			deleteDescription="This lease will be permanently removed. This can't be undone."
@@ -275,6 +292,8 @@ function LeaseDetailPage() {
 							{/* Tenants */}
 							<LeaseTenantsList
 								leaseId={lease.id}
+								unitId={lease.unitId}
+								propertyId={lease.propertyId}
 								isDraft={lease.status === LeaseStatus.DRAFT}
 								isReview={lease.status === LeaseStatus.REVIEW}
 							/>

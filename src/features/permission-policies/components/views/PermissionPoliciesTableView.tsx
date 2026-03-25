@@ -4,6 +4,7 @@ import type { PermissionPolicy } from '@/domain/permission-policy'
 import { FORM_DIALOG_CLASS } from '@/lib/dialog'
 import { formatDate } from '@/lib/format'
 import { useQueryErrorToast } from '@/lib/hooks'
+import { useCan } from '@/lib/permissions'
 import { Badge } from '@abumble/design-system/components/Badge'
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
 import { FormDialog } from '@abumble/design-system/components/Dialog'
@@ -48,9 +49,8 @@ export function PermissionPoliciesTableView({
 	const deletePolicy = useDeletePermissionPolicy()
 	const [editing, setEditing] = useState<PermissionPolicy | null>(null)
 	const [duplicating, setDuplicating] = useState<PermissionPolicy | null>(null)
-
-	// TODO: Replace with permission-based check once application access is implemented
-	const isGlobalAdmin = false
+	const canUpdate = useCan('UPDATE', 'ORGANIZATION')
+	const canDelete = useCan('DELETE', 'ORGANIZATION')
 
 	useQueryErrorToast(isError, error as Error, 'policies')
 
@@ -140,7 +140,9 @@ export function PermissionPoliciesTableView({
 							) : (
 								policies.map((policy) => {
 									const isSystem = policy.orgId === null
-									const canMutate = !isSystem || isGlobalAdmin
+									// System policies are immutable; org policies require ORGANIZATION UPDATE/DELETE
+									const canEdit = !isSystem && canUpdate
+									const canDeletePolicy = !isSystem && canDelete
 									return (
 										<TableRow key={policy.id}>
 											<TableCell className="font-medium">
@@ -165,10 +167,10 @@ export function PermissionPoliciesTableView({
 											</TableCell>
 											<TableCell>
 												<EntityActions
-													onEdit={canMutate ? () => setEditing(policy) : false}
+													onEdit={canEdit ? () => setEditing(policy) : false}
 													onDelete={() => handleDelete(policy)}
 													isDeletePending={deletePolicy.isPending}
-													disableDelete={!canMutate}
+													disableDelete={!canDeletePolicy}
 													deleteTitle={`Delete "${policy.name}"?`}
 													deleteDescription="This policy will be permanently removed. Assignments that used it will keep their current permissions."
 													stopTriggerPropagation

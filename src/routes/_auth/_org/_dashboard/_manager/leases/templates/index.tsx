@@ -11,6 +11,7 @@ import {
 	LeaseTemplateFormWizard,
 	LeaseTemplatesTableView,
 } from '@/features/lease-templates'
+import { PermissionGate } from '@/features/auth'
 import { FORM_DIALOG_CLASS_WIDE, useWizardDialogState } from '@/lib/dialog'
 
 export const Route = createFileRoute(
@@ -37,35 +38,37 @@ function RouteComponent() {
 			/>
 
 			<div>
-				<FormDialog
-					open={wizard.isOpen}
-					onOpenChange={wizard.handleOpenChange}
-					title="Add lease template"
-					description="Create a new reusable lease template with standard terms."
-					className={FORM_DIALOG_CLASS_WIDE}
-					wizard={{
-						currentStep: wizard.step,
-						totalSteps: 3,
-						stepTitle: LEASE_TEMPLATE_WIZARD_STEPS[wizard.step],
-						stepLabels: ['Details', 'Parameters', 'Content'],
-					}}
-					trigger={
-						<DialogTrigger asChild>
-							<Button>
-								<Plus className="size-4" />
-								Add template
-							</Button>
-						</DialogTrigger>
-					}
-				>
-					<LeaseTemplateFormWizard
-						step={wizard.step}
-						onStepChange={wizard.setStep}
-						onSuccess={wizard.close}
-						onCancel={wizard.close}
-						submitLabel="Create Template"
-					/>
-				</FormDialog>
+				<PermissionGate action="CREATE" domain="LEASES">
+					<FormDialog
+						open={wizard.isOpen}
+						onOpenChange={wizard.handleOpenChange}
+						title="Add lease template"
+						description="Create a new reusable lease template with standard terms."
+						className={FORM_DIALOG_CLASS_WIDE}
+						wizard={{
+							currentStep: wizard.step,
+							totalSteps: 3,
+							stepTitle: LEASE_TEMPLATE_WIZARD_STEPS[wizard.step],
+							stepLabels: ['Details', 'Parameters', 'Content'],
+						}}
+						trigger={
+							<DialogTrigger asChild>
+								<Button>
+									<Plus className="size-4" />
+									Add template
+								</Button>
+							</DialogTrigger>
+						}
+					>
+						<LeaseTemplateFormWizard
+							step={wizard.step}
+							onStepChange={wizard.setStep}
+							onSuccess={wizard.close}
+							onCancel={wizard.close}
+							submitLabel="Create Template"
+						/>
+					</FormDialog>
+				</PermissionGate>
 			</div>
 
 			<LeaseTemplatesTableView />

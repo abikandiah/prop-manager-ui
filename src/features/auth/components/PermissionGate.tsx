@@ -7,6 +7,8 @@ interface PermissionGateProps {
 	domain: keyof typeof PermissionDomains
 	scopeType?: ResourceType
 	scopeId?: string
+	/** Parent property ID — required when scopeType is UNIT for hierarchy resolution. */
+	parentScopeId?: string
 	children: ReactNode
 	/** Rendered when access is denied. Defaults to null (hidden). */
 	fallback?: ReactNode
@@ -18,9 +20,10 @@ export function PermissionGate({
 	domain,
 	scopeType,
 	scopeId,
+	parentScopeId,
 	children,
 	fallback = null,
 }: PermissionGateProps) {
-	const allowed = useCan(action, domain, scopeType, scopeId)
+	const allowed = useCan(action, domain, scopeType, scopeId, parentScopeId)
 	return <>{allowed ? children : fallback}</>
 }

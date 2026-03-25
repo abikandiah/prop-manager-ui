@@ -3,12 +3,14 @@ import { config } from '@/config'
 import { useOrganization } from '@/contexts/organization'
 import type { LeaseTenant } from '@/domain/lease-tenant'
 import { LeaseTenantRole } from '@/domain/lease-tenant'
+import { ResourceType } from '@/domain/policy-assignment'
 import { InviteStatusBadge } from '@/features/invites/components/views/InviteStatusBadge'
 import { useResendInvite } from '@/features/invites/hooks'
 import { useLeaseTenants, useRemoveLeaseTenant } from '@/features/leases/hooks'
 import { leaseTenantKeys } from '@/features/leases/keys'
 import { FORM_DIALOG_CLASS, useDialogState } from '@/lib/dialog'
 import { formatDate, formatEnumLabel } from '@/lib/format'
+import { useCan } from '@/lib/permissions'
 import { ActionsPopover } from '@abumble/design-system/components/ActionsPopover'
 import { Badge } from '@abumble/design-system/components/Badge'
 import { Button } from '@abumble/design-system/components/Button'
@@ -88,6 +90,7 @@ function TenantsSkeleton({ showActions }: { showActions: boolean }) {
 interface TenantRowActionsProps {
 	tenant: LeaseTenant
 	leaseId: string
+	canManage: boolean
 	isDraft: boolean
 	/** True when the lease is in REVIEW (unsigned tenants can still be removed). */
 	isReview: boolean
@@ -96,6 +99,7 @@ interface TenantRowActionsProps {
 function TenantRowActions({
 	tenant,
 	leaseId,
+	canManage,
 	isDraft,
 	isReview,
 }: TenantRowActionsProps) {
@@ -105,8 +109,8 @@ function TenantRowActions({
 	const queryClient = useQueryClient()
 	const { activeOrgId } = useOrganization()
 
-	const canResend = tenant.status === 'INVITED'
-	const canRemove = (isDraft || isReview) && tenant.status !== 'SIGNED'
+	const canResend = canManage && tenant.status === 'INVITED'
+	const canRemove = canManage && (isDraft || isReview) && tenant.status !== 'SIGNED'
 
 	if (!canResend && !canRemove) return null
 
@@ -192,6 +196,8 @@ function TenantRowActions({
 
 export interface LeaseTenantListProps {
 	leaseId: string
+	unitId: string
+	propertyId: string
 	/** True for DRAFT leases — shows the "Invite tenants" button and enables removal. */
 	isDraft: boolean
 	/** True for REVIEW leases — enables removal of unsigned tenants only. */
@@ -210,11 +216,14 @@ const TABLE_COLS_WITH_ACTIONS = TABLE_COLS_BASE + 1
  */
 export function LeaseTenantsList({
 	leaseId,
+	unitId,
+	propertyId,
 	isDraft,
 	isReview = false,
 }: LeaseTenantListProps) {
 	const inviteDialog = useDialogState()
 	const { data: tenants = [], isLoading } = useLeaseTenants(leaseId)
+	const canManage = useCan('UPDATE', 'LEASES', ResourceType.UNIT, unitId, propertyId)
 
 	const hasActions =
 		isDraft || isReview || tenants.some((t) => t.status === 'INVITED')
@@ -225,7 +234,7 @@ export function LeaseTenantsList({
 			title="Tenants"
 			className="overflow-hidden"
 			actions={
-				isDraft && (
+				isDraft && canManage && (
 					<Button variant="outline" size="sm" onClick={inviteDialog.open}>
 						<UserPlus className="size-4" />
 						Invite tenants
@@ -292,6 +301,7 @@ export function LeaseTenantsList({
 										<TenantRowActions
 											tenant={tenant}
 											leaseId={leaseId}
+											canManage={canManage}
 											isDraft={isDraft}
 											isReview={isReview}
 										/>

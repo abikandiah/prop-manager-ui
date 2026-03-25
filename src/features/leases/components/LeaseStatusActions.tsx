@@ -12,6 +12,7 @@ import {
 } from '@abumble/design-system/components/Dialog'
 import type { Lease } from '@/domain/lease'
 import { LeaseStatus } from '@/domain/lease'
+import { ResourceType } from '@/domain/policy-assignment'
 import {
 	useActivateLease,
 	useEvictLease,
@@ -19,6 +20,7 @@ import {
 	useSubmitLeaseForReview,
 	useTerminateLease,
 } from '@/features/leases'
+import { useCan } from '@/lib/permissions'
 
 type ActionKey = 'submit' | 'activate' | 'revert' | 'terminate' | 'evict'
 
@@ -111,6 +113,13 @@ interface LeaseStatusActionsProps {
 
 export function LeaseStatusActions({ lease }: LeaseStatusActionsProps) {
 	const [confirmAction, setConfirmAction] = useState<ActionKey | null>(null)
+	const canUpdate = useCan(
+		'UPDATE',
+		'LEASES',
+		ResourceType.UNIT,
+		lease.unitId,
+		lease.propertyId,
+	)
 
 	const submitForReview = useSubmitLeaseForReview()
 	const activate = useActivateLease()
@@ -131,6 +140,8 @@ export function LeaseStatusActions({ lease }: LeaseStatusActionsProps) {
 		terminate,
 		evict,
 	}
+
+	if (!canUpdate) return null
 
 	const isPending = Object.values(mutations).some((m) => m.isPending)
 	const visibleActions = (

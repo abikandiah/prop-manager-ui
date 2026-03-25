@@ -26,13 +26,15 @@ function UnitRowActions({ unit, onEdit }: { unit: Unit; onEdit: () => void }) {
 	const canUpdate = useCan(
 		'UPDATE',
 		'PORTFOLIO',
-		ResourceType.PROPERTY,
+		ResourceType.UNIT,
+		unit.id,
 		unit.propertyId,
 	)
 	const canDelete = useCan(
 		'DELETE',
 		'PORTFOLIO',
-		ResourceType.PROPERTY,
+		ResourceType.UNIT,
+		unit.id,
 		unit.propertyId,
 	)
 

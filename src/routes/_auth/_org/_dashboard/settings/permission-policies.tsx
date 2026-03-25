@@ -11,6 +11,7 @@ import {
 	PermissionPolicyForm,
 	PermissionPoliciesTableView,
 } from '@/features/permission-policies'
+import { PermissionGate } from '@/features/auth'
 import { FORM_DIALOG_CLASS, useDialogState } from '@/lib/dialog'
 
 const searchSchema = z.object({
@@ -51,27 +52,29 @@ function RouteComponent() {
 			/>
 
 			<div>
-				<FormDialog
-					open={dialog.isOpen}
-					onOpenChange={dialog.setIsOpen}
-					title="Add permission policy"
-					description="Create a reusable permission set for your organization."
-					className={FORM_DIALOG_CLASS}
-					trigger={
-						<DialogTrigger asChild>
-							<Button>
-								<Plus className="size-4" />
-								Add policy
-							</Button>
-						</DialogTrigger>
-					}
-				>
-					<PermissionPolicyForm
-						orgId={orgId}
-						onSuccess={dialog.close}
-						onCancel={dialog.close}
-					/>
-				</FormDialog>
+				<PermissionGate action="CREATE" domain="ORGANIZATION">
+					<FormDialog
+						open={dialog.isOpen}
+						onOpenChange={dialog.setIsOpen}
+						title="Add permission policy"
+						description="Create a reusable permission set for your organization."
+						className={FORM_DIALOG_CLASS}
+						trigger={
+							<DialogTrigger asChild>
+								<Button>
+									<Plus className="size-4" />
+									Add policy
+								</Button>
+							</DialogTrigger>
+						}
+					>
+						<PermissionPolicyForm
+							orgId={orgId}
+							onSuccess={dialog.close}
+							onCancel={dialog.close}
+						/>
+					</FormDialog>
+				</PermissionGate>
 			</div>
 
 			<PermissionPoliciesTableView orgId={orgId} />

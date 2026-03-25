@@ -31,32 +31,47 @@ export type AccessEntry = {
 	permissions: Record<string, number>
 }
 
-/** Returns true if the access list grants the action on the given scope+domain. */
-export function can(
+type ScopeStep = { scopeType: ResourceType; scopeId: string }
+
+/**
+ * Walks the scope chain with first-match-wins semantics (mirrors backend HierarchyAwareAuthorizationService).
+ * The first scope level that has an assignment entry determines the result — no fallback once an entry is found.
+ */
+function canWithChain(
 	access: AccessEntry[],
 	action: number,
 	domain: string,
-	scopeType: ResourceType,
-	scopeId: string,
+	chain: ScopeStep[],
 ): boolean {
 	if (access.length === 0) return false
-	const entry = access.find(
-		(e) => e.scopeType === scopeType && e.scopeId === scopeId,
-	)
-	if (!entry) return false
-	return hasAccess(entry.permissions[domain] ?? 0, action)
+	for (const scope of chain) {
+		const entry = access.find(
+			(e) => e.scopeType === scope.scopeType && e.scopeId === scope.scopeId,
+		)
+		if (entry !== undefined) {
+			return hasAccess(entry.permissions[domain] ?? 0, action)
+		}
+	}
+	return false
 }
 
 /**
  * Hook for permission checks. ADMIN short-circuits to true (UX only — backend enforces via @PreAuthorize).
- * Defaults to ORG scope using activeOrgId when scopeId is omitted.
- * Returns false while user is loading or when required scopeId is missing.
+ *
+ * Implements hierarchy: UNIT → PROPERTY → ORG (first-match-wins, mirrors backend).
+ * - UNIT scope: chain is [(UNIT, scopeId), (PROPERTY, parentScopeId), (ORG, activeOrgId)]
+ * - PROPERTY scope: chain is [(PROPERTY, scopeId), (ORG, activeOrgId)]
+ * - ORG scope: chain is [(ORG, activeOrgId)]
+ *
+ * @param scopeId - The resource ID. Ignored when scopeType is ORG (activeOrgId is always used).
+ * @param parentScopeId - The parent property ID when scopeType is UNIT.
  */
 export function useCan(
 	action: keyof typeof Actions,
 	domain: keyof typeof PermissionDomains,
 	scopeType: ResourceType = ResourceType.ORG,
 	scopeId?: string,
+	parentScopeId?: string,
 ): boolean {
 	const { user } = useAuth()
 	const { activeOrgId } = useOrganization()
@@ -65,18 +80,30 @@ export function useCan(
 
 	if (user.roles.includes(AppRole.ADMIN)) return true
 
-	let targetId = scopeId
-	if (!targetId && scopeType === ResourceType.ORG) {
-		targetId = activeOrgId ?? undefined
+	const orgStep: ScopeStep | null = activeOrgId
+		? { scopeType: ResourceType.ORG, scopeId: activeOrgId }
+		: null
+
+	const chain: ScopeStep[] = []
+
+	if (scopeType !== ResourceType.ORG && scopeId) {
+		chain.push({ scopeType, scopeId })
 	}
 
-	if (!targetId) return false
+	if (scopeType === ResourceType.UNIT && parentScopeId) {
+		chain.push({ scopeType: ResourceType.PROPERTY, scopeId: parentScopeId })
+	}
 
-	return can(
+	if (orgStep) {
+		chain.push(orgStep)
+	}
+
+	if (chain.length === 0) return false
+
+	return canWithChain(
 		user.access,
 		Actions[action],
 		PermissionDomains[domain],
-		scopeType,
-		targetId,
+		chain,
 	)
 }

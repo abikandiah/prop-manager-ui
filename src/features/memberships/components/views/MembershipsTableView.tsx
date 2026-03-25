@@ -22,6 +22,7 @@ import {
 } from '@/features/memberships/hooks'
 import { membershipKeys } from '@/features/memberships/keys'
 import { useQueryErrorToast } from '@/lib/hooks'
+import { useCan } from '@/lib/permissions'
 import { config } from '@/config'
 import { SectionCard, TableSkeleton } from '@/components/ui'
 import { InviteStatusBadge } from '@/features/invites/components/views/InviteStatusBadge'
@@ -189,13 +190,15 @@ function MemberRowActions({
 	const resendInvite = useResendInvite()
 	const deleteMembership = useDeleteMembership()
 	const queryClient = useQueryClient()
+	const canUpdate = useCan('UPDATE', 'ORGANIZATION')
+	const canDelete = useCan('DELETE', 'ORGANIZATION')
 
 	const hasPendingInvite =
 		membership.inviteStatus === InviteStatus.PENDING ||
 		membership.inviteStatus === InviteStatus.EXPIRED
-	const canResend = hasPendingInvite
-	const canRevoke = hasPendingInvite
-	const canRemove = !!membership.userId
+	const canResend = canUpdate && hasPendingInvite
+	const canRevoke = canDelete && hasPendingInvite
+	const canRemove = canDelete && !!membership.userId
 
 	if (!canResend && !canRemove) return null
 

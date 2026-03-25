@@ -7,6 +7,7 @@ import {
 } from '@/components/ui'
 import { config } from '@/config'
 import type { Prop } from '@/domain/property'
+import { ResourceType } from '@/domain/policy-assignment'
 import {
 	AddressDisplay,
 	PropsForm,
@@ -15,6 +16,7 @@ import {
 } from '@/features/props'
 import { formatAddress, formatDate, formatEnumLabel } from '@/lib/format'
 import { FORM_DIALOG_CLASS, useEditDialogState } from '@/lib/dialog'
+import { useCan } from '@/lib/permissions'
 import { BannerHeader } from '@abumble/design-system/components/BannerHeader'
 import { DelayedLoadingFallback } from '@abumble/design-system/components/DelayedLoadingFallback'
 import { FormDialog } from '@abumble/design-system/components/Dialog'
@@ -32,11 +34,13 @@ export const Route = createFileRoute(
 function PropActions({ prop, onEdit }: { prop: Prop; onEdit: () => void }) {
 	const navigate = useNavigate()
 	const deleteProp = useDeleteProp()
+	const canUpdate = useCan('UPDATE', 'PORTFOLIO', ResourceType.PROPERTY, prop.id)
+	const canDelete = useCan('DELETE', 'PORTFOLIO', ResourceType.PROPERTY, prop.id)
 
 	return (
 		<EntityActions
 			label="Property actions"
-			onEdit={onEdit}
+			onEdit={canUpdate ? onEdit : undefined}
 			onDelete={() => {
 				deleteProp.mutate(prop.id, {
 					onSuccess: () => {
@@ -45,6 +49,7 @@ function PropActions({ prop, onEdit }: { prop: Prop; onEdit: () => void }) {
 					},
 				})
 			}}
+			disableDelete={!canDelete}
 			isDeletePending={deleteProp.isPending}
 			deleteTitle="Delete property?"
 			deleteDescription={
